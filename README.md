@@ -1,320 +1,149 @@
-# Sylang Language Support for VSCode
+# Sylang Language Support
 
-A comprehensive VSCode extension providing language support for **Sylang** - a domain-specific language for Product Line Engineering in automotive systems.
+[![Version](https://img.shields.io/vscode-marketplace/v/balaji-embedcentrum.sylang-language-support.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang-language-support)
+[![Downloads](https://img.shields.io/vscode-marketplace/d/balaji-embedcentrum.sylang-language-support.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang-language-support)
+[![Rating](https://img.shields.io/vscode-marketplace/r/balaji-embedcentrum.sylang-language-support.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang-language-support)
 
-## 🚀 Features
+Professional IDE support for **Sylang DSL** - A complete Product Line Engineering toolkit for automotive safety & security development.
 
-### ✅ **Multi-File Type Support**
-- **Product Lines** (`.ple`) - Define product families and variants
-- **Functions** (`.fun`) - System function definitions
-- **Features** (`.fml`) - Feature modeling with variability
-- **Safety** (`.itm`, `.sgl`, `.haz`, `.rsk`, `.fsr`) - Safety analysis and requirements
-- **Security** (`.tra`, `.thr`, `.sgo`, `.sre`, `.ast`, `.sec`) - Security analysis and requirements
+## 🚀 **Features**
 
-### ✅ **Language Server Protocol (LSP)**
-- Real-time syntax validation
-- Intelligent auto-completion
-- Hover documentation
-- Error diagnostics
+### **Universal Language Support**
+- **22 Sylang file extensions** with full IDE features
+- **Syntax highlighting** for all domains: Safety, Security, Components, Software, Electronics, Mechanics
+- **Auto-completion** with domain-specific keywords and snippets
+- **Real-time validation** with intelligent error detection
 
-### ✅ **Syntax Highlighting**
-- Keywords highlighting (`productline`, `function`, `feature`, etc.)
-- Safety levels (`ASIL-A`, `ASIL-B`, `ASIL-C`, `ASIL-D`, `QM`)
-- Variability types (`mandatory`, `optional`, `alternative`, `or`)
-- String literals and comments
+### **Cross-File Navigation**
+- **Go to Definition (F12)** - Jump to actual symbol definitions across files
+- **Find All References (Shift+F12)** - Locate all usages throughout workspace  
+- **Workspace-wide symbol indexing** with progress feedback
+- **Smart identifier recognition** for components, requirements, hazards, goals
 
-### ✅ **IntelliSense & Auto-completion**
-- Context-aware suggestions
-- Code snippets for common patterns
-- Safety level suggestions
-- Property auto-completion
+### **Domain Expertise**
+- **Automotive Safety**: ASIL levels, functional safety requirements, hazard analysis
+- **Cybersecurity**: TARA, threat modeling, security goals  
+- **Component Architecture**: Subsystems, interfaces, dependencies
+- **Software Engineering**: Modules, algorithms, services, timing analysis
+- **Electronics Design**: Circuits, PCBs, signal integrity, power management
+- **Mechanical Design**: Assemblies, materials, tolerances, actuators
 
-### ✅ **Code Snippets**
-- **Product Line templates** - Complete product line definitions
-- **Function templates** - System function patterns
-- **Feature templates** - Feature model structures
-- **Safety templates** - Safety goals, hazards, risks
-- **Security templates** - Threats, assets, requirements
+## 📋 **Supported File Types**
 
-### ✅ **Validation & Diagnostics**
-- Syntax error detection
-- Safety level validation
-- Feature variability type checking
-- Indentation consistency
-- Required field validation
+| Domain | Extensions | Description |
+|--------|------------|-------------|
+| **Product Line** | `.ple` | Product line definitions and configurations |
+| **Functions** | `.fun`, `.fma` | System functions and functional models |
+| **Features** | `.fml` | Feature models with variability |
+| **Safety** | `.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm` | Safety goals, hazards, risks, requirements |
+| **Security** | `.sgo`, `.ast`, `.sec`, `.tra`, `.thr`, `.sre` | Security goals, assets, threats |
+| **Components** | `.cmp`, `.sub`, `.req` | Components, subsystems, requirements |
+| **Software** | `.mod`, `.prt` | Software modules and parts |
+| **Electronics** | `.ckt` | Electronic circuits and designs |
+| **Mechanics** | `.asm` | Mechanical assemblies and components |
 
-### ✅ **Formatting**
-- Automatic code formatting
-- Consistent indentation
-- Structure beautification
+## 🎯 **Quick Start**
 
-## 📦 Installation
+### **Installation**
+1. Open VS Code
+2. Go to Extensions (Ctrl+Shift+X)
+3. Search for "Sylang Language Support"
+4. Click Install
 
-### Method 1: From VSIX (Recommended)
-1. Download the `.vsix` file from releases
-2. Open VSCode
-3. Press `Ctrl+Shift+P` (Cmd+Shift+P on Mac)
-4. Type "Extensions: Install from VSIX"
-5. Select the downloaded `.vsix` file
+### **Usage**
+1. **Open any Sylang file** - Automatic language detection and syntax highlighting
+2. **Start typing** - IntelliSense provides auto-completion
+3. **Use F12** - Navigate to definitions across files
+4. **Press Shift+F12** - Find all references in workspace
+5. **Check Problems panel** - Real-time validation and error detection
 
-### Method 2: Development Installation
-```bash
-# Clone the repository
-git clone <repo-url>
-cd sylang-extn
-
-# Install dependencies
-npm install
-
-# Compile the extension
-npm run compile
-
-# Open in VSCode
-code .
-
-# Press F5 to launch Extension Development Host
-```
-
-## 🎯 Quick Start
-
-### 1. Create a Product Line File
-Create a new file with `.ple` extension:
-
-```sylang
-productline ElectricParkingBrakeSystem
-  description "A family of electronic parking brake systems for automotive applications"
-  owner "Chassis Team", "Braking Systems Group"
-  domain "automotive", "safety"
-  compliance "ISO 26262", "ASPICE"
-  safetylevel ASIL-D
-  region "Global", "Europe", "North America"
-```
-
-### 2. Define System Functions
-Create a `.fun` file:
-
-```sylang
-systemfunctions EPBFunctions
-    function CoreSystemOrchestrator
-        name "Core System Orchestrator"
-        description "Main orchestration engine for the entire EPB system"
-        owner "Systems Engineering"
-        safetylevel ASIL-D
-        enables EPBSystem
-```
-
-### 3. Model Features
-Create a `.fml` file:
-
-```sylang
-systemfeatures EPBFeatures
-  feature EPBSystem mandatory
-    name "EPB System"
-    description "The root feature for the entire Electric Parking Brake system"
-    safetylevel ASIL-D
-
-    feature UserInterface mandatory
-      name "User Interface"
-      description "Driver interaction with the EPB system"
-      safetylevel ASIL-B
-
-      feature SwitchType alternative
-        name "Switch Type"
-        description "Physical switch type (exactly one must be chosen)"
-        
-        feature PushPullSwitch alternative
-          name "Push-Pull Switch"
-          description "Push to release, pull to apply"
-          
-        feature RockerSwitch alternative
-          name "Rocker Switch"
-          description "Rocker-style switch for apply/release"
-```
-
-## 🔧 Configuration
-
-The extension can be configured through VSCode settings:
+## 🔧 **Configuration**
 
 ```json
 {
-  "sylang.lsp.enabled": true,
-  "sylang.validation.enabled": true,
-  "sylang.treeSitter.enabled": true
+  "sylang.lsp.enabled": true,           // Enable Language Server Protocol
+  "sylang.validation.enabled": true,    // Enable real-time validation  
+  "sylang.treeSitter.enabled": true     // Use Tree-sitter for highlighting
 }
 ```
 
-### Available Settings:
-- `sylang.lsp.enabled` - Enable/disable Language Server Protocol
-- `sylang.validation.enabled` - Enable/disable real-time validation
-- `sylang.treeSitter.enabled` - Enable/disable Tree-sitter syntax highlighting
+## 📝 **Example Usage**
 
-## 📝 Supported File Types
-
-| Extension | Language Type | Description |
-|-----------|---------------|-------------|
-| `.ple` | Product Line | Product line definitions and variants |
-| `.fun` | Functions | System function specifications |
-| `.fml` | Features | Feature models with variability |
-| `.itm` | Safety Items | Safety item definitions |
-| `.sgl` | Safety Goals | Safety goal specifications |
-| `.haz` | Hazards | Hazard analysis and assessment |
-| `.rsk` | Risk | Risk assessment and analysis |
-| `.fsr` | Safety Requirements | Functional safety requirements |
-| `.tra` | TARA | Threat Assessment and Risk Analysis |
-| `.thr` | Threats | Security threat definitions |
-| `.sgo` | Security Goals | Security goal specifications |
-| `.sre` | Security Requirements | Security requirements |
-| `.ast` | Assets | Security asset definitions |
-| `.sec` | Security | General security specifications |
-
-## 🏗️ Modular Architecture
-
-This extension is designed with modularity in mind, making it easy to extend for other DSLs:
-
-### Core Components:
-- **Language Providers** - Modular providers for completion, hover, validation
-- **LSP Server** - Extensible Language Server Protocol implementation
-- **Grammar System** - TextMate grammars for syntax highlighting
-- **Snippet System** - Organized snippet collections per language type
-- **Validation Engine** - Pluggable validation rules
-
-### Adding New DSLs:
-```typescript
-// Easy extension for new languages
-const newDSLConfig = {
-  languageId: 'my-dsl',
-  keywords: ['keyword1', 'keyword2'],
-  fileExtensions: ['.mydsl'],
-  validators: [myCustomValidator]
-};
-
-LanguageProviderFactory.registerNewDSL(
-  newDSLConfig.languageId,
-  newDSLConfig.keywords,
-  newDSLConfig.fileExtensions,
-  newDSLConfig.validators
-);
-```
-
-## 🔥 Performance Features
-
-- **Incremental compilation** for fast development
-- **Lazy loading** of language features
-- **Efficient grammar parsing** with TextMate
-- **Optimized LSP communication** with minimal overhead
-- **Modular provider system** for scalability
-
-## 🎨 Syntax Highlighting Examples
-
-### Product Line
+### **Safety Goals (.sgl)**
 ```sylang
-productline MyProductLine  // Keyword highlighting
-  description "Product description"  // String highlighting
-  safetylevel ASIL-D  // Safety level highlighting
-  // Comment highlighting
+safetygoal SG_EPB_001
+  name "Prevent Unintended Activation"
+  description "EPB shall not activate without driver command"
+  safetylevel ASIL-C
+  allocatedto ActuationControlSubsystem, HMIControlSubsystem
+  derivedfrom FSR_EPB_014, FSR_EPB_027
 ```
 
-### Features with Variability
+### **Component Definition (.cmp)**
 ```sylang
-systemfeatures MyFeatures
-  feature RootFeature mandatory    // Variability type highlighting
-    feature Option1 alternative    // Alternative highlighting
-    feature Option2 alternative    // Alternative highlighting
-    feature OptionalFeature optional  // Optional highlighting
+component ActuatorManagementUnit
+  description "Controls actuator motor and position feedback"
+  safetylevel ASIL-C
+  
+  interfaces
+    interface MotorControl
+      type Digital
+      direction Output
+      protocol SPI
+      voltage 3.3V
 ```
 
-### Safety Elements
+### **Hazard Analysis (.haz)**
 ```sylang
-hazard BrakingFailure
-  severity S3        // Safety parameter highlighting
-  probability E4     // Safety parameter highlighting
-  safetylevel ASIL-D // Safety level highlighting
+hazard H_ACT_001
+  name "Actuator Motor Runaway"
+  description "Motor continues running beyond commanded position"
+  cause "Motor controller failure, position feedback loss"
+  effect "Excessive clamping force, potential component damage"
+  category UnintendedActivation
+  functions_affected "MotorDriveController", "ActuatorPositionTracker"
 ```
 
-## 🚧 Commands
+## ✨ **Key Benefits**
 
-The extension provides several commands accessible via the Command Palette (`Ctrl+Shift+P`):
+- **🎯 Professional IDE Experience** - IntelliSense, validation, navigation
+- **🔍 Cross-File Navigation** - F12 and Shift+F12 work across entire workspace
+- **⚡ Real-Time Feedback** - Instant validation with intelligent error detection
+- **🏗️ Domain Expertise** - Automotive-specific keywords and validation rules
+- **📊 Workspace Indexing** - Progress feedback and comprehensive symbol tracking
+- **🔧 Zero Configuration** - Works out of the box with intelligent defaults
 
-- **Sylang: Validate File** - Manually validate current Sylang file
-- **Sylang: Format File** - Format current Sylang file
-- **Sylang: Show Language Info** - Display language information
+## 🛠️ **Development**
 
-## 🔍 Validation Rules
+### **Requirements**
+- VS Code 1.74.0 or higher
+- Node.js 16+ for development
 
-The extension validates:
-- ✅ **Safety Levels** - Must be valid ASIL-A/B/C/D or QM
-- ✅ **Feature Variability** - Features must specify variability type
-- ✅ **String Formatting** - Proper quotation marks for string values
-- ✅ **Indentation** - Consistent 2-space indentation
-- ✅ **Required Fields** - Essential properties for each element type
-- ✅ **Syntax Structure** - Valid keyword usage and structure
-
-## 📚 Documentation
-
-### Safety Levels (ISO 26262)
-- **ASIL-D** - Highest integrity level (life-threatening risks)
-- **ASIL-C** - High integrity level (severe risks)
-- **ASIL-B** - Medium integrity level (moderate risks) 
-- **ASIL-A** - Low integrity level (minor risks)
-- **QM** - Quality Management (no ASIL classification)
-
-### Feature Variability Types
-- **mandatory** - Must be present in all variants
-- **optional** - May or may not be present
-- **alternative** - Exactly one from the group must be selected
-- **or** - At least one from the group must be selected
-
-## 🛠️ Development
-
-### Prerequisites
-- Node.js 16+ 
-- VSCode 1.74+
-- TypeScript 4.9+
-
-### Build Commands
+### **Building from Source**
 ```bash
-npm install          # Install dependencies
-npm run compile      # Compile TypeScript
-npm run watch        # Watch for changes
-npm run package      # Create VSIX package
+git clone https://github.com/balaji-embedcentrum/sylang.git
+cd sylang
+npm install
+npm run compile
+code --install-extension sylang-language-support-*.vsix
 ```
 
-### Testing
-```bash
-npm test            # Run unit tests
-npm run integration # Run integration tests
-```
+## 🤝 **Contributing**
 
-## 📄 License
+We welcome contributions! Please see our [Contributing Guide](https://github.com/balaji-embedcentrum/sylang/blob/main/CONTRIBUTING.md) for details.
+
+### **Reporting Issues**
+- [Bug Reports](https://github.com/balaji-embedcentrum/sylang/issues/new?template=bug_report.md)
+- [Feature Requests](https://github.com/balaji-embedcentrum/sylang/issues/new?template=feature_request.md)
+
+## 📄 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## 🏢 **About**
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Guidelines:
-1. Follow the modular architecture patterns
-2. Add tests for new features
-3. Update documentation
-4. Ensure compatibility with existing file types
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](link-to-issues)
-- **Documentation**: [Wiki](link-to-wiki)
-- **Discussions**: [GitHub Discussions](link-to-discussions)
-
-## 🎯 Future Enhancements
-
-- [ ] Tree-sitter grammar implementation
-- [ ] Real-time collaboration features
-- [ ] Visual feature model diagrams
-- [ ] Export to other formats (JSON, XML)
-- [ ] Integration with automotive toolchains
-- [ ] Advanced refactoring tools
-- [ ] Code generation capabilities
+Developed by [Embed Centrum](https://github.com/balaji-embedcentrum) for professional automotive software development teams working with Product Line Engineering, Functional Safety, and Cybersecurity.
 
 ---
 
-**Made with ❤️ for the automotive software engineering community** 
+**⭐ If this extension helps your development workflow, please consider giving it a star on [GitHub](https://github.com/balaji-embedcentrum/sylang)!** 

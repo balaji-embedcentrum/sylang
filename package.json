@@ -1,12 +1,16 @@
 {
   "name": "sylang-language-support",
   "displayName": "Sylang Language Support",
-  "description": "Comprehensive language support for Sylang DSL - Product Line Engineering with LSP and Tree-sitter",
-  "version": "0.1.0",
-  "publisher": "sylang-team",
+  "description": "Professional IDE support for Sylang DSL - Complete Product Line Engineering toolkit with syntax highlighting, validation, cross-file navigation, and IntelliSense for automotive safety & security",
+  "version": "1.0.0",
+  "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sylang-team/sylang-extension"
+    "url": "https://github.com/balaji-embedcentrum/sylang.git"
+  },
+  "homepage": "https://github.com/balaji-embedcentrum/sylang",
+  "bugs": {
+    "url": "https://github.com/balaji-embedcentrum/sylang/issues"
   },
   "license": "MIT",
   "engines": {
@@ -15,16 +19,29 @@
   "categories": [
     "Programming Languages",
     "Linters",
-    "Snippets"
+    "Snippets",
+    "Other"
   ],
   "keywords": [
     "sylang",
-    "product-line",
+    "product-line-engineering",
     "automotive",
-    "dsl",
     "safety",
-    "security"
+    "security",
+    "dsl",
+    "language-server",
+    "asil",
+    "functional-safety",
+    "cybersecurity",
+    "requirements",
+    "components",
+    "embedded-systems"
   ],
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "icon": "icon.png",
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
