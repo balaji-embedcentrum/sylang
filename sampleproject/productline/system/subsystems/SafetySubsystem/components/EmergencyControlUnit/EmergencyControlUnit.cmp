@@ -1,0 +1,47 @@
+component EmergencyControlUnit
+  name "Emergency Control Unit"
+  description "Component responsible for emergency detection, manual release control, and safety shutdown procedures"
+  owner "Safety Team"
+  tags "emergency", "manual", "release", "interlock", "shutdown", "failsafe"
+  safetylevel ASIL-B
+  aggregatedby SafetySubsystem
+  
+  interfaces
+    interface Emergency_Detection_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Manual_Release_Interface
+      type Digital
+      voltage "24V"
+      safety_level ASIL-B
+      direction Bidirectional
+      
+    interface Safety_Interlock_Control
+      type Digital
+      safety_level ASIL-B
+      direction Output
+      
+    interface Emergency_Shutdown_Output
+      type Digital
+      safety_level ASIL-B
+      response_time "10ms"
+      direction Output
+      
+    interface Violation_Alert_Output
+      type Digital
+      priority "Critical"
+      direction Output
+      
+    interface Failsafe_State_Output
+      type Digital
+      safety_level ASIL-B
+      direction Output
+      
+    interface Notification_Interface
+      type Communication
+      protocol "CAN 2.0B"
+      direction Output
+      
+  implements EmergencyDetectionLogic, ManualReleaseController, SafetyInterlockManager, EmergencyShutdownController, SafetyViolationDetector, FailsafeStateController, EmergencyNotificationManager 

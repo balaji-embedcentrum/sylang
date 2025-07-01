@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Features",
+  "scopeName": "source.sylang.features",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#keywords" },
+    { "include": "#variability" },
+    { "include": "#strings" },
+    { "include": "#safety-levels" },
+    { "include": "#attributes" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sylang",
+          "begin": "//",
+          "end": "$"
+        },
+        {
+          "name": "comment.block.sylang",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.sylang",
+          "match": "\\b(systemfeatures|feature)\\b"
+        },
+        {
+          "name": "keyword.other.sylang",
+          "match": "\\b(name|description|owner|tags)\\b"
+        }
+      ]
+    },
+    "variability": {
+      "patterns": [
+        {
+          "name": "keyword.other.variability.sylang",
+          "match": "\\b(mandatory|optional|alternative|or)\\b"
+        }
+      ]
+    },
+    "safety-levels": {
+      "patterns": [
+        {
+          "name": "constant.language.safety-level.sylang",
+          "match": "\\b(ASIL-[ABCD]|QM)\\b"
+        },
+        {
+          "name": "keyword.other.safety.sylang",
+          "match": "\\b(safetylevel)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.sylang",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.sylang",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.sylang",
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*[\":])"
+        }
+      ]
+    }
+  }
+} 

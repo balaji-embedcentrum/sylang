@@ -1,0 +1,40 @@
+component ProtocolManagementUnit
+  name "Protocol Management Unit"
+  description "Component responsible for communication protocol management, security, and network coordination"
+  owner "Diagnostics Team"
+  tags "protocol", "security", "network", "communication", "management"
+  safetylevel ASIL-C
+  aggregatedby CommunicationSubsystem
+  
+  interfaces
+    interface CAN_Bus_Interface
+      type Communication
+      protocol "CAN 2.0B"
+      direction Bidirectional
+      
+    interface Ethernet_Interface
+      type Communication
+      protocol "100BASE-TX"
+      direction Bidirectional
+      
+    interface Security_Key_Input
+      type Digital
+      encryption "AES-256"
+      direction Input
+      
+    interface Message_Queue_Status
+      type Digital
+      protocol "Internal"
+      direction Output
+      
+    interface Network_Health_Status
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Diagnostic_Port
+      type Communication
+      protocol "ISO 14229 UDS"
+      direction Bidirectional
+      
+  implements ProtocolStackManager, CommSecurityManager, MessageQueueManager, NetworkConnectionManager, ErrorCorrectionProcessor, CommLatencyOptimizer, CommHealthMonitor, CommDiagnosticAgent 

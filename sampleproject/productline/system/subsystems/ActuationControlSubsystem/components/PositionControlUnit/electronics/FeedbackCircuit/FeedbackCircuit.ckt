@@ -1,0 +1,14 @@
+circuit FeedbackCircuit
+  name "Position Feedback Circuit"
+  description "Electronics circuit for position feedback processing, signal conditioning, and velocity/acceleration estimation interfaces"
+  owner "Electronics Team"
+  tags "feedback", "conditioning", "velocity", "acceleration"
+  safetylevel ASIL-D
+  partof PositionControlUnit
+  
+  implements PositionFeedbackFilter
+  
+  interfaces
+    Raw_Feedback "Raw position feedback signals"
+    Conditioned_Feedback "Filtered and conditioned feedback"
+    Derivative_Signals "Velocity and acceleration estimates"

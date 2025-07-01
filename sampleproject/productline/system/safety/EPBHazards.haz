@@ -1,0 +1,422 @@
+hazardidentification EPBHazards
+  name "EPB System - Comprehensive Hazard Identification"
+  description "Systematic identification of all potential hazards in the EPB system using FMEA and HAZOP methodologies"
+  hazardanalysis EPBSafety
+  methodology "FMEA", "HAZOP", "STPA"
+  
+  hazardcategories
+    category UnintendedActivation
+      description "EPB applies when not commanded or expected"
+      severity "High potential for vehicle instability"
+      
+    category FailureToActivate  
+      description "EPB fails to apply when commanded"
+      severity "Risk of vehicle rollaway"
+      
+    category FailureToRelease
+      description "EPB fails to release when commanded"  
+      severity "Vehicle cannot be driven"
+      
+    category PartialFailure
+      description "EPB provides insufficient or excessive force"
+      severity "Unpredictable braking behavior"
+      
+    category DelayedResponse
+      description "EPB responds too slowly to commands"
+      severity "Driver confusion and potential accidents"
+      
+    category MisleadingIndication
+      description "Incorrect status information to driver"
+      severity "Driver makes wrong decisions"
+
+  subsystemhazards
+    subsystem ActuationControlSubsystem
+      reference system/subsystems/ActuationControlSubsystem/
+      
+      hazard H_ACT_001
+        name "Actuator Motor Runaway"
+        description "Motor continues running beyond commanded position"
+        cause "Motor controller failure, position feedback loss"
+        effect "Excessive clamping force, potential component damage"
+        category UnintendedActivation
+        functions_affected "MotorDriveController", "ActuatorPositionTracker"
+        
+      hazard H_ACT_002
+        name "Actuator Seizure"
+        description "Mechanical seizure prevents actuator movement"
+        cause "Mechanical wear, contamination, extreme temperature"
+        effect "Cannot apply or release parking brake"
+        category FailureToActivate, FailureToRelease
+        functions_affected "ActuationSystemManager", "ThermalProtectionManager"
+        
+      hazard H_ACT_003
+        name "Position Sensor Failure"
+        description "False or missing position feedback"
+        cause "Sensor damage, wiring fault, EMI interference"
+        effect "Incorrect force application, uncertain brake status"
+        category PartialFailure, MisleadingIndication
+        functions_affected "ActuatorPositionTracker", "ForceCalculationEngine"
+        
+      hazard H_ACT_004
+        name "Power Supply Interruption"
+        description "Loss of power during actuator operation"
+        cause "Electrical fault, fuse failure, battery disconnect"
+        effect "Brake stuck in current position"
+        category FailureToActivate, FailureToRelease
+        functions_affected "PowerSupplyManager", "BackupActuatorController"
+        
+      hazard H_ACT_005
+        name "Thermal Overload"
+        description "Actuator overheats during operation"
+        cause "Excessive duty cycle, cooling system failure"
+        effect "Reduced performance, potential component damage"
+        category PartialFailure, DelayedResponse
+        functions_affected "ThermalProtectionManager", "LoadCompensationController"
+        
+      hazard H_ACT_006
+        name "Cable Breakage (Cable-Type)"
+        description "Parking brake cable breaks or stretches"
+        cause "Cable wear, corrosion, excessive force"
+        effect "Loss of braking force transmission"
+        category FailureToActivate
+        functions_affected "CableDriveController", "CableHealthMonitor"
+        
+      hazard H_ACT_007
+        name "Calibration Drift"
+        description "Actuator calibration becomes inaccurate over time"
+        cause "Component aging, wear, temperature cycling"
+        effect "Incorrect force application, inconsistent performance"
+        category PartialFailure
+        functions_affected "ActuatorCalibrationController", "ActuatorDiagnosticProcessor"
+
+    subsystem HMIControlSubsystem
+      reference system/subsystems/HMIControlSubsystem/
+      
+      hazard H_HMI_001
+        name "Switch Stuck Activated"
+        description "EPB switch remains in activated state"
+        cause "Mechanical jamming, liquid contamination"
+        effect "Continuous apply/release commands"
+        category UnintendedActivation
+        functions_affected "UserInputHandler", "SwitchStateManager"
+        
+      hazard H_HMI_002
+        name "Switch Not Responsive"
+        description "EPB switch fails to register activation"
+        cause "Electrical fault, mechanical damage"
+        effect "Cannot command EPB operation"
+        category FailureToActivate, FailureToRelease
+        functions_affected "InputSignalDebouncer", "SwitchDiagnosticAgent"
+        
+      hazard H_HMI_003
+        name "False Status Indication"
+        description "EPB status light shows incorrect state"
+        cause "LED failure, wiring fault, software error"
+        effect "Driver unaware of actual EPB state"
+        category MisleadingIndication
+        functions_affected "VisualStateController", "FeedbackCoordinator"
+        
+      hazard H_HMI_004
+        name "No Status Indication"
+        description "EPB status not displayed to driver"
+        cause "Display failure, power loss, communication fault"
+        effect "Driver cannot determine EPB state"
+        category MisleadingIndication
+        functions_affected "InterfaceHealthMonitor", "VisualThemeManager"
+        
+      hazard H_HMI_005
+        name "Spurious Switch Activation"
+        description "Switch registers activation without user input"
+        cause "EMI interference, electrical noise, software fault"
+        effect "Unexpected EPB commands"
+        category UnintendedActivation
+        functions_affected "InputSignalDebouncer", "InterfaceErrorHandler"
+        
+      hazard H_HMI_006
+        name "Multiple Switch Interpretation"
+        description "Single switch press interpreted as multiple commands"
+        cause "Contact bounce, software timing error"
+        effect "Unpredictable EPB behavior"
+        category UnintendedActivation, DelayedResponse
+        functions_affected "SwitchConfigurationManager", "HMICommandTranslator"
+
+    subsystem SensorMonitoringSubsystem
+      reference system/subsystems/SensorMonitoringSubsystem/
+      
+      hazard H_SEN_001
+        name "Position Sensor Drift"
+        description "Gradual inaccuracy in position measurement"
+        cause "Sensor aging, temperature effects, magnetic interference"
+        effect "Incorrect brake force application"
+        category PartialFailure
+        functions_affected "SensorDataAcquisition", "PositionAccuracyValidator"
+        
+      hazard H_SEN_002
+        name "Sensor Signal Noise"
+        description "Electrical noise corrupts sensor signals"
+        cause "EMI, poor grounding, cable damage"
+        effect "Erratic actuator behavior"
+        category DelayedResponse, PartialFailure
+        functions_affected "SensorSignalFilter", "SensorFusionProcessor"
+        
+      hazard H_SEN_003
+        name "Sensor Disconnection"
+        description "Physical disconnection of sensor"
+        cause "Connector corrosion, cable damage, vibration"
+        effect "Loss of position feedback"
+        category FailureToActivate, FailureToRelease
+        functions_affected "SensorRedundancyManager", "SensorDiagnosticAgent"
+        
+      hazard H_SEN_004
+        name "Environmental Contamination"
+        description "Sensors affected by dirt, moisture, salt"
+        cause "Environmental exposure, seal failure"
+        effect "Degraded sensor performance"
+        category PartialFailure, DelayedResponse
+        functions_affected "EnvironmentalCompensator", "MonitoringDataProcessor"
+        
+      hazard H_SEN_005
+        name "Cable Tension Sensor Failure"
+        description "Cannot detect cable condition in cable-type systems"
+        cause "Sensor damage, calibration loss"
+        effect "Undetected cable problems"
+        category MisleadingIndication
+        functions_affected "CableHealthAnalyzer", "CableWearPredictor"
+
+    subsystem AutomationLogicSubsystem
+      reference system/subsystems/AutomationLogicSubsystem/
+      
+      hazard H_AUT_001
+        name "Auto-Hold Unintended Activation"
+        description "Auto-hold activates when not appropriate"
+        cause "Faulty vehicle speed sensor, software logic error"
+        effect "Unexpected braking during driving"
+        category UnintendedActivation
+        functions_affected "VehicleSpeedAnalyzer", "AutomationStateMachine"
+        
+      hazard H_AUT_002
+        name "Auto-Hold Failure to Activate"
+        description "Auto-hold doesn't engage when conditions are met"
+        cause "Logic error, sensor failure, communication fault"
+        effect "Vehicle rolls when driver expects it held"
+        category FailureToActivate
+        functions_affected "HoldConditionEvaluator", "AutomationSafetyValidator"
+        
+      hazard H_AUT_003
+        name "Hill-Start Assist Malfunction"
+        description "Hill-start assist provides incorrect assistance"
+        cause "Slope sensor error, timing logic fault"
+        effect "Vehicle rolls backward or jerky start"
+        category PartialFailure, UnintendedActivation
+        functions_affected "HillDetectionProcessor", "SlopeAngleProcessor"
+        
+      hazard H_AUT_004
+        name "Release Logic Error"
+        description "Automation releases brake at wrong time"
+        cause "Driver intent detection error, sensor fusion fault"
+        effect "Unexpected brake release"
+        category FailureToRelease
+        functions_affected "DriverIntentPredictor", "ReleaseConditionMonitor"
+        
+      hazard H_AUT_005
+        name "Arbitration Conflict"
+        description "Conflicting commands from different automation functions"
+        cause "Logic error, communication delay, priority fault"
+        effect "Unpredictable EPB behavior"
+        category DelayedResponse, PartialFailure
+        functions_affected "AutomationArbitrator", "FailsafeActivationController"
+
+    subsystem DiagnosticSubsystem
+      reference system/subsystems/DiagnosticSubsystem/
+      
+      hazard H_DIA_001
+        name "False Fault Detection"
+        description "System reports faults that don't exist"
+        cause "Diagnostic algorithm error, sensor noise"
+        effect "Unnecessary system shutdown or degraded mode"
+        category PartialFailure
+        functions_affected "FaultClassificationAlgorithm", "HealthAssessmentEngine"
+        
+      hazard H_DIA_002
+        name "Missed Fault Detection"
+        description "Real faults not detected by diagnostic system"
+        cause "Diagnostic coverage gap, algorithm fault"
+        effect "Hazardous failures go undetected"
+        category FailureToActivate, MisleadingIndication
+        functions_affected "AnomalyDetectionEngine", "SymptomCorrelationEngine"
+        
+      hazard H_DIA_003
+        name "Diagnostic System Failure"
+        description "Entire diagnostic system becomes non-functional"
+        cause "Software fault, hardware failure, power loss"
+        effect "No health monitoring or fault detection"
+        category MisleadingIndication
+        functions_affected "SystemHealthSupervisor", "DiagnosticScheduler"
+
+    subsystem CommunicationSubsystem
+      reference system/subsystems/CommunicationSubsystem/
+      
+      hazard H_COM_001
+        name "CAN Bus Failure"
+        description "Loss of communication on vehicle CAN network"
+        cause "Bus short, termination failure, EMI"
+        effect "EPB cannot receive commands or send status"
+        category FailureToActivate, FailureToRelease
+        functions_affected "ProtocolStackManager", "CommHealthMonitor"
+        
+      hazard H_COM_002
+        name "Message Corruption"
+        description "CAN messages corrupted during transmission"
+        cause "EMI interference, bus errors"
+        effect "Wrong commands executed"
+        category UnintendedActivation, MisleadingIndication
+        functions_affected "MessageValidationEngine", "ErrorCorrectionProcessor"
+        
+      hazard H_COM_003
+        name "Communication Delay"
+        description "Excessive delay in message transmission"
+        cause "Bus overload, priority conflicts"
+        effect "Delayed EPB response to commands"
+        category DelayedResponse
+        functions_affected "CommLatencyOptimizer", "BandwidthAllocationManager"
+
+    subsystem SafetySubsystem
+      reference system/subsystems/SafetySubsystem/
+      
+      hazard H_SAF_001
+        name "Emergency Release Failure"
+        description "Manual emergency release mechanism fails"
+        cause "Mechanical seizure, cable break, access blockage"
+        effect "Cannot release EPB in emergency"
+        category FailureToRelease
+        functions_affected "EmergencyDetectionLogic", "ManualReleaseController"
+        
+      hazard H_SAF_002
+        name "Safety Monitoring Failure"
+        description "Safety critical path monitoring fails"
+        cause "Monitor software fault, hardware failure"
+        effect "Hazards not detected or mitigated"
+        category MisleadingIndication
+        functions_affected "SafetyCriticalPathMonitor", "HazardAnalysisEngine"
+
+    subsystem DisplayRenderingSubsystem
+      reference system/subsystems/DisplayRenderingSubsystem/
+      
+      hazard H_DIS_001
+        name "Display Information Error"
+        description "Incorrect EPB status shown on instrument cluster"
+        cause "Display driver fault, communication error"
+        effect "Driver receives wrong information"
+        category MisleadingIndication
+        functions_affected "InstrumentInterfaceDriver", "DisplayCoordinationService"
+
+    subsystem InputProcessingSubsystem
+      reference system/subsystems/InputProcessingSubsystem/
+      
+      hazard H_INP_001
+        name "Input Processing Delay"
+        description "Significant delay between switch press and recognition"
+        cause "Software processing fault, hardware timing issue"
+        effect "Driver may press switch multiple times"
+        category DelayedResponse
+        functions_affected "InputTimingAnalyzer", "InputPerformanceOptimizer"
+
+    subsystem SystemOrchestrationSubsystem
+      reference system/subsystems/SystemOrchestrationSubsystem/
+      
+      hazard H_SYS_001
+        name "Resource Allocation Conflict"
+        description "System resources incorrectly allocated"
+        cause "Orchestration software fault"
+        effect "System components cannot function properly"
+        category PartialFailure
+        functions_affected "ResourceAllocationController", "LoadBalancingController"
+        
+      hazard H_SYS_002
+        name "Mode Transition Error"
+        description "System fails to properly transition between modes"
+        cause "State machine error, timing fault"
+        effect "System stuck in wrong operational mode"
+        category PartialFailure, DelayedResponse
+        functions_affected "SystemModeManager", "InterSubsystemCoordinator"
+
+  systemlevelhazards
+    hazard H_SYS_003
+      name "Total System Failure"
+      description "Complete EPB system becomes non-functional"
+      cause "Power loss, ECU failure, software crash"
+      effect "No EPB functionality available"
+      category FailureToActivate, FailureToRelease
+      mitigation "Emergency manual release mechanism"
+      
+    hazard H_SYS_004
+      name "Partial System Degradation"
+      description "Some EPB functions work, others don't"
+      cause "Partial component failure, communication loss"
+      effect "Unpredictable system behavior"
+      category PartialFailure, MisleadingIndication
+      
+    hazard H_SYS_005
+      name "Software Corruption"
+      description "EPB control software becomes corrupted"
+      cause "Memory fault, EMI, power glitch"
+      effect "Erratic or non-functional behavior"
+      category UnintendedActivation, FailureToActivate
+      
+    hazard H_SYS_006
+      name "Integration Failure"
+      description "EPB fails to integrate properly with other vehicle systems"
+      cause "Communication protocol mismatch, timing conflicts"
+      effect "Coordination problems with other safety systems"
+      category DelayedResponse, PartialFailure
+
+  environmentalhazards
+    hazard H_ENV_001
+      name "Extreme Temperature Effects"
+      description "System performance degraded by temperature extremes"
+      cause "Operating outside temperature specifications"
+      effect "Reduced functionality or component damage"
+      category PartialFailure, DelayedResponse
+      
+    hazard H_ENV_002
+      name "EMI Interference"
+      description "Electromagnetic interference affects system operation"
+      cause "Radio transmitters, electrical equipment, lightning"
+      effect "False signals, corrupted communication"
+      category UnintendedActivation, MisleadingIndication
+      
+    hazard H_ENV_003
+      name "Corrosion and Contamination"
+      description "Environmental contamination degrades components"
+      cause "Salt, moisture, chemicals, dirt"
+      effect "Mechanical binding, electrical faults"
+      category PartialFailure, FailureToActivate
+      
+    hazard H_ENV_004
+      name "Vibration and Shock"
+      description "Mechanical stress affects component reliability"
+      cause "Road conditions, vehicle operation, accidents"
+      effect "Mechanical wear, electrical connection faults"
+      category PartialFailure, DelayedResponse
+
+  usagehazards
+    hazard H_USE_001
+      name "Driver Misuse - High Speed Application"
+      description "Driver attempts to apply EPB while driving at speed"
+      cause "Driver confusion, panic, misunderstanding"
+      effect "Vehicle instability, loss of control"
+      category UnintendedActivation
+      
+    hazard H_USE_002
+      name "Maintenance Error"
+      description "Improper maintenance or repair procedures"
+      cause "Technician error, wrong procedures, inadequate training"
+      effect "Component damage, safety degradation"
+      category PartialFailure, FailureToActivate
+      
+    hazard H_USE_003
+      name "Accessory Installation Interference"
+      description "Aftermarket equipment interferes with EPB"
+      cause "Improper installation, electrical interference"
+      effect "EPB malfunction, false signals"
+      category UnintendedActivation, MisleadingIndication

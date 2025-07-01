@@ -1,0 +1,321 @@
+assets EPBAssets
+  name "EPB System - Cybersecurity Assets Identification"
+  description "Identification and classification of cybersecurity assets requiring protection in EPB system"
+  standard "ISO 21434 - Asset Identification and Valuation"
+  
+  productlinereference ElectricParkingBrakeSystem
+  systemreference EPBSafety, EPBFeatures, EPBFunctions
+  securityreference EPBSecurity
+  
+  assetcategories
+    category Digital
+      description "Software, firmware, data, and digital communications"
+      
+    category Physical  
+      description "Hardware components, connectors, and physical interfaces"
+      
+    category Logical
+      description "Algorithms, configurations, cryptographic keys, and logical processes"
+      
+    category Information
+      description "Operational data, diagnostic information, and usage patterns"
+
+  digitalassets
+    
+    asset DA_001
+      name "EPB Control Software"
+      description "Main application software controlling brake actuation logic"
+      category Digital
+      criticality High
+      impactrating CAL3
+      productlinefeatures AutoParkingBrake, ManualParkingBrake, EmergencyBrake
+      functions ActuationControlManager, SafetyMonitoringProcessor
+      confidentiality High
+      integrity Critical
+      availability High
+      threats "Malicious code injection, unauthorized modification, reverse engineering"
+      
+    asset DA_002
+      name "EPB Firmware"
+      description "Low-level firmware for ECU and actuator control"
+      category Digital
+      criticality Critical
+      impactrating CAL4
+      productlinefeatures BasicActuation, SafetyBackup
+      functions ActuationControlManager, SystemHealthSupervisor
+      confidentiality Medium
+      integrity Critical
+      availability Critical
+      threats "Firmware tampering, rollback attacks, unauthorized updates"
+      
+    asset DA_003
+      name "Diagnostic Data"
+      description "System diagnostic codes, fault history, and calibration data"
+      category Digital
+      criticality Medium
+      impactrating CAL2
+      productlinefeatures DiagnosticReporting, SystemMonitoring
+      functions DiagnosticSystemController, AnomalyDetectionEngine
+      confidentiality Medium
+      integrity High
+      availability Medium
+      threats "Data manipulation, unauthorized access, information disclosure"
+      
+    asset DA_004
+      name "Communication Messages"
+      description "CAN messages for brake commands and status reporting"
+      category Digital
+      criticality High
+      impactrating CAL3
+      productlinefeatures VehicleIntegration, StatusReporting
+      functions MessageValidationEngine, HMICoordinationEngine
+      confidentiality Medium
+      integrity Critical
+      availability High
+      threats "Message injection, replay attacks, eavesdropping"
+      
+    asset DA_005
+      name "Configuration Parameters"
+      description "System configuration, calibration values, and operational parameters"
+      category Digital
+      criticality High
+      impactrating CAL3
+      productlinefeatures AdaptiveControl, CustomizableSettings
+      functions SystemModeManager, EnvironmentalCompensator
+      confidentiality Low
+      integrity Critical
+      availability High
+      threats "Parameter manipulation, unauthorized reconfiguration"
+
+  physicalassets
+    
+    asset PA_001
+      name "EPB ECU Hardware"
+      description "Electronic control unit housing processors and interfaces"
+      category Physical
+      criticality Critical
+      impactrating CAL4
+      productlinefeatures AllFeatures
+      functions AllSystemFunctions
+      confidentiality High
+      integrity Critical
+      availability Critical
+      threats "Physical tampering, chip extraction, hardware modification"
+      
+    asset PA_002
+      name "Actuator Assembly"
+      description "Electromechanical actuator with motors and position sensors"
+      category Physical
+      criticality High
+      impactrating CAL3
+      productlinefeatures BasicActuation, ForceControl
+      functions ActuationControlManager, SensorFusionEngine
+      confidentiality Low
+      integrity High
+      availability Critical
+      threats "Physical damage, sensor spoofing, mechanical interference"
+      
+    asset PA_003
+      name "Diagnostic Connector"
+      description "OBD-II or proprietary diagnostic interface connector"
+      category Physical
+      criticality Medium
+      impactrating CAL2
+      productlinefeatures ServiceAccess, DiagnosticReporting
+      functions DiagnosticSystemController
+      confidentiality High
+      integrity Medium
+      availability Low
+      threats "Unauthorized access, connector tampering, physical bypass"
+      
+    asset PA_004
+      name "CAN Bus Interfaces"
+      description "Physical CAN bus connectors and wiring harnesses"
+      category Physical
+      criticality High
+      impactrating CAL3
+      productlinefeatures VehicleIntegration, NetworkCommunication
+      functions MessageValidationEngine, CommHealthMonitor
+      confidentiality Medium
+      integrity High
+      availability High
+      threats "Wire tapping, signal injection, connector tampering"
+      
+    asset PA_005
+      name "Power Supply Interface"
+      description "Power distribution connectors and protection circuits"
+      category Physical
+      criticality Medium
+      impactrating CAL2
+      productlinefeatures PowerManagement, BackupPower
+      functions PowerSupplyManager, ThermalProtectionManager
+      confidentiality Low
+      integrity Medium
+      availability High
+      threats "Power supply attack, voltage manipulation, surge attacks"
+
+  logicalassets
+    
+    asset LA_001
+      name "Cryptographic Keys"
+      description "Encryption keys for secure communication and authentication"
+      category Logical
+      criticality Critical
+      impactrating CAL4
+      productlinefeatures SecureCommunication, Authentication
+      functions MessageValidationEngine, SecurityProcessor
+      confidentiality Critical
+      integrity Critical
+      availability High
+      threats "Key extraction, brute force attacks, key compromise"
+      
+    asset LA_002
+      name "Safety Algorithms"
+      description "Safety-critical control algorithms and logic"
+      category Logical
+      criticality Critical
+      impactrating CAL4
+      productlinefeatures SafetyBackup, FailSafeOperation
+      functions SafetyMonitoringProcessor, FailsafeActivationController
+      confidentiality High
+      integrity Critical
+      availability Critical
+      threats "Algorithm manipulation, logic bombing, unauthorized modification"
+      
+    asset LA_003
+      name "Authentication Credentials"
+      description "Service tool authentication and access control credentials"
+      category Logical
+      criticality High
+      impactrating CAL3
+      productlinefeatures ServiceAccess, AccessControl
+      functions AccessControlManager, SessionManager
+      confidentiality Critical
+      integrity High
+      availability Medium
+      threats "Credential theft, privilege escalation, unauthorized access"
+      
+    asset LA_004
+      name "Control Flow Logic"
+      description "Program execution flow and state machine logic"
+      category Logical
+      criticality High
+      impactrating CAL3
+      productlinefeatures SystemOrchestration, StateManagement
+      functions SystemModeManager, AutomationArbitrator
+      confidentiality Medium
+      integrity Critical
+      availability High
+      threats "Control flow hijacking, state corruption, timing attacks"
+      
+    asset LA_005
+      name "Sensor Fusion Algorithms"
+      description "Algorithms combining multiple sensor inputs for decision making"
+      category Logical
+      criticality High
+      impactrating CAL3
+      productlinefeatures SensorIntegration, FaultTolerance
+      functions SensorFusionEngine, AnomalyDetectionEngine
+      confidentiality Medium
+      integrity Critical
+      availability High
+      threats "Algorithm poisoning, sensor spoofing, data corruption"
+
+  informationassets
+    
+    asset IA_001
+      name "Vehicle Usage Patterns"
+      description "Operational data revealing vehicle usage and driver behavior"
+      category Information
+      criticality Low
+      impactrating CAL1
+      productlinefeatures DataAnalytics, UsageMonitoring
+      functions DataCollectionService, UsageAnalyzer
+      confidentiality High
+      integrity Low
+      availability Low
+      threats "Privacy violation, data mining, behavioral profiling"
+      
+    asset IA_002
+      name "System Performance Metrics"
+      description "Performance data and operational statistics"
+      category Information
+      criticality Medium
+      impactrating CAL2
+      productlinefeatures PerformanceMonitoring, OptimizationData
+      functions PerformanceAnalyzer, SystemHealthSupervisor
+      confidentiality Medium
+      integrity Medium
+      availability Low
+      threats "Competitive intelligence, performance manipulation"
+      
+    asset IA_003
+      name "Fault History Records"
+      description "Historical fault data and error logs"
+      category Information
+      criticality Medium
+      impactrating CAL2
+      productlinefeatures FaultTracking, TrendAnalysis
+      functions FaultLogger, SymptomCorrelationEngine
+      confidentiality Medium
+      integrity High
+      availability Medium
+      threats "Forensic analysis, fault injection evidence, privacy breach"
+      
+    asset IA_004
+      name "Calibration Data"
+      description "System calibration values and adjustment parameters"
+      category Information
+      criticality High
+      impactrating CAL3
+      productlinefeatures SystemCalibration, AdaptiveControl
+      functions CalibrationManager, EnvironmentalCompensator
+      confidentiality Low
+      integrity Critical
+      availability High
+      threats "Calibration tampering, performance degradation, safety compromise"
+      
+    asset IA_005
+      name "Security Event Logs"
+      description "Audit logs of security-relevant events and access attempts"
+      category Information
+      criticality Medium
+      impactrating CAL2
+      productlinefeatures SecurityAuditing, ForensicAnalysis
+      functions SecurityLogger, AuditManager
+      confidentiality High
+      integrity Critical
+      availability Medium
+      threats "Log tampering, evidence destruction, forensic interference"
+
+  assetvaluations
+    methodology "CIA Triad assessment with automotive-specific impact analysis"
+    scale "CAL1 (Low) to CAL4 (Critical) based on cybersecurity impact"
+    factors "Safety impact, operational disruption, privacy breach, competitive advantage"
+    
+    valuation Critical
+      level CAL4
+      assets DA_002, PA_001, LA_001, LA_002
+      justification "Direct impact on safety-critical functions or fundamental security"
+      
+    valuation High
+      level CAL3
+      assets DA_001, DA_004, DA_005, PA_002, PA_004, LA_003, LA_004, LA_005, IA_004
+      justification "Significant operational or security impact"
+      
+    valuation Medium
+      level CAL2
+      assets DA_003, PA_003, PA_005, IA_002, IA_003, IA_005
+      justification "Moderate impact on system operation or data integrity"
+      
+    valuation Low
+      level CAL1
+      assets IA_001
+      justification "Limited impact, primarily privacy or competitive concerns"
+
+  protectionrequirements
+    requirement "All CAL4 assets require hardware security modules and tamper detection"
+    requirement "All CAL3+ assets require cryptographic protection and access control"
+    requirement "All digital assets require integrity verification and secure storage"
+    requirement "All communication assets require authentication and encryption"
+    requirement "All information assets require privacy protection and access logging" 

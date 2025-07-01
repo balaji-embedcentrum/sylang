@@ -1,0 +1,14 @@
+circuit BrakeSystemCircuit
+  name "Brake System Circuit"
+  description "Electronics circuit for brake force control, hold force calculation, and brake system actuation interfaces"
+  owner "Electronics Team"
+  tags "brake", "system", "force", "actuation"
+  safetylevel ASIL-B
+  partof AutoHoldControlUnit
+  
+  implements HoldForceCalculator, StopDetectionAlgorithm
+  
+  interfaces
+    Brake_Force_Output "Brake force control outputs"
+    Hold_Actuation_Control "Auto-hold actuation control signals"
+    Brake_System_Feedback "Brake system status feedback" 

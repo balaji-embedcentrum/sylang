@@ -1,0 +1,40 @@
+component DisplayInterfaceUnit
+  name "Display Interface Unit"
+  description "Component responsible for instrument interface control, display coordination, and hardware management"
+  owner "HMI Team"
+  tags "instrument", "interface", "coordination", "health", "color"
+  safetylevel ASIL-B
+  aggregatedby DisplayRenderingSubsystem
+  
+  interfaces
+    interface Instrument_Cluster_Interface
+      type Communication
+      protocol "LVDS"
+      direction Bidirectional
+      
+    interface Display_Coordination_Bus
+      type Communication
+      protocol "CAN 2.0B"
+      direction Bidirectional
+      
+    interface Health_Monitor_Input
+      type Digital
+      protocol "I2C"
+      direction Input
+      
+    interface Color_Calibration_Data
+      type Digital
+      protocol "Internal"
+      direction Input
+      
+    interface Display_Control_Output
+      type Digital
+      protocol "SPI"
+      direction Output
+      
+    interface Status_Feedback
+      type Digital
+      safety_level ASIL-B
+      direction Output
+      
+  implements InstrumentInterfaceDriver, DisplayCoordinationService, DisplayHealthMonitor, ColorSpaceConverter 

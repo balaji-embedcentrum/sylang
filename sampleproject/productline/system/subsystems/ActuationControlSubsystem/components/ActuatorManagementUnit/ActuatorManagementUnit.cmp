@@ -1,0 +1,39 @@
+component ActuatorManagementUnit
+  name "Actuator Management Unit"
+  description "Component responsible for actuator selection, calibration procedures, and backup system management"
+  owner "Hardware Team"
+  tags "actuator", "management", "selection", "calibration", "backup"
+  safetylevel ASIL-D
+  aggregatedby ActuationControlSubsystem
+  interfaces
+    interface System_Bus
+      type Communication
+      protocol "SPI 20MHz"
+      direction Bidirectional
+      
+    interface Actuator_Config
+      type Digital
+      protocol "I2C"
+      direction Output
+      
+    interface Backup_Enable
+      type Digital
+      voltage "3.3V CMOS"
+      direction Output
+      
+    interface Calibration_Mode
+      type Digital
+      voltage "3.3V CMOS"
+      direction Input
+      
+    interface Actuator_Type_Select
+      type Digital
+      width "4-bit"
+      direction Output
+      
+    interface Backup_Status
+      type Digital
+      safety_level ASIL-D
+      direction Input
+      
+  implements ActuatorSelectionLogic, ActuatorCalibrationController, BackupActuatorController 

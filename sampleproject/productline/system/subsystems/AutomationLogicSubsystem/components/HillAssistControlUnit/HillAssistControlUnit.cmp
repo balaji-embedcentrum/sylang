@@ -1,0 +1,37 @@
+component HillAssistControlUnit
+  name "Hill Assist Control Unit"
+  description "Component responsible for hill detection, slope angle processing, and release condition management"
+  owner "Software Team"
+  tags "hill", "assist", "slope", "detection", "release"
+  safetylevel ASIL-C
+  aggregatedby AutomationLogicSubsystem
+  
+  interfaces
+    interface Inclination_Sensor_Input
+      type Analog
+      range "±30 degrees"
+      accuracy "±0.1 degrees"
+      direction Input
+      
+    interface Hill_Detection_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Slope_Angle_Output
+      type Analog
+      range "±30 degrees"
+      direction Output
+      
+    interface Release_Condition_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Release_Control_Output
+      type Digital
+      safety_level ASIL-C
+      response_time "50ms"
+      direction Output
+      
+  implements HillDetectionProcessor, ReleaseConditionMonitor, SlopeAngleProcessor, HillAssistReleaseController 

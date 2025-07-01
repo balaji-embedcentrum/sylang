@@ -1,0 +1,29 @@
+part ActuatorTypeResolverAlgorithm
+  name "Actuator Type Resolver Algorithm"
+  description "Software implementation of actuator type resolution logic based on vehicle configuration"
+  owner "Software Team"
+  tags "algorithm", "actuator", "type-resolution", "configuration"
+  safetylevel ASIL-D
+  partof ActuatorManagementUnit
+  implements ActuatorTypeResolver
+  
+  properties
+    language "C++"
+    standard "ISO 26262"
+    architecture "Real-time embedded"
+    memory_requirement "32KB ROM, 8KB RAM"
+    execution_time "< 10ms"
+    
+  inputs
+    vehicle_config "Vehicle configuration parameters"
+    system_state "Current system operational state"
+    actuator_capabilities "Available actuator capabilities matrix"
+    
+  outputs
+    actuator_type "Selected actuator type identifier"
+    resolution_confidence "Confidence level of type resolution"
+    
+  algorithms
+    decision_tree "Multi-criteria decision tree for actuator selection"
+    compatibility_matrix "Actuator-vehicle compatibility lookup"
+    fallback_logic "Fallback selection when primary logic fails" 

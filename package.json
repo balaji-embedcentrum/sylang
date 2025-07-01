@@ -1,0 +1,168 @@
+{
+  "name": "sylang-language-support",
+  "displayName": "Sylang Language Support",
+  "description": "Comprehensive language support for Sylang DSL - Product Line Engineering with LSP and Tree-sitter",
+  "version": "0.1.0",
+  "publisher": "sylang-team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sylang-team/sylang-extension"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Snippets"
+  ],
+  "keywords": [
+    "sylang",
+    "product-line",
+    "automotive",
+    "dsl",
+    "safety",
+    "security"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "sylang-productline",
+        "aliases": ["Sylang ProductLine", "sylang-ple"],
+        "extensions": [".ple"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-functions",
+        "aliases": ["Sylang Functions", "sylang-fun"],
+        "extensions": [".fun"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-features",
+        "aliases": ["Sylang Features", "sylang-fml"],
+        "extensions": [".fml"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-safety",
+        "aliases": ["Sylang Safety", "sylang-safety"],
+        "extensions": [".itm", ".sgl", ".haz", ".rsk", ".fsr"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-security",
+        "aliases": ["Sylang Security", "sylang-security"],
+        "extensions": [".tra", ".thr", ".sgo", ".sre", ".ast", ".sec"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sylang-productline",
+        "scopeName": "source.sylang.productline",
+        "path": "./syntaxes/sylang-productline.tmGrammar.json"
+      },
+      {
+        "language": "sylang-functions",
+        "scopeName": "source.sylang.functions",
+        "path": "./syntaxes/sylang-functions.tmGrammar.json"
+      },
+      {
+        "language": "sylang-features",
+        "scopeName": "source.sylang.features",
+        "path": "./syntaxes/sylang-features.tmGrammar.json"
+      },
+      {
+        "language": "sylang-safety",
+        "scopeName": "source.sylang.safety",
+        "path": "./syntaxes/sylang-safety.tmGrammar.json"
+      },
+      {
+        "language": "sylang-security",
+        "scopeName": "source.sylang.security",
+        "path": "./syntaxes/sylang-security.tmGrammar.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "sylang-productline",
+        "path": "./snippets/productline.json"
+      },
+      {
+        "language": "sylang-functions",
+        "path": "./snippets/functions.json"
+      },
+      {
+        "language": "sylang-features",
+        "path": "./snippets/features.json"
+      },
+      {
+        "language": "sylang-safety",
+        "path": "./snippets/safety.json"
+      },
+      {
+        "language": "sylang-security",
+        "path": "./snippets/security.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sylang.validate",
+        "title": "Validate Sylang File",
+        "category": "Sylang"
+      },
+      {
+        "command": "sylang.format",
+        "title": "Format Sylang File",
+        "category": "Sylang"
+      }
+    ],
+    "configuration": {
+      "title": "Sylang Language Support",
+      "properties": {
+        "sylang.lsp.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Sylang Language Server Protocol"
+        },
+        "sylang.validation.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time validation"
+        },
+        "sylang.treeSitter.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use Tree-sitter for syntax highlighting"
+        }
+      }
+    }
+  },
+  "activationEvents": [
+    "onLanguage:sylang-productline",
+    "onLanguage:sylang-functions",
+    "onLanguage:sylang-features",
+    "onLanguage:sylang-safety",
+    "onLanguage:sylang-security"
+  ],
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^8.1.0",
+    "vscode-languageserver": "^8.1.0",
+    "vscode-languageserver-textdocument": "^1.0.8",
+    "tree-sitter": "^0.20.4",
+    "web-tree-sitter": "^0.20.8"
+  }
+} 

@@ -1,0 +1,14 @@
+circuit ProtectionCircuit
+  name "Power Protection Circuit"
+  description "Electronics circuit for overvoltage/undervoltage protection, thermal protection, and emergency power control"
+  owner "Electronics Team"
+  tags "protection", "overvoltage", "thermal", "emergency"
+  safetylevel ASIL-D
+  partof PowerManagementUnit
+  
+  implements OvervoltageProtectionAgent, UndervoltageProtectionAgent
+  
+  interfaces
+    Voltage_Monitoring "Voltage monitoring inputs"
+    Protection_Control "Protection trigger outputs"
+    Emergency_Shutdown "Emergency power shutdown" 

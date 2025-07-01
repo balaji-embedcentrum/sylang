@@ -1,0 +1,14 @@
+electronicscircuit LINInterfaceCircuit
+  name "LIN Interface Circuit"
+  description "Electronics circuit providing LIN transceiver functionality, schedule control, and checksum processing"
+  owner "Electronics Team"
+  tags "LIN-interface", "transceiver", "schedule-control", "checksum-processing"
+  safetylevel ASIL-C
+  partof StandardsComplianceUnit
+  implements LINScheduleController, LINChecksumValidator
+  interfaces
+    input lin_bus_signals "LIN bus single-wire signals and communication data"
+    input lin_control_signals "LIN transceiver control signals and schedule commands"
+    output lin_transceiver "LIN bus transceiver functionality and signal processing"
+    output lin_scheduler "Hardware LIN schedule control and timing management"
+    output lin_checksum "LIN checksum processing and frame validation"

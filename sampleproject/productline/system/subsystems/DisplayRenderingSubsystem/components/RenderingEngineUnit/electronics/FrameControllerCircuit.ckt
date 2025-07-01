@@ -1,0 +1,14 @@
+electronicscircuit FrameControllerCircuit
+  name "Frame Controller Circuit"
+  description "Electronics circuit providing hardware support for frame rate control, VSync management, and adaptive timing"
+  owner "Electronics Team"
+  tags "frame-controller", "vsync-management", "adaptive-timing", "frame-rate"
+  safetylevel ASIL-B
+  partof RenderingEngineUnit
+  implements VSyncController, FramePacingEngine, AdaptiveFrameRateManager
+  interfaces
+    input timing_signals "Frame timing signals and synchronization requirements"
+    input performance_metrics "Performance metrics and adaptive control parameters"
+    output frame_controller "Hardware frame control and timing management"
+    output sync_generator "Hardware VSync generation and synchronization control"
+    output adaptive_timer "Hardware adaptive timing and frame rate optimization"

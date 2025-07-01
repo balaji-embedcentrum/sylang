@@ -1,0 +1,11 @@
+circuit CommunicationCircuit
+  name "Communication Interface Circuit"
+  description "Electronics circuit providing SPI and I2C communication interfaces for actuator management with ESD protection and EMI filtering"
+  owner "Electronics Team"
+  tags "communication", "SPI", "I2C", "interface"
+  safetylevel ASIL-D
+  partof ActuatorManagementUnit
+  
+  interfaces
+    System_Bus "SPI 20MHz bidirectional communication"
+    Actuator_Config "I2C configuration interface" 

@@ -1,0 +1,35 @@
+component VersionManagementUnit
+  name "Version Management Unit"
+  description "Component responsible for system version management and compatibility validation"
+  owner "Systems Engineering"
+  tags "version", "compatibility", "synchronization", "management"
+  safetylevel ASIL-D
+  aggregatedby SystemOrchestrationSubsystem
+  
+  interfaces
+    interface Version_Data_Interface
+      type Digital
+      protocol "EEPROM"
+      direction Bidirectional
+      
+    interface Compatibility_Check_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Version_Status_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Synchronization_Control_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Compatibility_Result_Output
+      type Digital
+      safety_level ASIL-D
+      direction Output
+      
+  implements SystemVersionManager 

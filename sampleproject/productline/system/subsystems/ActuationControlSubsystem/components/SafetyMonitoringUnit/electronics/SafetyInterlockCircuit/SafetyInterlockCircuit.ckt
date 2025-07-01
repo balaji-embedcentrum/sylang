@@ -1,0 +1,14 @@
+circuit SafetyInterlockCircuit
+  name "Safety Interlock Circuit"
+  description "Electronics circuit for safety interlocks, redundancy switching, and safe state control hardware"
+  owner "Electronics Team"
+  tags "safety", "interlock", "redundancy", "safe-state"
+  safetylevel ASIL-D
+  partof SafetyMonitoringUnit
+  
+  implements SafetyInterlockManager, RedundancySupervisor
+  
+  interfaces
+    Interlock_Input "Safety interlock signal inputs"
+    Redundancy_Control "Redundancy switching control"
+    Safe_State_Output "Safe state control outputs"

@@ -1,0 +1,433 @@
+failuremodeanalysis ActuationControlSubsystem_FailureModeAnalysis
+  
+  // ========== MOTOR DRIVE & CONTROL FAILURES ==========
+  
+  failuremode ACS_MotorDriveControllerFailure
+    name "Motor Drive Controller Failure"
+    description "Motor drive controller fails to control motor drive circuits and power management"
+    function MotorDriveController
+    severity 10
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      MCU_PowerRegulationFailure "Motor Control Unit power regulation circuit malfunction"
+      PMU_VoltageRegulationFailure "Power Management Unit voltage regulation system failure"
+      MCU_PWMGenerationFailure "Motor Control Unit PWM signal generation circuit failure"
+      PMU_EfficiencyOptimizationFailure "Power Management Unit efficiency optimization algorithm failure"
+    effects
+      EPB_FailsToEngageBrake "EPB system fails to engage brake mechanism"
+      EPB_FailsToDisengageBrake "EPB system fails to disengage brake mechanism"
+      EPB_LossOfBrakingForceControl "EPB system loses braking force control capability"
+      EPB_UncontrolledActuatorMovement "EPB system exhibits uncontrolled actuator movement"
+    detection
+      ACS_MotorCurrentMonitoring "Actuation Control Subsystem motor current monitoring"
+      ACS_PowerSupplyVoltageMonitoring "Actuation Control Subsystem power supply voltage monitoring"
+      ACS_MotorPositionFeedbackMonitoring "Actuation Control Subsystem motor position feedback monitoring"
+      ACS_ActuatorDiagnosticFeedback "Actuation Control Subsystem actuator diagnostic feedback"
+    mitigation
+      ACS_BackupActuatorActivation "Actuation Control Subsystem backup actuator activation"
+      ACS_EmergencyPowerSupplySwitching "Actuation Control Subsystem emergency power supply switching"
+      ACS_FailsafeBrakeEngagement "Actuation Control Subsystem failsafe brake engagement"
+      ACS_SystemShutdownAndAlert "Actuation Control Subsystem system shutdown and alert"
+
+  failuremode ACS_MotorCurrentControllerFailure
+    name "Motor Current Controller Failure"
+    description "Motor current controller fails to control current levels and implement current limiting"
+    function MotorCurrentController
+    severity 10
+    occurrence 2
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      MCU_CurrentSensingFailure "Motor Control Unit current sensing circuit malfunction"
+      MCU_CurrentRegulationFailure "Motor Control Unit current regulation control failure"
+      PMU_ProtectionSystemFailure "Power Management Unit overcurrent protection system failure"
+      SMU_OvercurrentDetectionFailure "Safety Monitoring Unit overcurrent detection algorithm failure"
+    effects
+      EPB_MotorOvercurrentDamage "EPB system motor overcurrent damage"
+      EPB_ActuatorMechanicalDamage "EPB system actuator mechanical damage"
+      EPB_FireHazardFromOverheating "EPB system fire hazard from overheating"
+      EPB_LossOfPreciseForceControl "EPB system loss of precise force control"
+    detection
+      ACS_CurrentSensorMonitoring "Actuation Control Subsystem current sensor monitoring"
+      ACS_TemperatureMonitoring "Actuation Control Subsystem temperature monitoring"
+      ACS_PowerConsumptionAnalysis "Actuation Control Subsystem power consumption analysis"
+      ACS_MotorImpedanceMonitoring "Actuation Control Subsystem motor impedance monitoring"
+    mitigation
+      ACS_HardwareCurrentLimiting "Actuation Control Subsystem hardware current limiting"
+      ACS_ThermalShutdownProtection "Actuation Control Subsystem thermal shutdown protection"
+      ACS_FuseBreakerProtection "Actuation Control Subsystem fuse breaker protection"
+      ACS_EmergencySystemIsolation "Actuation Control Subsystem emergency system isolation"
+
+  // ========== ACTUATOR SELECTION & MANAGEMENT FAILURES ==========
+
+  failuremode ACS_ActuatorSelectionLogicFailure
+    name "Actuator Selection Logic Failure"
+    description "Actuator selection logic fails to select and switch between actuator types"
+    function ActuatorSelectionLogic
+    severity 10
+    occurrence 2
+    detection 5
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_TypeResolverFailure "Actuator Management Unit actuator type resolver algorithm failure"
+      AMU_SwitchingControllerFailure "Actuator Management Unit actuator switching controller failure"
+      AMU_CompatibilityValidatorFailure "Actuator Management Unit actuator compatibility validation failure"
+      SMU_ActuatorStatusMonitoringFailure "Safety Monitoring Unit actuator status monitoring failure"
+    effects
+      EPB_WrongActuatorTypeActivation "EPB system wrong actuator type activation"
+      EPB_SimultaneousActuatorConflicts "EPB system simultaneous actuator conflicts"
+      EPB_IncompatibleActuatorOperation "EPB system incompatible actuator operation"
+      EPB_TotalActuationSystemFailure "EPB system total actuation system failure"
+    detection
+      ACS_ActuatorTypeFeedbackMonitoring "Actuation Control Subsystem actuator type feedback monitoring"
+      ACS_ActuatorPerformanceValidation "Actuation Control Subsystem actuator performance validation"
+      ACS_CrossReferenceChecking "Actuation Control Subsystem cross reference checking"
+      ACS_SystemConfigurationVerification "Actuation Control Subsystem system configuration verification"
+    mitigation
+      ACS_DefaultActuatorSelection "Actuation Control Subsystem default actuator selection"
+      ACS_ActuatorConflictResolutionLogic "Actuation Control Subsystem actuator conflict resolution logic"
+      ACS_ManualActuatorOverride "Actuation Control Subsystem manual actuator override"
+      ACS_SafeActuatorIsolation "Actuation Control Subsystem safe actuator isolation"
+
+  failuremode ACS_ActuatorCalibrationControllerFailure
+    name "Actuator Calibration Controller Failure"
+    description "Actuator calibration controller fails to control calibration procedures and parameters"
+    function ActuatorCalibrationController
+    severity 8
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_CalibrationSequenceFailure "Actuator Management Unit calibration sequence orchestration failure"
+      AMU_ParameterCalculationFailure "Actuator Management Unit calibration parameter calculation failure"
+      AMU_DataValidationFailure "Actuator Management Unit calibration data validation failure"
+      PCU_PositionTrackingFailure "Position Control Unit position tracking sensor failure"
+    effects
+      EPB_InaccurateActuatorPositioning "EPB system inaccurate actuator positioning"
+      EPB_InconsistentBrakingForce "EPB system inconsistent braking force"
+      EPB_ActuatorMechanicalWear "EPB system actuator mechanical wear"
+      EPB_SystemPerformanceDegradation "EPB system performance degradation"
+    detection
+      ACS_CalibrationParameterVerification "Actuation Control Subsystem calibration parameter verification"
+      ACS_PositionAccuracyMonitoring "Actuation Control Subsystem position accuracy monitoring"
+      ACS_ForceConsistencyChecking "Actuation Control Subsystem force consistency checking"
+      ACS_PerformanceDriftDetection "Actuation Control Subsystem performance drift detection"
+    mitigation
+      ACS_AutoRecalibrationProcedures "Actuation Control Subsystem auto recalibration procedures"
+      ACS_FactoryDefaultParameters "Actuation Control Subsystem factory default parameters"
+      ACS_ManualCalibrationOverride "Actuation Control Subsystem manual calibration override"
+      ACS_GracefulDegradationMode "Actuation Control Subsystem graceful degradation mode"
+
+  // ========== FORCE & TORQUE REGULATION FAILURES ==========
+
+  failuremode ACS_ForceCalculationEngineFailure
+    name "Force Calculation Engine Failure"
+    description "Force calculation engine fails to calculate required clamping forces and manage algorithms"
+    function ForceCalculationEngine
+    severity 9
+    occurrence 3
+    detection 3
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      FRU_ForceCalculationFailure "Force Regulation Unit force calculation algorithm failure"
+      FRU_DynamicAdjustmentFailure "Force Regulation Unit dynamic force adjustment failure"
+      FRU_ForceFeedbackFailure "Force Regulation Unit force feedback sensor failure"
+      SMU_ForceMonitoringFailure "Safety Monitoring Unit force monitoring system failure"
+    effects
+      EPB_InsufficientBrakingForce "EPB system insufficient braking force"
+      EPB_ExcessiveBrakingForce "EPB system excessive braking force"
+      EPB_BrakePadRotorDamage "EPB system brake pad rotor damage"
+      EPB_VehicleRollawayRisk "EPB system vehicle rollaway risk"
+    detection
+      ACS_ForceSensorMonitoring "Actuation Control Subsystem force sensor monitoring"
+      ACS_BrakePadPositionMonitoring "Actuation Control Subsystem brake pad position monitoring"
+      ACS_MotorTorqueFeedback "Actuation Control Subsystem motor torque feedback"
+      ACS_SystemLoadAnalysis "Actuation Control Subsystem system load analysis"
+    mitigation
+      ACS_DefaultForceValues "Actuation Control Subsystem default force values"
+      ACS_ForceLimitingAlgorithms "Actuation Control Subsystem force limiting algorithms"
+      ACS_ManualForceOverride "Actuation Control Subsystem manual force override"
+      ACS_EmergencyBrakeActivation "Actuation Control Subsystem emergency brake activation"
+
+  failuremode ACS_TorqueRegulationModuleFailure
+    name "Torque Regulation Module Failure"
+    description "Torque regulation module fails to regulate motor torque and manage control strategies"
+    function TorqueRegulationModule
+    severity 8
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      FRU_TorqueControlFailure "Force Regulation Unit torque control algorithm failure"
+      FRU_TorqueFeedbackFailure "Force Regulation Unit torque feedback sensor failure"
+      FRU_LoadCompensationFailure "Force Regulation Unit load compensation algorithm failure"
+      MCU_TorqueGenerationFailure "Motor Control Unit torque generation control failure"
+    effects
+      EPB_UncontrolledMotorTorque "EPB system uncontrolled motor torque"
+      EPB_ActuatorMechanicalStress "EPB system actuator mechanical stress"
+      EPB_InconsistentBrakeApplication "EPB system inconsistent brake application"
+      EPB_SystemOscillationAndInstability "EPB system oscillation and instability"
+    detection
+      ACS_TorqueSensorMonitoring "Actuation Control Subsystem torque sensor monitoring"
+      ACS_MotorCurrentAnalysis "Actuation Control Subsystem motor current analysis"
+      ACS_VibrationMonitoring "Actuation Control Subsystem vibration monitoring"
+      ACS_PerformanceStabilityTracking "Actuation Control Subsystem performance stability tracking"
+    mitigation
+      ACS_TorqueLimitingAlgorithms "Actuation Control Subsystem torque limiting algorithms"
+      ACS_SmoothTorqueRamping "Actuation Control Subsystem smooth torque ramping"
+      ACS_StabilityControlAlgorithms "Actuation Control Subsystem stability control algorithms"
+      ACS_EmergencyTorqueCutoff "Actuation Control Subsystem emergency torque cutoff"
+
+  failuremode ACS_LoadCompensationControllerFailure
+    name "Load Compensation Controller Failure"
+    description "Load compensation controller fails to compensate for varying loads and maintain performance"
+    function LoadCompensationController
+    severity 7
+    occurrence 4
+    detection 5
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      FRU_LoadAnalysisFailure "Force Regulation Unit load analysis algorithm failure"
+      FRU_CompensationAlgorithmFailure "Force Regulation Unit compensation algorithm calculation failure"
+      PCU_PositionFeedbackFailure "Position Control Unit position feedback sensor failure"
+      SMU_LoadMonitoringFailure "Safety Monitoring Unit load monitoring system failure"
+    effects
+      EPB_InconsistentBrakePerformance "EPB system inconsistent brake performance"
+      EPB_PoorPerformanceUnderLoadVariations "EPB system poor performance under load variations"
+      EPB_ActuatorPositioningErrors "EPB system actuator positioning errors"
+      EPB_ReducedSystemReliability "EPB system reduced system reliability"
+    detection
+      ACS_LoadSensorMonitoring "Actuation Control Subsystem load sensor monitoring"
+      ACS_PerformanceConsistencyTracking "Actuation Control Subsystem performance consistency tracking"
+      ACS_PositionErrorAnalysis "Actuation Control Subsystem position error analysis"
+      ACS_SystemResponseTimeMonitoring "Actuation Control Subsystem system response time monitoring"
+    mitigation
+      ACS_StaticLoadCompensationTables "Actuation Control Subsystem static load compensation tables"
+      ACS_PerformanceMarginIncreases "Actuation Control Subsystem performance margin increases"
+      ACS_LoadDependentOperatingModes "Actuation Control Subsystem load dependent operating modes"
+      ACS_AdaptiveControlAlgorithms "Actuation Control Subsystem adaptive control algorithms"
+
+  // ========== POSITION & TRACKING FAILURES ==========
+
+  failuremode ACS_ActuatorPositionTrackerFailure
+    name "Actuator Position Tracker Failure"
+    description "Actuator position tracker fails to track position and manage feedback loops"
+    function ActuatorPositionTracker
+    severity 9
+    occurrence 3
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      PCU_PositionSensingFailure "Position Control Unit position sensing hardware failure"
+      PCU_FeedbackControllerFailure "Position Control Unit feedback controller algorithm failure"
+      PCU_PositionEstimationFailure "Position Control Unit position estimation algorithm failure"
+      AMU_ActuatorInterfaceFailure "Actuator Management Unit actuator interface communication failure"
+    effects
+      EPB_LossOfPositionFeedback "EPB system loss of position feedback"
+      EPB_ActuatorOvertravel "EPB system actuator overtravel"
+      EPB_BrakePadContactLoss "EPB system brake pad contact loss"
+      EPB_SystemInstability "EPB system instability"
+    detection
+      ACS_PositionSensorValidation "Actuation Control Subsystem position sensor validation"
+      ACS_PositionEstimationVerification "Actuation Control Subsystem position estimation verification"
+      ACS_TravelLimitMonitoring "Actuation Control Subsystem travel limit monitoring"
+      ACS_FeedbackLoopStabilityTracking "Actuation Control Subsystem feedback loop stability tracking"
+    mitigation
+      ACS_RedundantPositionSensors "Actuation Control Subsystem redundant position sensors"
+      ACS_PositionEstimationAlgorithms "Actuation Control Subsystem position estimation algorithms"
+      ACS_TravelLimitSwitches "Actuation Control Subsystem travel limit switches"
+      ACS_SafePositionDefaults "Actuation Control Subsystem safe position defaults"
+
+  // ========== POWER & THERMAL MANAGEMENT FAILURES ==========
+
+  failuremode ACS_PowerSupplyManagerFailure
+    name "Power Supply Manager Failure"
+    description "Power supply manager fails to manage power distribution and voltage regulation"
+    function PowerSupplyManager
+    severity 10
+    occurrence 2
+    detection 2
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      PMU_VoltageRegulationFailure "Power Management Unit voltage regulation circuit failure"
+      PMU_PowerDistributionFailure "Power Management Unit power distribution switching failure"
+      PMU_ProtectionSystemFailure "Power Management Unit power protection system failure"
+      SMU_PowerMonitoringFailure "Safety Monitoring Unit power monitoring system failure"
+    effects
+      EPB_SystemPowerLoss "EPB system power loss"
+      EPB_VoltageInstability "EPB system voltage instability"
+      EPB_ComponentDamage "EPB system component damage"
+      EPB_TotalSystemShutdown "EPB system total shutdown"
+    detection
+      ACS_VoltageMonitoring "Actuation Control Subsystem voltage monitoring"
+      ACS_CurrentMonitoring "Actuation Control Subsystem current monitoring"
+      ACS_PowerQualityAnalysis "Actuation Control Subsystem power quality analysis"
+      ACS_ProtectionSystemStatus "Actuation Control Subsystem protection system status"
+    mitigation
+      ACS_BackupPowerSystems "Actuation Control Subsystem backup power systems"
+      ACS_VoltageRegulationCircuits "Actuation Control Subsystem voltage regulation circuits"
+      ACS_PowerIsolationSwitches "Actuation Control Subsystem power isolation switches"
+      ACS_EmergencyPowerModes "Actuation Control Subsystem emergency power modes"
+
+  failuremode ACS_ThermalProtectionManagerFailure
+    name "Thermal Protection Manager Failure"
+    description "Thermal protection manager fails to monitor temperature and implement protection"
+    function ThermalProtectionManager
+    severity 8
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      SMU_TemperatureSensingFailure "Safety Monitoring Unit temperature sensing hardware failure"
+      SMU_ThermalAlgorithmFailure "Safety Monitoring Unit thermal algorithm calculation failure"
+      SMU_ProtectionActivationFailure "Safety Monitoring Unit thermal protection activation failure"
+      PMU_ThermalManagementFailure "Power Management Unit thermal management system failure"
+    effects
+      EPB_ComponentOverheating "EPB system component overheating"
+      EPB_ThermalDamage "EPB system thermal damage"
+      EPB_FireHazard "EPB system fire hazard"
+      EPB_PerformanceDegradation "EPB system performance degradation"
+    detection
+      ACS_TemperatureSensorMonitoring "Actuation Control Subsystem temperature sensor monitoring"
+      ACS_ThermalImaging "Actuation Control Subsystem thermal imaging"
+      ACS_PerformanceDegradationTracking "Actuation Control Subsystem performance degradation tracking"
+      ACS_EnvironmentalMonitoring "Actuation Control Subsystem environmental monitoring"
+    mitigation
+      ACS_ThermalShutdownCircuits "Actuation Control Subsystem thermal shutdown circuits"
+      ACS_ActiveCoolingSystems "Actuation Control Subsystem active cooling systems"
+      ACS_ThermalDerating "Actuation Control Subsystem thermal derating"
+      ACS_HeatDissipationDesign "Actuation Control Subsystem heat dissipation design"
+
+  // ========== SAFETY & DIAGNOSTIC FAILURES ==========
+
+  failuremode ACS_ActuatorSafetyMonitorFailure
+    name "Actuator Safety Monitor Failure"
+    description "Actuator safety monitor fails to monitor safety parameters and implement emergency procedures"
+    function ActuatorSafetyMonitor
+    severity 10
+    occurrence 2
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      SMU_SafetyAlgorithmFailure "Safety Monitoring Unit safety algorithm processing failure"
+      SMU_EmergencyResponseFailure "Safety Monitoring Unit emergency response activation failure"
+      SMU_SensorValidationFailure "Safety Monitoring Unit sensor validation algorithm failure"
+      SMU_DiagnosticFailure "Safety Monitoring Unit diagnostic system failure"
+    effects
+      EPB_LossOfSafetyMonitoring "EPB system loss of safety monitoring"
+      EPB_DelayedEmergencyResponse "EPB system delayed emergency response"
+      EPB_UndetectedHazardousConditions "EPB system undetected hazardous conditions"
+      EPB_SafetySystemCompromise "EPB system safety system compromise"
+    detection
+      ACS_SafetySystemSelfTest "Actuation Control Subsystem safety system self test"
+      ACS_WatchdogMonitoring "Actuation Control Subsystem watchdog monitoring"
+      ACS_CrossSystemValidation "Actuation Control Subsystem cross system validation"
+      ACS_EmergencyResponseTesting "Actuation Control Subsystem emergency response testing"
+    mitigation
+      ACS_RedundantSafetyMonitoring "Actuation Control Subsystem redundant safety monitoring"
+      ACS_HardwareSafetyCircuits "Actuation Control Subsystem hardware safety circuits"
+      ACS_IndependentSafetySystems "Actuation Control Subsystem independent safety systems"
+      ACS_FailSafeSystemDesign "Actuation Control Subsystem fail safe system design"
+
+  failuremode ACS_ActuatorDiagnosticProcessorFailure
+    name "Actuator Diagnostic Processor Failure"
+    description "Actuator diagnostic processor fails to process diagnostic data and identify issues"
+    function ActuatorDiagnosticProcessor
+    severity 7
+    occurrence 4
+    detection 5
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      SMU_DiagnosticDataFailure "Safety Monitoring Unit diagnostic data processing failure"
+      SMU_FaultAnalysisFailure "Safety Monitoring Unit fault analysis algorithm failure"
+      SMU_HealthAssessmentFailure "Safety Monitoring Unit health assessment calculation failure"
+      AMU_DiagnosticInterfaceFailure "Actuator Management Unit diagnostic interface communication failure"
+    effects
+      EPB_UndetectedComponentFailures "EPB system undetected component failures"
+      EPB_DelayedMaintenance "EPB system delayed maintenance"
+      EPB_SystemReliabilityDegradation "EPB system reliability degradation"
+      EPB_UnexpectedSystemFailures "EPB system unexpected failures"
+    detection
+      ACS_DiagnosticSystemSelfTest "Actuation Control Subsystem diagnostic system self test"
+      ACS_KnownFaultInjectionTesting "Actuation Control Subsystem known fault injection testing"
+      ACS_DiagnosticCoverageAnalysis "Actuation Control Subsystem diagnostic coverage analysis"
+      ACS_SystemHealthMonitoring "Actuation Control Subsystem system health monitoring"
+    mitigation
+      ACS_MultipleDiagnosticApproaches "Actuation Control Subsystem multiple diagnostic approaches"
+      ACS_ExternalDiagnosticTools "Actuation Control Subsystem external diagnostic tools"
+      ACS_PredictiveMaintenance "Actuation Control Subsystem predictive maintenance"
+      ACS_ConservativeSafetyMargins "Actuation Control Subsystem conservative safety margins"
+
+  failuremode ACS_ActuatorWearMonitorFailure
+    name "Actuator Wear Monitor Failure"
+    description "Actuator wear monitor fails to monitor wear patterns and predict maintenance"
+    function ActuatorWearMonitor
+    severity 6
+    occurrence 5
+    detection 6
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      AMU_WearAnalysisFailure "Actuator Management Unit wear analysis algorithm failure"
+      AMU_LifetimePredictionFailure "Actuator Management Unit lifetime prediction model failure"
+      SMU_WearSensorFailure "Safety Monitoring Unit wear sensor hardware failure"
+      AMU_MaintenanceSchedulingFailure "Actuator Management Unit maintenance scheduling algorithm failure"
+    effects
+      EPB_UnexpectedComponentWear "EPB system unexpected component wear"
+      EPB_UnplannedMaintenance "EPB system unplanned maintenance"
+      EPB_ComponentFailure "EPB system component failure"
+      EPB_SystemUnavailability "EPB system unavailability"
+    detection
+      ACS_WearPatternAnalysis "Actuation Control Subsystem wear pattern analysis"
+      ACS_PerformanceDegradationTracking "Actuation Control Subsystem performance degradation tracking"
+      ACS_UsageCycleCounting "Actuation Control Subsystem usage cycle counting"
+      ACS_ComponentLifeModeling "Actuation Control Subsystem component life modeling"
+    mitigation
+      ACS_ConservativeMaintenanceIntervals "Actuation Control Subsystem conservative maintenance intervals"
+      ACS_WearResistantMaterials "Actuation Control Subsystem wear resistant materials"
+      ACS_RedundantWearMonitoring "Actuation Control Subsystem redundant wear monitoring"
+      ACS_ProactiveComponentReplacement "Actuation Control Subsystem proactive component replacement"
+
+  failuremode ACS_BackupActuatorControllerFailure
+    name "Backup Actuator Controller Failure"
+    description "Backup actuator controller fails to control backup systems and manage failover"
+    function BackupActuatorController
+    severity 10
+    occurrence 2
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_BackupMonitoringFailure "Actuator Management Unit backup actuator monitoring failure"
+      AMU_FailoverDecisionFailure "Actuator Management Unit failover decision algorithm failure"
+      AMU_BackupActivationFailure "Actuator Management Unit backup activation controller failure"
+      SMU_BackupStatusFailure "Safety Monitoring Unit backup status monitoring failure"
+    effects
+      EPB_LossOfBackupCapability "EPB system loss of backup capability"
+      EPB_FailedSystemRedundancy "EPB system failed redundancy"
+      EPB_SinglePointOfFailure "EPB system single point of failure"
+      EPB_ReducedSystemSafety "EPB system reduced safety"
+    detection
+      ACS_BackupSystemTesting "Actuation Control Subsystem backup system testing"
+      ACS_FailoverSimulation "Actuation Control Subsystem failover simulation"
+      ACS_RedundancyVerification "Actuation Control Subsystem redundancy verification"
+      ACS_BackupStatusMonitoring "Actuation Control Subsystem backup status monitoring"
+    mitigation
+      ACS_MultipleBackupSystems "Actuation Control Subsystem multiple backup systems"
+      ACS_IndependentBackupControllers "Actuation Control Subsystem independent backup controllers"
+      ACS_ManualBackupActivation "Actuation Control Subsystem manual backup activation"
+      ACS_BackupSystemIsolation "Actuation Control Subsystem backup system isolation" 

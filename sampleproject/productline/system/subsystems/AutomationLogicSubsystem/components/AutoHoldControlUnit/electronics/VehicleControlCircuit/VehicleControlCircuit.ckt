@@ -1,0 +1,14 @@
+circuit VehicleControlCircuit
+  name "Vehicle Control Circuit"
+  description "Electronics circuit for vehicle state monitoring, speed analysis, and brake input processing interfaces"
+  owner "Electronics Team"
+  tags "vehicle", "control", "monitoring", "speed"
+  safetylevel ASIL-B
+  partof AutoHoldControlUnit
+  
+  implements VehicleStateAnalyzer, SpeedThresholdMonitor, BrakeInputProcessor
+  
+  interfaces
+    Vehicle_State_Input "Vehicle state monitoring inputs"
+    Speed_Analysis_Input "Speed sensor and analysis inputs"
+    Brake_Input_Monitoring "Brake pedal and system input monitoring" 

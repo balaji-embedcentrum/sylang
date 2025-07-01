@@ -1,0 +1,8 @@
+Subsystem InputProcessingSubsystem
+  name "Input Processing Subsystem"
+  description "Processes driver inputs from various switch types and feedback mechanisms."
+  owner "HMI Team"
+  tags "input", "processing", "switch"
+  safetylevel ASIL-B
+  enables PushPullSwitch, RockerSwitch, ToggleSwitch, SwitchIllumination, SwitchFeedback
+  implements PushPullInputDriver, RockerInputDriver, ToggleInputDriver, IlluminationControlService, HapticFeedbackEngine 

@@ -1,0 +1,14 @@
+circuit VoltageRegulationCircuit
+  name "Voltage Regulation Circuit"
+  description "Electronics circuit for voltage regulation, power conversion, and supply stability with multiple output rails"
+  owner "Electronics Team"
+  tags "voltage", "regulation", "power", "conversion"
+  safetylevel ASIL-D
+  partof PowerManagementUnit
+  
+  implements VoltageRegulationController
+  
+  interfaces
+    Input_Power "Input power supply interfaces"
+    Regulated_Outputs "Multiple regulated voltage outputs"
+    Regulation_Control "Voltage regulation control signals" 

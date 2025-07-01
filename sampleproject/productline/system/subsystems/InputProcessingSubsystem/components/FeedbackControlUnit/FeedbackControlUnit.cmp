@@ -1,0 +1,35 @@
+component FeedbackControlUnit
+  name "Feedback Control Unit"
+  description "Component responsible for switch illumination control and haptic feedback generation"
+  owner "HMI Team"
+  tags "illumination", "feedback", "haptic", "customization", "control"
+  safetylevel QM
+  aggregatedby InputProcessingSubsystem
+  
+  interfaces
+    interface Illumination_Control_Output
+      type Analog
+      range "0-12V LED control"
+      direction Output
+      
+    interface Haptic_Output
+      type Analog
+      protocol "PWM"
+      direction Output
+      
+    interface Audio_Feedback_Output
+      type Analog
+      protocol "I2S"
+      direction Output
+      
+    interface Customization_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Feedback_Status_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+  implements SwitchIlluminationController, FeedbackGenerationEngine, FeedbackCustomizationManager 

@@ -1,0 +1,102 @@
+{
+  "Safety Goal": {
+    "prefix": "goal",
+    "body": [
+      "goal ${1:GoalName}",
+      "  name \"${2:Safety Goal Name}\"",
+      "  description \"${3:Safety goal description}\"",
+      "  safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  owner \"${5:Safety Team}\"",
+      "  tags \"${6:safety}\", \"${7:goal}\""
+    ],
+    "description": "Safety goal definition"
+  },
+  "Hazard": {
+    "prefix": "hazard",
+    "body": [
+      "hazard ${1:HazardName}",
+      "  name \"${2:Hazard Name}\"",
+      "  description \"${3:Hazard description}\"",
+      "  severity ${4|S1,S2,S3|}",
+      "  probability ${5|E1,E2,E3,E4|}",
+      "  controllability ${6|C1,C2,C3|}",
+      "  safetylevel ${7|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  owner \"${8:Safety Team}\""
+    ],
+    "description": "Hazard analysis definition"
+  },
+  "Risk Assessment": {
+    "prefix": "risk",
+    "body": [
+      "risk ${1:RiskName}",
+      "  name \"${2:Risk Name}\"",
+      "  description \"${3:Risk description}\"",
+      "  impact ${4|Low,Medium,High,Critical|}",
+      "  likelihood ${5|Rare,Unlikely,Possible,Likely,Almost Certain|}",
+      "  safetylevel ${6|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  mitigation \"${7:Mitigation strategy}\"",
+      "  owner \"${8:Safety Team}\""
+    ],
+    "description": "Risk assessment definition"
+  },
+  "Safety Requirement": {
+    "prefix": "requirement",
+    "body": [
+      "requirement ${1:RequirementName}",
+      "  name \"${2:Safety Requirement Name}\"",
+      "  description \"${3:Requirement description}\"",
+      "  safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  verification \"${5:Verification method}\"",
+      "  owner \"${6:Safety Team}\"",
+      "  tags \"${7:safety}\", \"${8:requirement}\""
+    ],
+    "description": "Safety requirement definition"
+  },
+  "Safety Item": {
+    "prefix": "item",
+    "body": [
+      "item ${1:ItemName}",
+      "  name \"${2:Safety Item Name}\"",
+      "  description \"${3:Item description}\"",
+      "  safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  boundary \"${5:Item boundary}\"",
+      "  owner \"${6:Safety Team}\""
+    ],
+    "description": "Safety item definition"
+  },
+  "ASIL-D": {
+    "prefix": "asild",
+    "body": [
+      "safetylevel ASIL-D"
+    ],
+    "description": "ASIL-D safety level"
+  },
+  "ASIL-C": {
+    "prefix": "asilc",
+    "body": [
+      "safetylevel ASIL-C"
+    ],
+    "description": "ASIL-C safety level"
+  },
+  "ASIL-B": {
+    "prefix": "asilb",
+    "body": [
+      "safetylevel ASIL-B"
+    ],
+    "description": "ASIL-B safety level"
+  },
+  "ASIL-A": {
+    "prefix": "asila",
+    "body": [
+      "safetylevel ASIL-A"
+    ],
+    "description": "ASIL-A safety level"
+  },
+  "QM": {
+    "prefix": "qm",
+    "body": [
+      "safetylevel QM"
+    ],
+    "description": "Quality Management (no ASIL)"
+  }
+} 

@@ -1,0 +1,41 @@
+component CableMonitoringUnit
+  name "Cable Monitoring Unit"
+  description "Component responsible for cable health monitoring, tension analysis, and wear prediction"
+  owner "Hardware Team"
+  tags "cable", "health", "monitoring", "tension", "wear", "prediction"
+  safetylevel ASIL-C
+  aggregatedby SensorMonitoringSubsystem
+  
+  interfaces
+    interface Cable_Health_Input
+      type Analog
+      range "Cable health sensors"
+      direction Input
+      
+    interface Tension_Sensor_Input
+      type Analog
+      range "0-10V representing tension"
+      accuracy "±0.5%"
+      direction Input
+      
+    interface Health_Report_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Tension_Analysis_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Wear_Prediction_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Alert_Notification_Output
+      type Digital
+      priority "High"
+      direction Output
+      
+  implements CableHealthAnalyzer, MonitoringDataProcessor, CableTensionAnalyzer, CableWearPredictor, MonitoringAlertManager 

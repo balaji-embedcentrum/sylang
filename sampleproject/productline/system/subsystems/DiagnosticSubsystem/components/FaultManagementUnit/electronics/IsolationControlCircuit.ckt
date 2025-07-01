@@ -1,0 +1,14 @@
+electronicscircuit IsolationControlCircuit
+  name "Isolation Control Circuit"
+  description "Electronics circuit providing hardware support for fault isolation decisions, safety barrier control, and redundancy activation"
+  owner "Electronics Team"
+  tags "isolation-control", "safety-barriers", "redundancy-control", "failover"
+  safetylevel ASIL-D
+  partof FaultManagementUnit
+  implements IsolationDecisionEngine, SafetyBarrierController, RedundancyActivationController
+  interfaces
+    input isolation_commands "Fault isolation commands and safety containment signals"
+    input redundancy_status "Redundant system status and availability information"
+    output isolation_controller "Hardware isolation control and decision implementation"
+    output safety_barrier_control "Hardware safety barrier activation and control"
+    output redundancy_switch "Hardware redundancy switching and failover control"

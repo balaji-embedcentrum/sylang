@@ -1,0 +1,300 @@
+threats EPBThreats
+  name "EPB System - Cybersecurity Threats Analysis"
+  description "Identification and analysis of cybersecurity threats targeting EPB system assets"
+  standard "ISO 21434 - Threat Analysis and Risk Assessment"
+  
+  productlinereference ElectricParkingBrakeSystem
+  systemreference EPBSafety, EPBFeatures, EPBFunctions
+  securityreference EPBSecurity
+  assetsreference EPBAssets
+  
+  threatmethodology
+    framework "STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)"
+    approach "Asset-centric threat modeling with attack vector analysis"
+    scope "All identified assets across digital, physical, logical, and information categories"
+    
+  threatenvironments
+    environment Remote
+      access "Network-based attacks via vehicle communication systems"
+      proximity "No physical access required"
+      expertise "Medium to high cybersecurity skills"
+      resources "Standard hacking tools and techniques"
+      
+    environment Physical
+      access "Direct physical access to vehicle components"
+      proximity "Physical presence at vehicle location"
+      expertise "Low to medium technical skills"
+      resources "Basic tools and equipment"
+      
+    environment Supply_Chain
+      access "Access during manufacturing or distribution"
+      proximity "Component-level access before installation"
+      expertise "High technical and organizational skills"
+      resources "Significant resources and insider access"
+      
+    environment Service
+      access "Authorized service interface access"
+      proximity "Legitimate service environment"
+      expertise "Medium technical skills with insider knowledge"
+      resources "Diagnostic tools and service credentials"
+
+  threatagents
+    
+    agent TA_001
+      name "Remote Cybercriminal"
+      description "External attacker with network access to vehicle systems"
+      motivation "Financial gain, vehicle theft, ransom demands"
+      capability "High technical skills, specialized automotive tools"
+      access "Remote via compromised vehicle networks or wireless interfaces"
+      resources "Professional hacking tools, botnets, exploit kits"
+      examples "Organized crime groups, professional hackers, cybercriminal organizations"
+      
+    agent TA_002
+      name "Malicious Insider"
+      description "Employee or contractor with legitimate system access"
+      motivation "Financial gain, revenge, espionage, sabotage"
+      capability "High domain knowledge, legitimate access credentials"
+      access "Direct access to systems, development tools, and documentation"
+      resources "Company resources, insider knowledge, legitimate access"
+      examples "Disgruntled employees, contractors, business partners"
+      
+    agent TA_003
+      name "Nation State Actor"
+      description "Government-sponsored advanced persistent threat group"
+      motivation "Espionage, infrastructure disruption, strategic advantage"
+      capability "Very high technical skills, advanced tools, unlimited resources"
+      access "Sophisticated multi-vector attacks, zero-day exploits"
+      resources "Unlimited funding, custom tools, long-term operations"
+      examples "APT groups, military cyber units, intelligence agencies"
+      
+    agent TA_004
+      name "Script Kiddie"
+      description "Low-skill attacker using readily available tools"
+      motivation "Fame, curiosity, minor financial gain, pranks"
+      capability "Low technical skills, relies on automated tools"
+      access "Public exploits, basic scanning tools, opportunistic attacks"
+      resources "Free tools, public exploits, limited resources"
+      examples "Amateur hackers, students, hobby attackers"
+      
+    agent TA_005
+      name "Terrorist/Activist"
+      description "Ideologically motivated attacker targeting critical infrastructure"
+      motivation "Political statement, disruption, fear creation"
+      capability "Medium technical skills, focused determination"
+      access "Targeted attacks on high-visibility systems"
+      resources "Moderate funding, specialized training, network support"
+      examples "Terrorist organizations, hacktivist groups, extremist organizations"
+      
+    agent TA_006
+      name "Supply Chain Attacker"
+      description "Attacker compromising components during manufacturing or distribution"
+      motivation "Long-term strategic positioning, widespread access"
+      capability "High technical skills, manufacturing process knowledge"
+      access "Component-level access during production or shipping"
+      resources "Significant resources, insider access, manufacturing capabilities"
+      examples "State actors, organized crime, compromised suppliers"
+
+  attackscenarios
+    
+    scenario AS_001
+      name "CAN Bus Message Injection"
+      description "Attacker injects malicious CAN messages to control EPB actuation"
+      thretagent TA_001, TA_003
+      environment Remote
+      targetassets DA_004, PA_004
+      attackvector "Network penetration → Vehicle gateway compromise → CAN bus access"
+      steps
+        step "Gain access to vehicle network via compromised telematics"
+        step "Bypass network gateway security controls"
+        step "Analyze CAN traffic to identify EPB command messages"
+        step "Inject malicious actuation commands during vehicle operation"
+        step "Override legitimate brake control signals"
+      impact "Unintended brake activation causing vehicle instability or accident"
+      likelihood "Medium - requires network access and CAN protocol knowledge"
+      
+    scenario AS_002
+      name "Firmware Tampering Attack"
+      description "Modification of EPB firmware to alter safety-critical behavior"
+      thretagent TA_002, TA_006
+      environment Supply_Chain, Service
+      targetassets DA_002, PA_001
+      attackvector "Physical access → Firmware extraction → Modification → Reinstallation"
+      steps
+        step "Obtain physical access to EPB ECU"
+        step "Extract firmware using JTAG or similar interface"
+        step "Reverse engineer and modify safety algorithms"
+        step "Install modified firmware with hidden backdoors"
+        step "Activate malicious functionality remotely or via trigger"
+      impact "Compromised safety functions, hidden backdoors, unpredictable behavior"
+      likelihood "Low - requires specialized equipment and expertise"
+      
+    scenario AS_003
+      name "Diagnostic Port Exploitation"
+      description "Unauthorized access via OBD-II or proprietary diagnostic interface"
+      thretagent TA_001, TA_004
+      environment Physical, Service
+      targetassets PA_003, DA_003, LA_003
+      attackvector "Physical connector access → Authentication bypass → Command injection"
+      steps
+        step "Access vehicle diagnostic port (OBD-II connector)"
+        step "Connect malicious diagnostic tool or device"
+        step "Attempt authentication bypass or credential theft"
+        step "Execute unauthorized diagnostic commands"
+        step "Modify configuration parameters or extract sensitive data"
+      impact "System reconfiguration, data theft, unauthorized control access"
+      likelihood "Medium - requires physical access but uses standard interfaces"
+      
+    scenario AS_004
+      name "Cryptographic Key Extraction"
+      description "Physical attack to extract encryption keys from hardware security module"
+      thretagent TA_003, TA_006
+      environment Physical, Supply_Chain
+      targetassets LA_001, PA_001
+      attackvector "Physical ECU access → Hardware attack → Key extraction"
+      steps
+        step "Remove EPB ECU from vehicle"
+        step "Decapsulate security chip using chemical or laser techniques"
+        step "Perform side-channel analysis or fault injection attacks"
+        step "Extract cryptographic keys from secure storage"
+        step "Use keys to forge authenticated messages or decrypt data"
+      impact "Complete compromise of cryptographic protection, message forgery"
+      likelihood "Very Low - requires advanced laboratory equipment and expertise"
+      
+    scenario AS_005
+      name "Supply Chain Insertion"
+      description "Malicious components inserted during manufacturing process"
+      thretagent TA_006, TA_003
+      environment Supply_Chain
+      targetassets DA_002, PA_001, PA_002
+      attackvector "Manufacturing infiltration → Component substitution → Backdoor insertion"
+      steps
+        step "Compromise supplier or manufacturing facility"
+        step "Replace legitimate components with modified versions"
+        step "Insert hardware backdoors or malicious firmware"
+        step "Maintain covert channel for remote activation"
+        step "Deploy across multiple vehicle models and manufacturers"
+      impact "Widespread compromise, persistent backdoors, long-term espionage"
+      likelihood "Very Low - requires nation-state level resources and access"
+      
+    scenario AS_006
+      name "Sensor Data Manipulation"
+      description "Attack on position or force sensors to provide false feedback"
+      thretagent TA_001, TA_002
+      environment Physical, Remote
+      targetassets PA_002, LA_005, IA_004
+      attackvector "Sensor interface access → Signal injection → False data provision"
+      steps
+        step "Identify sensor wiring or wireless interfaces"
+        step "Inject false signals mimicking sensor outputs"
+        step "Manipulate sensor fusion algorithms with corrupted data"
+        step "Cause system to make decisions based on false information"
+        step "Potentially trigger inappropriate brake activation or release"
+      impact "Incorrect system behavior, safety function compromise"
+      likelihood "Medium - accessible sensors but requires technical knowledge"
+      
+    scenario AS_007
+      name "Replay Attack on Commands"
+      description "Capture and replay legitimate brake commands at inappropriate times"
+      thretagent TA_001, TA_004
+      environment Remote, Physical
+      targetassets DA_004, PA_004
+      attackvector "Traffic capture → Message analysis → Replay injection"
+      steps
+        step "Monitor and capture legitimate EPB command messages"
+        step "Analyze message structure and timing patterns"
+        step "Store commands for later replay"
+        step "Inject captured commands during inappropriate vehicle states"
+        step "Cause unintended brake activation during driving"
+      impact "Inappropriate brake activation, loss of vehicle control"
+      likelihood "Medium - requires network access and message capture capability"
+      
+    scenario AS_008
+      name "Privilege Escalation via Service Interface"
+      description "Escalate from service-level access to safety-critical control"
+      thretagent TA_002, TA_001
+      environment Service, Remote
+      targetassets LA_003, DA_001, LA_004
+      attackvector "Service authentication → Vulnerability exploitation → Privilege escalation"
+      steps
+        step "Obtain legitimate or stolen service credentials"
+        step "Access diagnostic or service interface"
+        step "Exploit software vulnerabilities in service functions"
+        step "Escalate privileges to safety-critical control functions"
+        step "Modify safety algorithms or control logic"
+      impact "Full system compromise, safety function manipulation"
+      likelihood "Medium - requires service access and vulnerability exploitation"
+      
+    scenario AS_009
+      name "Denial of Service Attack"
+      description "Overwhelm system resources to prevent normal EPB operation"
+      thretagent TA_001, TA_005
+      environment Remote
+      targetassets DA_001, DA_004, PA_004
+      attackvector "Network flooding → Resource exhaustion → Service disruption"
+      steps
+        step "Identify network interfaces and communication protocols"
+        step "Generate high volume of malicious or malformed messages"
+        step "Overwhelm processing capacity or communication bandwidth"
+        step "Cause system to become unresponsive or enter safe mode"
+        step "Prevent legitimate brake commands from being processed"
+      impact "System unavailability, brake function denial"
+      likelihood "High - relatively easy to execute with network access"
+      
+    scenario AS_010
+      name "Configuration Parameter Tampering"
+      description "Unauthorized modification of system configuration and calibration data"
+      thretagent TA_002, TA_001
+      environment Service, Remote
+      targetassets DA_005, IA_004, LA_004
+      attackvector "Service access → Parameter modification → System behavior change"
+      steps
+        step "Gain access to configuration or calibration interfaces"
+        step "Identify critical system parameters"
+        step "Modify parameters to alter system behavior"
+        step "Potentially reduce safety margins or change operational limits"
+        step "Hide modifications to avoid detection"
+      impact "Degraded performance, reduced safety margins, unpredictable behavior"
+      likelihood "Medium - requires access to configuration interfaces"
+
+  threatmapping
+    
+    mapping Digital_Assets
+      assets DA_001, DA_002, DA_003, DA_004, DA_005
+      primarythreats "Code injection, unauthorized modification, data corruption"
+      scenarios AS_001, AS_002, AS_003, AS_008, AS_009, AS_010
+      protections "Code signing, integrity verification, access control, encryption"
+      
+    mapping Physical_Assets
+      assets PA_001, PA_002, PA_003, PA_004, PA_005
+      primarythreats "Physical tampering, unauthorized access, component substitution"
+      scenarios AS_002, AS_003, AS_004, AS_005, AS_006
+      protections "Tamper detection, physical security, secure mounting, access control"
+      
+    mapping Logical_Assets
+      assets LA_001, LA_002, LA_003, LA_004, LA_005
+      primarythreats "Key extraction, algorithm manipulation, privilege escalation"
+      scenarios AS_004, AS_006, AS_008, AS_010
+      protections "Hardware security modules, algorithm obfuscation, access control"
+      
+    mapping Information_Assets
+      assets IA_001, IA_002, IA_003, IA_004, IA_005
+      primarythreats "Data theft, privacy violation, information manipulation"
+      scenarios AS_003, AS_006, AS_010
+      protections "Data encryption, access logging, privacy controls, integrity verification"
+
+  emergingthreats
+    threat "AI-powered attack automation"
+      description "Machine learning algorithms used to optimize attack strategies"
+      impact "Increased attack success rate and reduced detection time"
+      
+    threat "Quantum computing cryptographic attacks"
+      description "Future quantum computers breaking current encryption methods"
+      impact "Compromise of all current cryptographic protections"
+      
+    threat "Deep fake social engineering"
+      description "AI-generated content used for sophisticated social engineering"
+      impact "Improved success rate of insider threat recruitment"
+      
+    threat "5G/V2X attack vectors"
+      description "New attack surfaces introduced by vehicle connectivity"
+      impact "Expanded remote attack capabilities and new threat vectors" 

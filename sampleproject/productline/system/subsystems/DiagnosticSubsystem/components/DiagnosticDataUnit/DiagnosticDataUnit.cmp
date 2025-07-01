@@ -1,0 +1,40 @@
+component DiagnosticDataUnit
+  name "Diagnostic Data Unit"
+  description "Component responsible for diagnostic data formatting, logging, and report generation"
+  owner "Diagnostics Team"
+  tags "data", "formatting", "logging", "reports", "storage"
+  safetylevel ASIL-C
+  aggregatedby DiagnosticSubsystem
+  
+  interfaces
+    interface Raw_Diagnostic_Data_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Formatted_Data_Output
+      type Digital
+      protocol "ISO 14229 UDS"
+      direction Output
+      
+    interface Data_Storage_Interface
+      type Digital
+      protocol "Non-volatile memory"
+      direction Bidirectional
+      
+    interface Report_Request_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Generated_Report_Output
+      type Digital
+      protocol "ISO 14229 UDS"
+      direction Output
+      
+    interface External_Interface
+      type Communication
+      protocol "Ethernet/USB"
+      direction Output
+      
+  implements DiagnosticDataFormatter, DiagnosticDataLogger, DiagnosticReportGenerator 

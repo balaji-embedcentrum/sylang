@@ -1,0 +1,14 @@
+electronicscircuit FlowControlCircuit
+  name "Flow Control Circuit"
+  description "Electronics circuit providing hardware support for transmission rate control, backpressure handling, and flow regulation"
+  owner "Electronics Team"
+  tags "flow-control", "transmission-rate", "backpressure", "flow-regulation"
+  safetylevel ASIL-C
+  partof ProtocolManagementUnit
+  implements TransmissionRateController, BackpressureHandler
+  interfaces
+    input flow_data "Flow control data and transmission rate requirements"
+    input backpressure_signals "Network backpressure signals and congestion indicators"
+    output flow_control_circuit "Hardware flow control and rate regulation outputs"
+    output transmission_rate_controller "Hardware transmission rate control signals"
+    output backpressure_handler "Hardware backpressure handling and response control"

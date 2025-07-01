@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Safety",
+  "scopeName": "source.sylang.safety",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#safety-keywords" },
+    { "include": "#strings" },
+    { "include": "#safety-levels" },
+    { "include": "#attributes" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sylang",
+          "begin": "//",
+          "end": "$"
+        },
+        {
+          "name": "comment.block.sylang",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "safety-keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.safety.sylang",
+          "match": "\\b(functionalsafetyrequirements|requirement|safety|hazard|risk|goal|item)\\b"
+        },
+        {
+          "name": "keyword.other.property.sylang",
+          "match": "\\b(name|description|owner|tags|severity|probability|controllability|verification|rationale)\\b"
+        },
+        {
+          "name": "keyword.other.reference.sylang", 
+          "match": "\\b(derivedfrom|derivedFrom|allocatedto|allocatedTo|asil|ASIL)\\b"
+        }
+      ]
+    },
+    "safety-levels": {
+      "patterns": [
+        {
+          "name": "constant.language.safety-level.sylang",
+          "match": "\\b(ASIL-[ABCD]|QM)\\b"
+        },
+        {
+          "name": "keyword.other.safety.sylang",
+          "match": "\\b(safetylevel)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.sylang",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.sylang",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.sylang",
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*[\":])"
+        }
+      ]
+    }
+  }
+} 

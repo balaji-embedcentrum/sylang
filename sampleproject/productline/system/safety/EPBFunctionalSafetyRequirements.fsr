@@ -1,0 +1,230 @@
+functionalsafetyrequirements EPBFunctionalSafetyRequirements
+  name "EPB System - Functional Safety Requirements"
+  description "High-level functional safety requirements derived from safety goals per ISO 26262"
+  safetygoals EPBSafetyGoals
+
+  // ========================================
+  // ACTUATION SAFETY REQUIREMENTS (ASIL D)
+  // ========================================
+
+  requirement FSR_EPB_001
+    description "EPB actuator shall provide minimum 3000N holding force across all environmental conditions"
+    derivedfrom SG_EPB_001
+    asil D
+    rationale "Prevents vehicle rollaway on maximum specified grade"
+    allocatedto ActuationControlManager, ForceMonitoringService
+    verification "Physical force measurement across temperature and voltage range"
+    
+  requirement FSR_EPB_002
+    description "EPB position feedback shall have accuracy within ±1% of full range"
+    derivedfrom SG_EPB_001
+    asil D
+    rationale "Ensures accurate force application and release verification"
+    allocatedto SensorFusionEngine, ActuationControlManager
+    verification "Calibrated position measurement with certified reference"
+    
+  requirement FSR_EPB_003
+    description "EPB actuation response time shall not exceed 500ms from command to force application"
+    derivedfrom SG_EPB_001, SG_EPB_002
+    asil D
+    rationale "Ensures timely response for both parking and emergency scenarios"
+    allocatedto ActuationControlManager, SafetyMonitoringProcessor
+    verification "Timing measurement under all operational conditions"
+    
+  requirement FSR_EPB_004
+    description "EPB force application shall be monotonic without oscillation or overshoot >10%"
+    derivedfrom SG_EPB_001, SG_EPB_002
+    asil C
+    rationale "Prevents vehicle instability during brake application"
+    allocatedto ActuationControlManager, FailsafeActivationController
+    verification "Force profile analysis during application sequences"
+
+  // ========================================
+  // MONITORING AND DIAGNOSTIC REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_005
+    description "EPB diagnostic coverage shall achieve minimum 95% for all safety functions"
+    derivedfrom SG_EPB_003, SG_EPB_004
+    asil D
+    rationale "Ensures detection of safety-critical faults before hazardous events"
+    allocatedto DiagnosticSystemController, AnomalyDetectionEngine
+    verification "Fault injection testing and coverage analysis"
+    
+  requirement FSR_EPB_006
+    description "EPB fault detection latency shall not exceed 100ms for ASIL D functions"
+    derivedfrom SG_EPB_001, SG_EPB_003
+    asil D
+    rationale "Enables timely safety reactions before hazardous conditions develop"
+    allocatedto SafetyMonitoringProcessor, FaultClassificationAlgorithm
+    verification "Real-time fault injection with timing measurement"
+    
+  requirement FSR_EPB_007
+    description "EPB self-test shall execute automatically at each ignition cycle"
+    derivedfrom SG_EPB_003, SG_EPB_004
+    asil C
+    rationale "Detects dormant faults that could compromise safety functions"
+    allocatedto SystemHealthSupervisor, DiagnosticSystemController
+    verification "Automated test execution verification and fault insertion"
+
+  // ========================================
+  // HMI AND STATUS INDICATION REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_008
+    description "EPB status indication shall update within 200ms of actual state change"
+    derivedfrom SG_EPB_003
+    asil D
+    rationale "Prevents driver confusion and incorrect operational decisions"
+    allocatedto VisualStateController, HMICoordinationEngine
+    verification "Status timing measurement with high-speed data acquisition"
+    
+  requirement FSR_EPB_009
+    description "EPB degraded mode indication shall be clearly distinguishable from normal operation"
+    derivedfrom SG_EPB_003, SG_EPB_004
+    asil D
+    rationale "Ensures driver awareness of reduced system capability"
+    allocatedto VisualThemeManager, DisplayCoordinationService
+    verification "Human factors testing and symbol recognition analysis"
+    
+  requirement FSR_EPB_010
+    description "EPB fault indication shall remain active until fault is resolved or system reset"
+    derivedfrom SG_EPB_003
+    asil C
+    rationale "Prevents fault masking and ensures persistent safety awareness"
+    allocatedto FeedbackCoordinator, SystemHealthSupervisor
+    verification "Fault persistence testing across power and ignition cycles"
+
+  // ========================================
+  // POWER AND BACKUP SYSTEM REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_011
+    description "EPB shall maintain holding force for minimum 72 hours after power loss"
+    derivedfrom SG_EPB_001
+    asil D
+    rationale "Prevents rollaway during extended parking without vehicle power"
+    allocatedto PowerSupplyManager, BackupActuatorController
+    verification "Extended hold testing with power disconnection"
+    
+  requirement FSR_EPB_012
+    description "EPB backup power system shall activate within 50ms of primary power failure"
+    derivedfrom SG_EPB_001, SG_EPB_004
+    asil D
+    rationale "Ensures continuous safety function during power transitions"
+    allocatedto PowerSupplyManager, SystemModeManager
+    verification "Power transition timing with load testing"
+    
+  requirement FSR_EPB_013
+    description "EPB low power mode shall provide emergency release capability"
+    derivedfrom SG_EPB_004
+    asil B
+    rationale "Ensures vehicle operability during power system degradation"
+    allocatedto ManualReleaseController, EmergencyDetectionLogic
+    verification "Emergency release testing under low voltage conditions"
+
+  // ========================================
+  // SPEED INTERLOCK AND AUTOMATION REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_014
+    description "EPB automatic activation shall be inhibited above 5 km/h without explicit driver confirmation"
+    derivedfrom SG_EPB_002
+    asil C
+    rationale "Prevents unintended deceleration during normal driving"
+    allocatedto VehicleSpeedAnalyzer, AutomationSafetyValidator
+    verification "Speed threshold testing with controlled vehicle scenarios"
+    
+  requirement FSR_EPB_015
+    description "EPB driver override shall interrupt any automatic function within 100ms"
+    derivedfrom SG_EPB_002
+    asil C
+    rationale "Ensures driver authority over automated systems"
+    allocatedto UserInputHandler, AutomationArbitrator
+    verification "Override response time measurement under all conditions"
+    
+  requirement FSR_EPB_016
+    description "EPB automation logic shall validate vehicle state before any activation"
+    derivedfrom SG_EPB_002
+    asil C
+    rationale "Prevents inappropriate activation in unsuitable conditions"
+    allocatedto AutomationSafetyValidator, VehicleSpeedAnalyzer
+    verification "State validation testing across operational scenarios"
+
+  // ========================================
+  // COMMUNICATION AND INTERFACE REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_017
+    description "EPB communication errors shall not cause unintended actuation or release"
+    derivedfrom SG_EPB_002, SG_EPB_004
+    asil C
+    rationale "Ensures safe behavior during network faults"
+    allocatedto MessageValidationEngine, CommHealthMonitor
+    verification "Communication fault injection and behavior analysis"
+    
+  requirement FSR_EPB_018
+    description "EPB shall maintain local safety functions during communication loss"
+    derivedfrom SG_EPB_004
+    asil B
+    rationale "Ensures basic safety even when isolated from vehicle network"
+    allocatedto SystemOrchestrationSubsystem, CommHealthMonitor
+    verification "Communication isolation testing with safety function verification"
+
+  // ========================================
+  // ENVIRONMENTAL AND ROBUSTNESS REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_019
+    description "EPB shall maintain safety functions across operating temperature range -40°C to +85°C"
+    derivedfrom SG_EPB_001, SG_EPB_004
+    asil D
+    rationale "Ensures safety performance in all environmental conditions"
+    allocatedto EnvironmentalCompensator, ThermalProtectionManager
+    verification "Environmental chamber testing with full functional verification"
+    
+  requirement FSR_EPB_020
+    description "EPB EMI immunity shall meet automotive EMC requirements without safety function degradation"
+    derivedfrom SG_EPB_002
+    asil C
+    rationale "Prevents spurious activation due to electromagnetic interference"
+    allocatedto SensorSignalFilter, MessageValidationEngine
+    verification "EMC testing per ISO 11452 with safety function monitoring"
+
+  // ========================================
+  // EMERGENCY AND MANUAL OPERATION REQUIREMENTS
+  // ========================================
+  
+  requirement FSR_EPB_021
+    description "EPB manual emergency release shall be operable without electrical power"
+    derivedfrom SG_EPB_004
+    asil B
+    rationale "Ensures vehicle recovery capability during total system failure"
+    allocatedto ManualReleaseController, EmergencyDetectionLogic
+    verification "Manual release force measurement without power"
+    
+  requirement FSR_EPB_022
+    description "EPB emergency release mechanism shall be accessible without tools"
+    derivedfrom SG_EPB_004
+    asil B
+    rationale "Enables emergency vehicle movement by untrained personnel"
+    allocatedto ManualReleaseController
+    verification "Accessibility testing with ergonomic analysis"
+    
+  requirement FSR_EPB_023
+    description "EPB shall achieve safe state within 1 second of critical fault detection"
+    derivedfrom SG_EPB_001, SG_EPB_003
+    asil D
+    rationale "Prevents hazardous events from propagating after fault detection"
+    allocaedto SafetyMonitoringProcessor, FailsafeActivationController
+    verification "Fault injection with safe state timing measurement"
+
+  requirement FSR_EPB_024
+    description "EPB shall achieve safe state within 1 second of critical fault detection"
+    derivedfrom SG_EPB_001, SG_EPB_003
+    asil D
+    rationale "Prevents hazardous events from propagating after fault detection"
+    allocaedto SafetyMonitoringProcessor, FailsafeActivationController
+    verification "Fault injection with safe state timing measurement"
+
+

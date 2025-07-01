@@ -1,0 +1,11 @@
+circuit TorqueRegulationCircuit
+  name "Torque Regulation Circuit"
+  description "Electronics circuit for torque sensor interfaces and torque regulation signal processing"
+  owner "Electronics Team"
+  tags "torque", "regulation", "sensor", "signal-processing"
+  safetylevel ASIL-C
+  partof ForceRegulationUnit
+  
+  interfaces
+    Torque_Sensor_Input "Torque measurement sensor interfaces"
+    Torque_Control_Output "Torque regulation control outputs" 

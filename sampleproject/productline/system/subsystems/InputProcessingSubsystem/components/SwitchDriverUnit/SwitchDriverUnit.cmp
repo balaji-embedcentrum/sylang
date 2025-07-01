@@ -1,0 +1,35 @@
+component SwitchDriverUnit
+  name "Switch Driver Unit"
+  description "Component responsible for low-level switch driver operations for different switch types"
+  owner "HMI Team"
+  tags "switch", "driver", "push-pull", "rocker", "toggle"
+  safetylevel ASIL-B
+  aggregatedby InputProcessingSubsystem
+  
+  interfaces
+    interface Push_Pull_Interface
+      type Digital
+      protocol "GPIO"
+      direction Input
+      
+    interface Rocker_Interface
+      type Digital
+      protocol "GPIO"
+      direction Input
+      
+    interface Toggle_Interface
+      type Digital
+      protocol "GPIO"
+      direction Input
+      
+    interface Switch_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Status_Feedback
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+  implements PushPullSwitchDriver, RockerSwitchController, ToggleSwitchProcessor 

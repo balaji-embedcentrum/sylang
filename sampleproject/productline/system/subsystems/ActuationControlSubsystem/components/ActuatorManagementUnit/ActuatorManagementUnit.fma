@@ -1,0 +1,459 @@
+failuremodeanalysis ActuatorManagementUnit_FailureModeAnalysis
+
+  // ========== ACTUATOR TYPE RESOLUTION FAILURES ==========
+
+  failuremode AMU_ActuatorTypeResolverFailure
+    name "Actuator Type Resolver Failure"
+    description "Actuator type resolver fails to identify correct actuator type for vehicle configuration"
+    function ActuatorTypeResolver
+    severity 10
+    occurrence 2
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_VehicleConfigDataCorruption "Actuator Management Unit vehicle configuration data corruption"
+      AMU_ActuatorDatabaseFailure "Actuator Management Unit actuator database access failure"
+      AMU_TypeResolutionAlgorithmError "Actuator Management Unit type resolution algorithm error"
+      AMU_ConfigurationInterfaceFailure "Actuator Management Unit configuration interface communication failure"
+    effects
+      AMU_WrongActuatorTypeSelection "AMU selects inappropriate actuator type"
+      AMU_ActuatorIncompatibilityIssues "AMU causes actuator incompatibility issues"
+      AMU_SystemConfigurationMismatch "AMU creates system configuration mismatch"
+      AMU_PerformanceDegradation "AMU causes overall performance degradation"
+    detection
+      AMU_TypeValidationChecking "Actuator Management Unit actuator type validation checking"
+      AMU_ConfigurationConsistencyMonitoring "Actuator Management Unit configuration consistency monitoring"
+      AMU_PerformanceParameterVerification "Actuator Management Unit performance parameter verification"
+      AMU_ActuatorResponseAnalysis "Actuator Management Unit actuator response analysis"
+    mitigation
+      AMU_DefaultActuatorTypeSelection "Actuator Management Unit default actuator type selection"
+      AMU_ManualTypeOverrideCapability "Actuator Management Unit manual type override capability"
+      AMU_RedundantTypeValidation "Actuator Management Unit redundant type validation"
+      AMU_ConfigurationFallbackMode "Actuator Management Unit configuration fallback mode"
+
+  failuremode AMU_ActuatorCompatibilityValidatorFailure
+    name "Actuator Compatibility Validator Failure"
+    description "Actuator compatibility validator fails to verify actuator compatibility with system"
+    function ActuatorCompatibilityValidator
+    severity 9
+    occurrence 3
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_CompatibilityMatrixCorruption "Actuator Management Unit compatibility matrix data corruption"
+      AMU_ValidationAlgorithmFailure "Actuator Management Unit validation algorithm processing failure"
+      AMU_ParameterComparisonError "Actuator Management Unit parameter comparison calculation error"
+      AMU_SystemStateInformationLoss "Actuator Management Unit system state information loss"
+    effects
+      AMU_IncompatibleActuatorActivation "AMU activates incompatible actuator combination"
+      AMU_SystemInstabilityFromMismatch "AMU causes system instability from actuator mismatch"
+      AMU_ActuatorConflictSituations "AMU creates actuator conflict situations"
+      AMU_SafetyCompromiseFromIncompatibility "AMU compromises safety through incompatibility"
+    detection
+      AMU_CompatibilityMatrixVerification "Actuator Management Unit compatibility matrix verification"
+      AMU_ActuatorParameterMonitoring "Actuator Management Unit actuator parameter monitoring"
+      AMU_SystemStabilityTracking "Actuator Management Unit system stability tracking"
+      AMU_ConflictDetectionAlgorithms "Actuator Management Unit conflict detection algorithms"
+    mitigation
+      AMU_ConservativeCompatibilityRules "Actuator Management Unit conservative compatibility rules"
+      AMU_ActuatorIsolationProtocols "Actuator Management Unit actuator isolation protocols"
+      AMU_SafetyCompatibilityOverrides "Actuator Management Unit safety compatibility overrides"
+      AMU_RedundantValidationChecks "Actuator Management Unit redundant validation checks"
+
+  failuremode AMU_ActuatorSwitchingControllerFailure
+    name "Actuator Switching Controller Failure"
+    description "Actuator switching controller fails to manage actuator transitions during runtime"
+    function ActuatorSwitchingController
+    severity 10
+    occurrence 2
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_SwitchingLogicCorruption "Actuator Management Unit switching logic algorithm corruption"
+      AMU_ActuatorStateTrackingFailure "Actuator Management Unit actuator state tracking failure"
+      AMU_TransitionTimingError "Actuator Management Unit transition timing calculation error"
+      AMU_SwitchingInterfacemalfunction "Actuator Management Unit switching interface hardware malfunction"
+    effects
+      AMU_AbruptActuatorSwitching "AMU causes abrupt actuator switching"
+      AMU_SimultaneousActuatorActivation "AMU causes simultaneous actuator activation"
+      AMU_ActuatorSwitchingLoops "AMU creates actuator switching loops"
+      AMU_LossOfActuatorControl "AMU loses actuator control during switching"
+    detection
+      AMU_SwitchingSequenceMonitoring "Actuator Management Unit switching sequence monitoring"
+      AMU_ActuatorStateValidation "Actuator Management Unit actuator state validation"
+      AMU_TransitionTimeTracking "Actuator Management Unit transition time tracking"
+      AMU_SwitchingAnomalyDetection "Actuator Management Unit switching anomaly detection"
+    mitigation
+      AMU_GracefulSwitchingProtocols "Actuator Management Unit graceful switching protocols"
+      AMU_ActuatorMutexLocking "Actuator Management Unit actuator mutex locking"
+      AMU_SwitchingTimeoutProtection "Actuator Management Unit switching timeout protection"
+      AMU_EmergencySwitchingHalt "Actuator Management Unit emergency switching halt"
+
+  failuremode AMU_ActuatorConfigurationManagerFailure
+    name "Actuator Configuration Manager Failure"
+    description "Actuator configuration manager fails to maintain consistent configuration parameters"
+    function ActuatorConfigurationManager
+    severity 8
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_ConfigurationMemoryCorruption "Actuator Management Unit configuration memory corruption"
+      AMU_ParameterSynchronizationFailure "Actuator Management Unit parameter synchronization failure"
+      AMU_ConfigurationUpdateError "Actuator Management Unit configuration update processing error"
+      AMU_ConsistencyCheckAlgorithmFailure "Actuator Management Unit consistency check algorithm failure"
+    effects
+      AMU_InconsistentActuatorBehavior "AMU causes inconsistent actuator behavior"
+      AMU_ConfigurationDriftIssues "AMU creates configuration drift issues"
+      AMU_ParameterMismatchProblems "AMU causes parameter mismatch problems"
+      AMU_SystemReliabilityDegradation "AMU degrades system reliability"
+    detection
+      AMU_ConfigurationIntegrityChecking "Actuator Management Unit configuration integrity checking"
+      AMU_ParameterConsistencyVerification "Actuator Management Unit parameter consistency verification"
+      AMU_ConfigurationChangeTracking "Actuator Management Unit configuration change tracking"
+      AMU_ConsistencyAuditAlgorithms "Actuator Management Unit consistency audit algorithms"
+    mitigation
+      AMU_ConfigurationBackupRestore "Actuator Management Unit configuration backup restore"
+      AMU_ParameterValidationEnforcement "Actuator Management Unit parameter validation enforcement"
+      AMU_ConfigurationLockingMechanisms "Actuator Management Unit configuration locking mechanisms"
+      AMU_DefaultConfigurationFallback "Actuator Management Unit default configuration fallback"
+
+  // ========== CALIBRATION CONTROL FAILURES ==========
+
+  failuremode AMU_CalibrationSequenceOrchestratorFailure
+    name "Calibration Sequence Orchestrator Failure"
+    description "Calibration sequence orchestrator fails to manage calibration workflow properly"
+    function CalibrationSequenceOrchestrator
+    severity 8
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_CalibrationWorkflowCorruption "Actuator Management Unit calibration workflow logic corruption"
+      AMU_SequenceStepTrackingFailure "Actuator Management Unit sequence step tracking failure"
+      AMU_CalibrationTimingError "Actuator Management Unit calibration timing calculation error"
+      AMU_OrchestrationInterfaceFailure "Actuator Management Unit orchestration interface failure"
+    effects
+      AMU_IncompleteCalibrationSequences "AMU produces incomplete calibration sequences"
+      AMU_CalibrationStepSkipping "AMU causes calibration step skipping"
+      AMU_CalibrationWorkflowStalls "AMU creates calibration workflow stalls"
+      AMU_InvalidCalibrationResults "AMU generates invalid calibration results"
+    detection
+      AMU_CalibrationProgressTracking "Actuator Management Unit calibration progress tracking"
+      AMU_SequenceStepValidation "Actuator Management Unit sequence step validation"
+      AMU_CalibrationTimeoutDetection "Actuator Management Unit calibration timeout detection"
+      AMU_WorkflowIntegrityMonitoring "Actuator Management Unit workflow integrity monitoring"
+    mitigation
+      AMU_CalibrationSequenceRestart "Actuator Management Unit calibration sequence restart"
+      AMU_ManualCalibrationStepControl "Actuator Management Unit manual calibration step control"
+      AMU_CalibrationCheckpointRecovery "Actuator Management Unit calibration checkpoint recovery"
+      AMU_DefaultCalibrationSequence "Actuator Management Unit default calibration sequence"
+
+  failuremode AMU_CalibrationParameterCalculatorFailure
+    name "Calibration Parameter Calculator Failure"
+    description "Calibration parameter calculator fails to compute accurate calibration parameters"
+    function CalibrationParameterCalculator
+    severity 9
+    occurrence 3
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_CalculationAlgorithmError "Actuator Management Unit calculation algorithm mathematical error"
+      AMU_MeasurementDataCorruption "Actuator Management Unit measurement data corruption"
+      AMU_CalibrationModelFailure "Actuator Management Unit calibration model processing failure"
+      AMU_ParameterBoundaryCheckFailure "Actuator Management Unit parameter boundary check failure"
+    effects
+      AMU_InaccurateCalibrationParameters "AMU generates inaccurate calibration parameters"
+      AMU_ActuatorPerformanceDegradation "AMU causes actuator performance degradation"
+      AMU_CalibrationDriftOverTime "AMU creates calibration drift over time"
+      AMU_SystemInstabilityFromMiscalibration "AMU causes system instability from miscalibration"
+    detection
+      AMU_ParameterRangeValidation "Actuator Management Unit parameter range validation"
+      AMU_CalibrationAccuracyVerification "Actuator Management Unit calibration accuracy verification"
+      AMU_PerformanceImpactAssessment "Actuator Management Unit performance impact assessment"
+      AMU_CalibrationQualityMetrics "Actuator Management Unit calibration quality metrics"
+    mitigation
+      AMU_ParameterBoundaryEnforcement "Actuator Management Unit parameter boundary enforcement"
+      AMU_CalibrationDataValidation "Actuator Management Unit calibration data validation"
+      AMU_FactoryCalibrationFallback "Actuator Management Unit factory calibration fallback"
+      AMU_RedundantCalculationMethods "Actuator Management Unit redundant calculation methods"
+
+  failuremode AMU_CalibrationDataValidatorFailure
+    name "Calibration Data Validator Failure"
+    description "Calibration data validator fails to verify calibration data integrity and quality"
+    function CalibrationDataValidator
+    severity 8
+    occurrence 4
+    detection 5
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_ValidationAlgorithmCorruption "Actuator Management Unit validation algorithm corruption"
+      AMU_DataIntegrityCheckFailure "Actuator Management Unit data integrity check failure"
+      AMU_QualityMetricCalculationError "Actuator Management Unit quality metric calculation error"
+      AMU_ValidationCriteriaCorruption "Actuator Management Unit validation criteria corruption"
+    effects
+      AMU_AcceptanceOfInvalidCalibration "AMU accepts invalid calibration data"
+      AMU_CalibrationQualityDeterioration "AMU allows calibration quality deterioration"
+      AMU_UndetectedCalibrationErrors "AMU misses calibration errors"
+      AMU_SystemReliabilityCompromise "AMU compromises system reliability"
+    detection
+      AMU_DataIntegrityAuditing "Actuator Management Unit data integrity auditing"
+      AMU_CalibrationQualityAssessment "Actuator Management Unit calibration quality assessment"
+      AMU_ValidationLogAnalysis "Actuator Management Unit validation log analysis"
+      AMU_CalibrationVerificationTesting "Actuator Management Unit calibration verification testing"
+    mitigation
+      AMU_StrictValidationCriteria "Actuator Management Unit strict validation criteria"
+      AMU_MultipleValidationApproaches "Actuator Management Unit multiple validation approaches"
+      AMU_CalibrationRejectionProtocols "Actuator Management Unit calibration rejection protocols"
+      AMU_ManualCalibrationReview "Actuator Management Unit manual calibration review"
+
+  failuremode AMU_CalibrationStorageManagerFailure
+    name "Calibration Storage Manager Failure"
+    description "Calibration storage manager fails to maintain persistent calibration data"
+    function CalibrationStorageManager
+    severity 7
+    occurrence 4
+    detection 6
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_StorageMemoryCorruption "Actuator Management Unit storage memory corruption"
+      AMU_CalibrationDataWriteFailure "Actuator Management Unit calibration data write failure"
+      AMU_StorageInterfacemalfunction "Actuator Management Unit storage interface malfunction"
+      AMU_CalibrationHistoryCorruption "Actuator Management Unit calibration history corruption"
+    effects
+      AMU_CalibrationDataLoss "AMU loses calibration data"
+      AMU_InconsistentCalibrationHistory "AMU maintains inconsistent calibration history"
+      AMU_CalibrationRollbackFailure "AMU fails calibration rollback"
+      AMU_CalibrationTraceabilityLoss "AMU loses calibration traceability"
+    detection
+      AMU_StorageIntegrityMonitoring "Actuator Management Unit storage integrity monitoring"
+      AMU_CalibrationDataVerification "Actuator Management Unit calibration data verification"
+      AMU_StorageAccessTesting "Actuator Management Unit storage access testing"
+      AMU_CalibrationHistoryAuditing "Actuator Management Unit calibration history auditing"
+    mitigation
+      AMU_CalibrationDataBackup "Actuator Management Unit calibration data backup"
+      AMU_RedundantStorageSystems "Actuator Management Unit redundant storage systems"
+      AMU_CalibrationDataRecovery "Actuator Management Unit calibration data recovery"
+      AMU_StorageErrorCorrection "Actuator Management Unit storage error correction"
+
+  // ========== BACKUP ACTUATOR CONTROL FAILURES ==========
+
+  failuremode AMU_BackupActuatorMonitorFailure
+    name "Backup Actuator Monitor Failure"
+    description "Backup actuator monitor fails to track backup actuator status and readiness"
+    function BackupActuatorMonitor
+    severity 10
+    occurrence 2
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_BackupStatusSensingFailure "Actuator Management Unit backup status sensing failure"
+      AMU_ReadinessAssessmentError "Actuator Management Unit readiness assessment algorithm error"
+      AMU_BackupMonitoringInterfaceFailure "Actuator Management Unit backup monitoring interface failure"
+      AMU_StatusUpdateProcessingFailure "Actuator Management Unit status update processing failure"
+    effects
+      AMU_UndetectedBackupFailure "AMU misses backup actuator failure"
+      AMU_FalseBackupReadinessReporting "AMU reports false backup readiness"
+      AMU_BackupActivationFailure "AMU fails backup activation when needed"
+      AMU_SystemRedundancyLoss "AMU loses system redundancy capability"
+    detection
+      AMU_BackupStatusValidation "Actuator Management Unit backup status validation"
+      AMU_BackupFunctionalTesting "Actuator Management Unit backup functional testing"
+      AMU_ReadinessVerificationChecks "Actuator Management Unit readiness verification checks"
+      AMU_BackupMonitoringSystemSelfTest "Actuator Management Unit backup monitoring system self test"
+    mitigation
+      AMU_RedundantBackupMonitoring "Actuator Management Unit redundant backup monitoring"
+      AMU_BackupStatusCrossValidation "Actuator Management Unit backup status cross validation"
+      AMU_ConservativeReadinessAssessment "Actuator Management Unit conservative readiness assessment"
+      AMU_BackupPreemptiveTesting "Actuator Management Unit backup preemptive testing"
+
+  failuremode AMU_FailoverDecisionEngineFailure
+    name "Failover Decision Engine Failure"
+    description "Failover decision engine fails to make appropriate failover decisions"
+    function FailoverDecisionEngine
+    severity 10
+    occurrence 2
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_DecisionAlgorithmCorruption "Actuator Management Unit decision algorithm logic corruption"
+      AMU_HealthAssessmentDataCorruption "Actuator Management Unit health assessment data corruption"
+      AMU_FailoverCriteriaFailure "Actuator Management Unit failover criteria processing failure"
+      AMU_SystemStateEvaluationError "Actuator Management Unit system state evaluation error"
+    effects
+      AMU_DelayedFailoverDecision "AMU makes delayed failover decisions"
+      AMU_UnnecessaryFailoverActivation "AMU makes unnecessary failover activations"
+      AMU_FailoverDecisionPauses "AMU creates failover decision paralysis"
+      AMU_PrimaryActuatorContinuedOperation "AMU continues primary actuator operation when dangerous"
+    detection
+      AMU_DecisionLogicVerification "Actuator Management Unit decision logic verification"
+      AMU_FailoverTimingAnalysis "Actuator Management Unit failover timing analysis"
+      AMU_DecisionReasoningTracking "Actuator Management Unit decision reasoning tracking"
+      AMU_FailoverDecisionAuditing "Actuator Management Unit failover decision auditing"
+    mitigation
+      AMU_ConservativeFailoverCriteria "Actuator Management Unit conservative failover criteria"
+      AMU_ManualFailoverOverride "Actuator Management Unit manual failover override"
+      AMU_FailoverDecisionTimeout "Actuator Management Unit failover decision timeout"
+      AMU_IndependentFailoverLogic "Actuator Management Unit independent failover logic"
+
+  failuremode AMU_BackupActivationControllerFailure
+    name "Backup Activation Controller Failure"
+    description "Backup activation controller fails to properly activate backup actuators"
+    function BackupActivationController
+    severity 10
+    occurrence 2
+    detection 3
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_ActivationSequenceCorruption "Actuator Management Unit activation sequence logic corruption"
+      AMU_BackupActuatorInterfaceFailure "Actuator Management Unit backup actuator interface failure"
+      AMU_ActivationTimingError "Actuator Management Unit activation timing calculation error"
+      AMU_BackupPowerManagementFailure "Actuator Management Unit backup power management failure"
+    effects
+      AMU_BackupActivationFailure "AMU fails to activate backup actuator"
+      AMU_SlowBackupActivation "AMU causes slow backup activation"
+      AMU_PartialBackupActivation "AMU causes partial backup activation"
+      AMU_BackupActuatorDamage "AMU causes backup actuator damage during activation"
+    detection
+      AMU_BackupActivationMonitoring "Actuator Management Unit backup activation monitoring"
+      AMU_ActivationSequenceVerification "Actuator Management Unit activation sequence verification"
+      AMU_BackupPerformanceValidation "Actuator Management Unit backup performance validation"
+      AMU_ActivationTimeTracking "Actuator Management Unit activation time tracking"
+    mitigation
+      AMU_ActivationSequenceRestart "Actuator Management Unit activation sequence restart"
+      AMU_ManualBackupActivation "Actuator Management Unit manual backup activation"
+      AMU_BackupActivationTimeout "Actuator Management Unit backup activation timeout"
+      AMU_GracefulActivationProtocols "Actuator Management Unit graceful activation protocols"
+
+  failuremode AMU_FailoverCoordinatorFailure
+    name "Failover Coordinator Failure"
+    description "Failover coordinator fails to coordinate system-wide failover process"
+    function FailoverCoordinator
+    severity 9
+    occurrence 3
+    detection 4
+    rpn auto
+    safetylevel ASIL-D
+    causes
+      AMU_SubsystemCoordinationFailure "Actuator Management Unit subsystem coordination failure"
+      AMU_FailoverCommunicationError "Actuator Management Unit failover communication error"
+      AMU_SystemWideStateManagementFailure "Actuator Management Unit system wide state management failure"
+      AMU_CoordinationProtocolCorruption "Actuator Management Unit coordination protocol corruption"
+    effects
+      AMU_UncoordinatedFailover "AMU causes uncoordinated failover process"
+      AMU_SubsystemConflictsDuringFailover "AMU creates subsystem conflicts during failover"
+      AMU_FailoverProcessIncomplete "AMU leaves failover process incomplete"
+      AMU_SystemInstabilityFromPoorCoordination "AMU causes system instability from poor coordination"
+    detection
+      AMU_FailoverCoordinationTracking "Actuator Management Unit failover coordination tracking"
+      AMU_SubsystemResponseMonitoring "Actuator Management Unit subsystem response monitoring"
+      AMU_CoordinationProtocolVerification "Actuator Management Unit coordination protocol verification"
+      AMU_SystemWideFailoverAuditing "Actuator Management Unit system wide failover auditing"
+    mitigation
+      AMU_FailoverCoordinationTimeouts "Actuator Management Unit failover coordination timeouts"
+      AMU_IndependentSubsystemFailover "Actuator Management Unit independent subsystem failover"
+      AMU_CoordinationProtocolRetry "Actuator Management Unit coordination protocol retry"
+      AMU_EmergencyUncoordinatedFailover "Actuator Management Unit emergency uncoordinated failover"
+
+  // ========== WEAR MONITORING FAILURES ==========
+
+  failuremode AMU_WearPatternAnalyzerFailure
+    name "Wear Pattern Analyzer Failure"
+    description "Wear pattern analyzer fails to identify and analyze actuator wear patterns"
+    function WearPatternAnalyzer
+    severity 6
+    occurrence 5
+    detection 6
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      AMU_WearDataSensingFailure "Actuator Management Unit wear data sensing failure"
+      AMU_PatternAnalysisAlgorithmError "Actuator Management Unit pattern analysis algorithm error"
+      AMU_WearCharacteristicsCorruption "Actuator Management Unit wear characteristics data corruption"
+      AMU_AbnormalWearDetectionFailure "Actuator Management Unit abnormal wear detection failure"
+    effects
+      AMU_UndetectedAbnormalWear "AMU misses abnormal wear patterns"
+      AMU_IncorrectWearAssessment "AMU makes incorrect wear assessments"
+      AMU_WearProgressionMisunderstanding "AMU misunderstands wear progression"
+      AMU_MaintenancePredictionErrors "AMU makes maintenance prediction errors"
+    detection
+      AMU_WearDataValidation "Actuator Management Unit wear data validation"
+      AMU_PatternAnalysisVerification "Actuator Management Unit pattern analysis verification"
+      AMU_WearTrendTracking "Actuator Management Unit wear trend tracking"
+      AMU_AbnormalWearAlertTesting "Actuator Management Unit abnormal wear alert testing"
+    mitigation
+      AMU_ConservativeWearAssessment "Actuator Management Unit conservative wear assessment"
+      AMU_MultipleWearAnalysisMethods "Actuator Management Unit multiple wear analysis methods"
+      AMU_WearDataRedundancy "Actuator Management Unit wear data redundancy"
+      AMU_ManualWearInspectionTriggers "Actuator Management Unit manual wear inspection triggers"
+
+  failuremode AMU_LifetimePredictorFailure
+    name "Lifetime Predictor Failure"
+    description "Lifetime predictor fails to accurately predict actuator remaining lifetime"
+    function LifetimePredictor
+    severity 7
+    occurrence 4
+    detection 5
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      AMU_LifetimeModelCorruption "Actuator Management Unit lifetime model corruption"
+      AMU_UsagePatternDataError "Actuator Management Unit usage pattern data error"
+      AMU_PredictionAlgorithmFailure "Actuator Management Unit prediction algorithm failure"
+      AMU_WearAnalysisInputCorruption "Actuator Management Unit wear analysis input corruption"
+    effects
+      AMU_InaccurateLifetimePredictions "AMU makes inaccurate lifetime predictions"
+      AMU_PrematureMaintenance "AMU triggers premature maintenance"
+      AMU_MaintenanceDelays "AMU causes maintenance delays"
+      AMU_UnexpectedActuatorFailure "AMU misses impending actuator failure"
+    detection
+      AMU_PredictionAccuracyTracking "Actuator Management Unit prediction accuracy tracking"
+      AMU_LifetimeModelValidation "Actuator Management Unit lifetime model validation"
+      AMU_PredictionConsistencyChecking "Actuator Management Unit prediction consistency checking"
+      AMU_ActualVsPredictedAnalysis "Actuator Management Unit actual vs predicted analysis"
+    mitigation
+      AMU_ConservativeLifetimePredictions "Actuator Management Unit conservative lifetime predictions"
+      AMU_MultiplePredictionModels "Actuator Management Unit multiple prediction models"
+      AMU_PredictionModelCalibration "Actuator Management Unit prediction model calibration"
+      AMU_SafetyMarginInPredictions "Actuator Management Unit safety margin in predictions"
+
+  failuremode AMU_MaintenanceSchedulerFailure
+    name "Maintenance Scheduler Failure"
+    description "Maintenance scheduler fails to schedule appropriate preventive maintenance"
+    function MaintenanceScheduler
+    severity 6
+    occurrence 4
+    detection 7
+    rpn auto
+    safetylevel ASIL-C
+    causes
+      AMU_SchedulingAlgorithmCorruption "Actuator Management Unit scheduling algorithm corruption"
+      AMU_MaintenanceWindowCalculationError "Actuator Management Unit maintenance window calculation error"
+      AMU_PredictionInputProcessingFailure "Actuator Management Unit prediction input processing failure"
+      AMU_SchedulingConstraintViolation "Actuator Management Unit scheduling constraint violation"
+    effects
+      AMU_InadequateMaintenanceScheduling "AMU creates inadequate maintenance scheduling"
+      AMU_MaintenanceSchedulingConflicts "AMU creates maintenance scheduling conflicts"
+      AMU_OverscheduledMaintenance "AMU causes overscheduled maintenance"
+      AMU_MaintenanceWindowMissing "AMU misses critical maintenance windows"
+    detection
+      AMU_SchedulingLogicVerification "Actuator Management Unit scheduling logic verification"
+      AMU_MaintenanceScheduleValidation "Actuator Management Unit maintenance schedule validation"
+      AMU_SchedulingConflictDetection "Actuator Management Unit scheduling conflict detection"
+      AMU_MaintenanceEffectivenessTracking "Actuator Management Unit maintenance effectiveness tracking"
+    mitigation
+      AMU_ConservativeMaintenanceScheduling "Actuator Management Unit conservative maintenance scheduling"
+      AMU_ManualMaintenanceScheduleOverride "Actuator Management Unit manual maintenance schedule override"
+      AMU_MaintenanceScheduleBuffers "Actuator Management Unit maintenance schedule buffers"
+      AMU_PriorityBasedMaintenanceScheduling "Actuator Management Unit priority based maintenance scheduling" 

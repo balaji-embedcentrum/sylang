@@ -1,0 +1,8 @@
+Subsystem DisplayRenderingSubsystem
+  name "Display Rendering Subsystem"
+  description "Renders visual elements and manages display positioning."
+  owner "HMI Team"
+  tags "display", "rendering", "visual"
+  safetylevel ASIL-B
+  enables InstrumentDisplay, DisplayPosition, CentralWarningArea, StatusBar
+  implements InstrumentClusterInterface, DisplayLayoutEngine, WarningAreaRenderer, StatusBarController 
