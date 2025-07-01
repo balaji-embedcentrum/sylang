@@ -12,7 +12,10 @@ import {
     TextDocumentSyncKind,
     InitializeResult,
     Hover,
-    // MarkdownString
+    Location,
+    Range,
+    DefinitionParams,
+    ReferenceParams
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -41,7 +44,7 @@ const languageConfigs: Record<string, LanguageConfig> = {
         validators: [validateProductLine]
     },
     'sylang-functions': {
-        fileExtensions: ['.fun'],
+        fileExtensions: ['.fun', '.fma'],
         keywords: ['systemfunctions', 'function', 'name', 'description', 'owner', 'tags', 'safetylevel', 'enables'],
         validators: [validateFunctions]
     },
@@ -52,13 +55,33 @@ const languageConfigs: Record<string, LanguageConfig> = {
     },
     'sylang-safety': {
         fileExtensions: ['.itm', '.sgl', '.haz', '.rsk', '.fsr'],
-        keywords: ['safety', 'hazard', 'risk', 'requirement', 'goal', 'item', 'safetylevel', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'],
+        keywords: ['safety', 'hazard', 'risk', 'requirement', 'goal', 'item', 'safetylevel', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM', 'safetygoal', 'safetymeasures', 'measure', 'enabledby', 'verificationcriteria', 'criterion', 'scenario', 'derivedfrom', 'allocatedto', 'functionalrequirement', 'safetyfunction', 'rationale', 'verification', 'satisfies', 'implements', 'shall', 'should', 'may', 'will'],
         validators: [validateSafety]
     },
     'sylang-security': {
         fileExtensions: ['.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'],
         keywords: ['security', 'threat', 'asset', 'requirement', 'goal', 'TARA', 'cybersecurity'],
         validators: [validateSecurity]
+    },
+    'sylang-components': {
+        fileExtensions: ['.cmp', '.sub', '.req'],
+        keywords: ['component', 'subsystem', 'Subsystem', 'requirement', 'name', 'description', 'owner', 'tags', 'safetylevel', 'aggregatedby', 'partof', 'enables', 'implements', 'interfaces', 'interface', 'type', 'protocol', 'direction', 'voltage', 'width', 'safety_level', 'Communication', 'Digital', 'Analog', 'Input', 'Output', 'Bidirectional', 'SPI', 'I2C', 'CAN', 'LIN', 'UART', 'CMOS', 'TTL', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'],
+        validators: [validateComponents]
+    },
+    'sylang-software': {
+        fileExtensions: ['.mod', '.prt'],
+        keywords: ['module', 'software', 'part', 'algorithm', 'service', 'task', 'process', 'thread', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'implements', 'interfaces', 'input', 'output', 'returns', 'parameters', 'execution', 'timing', 'memory', 'cpu_usage', 'priority', 'dependencies', 'version', 'license', 'real-time', 'non-real-time', 'synchronous', 'asynchronous', 'high', 'medium', 'low', 'critical', 'non-critical', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'],
+        validators: [validateSoftware]
+    },
+    'sylang-electronics': {
+        fileExtensions: ['.ckt'],
+        keywords: ['circuit', 'board', 'chip', 'ic', 'pcb', 'schematic', 'layout', 'trace', 'via', 'pad', 'pin', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'interfaces', 'voltage', 'current', 'power', 'frequency', 'impedance', 'capacitance', 'resistance', 'inductance', 'tolerance', 'package', 'footprint', 'placement', '3.3V', '5V', '12V', '24V', 'GND', 'VCC', 'VDD', 'VSS', 'CMOS', 'TTL', 'LVDS', 'differential', 'single-ended', 'SMD', 'THT', 'BGA', 'QFP', 'SOIC', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'],
+        validators: [validateElectronics]
+    },
+    'sylang-mechanics': {
+        fileExtensions: ['.asm'],
+        keywords: ['assembly', 'part', 'component', 'mechanism', 'actuator', 'sensor', 'bracket', 'housing', 'mounting', 'fastener', 'gear', 'spring', 'bearing', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'material', 'dimensions', 'weight', 'tolerance', 'finish', 'coating', 'hardness', 'strength', 'temperature_range', 'pressure_rating', 'lifecycle', 'maintenance', 'steel', 'aluminum', 'plastic', 'rubber', 'titanium', 'carbon_fiber', 'stainless', 'anodized', 'painted', 'galvanized', 'static', 'dynamic', 'rotating', 'linear', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'],
+        validators: [validateMechanics]
     }
 };
 
@@ -84,7 +107,9 @@ connection.onInitialize((params: InitializeParams) => {
                 resolveProvider: true,
                 triggerCharacters: ['"', ' ', '\t']
             },
-            hoverProvider: true
+            hoverProvider: true,
+            definitionProvider: true,
+            referencesProvider: true
         }
     };
 
@@ -296,6 +321,131 @@ function validateSecurity(_document: TextDocument): Diagnostic[] {
     return [];
 }
 
+function validateComponents(document: TextDocument): Diagnostic[] {
+    const diagnostics: Diagnostic[] = [];
+    const text = document.getText();
+    const lines = text.split('\n');
+
+    lines.forEach((line, lineNumber) => {
+        // Validate component/subsystem declarations
+        const componentMatch = line.match(/^\s*(component|subsystem|Subsystem)\s+([A-Z][a-zA-Z0-9_]*)/);
+        if (componentMatch && componentMatch[2]) {
+            const componentName = componentMatch[2];
+            if (!/^[A-Z][a-zA-Z0-9_]*$/.test(componentName)) {
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Error,
+                    range: {
+                        start: { line: lineNumber, character: line.indexOf(componentName) },
+                        end: { line: lineNumber, character: line.indexOf(componentName) + componentName.length }
+                    },
+                    message: `Component name '${componentName}' should start with capital letter and use PascalCase`,
+                    source: 'sylang'
+                });
+            }
+        }
+
+        // Validate interface types
+        const interfaceTypeMatch = line.match(/\btype\s+(Communication|Digital|Analog)\b/);
+        if (line.includes('type') && !interfaceTypeMatch) {
+            const typeMatch = line.match(/\btype\s+(\w+)/);
+            if (typeMatch && typeMatch[1]) {
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Error,
+                    range: {
+                        start: { line: lineNumber, character: line.indexOf(typeMatch[1]) },
+                        end: { line: lineNumber, character: line.indexOf(typeMatch[1]) + typeMatch[1].length }
+                    },
+                    message: `Invalid interface type '${typeMatch[1]}'. Use Communication, Digital, or Analog`,
+                    source: 'sylang'
+                });
+            }
+        }
+    });
+
+    return diagnostics;
+}
+
+function validateSoftware(document: TextDocument): Diagnostic[] {
+    const diagnostics: Diagnostic[] = [];
+    const text = document.getText();
+    const lines = text.split('\n');
+
+    lines.forEach((line, lineNumber) => {
+        // Validate module declarations
+        const moduleMatch = line.match(/^\s*(module|software|service)\s+([A-Z][a-zA-Z0-9_]*)/);
+        if (moduleMatch && moduleMatch[2]) {
+            const moduleName = moduleMatch[2];
+            if (!/^[A-Z][a-zA-Z0-9_]*$/.test(moduleName)) {
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Error,
+                    range: {
+                        start: { line: lineNumber, character: line.indexOf(moduleName) },
+                        end: { line: lineNumber, character: line.indexOf(moduleName) + moduleName.length }
+                    },
+                    message: `Module name '${moduleName}' should start with capital letter and use PascalCase`,
+                    source: 'sylang'
+                });
+            }
+        }
+    });
+
+    return diagnostics;
+}
+
+function validateElectronics(document: TextDocument): Diagnostic[] {
+    const diagnostics: Diagnostic[] = [];
+    const text = document.getText();
+    const lines = text.split('\n');
+
+    lines.forEach((line, lineNumber) => {
+        // Validate circuit declarations
+        const circuitMatch = line.match(/^\s*(circuit|board|pcb)\s+([A-Z][a-zA-Z0-9_]*)/);
+        if (circuitMatch && circuitMatch[2]) {
+            const circuitName = circuitMatch[2];
+            if (!/^[A-Z][a-zA-Z0-9_]*$/.test(circuitName)) {
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Error,
+                    range: {
+                        start: { line: lineNumber, character: line.indexOf(circuitName) },
+                        end: { line: lineNumber, character: line.indexOf(circuitName) + circuitName.length }
+                    },
+                    message: `Circuit name '${circuitName}' should start with capital letter and use PascalCase`,
+                    source: 'sylang'
+                });
+            }
+        }
+    });
+
+    return diagnostics;
+}
+
+function validateMechanics(document: TextDocument): Diagnostic[] {
+    const diagnostics: Diagnostic[] = [];
+    const text = document.getText();
+    const lines = text.split('\n');
+
+    lines.forEach((line, lineNumber) => {
+        // Validate assembly declarations
+        const assemblyMatch = line.match(/^\s*(assembly|part|component)\s+([A-Z][a-zA-Z0-9_]*)/);
+        if (assemblyMatch && assemblyMatch[2]) {
+            const assemblyName = assemblyMatch[2];
+            if (!/^[A-Z][a-zA-Z0-9_]*$/.test(assemblyName)) {
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Error,
+                    range: {
+                        start: { line: lineNumber, character: line.indexOf(assemblyName) },
+                        end: { line: lineNumber, character: line.indexOf(assemblyName) + assemblyName.length }
+                    },
+                    message: `Assembly name '${assemblyName}' should start with capital letter and use PascalCase`,
+                    source: 'sylang'
+                });
+            }
+        }
+    });
+
+    return diagnostics;
+}
+
 // Helper functions
 function extractSafetyLevel(line: string): string | null {
     const match = line.match(/safetylevel\s+(\S+)/);
@@ -414,6 +564,164 @@ function getKeywordDocumentation(word: string): string | null {
 
     return docs[word] || null;
 }
+
+// Symbol Index for Go to Definition and Find References
+interface SymbolInfo {
+    name: string;
+    location: Location;
+    type: 'requirement' | 'component' | 'goal' | 'feature' | 'function';
+}
+
+class SylangSymbolIndex {
+    private symbols: Map<string, SymbolInfo[]> = new Map();
+
+    addSymbol(symbol: SymbolInfo): void {
+        const existing = this.symbols.get(symbol.name) || [];
+        existing.push(symbol);
+        this.symbols.set(symbol.name, existing);
+    }
+
+    findDefinition(symbolName: string): Location | null {
+        const symbols = this.symbols.get(symbolName);
+        if (!symbols || symbols.length === 0) {
+            return null;
+        }
+        // Return the first occurrence as definition
+        return symbols[0]!.location;
+    }
+
+    findReferences(symbolName: string): Location[] {
+        const symbols = this.symbols.get(symbolName);
+        return symbols ? symbols.map(s => s.location) : [];
+    }
+
+    clear(): void {
+        this.symbols.clear();
+    }
+
+    indexDocument(document: TextDocument): void {
+        const text = document.getText();
+        const lines = text.split('\n');
+        const uri = document.uri;
+
+        for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+            const line = lines[lineNumber];
+            if (!line) continue;
+
+            // Index requirement definitions: requirement FSR_EPB_014
+            const reqMatch = line.match(/\b(requirement)\s+([A-Z_]{2,20}\d{3})\b/);
+            if (reqMatch && reqMatch[2] && reqMatch.index !== undefined) {
+                const symbolName = reqMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, reqMatch.index + reqMatch[1]!.length + 1, lineNumber, reqMatch.index + reqMatch[0]!.length)),
+                    type: 'requirement'
+                });
+            }
+
+            // Index goal definitions: goal SG_EPB_002
+            const goalMatch = line.match(/\b(goal)\s+([A-Z_]{2,20}\d{3})\b/);
+            if (goalMatch && goalMatch[2] && goalMatch.index !== undefined) {
+                const symbolName = goalMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, goalMatch.index + goalMatch[1]!.length + 1, lineNumber, goalMatch.index + goalMatch[0]!.length)),
+                    type: 'goal'
+                });
+            }
+
+            // Index component references: allocatedto VehicleSpeedAnalyzer, AutomationSafetyValidator
+            const allocMatch = line.match(/\ballocatedto\s+([A-Z][a-zA-Z0-9,\s]*)/);
+            if (allocMatch && allocMatch[1]) {
+                const components = allocMatch[1].split(',').map(c => c.trim());
+                components.forEach(comp => {
+                    if (comp && /^[A-Z][a-zA-Z0-9]*$/.test(comp)) {
+                        this.addSymbol({
+                            name: comp,
+                            location: Location.create(uri, Range.create(lineNumber, line.indexOf(comp), lineNumber, line.indexOf(comp) + comp.length)),
+                            type: 'component'
+                        });
+                    }
+                });
+            }
+
+            // Index derivedfrom references: derivedfrom SG_EPB_002, SG_EPB_004
+            const derivedMatch = line.match(/\bderivedfrom\s+([A-Z_0-9,\s]*)/);
+            if (derivedMatch && derivedMatch[1]) {
+                const refs = derivedMatch[1].split(',').map(r => r.trim());
+                refs.forEach(ref => {
+                    if (ref && /^[A-Z_]{2,20}\d{3}$/.test(ref)) {
+                        this.addSymbol({
+                            name: ref,
+                            location: Location.create(uri, Range.create(lineNumber, line.indexOf(ref), lineNumber, line.indexOf(ref) + ref.length)),
+                            type: 'requirement'
+                        });
+                    }
+                });
+            }
+        }
+    }
+}
+
+const symbolIndex = new SylangSymbolIndex();
+
+// Rebuild symbol index when documents change
+documents.onDidChangeContent(change => {
+    validateTextDocument(change.document);
+    symbolIndex.indexDocument(change.document);
+});
+
+documents.onDidOpen(params => {
+    symbolIndex.indexDocument(params.document);
+});
+
+// Definition provider - Go to Definition (F12)
+connection.onDefinition((params: DefinitionParams): Location | null => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return null;
+    }
+
+    const position = params.position;
+    const line = document.getText({
+        start: { line: position.line, character: 0 },
+        end: { line: position.line + 1, character: 0 }
+    });
+
+    const wordRange = getWordRangeAtPosition(line, position.character);
+    if (!wordRange) {
+        return null;
+    }
+
+    const word = line.substring(wordRange.start, wordRange.end);
+    
+    // Look for definition in symbol index
+    return symbolIndex.findDefinition(word);
+});
+
+// References provider - Find All References (Shift+F12)
+connection.onReferences((params: ReferenceParams): Location[] => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return [];
+    }
+
+    const position = params.position;
+    const line = document.getText({
+        start: { line: position.line, character: 0 },
+        end: { line: position.line + 1, character: 0 }
+    });
+
+    const wordRange = getWordRangeAtPosition(line, position.character);
+    if (!wordRange) {
+        return [];
+    }
+
+    const word = line.substring(wordRange.start, wordRange.end);
+    
+    // Find all references in symbol index
+    return symbolIndex.findReferences(word);
+});
 
 // Make the text document manager listen on the connection
 documents.listen(connection);

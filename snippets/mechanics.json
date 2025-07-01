@@ -1,0 +1,82 @@
+{
+  "Assembly Template": {
+    "prefix": "assembly",
+    "body": [
+      "assembly ${1:AssemblyName}",
+      "  name \"${2:Assembly Display Name}\"",
+      "  description \"${3:Assembly description}\"",
+      "  owner \"${4:Mechanical Team}\"",
+      "  tags \"${5:tag1}\", \"${6:tag2}\"",
+      "  safetylevel ${7|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  partof ${8:ParentComponent}",
+      "  material \"${9|steel,aluminum,plastic,rubber,titanium|}\"",
+      "  weight \"${10:weight}kg\"",
+      "  dimensions \"${11:dimensions}\"",
+      "  $0"
+    ],
+    "description": "Create a new assembly definition"
+  },
+  "Actuator Template": {
+    "prefix": "actuator",
+    "body": [
+      "actuator ${1:ActuatorName}",
+      "  name \"${2:Actuator Display Name}\"",
+      "  description \"${3:Actuator description}\"",
+      "  type ${4|linear,rotating,hydraulic,pneumatic,electric|}",
+      "  force \"${5:force}N\"",
+      "  stroke \"${6:stroke}mm\"",
+      "  speed \"${7:speed}mm/s\"",
+      "  precision \"${8:precision}μm\"",
+      "  material \"${9|steel,aluminum,titanium|}\"",
+      "  $0"
+    ],
+    "description": "Create a new actuator definition"
+  },
+  "Sensor Template": {
+    "prefix": "sensor",
+    "body": [
+      "sensor ${1:SensorName}",
+      "  name \"${2:Sensor Display Name}\"",
+      "  description \"${3:Sensor description}\"",
+      "  type ${4|position,force,pressure,temperature,proximity|}",
+      "  range \"${5:measurement_range}\"",
+      "  accuracy \"${6:accuracy}%\"",
+      "  resolution \"${7:resolution}\"",
+      "  response_time \"${8:time}ms\"",
+      "  material \"${9|steel,aluminum,plastic|}\"",
+      "  $0"
+    ],
+    "description": "Create a new sensor definition"
+  },
+  "Mounting Template": {
+    "prefix": "mounting",
+    "body": [
+      "assembly ${1:MountingAssembly}",
+      "  name \"${2:Mounting Assembly}\"",
+      "  description \"${3:Mechanical mounting and positioning assembly}\"",
+      "  material \"${4|steel,aluminum,stainless|}\"",
+      "  finish \"${5|anodized,painted,galvanized|}\"",
+      "  fastener \"${6:fastener_type}\"",
+      "  torque \"${7:torque}Nm\"",
+      "  temperature_range \"${8:temp_range}°C\"",
+      "  $0"
+    ],
+    "description": "Create a mounting assembly"
+  },
+  "Bearing Template": {
+    "prefix": "bearing",
+    "body": [
+      "bearing ${1:BearingName}",
+      "  name \"${2:Bearing Display Name}\"",
+      "  description \"${3:Bearing description}\"",
+      "  type ${4|ball,roller,thrust,angular|}",
+      "  load_rating \"${5:load}N\"",
+      "  speed_rating \"${6:speed}rpm\"",
+      "  lubrication \"${7|grease,oil,dry|}\"",
+      "  material \"${8|steel,ceramic,plastic|}\"",
+      "  lifecycle \"${9:cycles}\"",
+      "  $0"
+    ],
+    "description": "Create a bearing definition"
+  }
+} 

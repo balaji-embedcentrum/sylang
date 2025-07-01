@@ -58,18 +58,7 @@ export class SylangValidationProvider implements vscode.Disposable {
     ): void {
         const trimmedLine = line.trim();
         
-        // Simple test: flag any line containing "test" as a warning
-        if (trimmedLine.toLowerCase().includes('test')) {
-            const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                'Test validation is working - remove this line to test other features',
-                vscode.DiagnosticSeverity.Information
-            );
-            diagnostic.code = 'test-validation';
-            diagnostic.source = 'Sylang';
-            diagnostics.push(diagnostic);
-        }
+        // Test validation removed
         
         // Check for missing quotes in string values
         if (trimmedLine.includes('description') || trimmedLine.includes('name') || trimmedLine.includes('owner')) {
@@ -121,7 +110,7 @@ export class SylangValidationProvider implements vscode.Disposable {
         // Validate required fields
         this.validateRequiredFields(document, lineIndex, trimmedLine, diagnostics);
 
-        // Check for keyword typos
+        // Check for keyword typos (but only outside string literals)
         this.validateKeywordSpelling(document, lineIndex, line, diagnostics);
     }
 
@@ -176,51 +165,59 @@ export class SylangValidationProvider implements vscode.Disposable {
             return;
         }
 
-        // Extended keyword list based on language type
-        const allKeywords = this.getExtendedKeywords();
+        // Get valid keywords for this language type
+        const validKeywords = this.getValidKeywords();
         
         // Extract the non-quoted parts of the line for keyword validation
         const nonQuotedText = this.extractNonQuotedText(trimmedLine);
         
-        // More robust word extraction - split by spaces and clean
+        // Split by spaces and punctuation, but keep word positions
         const words = nonQuotedText.split(/\s+/);
         
         for (let i = 0; i < words.length; i++) {
             const word = words[i];
             if (!word) continue;
             
-            // Clean the word - remove quotes, colons, etc.
+            // Clean the word - remove punctuation but keep letters/numbers
             const cleanWord = word.replace(/[^\w]/g, '');
             
-            // Skip if word is too short, is a number, or looks like a constant
+            // Skip if word is too short, is a number, or is an identifier/constant
             if (cleanWord.length <= 2 || /^\d+$/.test(cleanWord) || /^[A-Z_]+$/.test(cleanWord)) {
                 continue;
             }
             
-            // Check if it's a potential keyword that's misspelled
-            if (this.couldBeKeyword(cleanWord)) {
-                const suggestion = this.findClosestKeyword(cleanWord, allKeywords);
-                if (suggestion && suggestion !== cleanWord.toLowerCase()) {
-                    // Find the position of the word in the original line (not the filtered text)
-                    const wordStart = line.indexOf(word);
-                    const cleanWordStart = line.indexOf(cleanWord, wordStart >= 0 ? wordStart : 0);
-                    
-                    if (cleanWordStart !== -1 && !this.isInsideStringLiteral(line, cleanWordStart)) {
-                        const range = new vscode.Range(
-                            lineIndex, 
-                            cleanWordStart, 
-                            lineIndex, 
-                            cleanWordStart + cleanWord.length
-                        );
-                        const diagnostic = new vscode.Diagnostic(
-                            range,
-                            `Unknown keyword '${cleanWord}'. Did you mean '${suggestion}'?`,
-                            vscode.DiagnosticSeverity.Error
-                        );
-                        diagnostic.code = 'keyword-typo';
-                        diagnostic.source = 'Sylang';
-                        diagnostics.push(diagnostic);
-                    }
+            // Skip identifier patterns (requirement IDs, component names, etc.)
+            if (this.isValidIdentifier(cleanWord)) {
+                continue;
+            }
+            
+            // Skip common structural words that aren't keywords
+            const structuralWords = ['true', 'false', 'yes', 'no'];
+            if (structuralWords.includes(cleanWord.toLowerCase())) {
+                continue;
+            }
+            
+            // Check if word is a valid keyword
+            if (!validKeywords.includes(cleanWord.toLowerCase())) {
+                // Find the position of the word in the original line
+                const wordStart = line.indexOf(word);
+                const cleanWordStart = line.indexOf(cleanWord, wordStart >= 0 ? wordStart : 0);
+                
+                if (cleanWordStart !== -1 && !this.isInsideStringLiteral(line, cleanWordStart)) {
+                    const range = new vscode.Range(
+                        lineIndex, 
+                        cleanWordStart, 
+                        lineIndex, 
+                        cleanWordStart + cleanWord.length
+                    );
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Invalid keyword '${cleanWord}'. Check Sylang syntax.`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnostic.code = 'invalid-keyword';
+                    diagnostic.source = 'Sylang';
+                    diagnostics.push(diagnostic);
                 }
             }
         }
@@ -234,18 +231,44 @@ export class SylangValidationProvider implements vscode.Disposable {
         while (i < line.length) {
             const char = line[i];
             
+            // Handle quote characters (not escaped)
             if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
                 insideQuotes = !insideQuotes;
                 result += ' '; // Replace quote with space to maintain word separation
             } else if (!insideQuotes) {
+                // Only include characters that are outside quotes
                 result += char;
             } else {
-                result += ' '; // Replace quoted content with spaces to maintain positions
+                // Replace quoted content with spaces to maintain character positions
+                result += ' ';
             }
             i++;
         }
         
-        return result;
+        return result.trim();
+    }
+
+    private isValidIdentifier(word: string): boolean {
+        // Patterns for valid identifiers in Sylang
+        
+        // 1. Requirement/Goal IDs: FSR_EPB_014, SG_EPB_002, etc.
+        if (/^[A-Z]{2,4}_[A-Z]{2,4}_\d{3}$/.test(word)) {
+            return true;
+        }
+        
+        // 2. PascalCase component/class names: VehicleSpeedAnalyzer, AutomationSafetyValidator
+        if (/^[A-Z][a-zA-Z0-9]*$/.test(word) && word.length > 3) {
+            return true;
+        }
+        
+        // 3. camelCase identifiers: functionName, variableName
+        if (/^[a-z][a-zA-Z0-9]*$/.test(word) && word.length > 3) {
+            return true;
+        }
+        
+        // 4. Technical identifiers with numbers: EPB, ASIL-D, km/h (already handled by other patterns)
+        
+        return false;
     }
 
     private isInsideStringLiteral(line: string, position: number): boolean {
@@ -261,32 +284,30 @@ export class SylangValidationProvider implements vscode.Disposable {
         return insideQuotes;
     }
 
-    private couldBeKeyword(word: string): boolean {
-        // More lenient check - words that look like they could be keywords
-        if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(word)) {
-            return false;
-        }
+    private getValidKeywords(): string[] {
+        // Core Sylang keywords that are valid in all file types
+        const coreKeywords = [
+            'name', 'description', 'owner', 'tags', 'version', 'type', 'safetylevel'
+        ];
         
-        // Keywords are usually lowercase or camelCase
-        const hasLowercase = /[a-z]/.test(word);
-        return hasLowercase;
-    }
-
-    private getExtendedKeywords(): string[] {
+        // Safety level values
+        const safetyLevels = ['asil', 'qm'];
+        
         const safetyKeywords = [
-            // Main keywords
+            // Main safety keywords
             'functionalsafetyrequirements', 'requirement', 'safety', 'hazard', 'risk', 'goal', 'item',
-            // Property keywords  
-            'name', 'description', 'owner', 'tags', 'safetylevel', 'severity', 'probability', 'controllability', 
-            'verification', 'rationale',
-            // Reference keywords (both cases)
-            'derivedfrom', 'derivedFrom', 'allocatedto', 'allocatedTo', 'asil', 'ASIL',
-            // Common misspellings to catch
-            'requiremnt', 'descrition', 'alloctedto', 'raionale'
+            'safetygoal', 'safetymeasures', 'measure', 'scenario', 'functionalrequirement', 'safetyfunction',
+            // Safety properties
+            'severity', 'probability', 'controllability', 'verification', 'rationale', 'enabledby',
+            'verificationcriteria', 'criterion',
+            // Safety references
+            'derivedfrom', 'allocatedto', 'satisfies', 'implements',
+            // Requirement modals
+            'shall', 'should', 'may', 'will'
         ];
         
         const securityKeywords = [
-            'security', 'threat', 'asset', 'TARA', 'cybersecurity'
+            'security', 'threat', 'asset', 'tara', 'cybersecurity'
         ];
         
         const featureKeywords = [
@@ -301,77 +322,80 @@ export class SylangValidationProvider implements vscode.Disposable {
             'productline', 'domain', 'compliance', 'firstrelease', 'region'
         ];
 
-        // Return relevant keywords based on language type
+        const componentKeywords = [
+            'component', 'subsystem', 'requirement', 'aggregatedby', 'partof', 'enables', 'implements',
+            'interfaces', 'interface', 'protocol', 'direction', 'voltage', 'width', 'safety_level',
+            // Interface types
+            'communication', 'digital', 'analog', 'mechanical', 'software',
+            // Direction values
+            'input', 'output', 'bidirectional',
+            // Protocols
+            'spi', 'i2c', 'can', 'lin', 'uart',
+            // Voltage/Signal types
+            'cmos', 'ttl'
+        ];
+
+        const softwareKeywords = [
+            'module', 'software', 'part', 'algorithm', 'service', 'task', 'process', 'thread',
+            'parameters', 'execution', 'timing', 'memory', 'cpu_usage', 'priority', 'dependencies',
+            'license', 'returns',
+            // Execution types
+            'real-time', 'non-real-time', 'synchronous', 'asynchronous',
+            // Priority levels
+            'high', 'medium', 'low', 'critical', 'non-critical'
+        ];
+
+        const electronicsKeywords = [
+            'circuit', 'board', 'chip', 'ic', 'pcb', 'schematic', 'layout', 'trace', 'via', 'pad', 'pin',
+            'current', 'power', 'frequency', 'impedance', 'capacitance', 'resistance', 'inductance',
+            'tolerance', 'package', 'footprint', 'placement',
+            // Voltage values
+            '3v3', '5v', '12v', '24v', 'gnd', 'vcc', 'vdd', 'vss',
+            // Signal types
+            'lvds', 'differential', 'single-ended',
+            // Package types
+            'smd', 'tht', 'bga', 'qfp', 'soic'
+        ];
+
+        const mechanicsKeywords = [
+            'assembly', 'part', 'component', 'mechanism', 'actuator', 'sensor', 'bracket',
+            'housing', 'mounting', 'fastener', 'gear', 'spring', 'bearing',
+            'material', 'dimensions', 'weight', 'tolerance', 'finish', 'coating',
+            'hardness', 'strength', 'temperature_range', 'pressure_rating', 'lifecycle', 'maintenance',
+            // Materials
+            'steel', 'aluminum', 'plastic', 'rubber', 'titanium', 'carbon_fiber', 'stainless',
+            // Finishes
+            'anodized', 'painted', 'galvanized',
+            // Motion types
+            'static', 'dynamic', 'rotating', 'linear'
+        ];
+
+        // Return valid keywords based on language type
         switch (this.languageId) {
             case 'sylang-safety':
-                return [...this.keywords, ...safetyKeywords];
+                return [...coreKeywords, ...safetyLevels, ...safetyKeywords];
             case 'sylang-security':
-                return [...this.keywords, ...securityKeywords];
+                return [...coreKeywords, ...safetyLevels, ...securityKeywords];
             case 'sylang-features':
-                return [...this.keywords, ...featureKeywords];
+                return [...coreKeywords, ...safetyLevels, ...featureKeywords];
             case 'sylang-functions':
-                return [...this.keywords, ...functionKeywords];
+                return [...coreKeywords, ...safetyLevels, ...functionKeywords];
             case 'sylang-productline':
-                return [...this.keywords, ...productlineKeywords];
+                return [...coreKeywords, ...safetyLevels, ...productlineKeywords];
+            case 'sylang-components':
+                return [...coreKeywords, ...safetyLevels, ...componentKeywords];
+            case 'sylang-software':
+                return [...coreKeywords, ...safetyLevels, ...softwareKeywords];
+            case 'sylang-electronics':
+                return [...coreKeywords, ...safetyLevels, ...electronicsKeywords];
+            case 'sylang-mechanics':
+                return [...coreKeywords, ...safetyLevels, ...mechanicsKeywords];
             default:
-                return this.keywords;
+                return [...coreKeywords, ...safetyLevels, ...this.keywords];
         }
     }
 
-    private findClosestKeyword(word: string, keywords: string[]): string | null {
-        let bestMatch = null;
-        let bestDistance = Infinity;
-        
-        // Direct mapping for common typos
-        const commonTypos: { [key: string]: string } = {
-            'requiremnt': 'requirement',
-            'descrition': 'description', 
-            'alloctedto': 'allocatedto',
-            'raionale': 'rationale',
-            'derivedfrom': 'derivedfrom', // Accept this as valid
-            'allocatedto': 'allocatedto'  // Accept this as valid
-        };
-        
-        const lowerWord = word.toLowerCase();
-        if (commonTypos[lowerWord]) {
-            return commonTypos[lowerWord]!;
-        }
-        
-        for (const keyword of keywords) {
-            const distance = this.levenshteinDistance(lowerWord, keyword.toLowerCase());
-            if (distance < bestDistance && distance <= 2) { // Allow up to 2 character differences
-                bestDistance = distance;
-                bestMatch = keyword;
-            }
-        }
-        
-        return bestMatch;
-    }
 
-    private levenshteinDistance(a: string, b: string): number {
-        const matrix: number[][] = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(0));
-        
-        for (let i = 0; i <= a.length; i += 1) {
-            matrix[0]![i] = i;
-        }
-        
-        for (let j = 0; j <= b.length; j += 1) {
-            matrix[j]![0] = j;
-        }
-        
-        for (let j = 1; j <= b.length; j += 1) {
-            for (let i = 1; i <= a.length; i += 1) {
-                const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
-                matrix[j]![i] = Math.min(
-                    matrix[j]![i - 1]! + 1, // deletion
-                    matrix[j - 1]![i]! + 1, // insertion
-                    matrix[j - 1]![i - 1]! + indicator // substitution
-                );
-            }
-        }
-        
-        return matrix[b.length]![a.length]!;
-    }
 
     public dispose(): void {
         this.diagnosticCollection.dispose();
