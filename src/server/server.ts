@@ -19,6 +19,8 @@ import {
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Create a connection for the server
 const connection = createConnection(ProposedFeatures.all);
@@ -28,6 +30,7 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
+let workspaceRoot: string | null = null;
 // let hasDiagnosticRelatedInformationCapability = false;
 
 // Modular language configurations for different Sylang types
@@ -88,6 +91,13 @@ const languageConfigs: Record<string, LanguageConfig> = {
 connection.onInitialize((params: InitializeParams) => {
     const capabilities = params.capabilities;
 
+    // Store workspace root path
+    if (params.rootUri) {
+        workspaceRoot = decodeURIComponent(params.rootUri.replace('file://', ''));
+    } else if (params.rootPath) {
+        workspaceRoot = params.rootPath;
+    }
+
     hasConfigurationCapability = !!(
         capabilities.workspace && !!capabilities.workspace.configuration
     );
@@ -132,6 +142,12 @@ connection.onInitialized(() => {
         connection.workspace.onDidChangeWorkspaceFolders(_event => {
             connection.console.log('Workspace folder change event received.');
         });
+    }
+    
+    // Scan workspace for all Sylang files and build symbol index
+    if (workspaceRoot) {
+        connection.console.log(`Scanning workspace: ${workspaceRoot}`);
+        scanWorkspaceForSymbols(workspaceRoot);
     }
 });
 
@@ -565,11 +581,54 @@ function getKeywordDocumentation(word: string): string | null {
     return docs[word] || null;
 }
 
+// Workspace scanning for cross-file navigation
+function scanWorkspaceForSymbols(workspacePath: string): void {
+    const sylangExtensions = ['.ple', '.fun', '.fma', '.fml', '.sgl', '.haz', '.rsk', '.fsr', 
+                             '.cmp', '.sub', '.req', '.mod', '.prt', '.ckt', '.asm', 
+                             '.itm', '.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'];
+    
+    function scanDirectory(dirPath: string): void {
+        try {
+            const items = fs.readdirSync(dirPath);
+            
+            for (const item of items) {
+                const fullPath = path.join(dirPath, item);
+                const stat = fs.statSync(fullPath);
+                
+                if (stat.isDirectory()) {
+                    // Skip hidden directories and node_modules
+                    if (!item.startsWith('.') && item !== 'node_modules') {
+                        scanDirectory(fullPath);
+                    }
+                } else if (stat.isFile()) {
+                    const ext = path.extname(item);
+                    if (sylangExtensions.includes(ext)) {
+                        try {
+                            const content = fs.readFileSync(fullPath, 'utf8');
+                            const uri = `file://${fullPath}`;
+                            const document = TextDocument.create(uri, 'sylang', 0, content);
+                            symbolIndex.indexDocument(document);
+                            connection.console.log(`Indexed symbols from: ${fullPath}`);
+                        } catch (error) {
+                            connection.console.log(`Error reading file ${fullPath}: ${error}`);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            connection.console.log(`Error scanning directory ${dirPath}: ${error}`);
+        }
+    }
+    
+    scanDirectory(workspacePath);
+    connection.console.log('Workspace symbol indexing completed');
+}
+
 // Symbol Index for Go to Definition and Find References
 interface SymbolInfo {
     name: string;
     location: Location;
-    type: 'requirement' | 'component' | 'goal' | 'feature' | 'function';
+    type: 'requirement' | 'component' | 'goal' | 'feature' | 'function' | 'module' | 'circuit' | 'assembly';
 }
 
 class SylangSymbolIndex {
@@ -608,8 +667,63 @@ class SylangSymbolIndex {
             const line = lines[lineNumber];
             if (!line) continue;
 
+            // Index component definitions: component ActuatorManagementUnit
+            const componentMatch = line.match(/^\s*(component|Subsystem|subsystem)\s+([A-Z][a-zA-Z0-9_]*)/);
+            if (componentMatch && componentMatch[2]) {
+                const symbolName = componentMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'component'
+                });
+            }
+
+            // Index module definitions: module ActuatorControlModule
+            const moduleMatch = line.match(/^\s*(module|software|service)\s+([A-Z][a-zA-Z0-9_]*)/);
+            if (moduleMatch && moduleMatch[2]) {
+                const symbolName = moduleMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'module'
+                });
+            }
+
+            // Index circuit definitions: circuit CommunicationCircuit
+            const circuitMatch = line.match(/^\s*(circuit|board|pcb)\s+([A-Z][a-zA-Z0-9_]*)/);
+            if (circuitMatch && circuitMatch[2]) {
+                const symbolName = circuitMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'circuit'
+                });
+            }
+
+            // Index assembly definitions: assembly MountingAssembly
+            const assemblyMatch = line.match(/^\s*(assembly|part)\s+([A-Z][a-zA-Z0-9_]*)/);
+            if (assemblyMatch && assemblyMatch[2]) {
+                const symbolName = assemblyMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'assembly'
+                });
+            }
+
+            // Index function definitions: function VehicleSpeedAnalyzer
+            const functionMatch = line.match(/^\s*(function)\s+([A-Z][a-zA-Z0-9_]*)/);
+            if (functionMatch && functionMatch[2]) {
+                const symbolName = functionMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'function'
+                });
+            }
+
             // Index requirement definitions: requirement FSR_EPB_014
-            const reqMatch = line.match(/\b(requirement)\s+([A-Z_]{2,20}\d{3})\b/);
+            const reqMatch = line.match(/\b(requirement|functionalrequirement)\s+([A-Z_]{2,20}\d{3})\b/);
             if (reqMatch && reqMatch[2] && reqMatch.index !== undefined) {
                 const symbolName = reqMatch[2];
                 this.addSymbol({
@@ -620,7 +734,7 @@ class SylangSymbolIndex {
             }
 
             // Index goal definitions: goal SG_EPB_002
-            const goalMatch = line.match(/\b(goal)\s+([A-Z_]{2,20}\d{3})\b/);
+            const goalMatch = line.match(/\b(goal|safetygoal)\s+([A-Z_]{2,20}\d{3})\b/);
             if (goalMatch && goalMatch[2] && goalMatch.index !== undefined) {
                 const symbolName = goalMatch[2];
                 this.addSymbol({
@@ -630,12 +744,34 @@ class SylangSymbolIndex {
                 });
             }
 
+            // Index scenario definitions: scenario SCEN_AUT_001_UnintendedActivation
+            const scenarioMatch = line.match(/\b(scenario)\s+([A-Z_][a-zA-Z0-9_]*)/);
+            if (scenarioMatch && scenarioMatch[2]) {
+                const symbolName = scenarioMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'requirement'
+                });
+            }
+
+            // Index measure definitions: measure SM_004
+            const measureMatch = line.match(/\b(measure)\s+([A-Z]{1,3}_\d{3})/);
+            if (measureMatch && measureMatch[2]) {
+                const symbolName = measureMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'requirement'
+                });
+            }
+
             // Index component references: allocatedto VehicleSpeedAnalyzer, AutomationSafetyValidator
-            const allocMatch = line.match(/\ballocatedto\s+([A-Z][a-zA-Z0-9,\s]*)/);
-            if (allocMatch && allocMatch[1]) {
-                const components = allocMatch[1].split(',').map(c => c.trim());
+            const allocMatch = line.match(/\b(allocatedto|enabledby|implements|partof|aggregatedby)\s+([A-Z][a-zA-Z0-9,\s]*)/);
+            if (allocMatch && allocMatch[2]) {
+                const components = allocMatch[2].split(',').map(c => c.trim());
                 components.forEach(comp => {
-                    if (comp && /^[A-Z][a-zA-Z0-9]*$/.test(comp)) {
+                    if (comp && /^[A-Z][a-zA-Z0-9_]*$/.test(comp)) {
                         this.addSymbol({
                             name: comp,
                             location: Location.create(uri, Range.create(lineNumber, line.indexOf(comp), lineNumber, line.indexOf(comp) + comp.length)),
@@ -645,15 +781,30 @@ class SylangSymbolIndex {
                 });
             }
 
-            // Index derivedfrom references: derivedfrom SG_EPB_002, SG_EPB_004
-            const derivedMatch = line.match(/\bderivedfrom\s+([A-Z_0-9,\s]*)/);
-            if (derivedMatch && derivedMatch[1]) {
-                const refs = derivedMatch[1].split(',').map(r => r.trim());
+            // Index derivedfrom/satisfies references: derivedfrom SG_EPB_002, SG_EPB_004
+            const derivedMatch = line.match(/\b(derivedfrom|satisfies)\s+([A-Z_0-9,\s]*)/);
+            if (derivedMatch && derivedMatch[2]) {
+                const refs = derivedMatch[2].split(',').map(r => r.trim());
                 refs.forEach(ref => {
                     if (ref && /^[A-Z_]{2,20}\d{3}$/.test(ref)) {
                         this.addSymbol({
                             name: ref,
                             location: Location.create(uri, Range.create(lineNumber, line.indexOf(ref), lineNumber, line.indexOf(ref) + ref.length)),
+                            type: 'requirement'
+                        });
+                    }
+                });
+            }
+
+            // Index hazard references: hazard H_ACT_002, H_ACT_003
+            const hazardMatch = line.match(/\b(hazard)\s+([A-Z_0-9,\s]*)/);
+            if (hazardMatch && hazardMatch[2]) {
+                const hazards = hazardMatch[2].split(',').map(h => h.trim());
+                hazards.forEach(haz => {
+                    if (haz && /^H_[A-Z]{2,4}_\d{3}$/.test(haz)) {
+                        this.addSymbol({
+                            name: haz,
+                            location: Location.create(uri, Range.create(lineNumber, line.indexOf(haz), lineNumber, line.indexOf(haz) + haz.length)),
                             type: 'requirement'
                         });
                     }

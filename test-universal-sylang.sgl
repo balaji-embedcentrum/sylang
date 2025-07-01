@@ -1,0 +1,46 @@
+safetygoals UniversalSylangTest
+  name "Universal Sylang Extension Test - Safety Goals"
+  description "Testing comprehensive keyword support across all 22 Sylang file extensions"
+  owner "Sylang Extension Team"
+  safetylevel ASIL-D
+  
+  safetygoals
+    goal SG_TEST_001
+      name "Universal Keyword Recognition"
+      description "Validate that all safety-related keywords are properly recognized and not flagged as errors"
+      scenario SCEN_TEST_001_KeywordValidation
+      safetymeasures
+        measure SM_001 "Comprehensive validation testing"
+          enabledby ValidationController, TestHarness
+        measure SM_002 "Cross-extension symbol recognition"
+          enabledby SymbolIndexer, ReferenceResolver
+      verificationcriteria
+        criterion "All keywords recognized without validation errors"
+        criterion "Syntax highlighting works across all file types"
+        
+    goal SG_TEST_002
+      name "Cross-Extension Symbol Navigation"
+      description "Test Go to Definition and Find References across different file types"
+      scenario SCEN_TEST_002_NavigationTesting
+      safetymeasures
+        measure SM_003 "Symbol indexing validation"
+          enabledby ComponentMapper, CrossReferenceEngine
+        measure SM_004 "Navigation accuracy testing"
+          enabledby DefinitionProvider, ReferenceProvider
+      verificationcriteria
+        criterion "F12 navigation works between .sgl, .cmp, .mod, .fsr files"
+        criterion "Shift+F12 finds all references across workspace"
+
+  // Test specific keywords that were previously flagged as errors:
+  // These should now be properly recognized:
+  functionalrequirement REQ_UNIVERSAL_001
+    derivedfrom SG_TEST_001
+    allocatedto UniversalTestComponent
+    implements UniversalValidation
+    satisfies "Complete keyword coverage requirement"
+    
+  // Requirements modals that should be valid:
+  requirement "The system shall provide universal support"
+  requirement "The extension should recognize all keywords"
+  requirement "Validation may report only genuine syntax errors"
+  requirement "Cross-references will enable seamless navigation" 
