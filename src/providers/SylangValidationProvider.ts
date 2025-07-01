@@ -186,38 +186,52 @@ export class SylangValidationProvider implements vscode.Disposable {
                 continue;
             }
             
-            // Skip identifier patterns (requirement IDs, component names, etc.)
+            // Skip identifier patterns (requirement IDs, component names, hazard IDs, etc.)
             if (this.isValidIdentifier(cleanWord)) {
                 continue;
             }
             
             // Skip common structural words that aren't keywords
-            const structuralWords = ['true', 'false', 'yes', 'no'];
+            const structuralWords = ['true', 'false', 'yes', 'no', 'the', 'and', 'or', 'of', 'to', 'in', 'for', 'with', 'by', 'as', 'on', 'at'];
             if (structuralWords.includes(cleanWord.toLowerCase())) {
                 continue;
             }
             
-            // Check if word is a valid keyword
-            if (!validKeywords.includes(cleanWord.toLowerCase())) {
-                // Find the position of the word in the original line
-                const wordStart = line.indexOf(word);
-                const cleanWordStart = line.indexOf(cleanWord, wordStart >= 0 ? wordStart : 0);
-                
-                if (cleanWordStart !== -1 && !this.isInsideStringLiteral(line, cleanWordStart)) {
-                    const range = new vscode.Range(
-                        lineIndex, 
-                        cleanWordStart, 
-                        lineIndex, 
-                        cleanWordStart + cleanWord.length
-                    );
-                    const diagnostic = new vscode.Diagnostic(
-                        range,
-                        `Invalid keyword '${cleanWord}'. Check Sylang syntax.`,
-                        vscode.DiagnosticSeverity.Error
-                    );
-                    diagnostic.code = 'invalid-keyword';
-                    diagnostic.source = 'Sylang';
-                    diagnostics.push(diagnostic);
+            // Skip quoted content entirely (these are values, not keywords)
+            if (this.isInsideStringLiteral(line, line.indexOf(cleanWord))) {
+                continue;
+            }
+            
+            // Skip words that appear to be file extensions or technical terms
+            if (/^[a-z]{2,4}$/.test(cleanWord) && (cleanWord.endsWith('ml') || cleanWord.endsWith('js') || cleanWord.endsWith('ts'))) {
+                continue;
+            }
+            
+            // Only validate words that look like they should be keywords (not identifiers or values)
+            // Keywords typically start with lowercase and are structural terms
+            if (/^[a-z][a-z_]*$/.test(cleanWord) && cleanWord.length > 3) {
+                // Check if word is a valid keyword
+                if (!validKeywords.includes(cleanWord.toLowerCase())) {
+                    // Find the position of the word in the original line
+                    const wordStart = line.indexOf(word);
+                    const cleanWordStart = line.indexOf(cleanWord, wordStart >= 0 ? wordStart : 0);
+                    
+                    if (cleanWordStart !== -1 && !this.isInsideStringLiteral(line, cleanWordStart)) {
+                        const range = new vscode.Range(
+                            lineIndex, 
+                            cleanWordStart, 
+                            lineIndex, 
+                            cleanWordStart + cleanWord.length
+                        );
+                        const diagnostic = new vscode.Diagnostic(
+                            range,
+                            `Invalid keyword '${cleanWord}'. Check Sylang syntax.`,
+                            vscode.DiagnosticSeverity.Error
+                        );
+                        diagnostic.code = 'invalid-keyword';
+                        diagnostic.source = 'Sylang';
+                        diagnostics.push(diagnostic);
+                    }
                 }
             }
         }
@@ -256,17 +270,40 @@ export class SylangValidationProvider implements vscode.Disposable {
             return true;
         }
         
-        // 2. PascalCase component/class names: VehicleSpeedAnalyzer, AutomationSafetyValidator
+        // 2. Hazard IDs: H_ACT_001, H_HMI_002, H_SEN_003, etc.
+        if (/^H_[A-Z]{2,4}_\d{3}$/.test(word)) {
+            return true;
+        }
+        
+        // 3. Scenario IDs: SCEN_AUT_001_UnintendedActivation, etc.
+        if (/^SCEN_[A-Z]{3}_\d{3}_[a-zA-Z]+$/.test(word)) {
+            return true;
+        }
+        
+        // 4. Measure IDs: SM_004, etc.
+        if (/^[A-Z]{1,3}_\d{3}$/.test(word)) {
+            return true;
+        }
+        
+        // 5. PascalCase component/class names: VehicleSpeedAnalyzer, AutomationSafetyValidator
         if (/^[A-Z][a-zA-Z0-9]*$/.test(word) && word.length > 3) {
             return true;
         }
         
-        // 3. camelCase identifiers: functionName, variableName
+        // 6. camelCase identifiers: functionName, variableName
         if (/^[a-z][a-zA-Z0-9]*$/.test(word) && word.length > 3) {
             return true;
         }
         
-        // 4. Technical identifiers with numbers: EPB, ASIL-D, km/h (already handled by other patterns)
+        // 7. Technical constants and abbreviations: EPB, EMI, LED, SPI, CAN, etc.
+        if (/^[A-Z]{2,5}$/.test(word)) {
+            return true;
+        }
+        
+        // 8. Technical units and values: V, km/h, 3v3, 5v, etc.
+        if (/^[\d]*[vV][\d]*$/.test(word) || /^[\d]+[A-Za-z]*$/.test(word)) {
+            return true;
+        }
         
         return false;
     }
@@ -303,7 +340,14 @@ export class SylangValidationProvider implements vscode.Disposable {
             // Safety references
             'derivedfrom', 'allocatedto', 'satisfies', 'implements',
             // Requirement modals
-            'shall', 'should', 'may', 'will'
+            'shall', 'should', 'may', 'will',
+            // Hazard-specific keywords
+            'subsystemhazards', 'functions_affected', 'category', 'cause', 'effect', 'reference',
+            // Hazard categories
+            'unintendedactivation', 'failuretoactivate', 'failuretorelease', 'partialfailure', 
+            'delayedresponse', 'misleadingindication',
+            // System structure
+            'subsystem', 'subsystems', 'system'
         ];
         
         const securityKeywords = [
@@ -394,8 +438,6 @@ export class SylangValidationProvider implements vscode.Disposable {
                 return [...coreKeywords, ...safetyLevels, ...this.keywords];
         }
     }
-
-
 
     public dispose(): void {
         this.diagnosticCollection.dispose();
