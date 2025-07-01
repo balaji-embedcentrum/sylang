@@ -1,65 +1,65 @@
 # Change Log
 
-All notable changes to the "Sylang Language Support" extension will be documented in this file.
+All notable changes to the "Sylang" extension will be documented in this file.
 
 ## [1.0.0] - 2024-12-19
 
-### 🚀 **Initial Release - Professional Sylang IDE Support**
+### 🚀 **Initial Release - Professional Sylang MBSE IDE Support**
 
-#### ✅ **Universal Language Support**
-- **22 Sylang file extensions** with complete IDE features
-- **Domain-specific syntax highlighting** for all automotive engineering domains
-- **TextMate grammars** for Safety, Security, Components, Software, Electronics, Mechanics
-- **Auto-completion** with 200+ domain-specific keywords and technical terms
+#### ✅ **Complete MBSE Toolkit**
+- **22 Sylang file extensions** with professional IDE features for systems engineering
+- **Multi-industry support**: Automotive, Aerospace, and Medical device development
+- **Safety standards compliance**: ISO 26262, DO-178C, IEC 62304 validation
+- **Domain-specific syntax highlighting** for all engineering disciplines
 
-#### ✅ **Cross-File Navigation**
-- **Go to Definition (F12)** - Jump to actual symbol definitions across files  
-- **Find All References (Shift+F12)** - Locate all usages throughout workspace
+#### ✅ **Cross-System Navigation**
+- **Go to Definition (F12)** - Navigate to system component definitions across files  
+- **Find All References (Shift+F12)** - Trace requirements and dependencies throughout workspace
 - **Workspace-wide symbol indexing** with real-time progress feedback
 - **Smart identifier recognition** for components, requirements, hazards, safety goals
 
-#### ✅ **Enhanced Validation**
-- **Real-time error detection** with automotive domain expertise
-- **ASIL safety level validation** (ASIL-A through ASIL-D, QM)
-- **Intelligent keyword validation** with reduced false positives
-- **Hazard analysis validation** for automotive safety standards
+#### ✅ **Enhanced Safety & Standards Validation**
+- **Real-time standards compliance** checking for automotive, aerospace, and medical
+- **ASIL safety level validation** (ASIL-A through ASIL-D, QM) for ISO 26262
+- **DO-178C compliance** features for aerospace software development
+- **IEC 62304 support** for medical device software lifecycle processes
 
 #### ✅ **Professional IDE Features**
-- **IntelliSense** with context-aware suggestions
-- **Code snippets** for common patterns in all domains
-- **Document formatting** with consistent styling
-- **Hover documentation** for keywords and technical terms
+- **IntelliSense** with engineering-specific context-aware suggestions
+- **Code snippets** for common MBSE patterns across all domains
+- **Document formatting** with systems engineering best practices
+- **Hover documentation** for standards and technical terms
 
 #### ✅ **Language Server Protocol (LSP)**
-- **Full LSP implementation** for professional IDE experience
+- **Full LSP implementation** for professional systems engineering IDE experience
 - **Workspace symbol indexing** with progress notifications
-- **Cross-file navigation** with definition prioritization
-- **Real-time diagnostics** and validation
+- **Cross-file navigation** with definition prioritization for system architecture
+- **Real-time diagnostics** and standards compliance validation
 
-#### ✅ **Supported File Types**
-- **Product Line** (`.ple`) - Product line definitions and configurations
-- **Functions** (`.fun`, `.fma`) - System functions and functional models  
-- **Features** (`.fml`) - Feature models with variability
-- **Safety** (`.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm`) - Safety goals, hazards, risks, requirements
-- **Security** (`.sgo`, `.ast`, `.sec`, `.tra`, `.thr`, `.sre`) - Security goals, assets, threats
-- **Components** (`.cmp`, `.sub`, `.req`) - Components, subsystems, requirements
-- **Software** (`.mod`, `.prt`) - Software modules and parts
-- **Electronics** (`.ckt`) - Electronic circuits and designs
-- **Mechanics** (`.asm`) - Mechanical assemblies and components
+#### ✅ **Supported Engineering Domains**
+- **Systems Architecture** (`.ple`) - Systems modeling, component hierarchies
+- **Functional Design** (`.fun`, `.fma`) - System functions, behavioral models  
+- **Feature Models** (`.fml`) - Variability modeling, product lines
+- **Safety Engineering** (`.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm`) - ISO 26262, DO-178C, IEC 62304
+- **Security Engineering** (`.sgo`, `.ast`, `.sec`, `.tra`, `.thr`, `.sre`) - Cybersecurity, threat analysis
+- **Component Engineering** (`.cmp`, `.sub`, `.req`) - Component specs, subsystem design
+- **Software Engineering** (`.mod`, `.prt`) - Software architecture, modules
+- **Electronics Design** (`.ckt`) - Circuit design, signal integrity
+- **Mechanical Design** (`.asm`) - Mechanical assemblies, actuators
 
 ### 🎯 **Key Benefits**
-- Zero configuration - works out of the box
-- Professional automotive domain expertise
-- Comprehensive workspace-wide navigation
-- Real-time feedback with intelligent validation
-- Complete Product Line Engineering toolkit
+- Zero configuration - works out of the box with industry best practices
+- Professional MBSE workflow support for complex systems
+- Cross-industry applicability (Automotive, Aerospace, Medical)
+- Standards compliance with real-time validation
+- Complete requirement traceability and dependency management
 
 ### 🔧 **Technical Details**
 - Built with TypeScript and Language Server Protocol
-- Modular architecture for easy extensibility
-- Tree-sitter based syntax highlighting
-- Comprehensive test coverage
-- Performance optimized for large workspaces
+- Modular architecture for easy extensibility across engineering domains
+- Tree-sitter based syntax highlighting optimized for systems engineering
+- Comprehensive test coverage for safety-critical development
+- Performance optimized for large, complex system architectures
 
 ---
 

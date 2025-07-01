@@ -1,61 +1,60 @@
-# Sylang Language Support
+# Sylang
 
-[![Version](https://img.shields.io/vscode-marketplace/v/balaji-embedcentrum.sylang-language-support.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang-language-support)
-[![Downloads](https://img.shields.io/vscode-marketplace/d/balaji-embedcentrum.sylang-language-support.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang-language-support)
-[![Rating](https://img.shields.io/vscode-marketplace/r/balaji-embedcentrum.sylang-language-support.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang-language-support)
+[![Version](https://img.shields.io/vscode-marketplace/v/balaji-embedcentrum.sylang.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang)
+[![Downloads](https://img.shields.io/vscode-marketplace/d/balaji-embedcentrum.sylang.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang)
+[![Rating](https://img.shields.io/vscode-marketplace/r/balaji-embedcentrum.sylang.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang)
 
-Professional IDE support for **Sylang DSL** - A complete Product Line Engineering toolkit for automotive safety & security development.
+**IDE Support for Sylang** - Systems and Safety Engineering Language for **Model Based Systems Engineering (MBSE)** in complex systems development across Automotive, Aerospace, and Medical industries.
 
 ## 🚀 **Features**
 
-### **Universal Language Support**
-- **22 Sylang file extensions** with full IDE features
-- **Syntax highlighting** for all domains: Safety, Security, Components, Software, Electronics, Mechanics
-- **Auto-completion** with domain-specific keywords and snippets
-- **Real-time validation** with intelligent error detection
+### **Complete MBSE Toolkit**
+- **22 Sylang file extensions** with professional IDE features
+- **Systems Engineering domains**: Safety, Security, Components, Software, Electronics, Mechanics
+- **Safety standards compliance**: ISO 26262, DO-178C, IEC 62304
+- **Real-time validation** with domain-specific engineering rules
 
 ### **Cross-File Navigation**
-- **Go to Definition (F12)** - Jump to actual symbol definitions across files
-- **Find All References (Shift+F12)** - Locate all usages throughout workspace  
+- **Go to Definition (F12)** - Navigate to system component definitions across files
+- **Find All References (Shift+F12)** - Trace requirements and dependencies throughout workspace  
 - **Workspace-wide symbol indexing** with progress feedback
-- **Smart identifier recognition** for components, requirements, hazards, goals
+- **Smart identifier recognition** for components, requirements, hazards, safety goals
 
-### **Domain Expertise**
-- **Automotive Safety**: ASIL levels, functional safety requirements, hazard analysis
-- **Cybersecurity**: TARA, threat modeling, security goals  
-- **Component Architecture**: Subsystems, interfaces, dependencies
-- **Software Engineering**: Modules, algorithms, services, timing analysis
-- **Electronics Design**: Circuits, PCBs, signal integrity, power management
-- **Mechanical Design**: Assemblies, materials, tolerances, actuators
+### **Industry Focus**
+- **Automotive Safety**: ASIL levels, functional safety requirements, hazard analysis, ISO 26262
+- **Aerospace Systems**: DO-178C compliance, safety-critical software development
+- **Medical Devices**: IEC 62304, risk management, device safety requirements
+- **Systems Architecture**: Component hierarchies, interfaces, traceability
+- **Requirements Engineering**: Traceability, verification, validation
 
-## 📋 **Supported File Types**
+## 📋 **Supported Engineering Domains**
 
-| Domain | Extensions | Description |
-|--------|------------|-------------|
-| **Product Line** | `.ple` | Product line definitions and configurations |
-| **Functions** | `.fun`, `.fma` | System functions and functional models |
-| **Features** | `.fml` | Feature models with variability |
-| **Safety** | `.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm` | Safety goals, hazards, risks, requirements |
-| **Security** | `.sgo`, `.ast`, `.sec`, `.tra`, `.thr`, `.sre` | Security goals, assets, threats |
-| **Components** | `.cmp`, `.sub`, `.req` | Components, subsystems, requirements |
-| **Software** | `.mod`, `.prt` | Software modules and parts |
-| **Electronics** | `.ckt` | Electronic circuits and designs |
-| **Mechanics** | `.asm` | Mechanical assemblies and components |
+| Domain | Extensions | Industry Standards |
+|--------|------------|-------------------|
+| **Systems Architecture** | `.ple` | Systems modeling, component hierarchies |
+| **Functional Design** | `.fun`, `.fma` | System functions, behavioral models |
+| **Feature Models** | `.fml` | Variability modeling, product lines |
+| **Safety Engineering** | `.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm` | ISO 26262, DO-178C, IEC 62304 |
+| **Security Engineering** | `.sgo`, `.ast`, `.sec`, `.tra`, `.thr`, `.sre` | Cybersecurity, threat analysis |
+| **Component Engineering** | `.cmp`, `.sub`, `.req` | Component specs, subsystem design |
+| **Software Engineering** | `.mod`, `.prt` | Software architecture, modules |
+| **Electronics Design** | `.ckt` | Circuit design, signal integrity |
+| **Mechanical Design** | `.asm` | Mechanical assemblies, actuators |
 
 ## 🎯 **Quick Start**
 
 ### **Installation**
 1. Open VS Code
 2. Go to Extensions (Ctrl+Shift+X)
-3. Search for "Sylang Language Support"
+3. Search for "Sylang"
 4. Click Install
 
 ### **Usage**
 1. **Open any Sylang file** - Automatic language detection and syntax highlighting
-2. **Start typing** - IntelliSense provides auto-completion
-3. **Use F12** - Navigate to definitions across files
-4. **Press Shift+F12** - Find all references in workspace
-5. **Check Problems panel** - Real-time validation and error detection
+2. **Start typing** - IntelliSense provides engineering-specific auto-completion
+3. **Use F12** - Navigate to component definitions across system architecture
+4. **Press Shift+F12** - Trace requirements and dependencies
+5. **Check Problems panel** - Real-time validation with safety standards compliance
 
 ## 🔧 **Configuration**
 
@@ -69,7 +68,7 @@ Professional IDE support for **Sylang DSL** - A complete Product Line Engineerin
 
 ## 📝 **Example Usage**
 
-### **Safety Goals (.sgl)**
+### **Safety Goals (ISO 26262)**
 ```sylang
 safetygoal SG_EPB_001
   name "Prevent Unintended Activation"
@@ -79,7 +78,7 @@ safetygoal SG_EPB_001
   derivedfrom FSR_EPB_014, FSR_EPB_027
 ```
 
-### **Component Definition (.cmp)**
+### **System Component Architecture**
 ```sylang
 component ActuatorManagementUnit
   description "Controls actuator motor and position feedback"
@@ -93,7 +92,7 @@ component ActuatorManagementUnit
       voltage 3.3V
 ```
 
-### **Hazard Analysis (.haz)**
+### **Hazard Analysis & Risk Assessment**
 ```sylang
 hazard H_ACT_001
   name "Actuator Motor Runaway"
@@ -106,12 +105,32 @@ hazard H_ACT_001
 
 ## ✨ **Key Benefits**
 
-- **🎯 Professional IDE Experience** - IntelliSense, validation, navigation
-- **🔍 Cross-File Navigation** - F12 and Shift+F12 work across entire workspace
-- **⚡ Real-Time Feedback** - Instant validation with intelligent error detection
-- **🏗️ Domain Expertise** - Automotive-specific keywords and validation rules
-- **📊 Workspace Indexing** - Progress feedback and comprehensive symbol tracking
-- **🔧 Zero Configuration** - Works out of the box with intelligent defaults
+- **🎯 Professional MBSE Experience** - Complete systems engineering workflow
+- **🔍 Cross-System Navigation** - F12 and Shift+F12 across entire system architecture
+- **⚡ Standards Compliance** - Real-time validation for ISO 26262, DO-178C, IEC 62304
+- **🏗️ Multi-Industry Support** - Automotive, Aerospace, Medical device development
+- **📊 Requirement Traceability** - Full traceability from requirements to implementation
+- **🔧 Zero Configuration** - Works out of the box with industry best practices
+
+## 🏭 **Industry Applications**
+
+### **Automotive (ISO 26262)**
+- Electric vehicle control systems
+- Advanced driver assistance systems (ADAS)
+- Autonomous driving functions
+- Brake and steering systems
+
+### **Aerospace (DO-178C)**
+- Flight control systems
+- Avionics software
+- Navigation systems
+- Engine control units
+
+### **Medical Devices (IEC 62304)**
+- Patient monitoring systems
+- Surgical robots
+- Diagnostic equipment
+- Implantable devices
 
 ## 🛠️ **Development**
 
@@ -125,7 +144,7 @@ git clone https://github.com/balaji-embedcentrum/sylang.git
 cd sylang
 npm install
 npm run compile
-code --install-extension sylang-language-support-*.vsix
+code --install-extension sylang-*.vsix
 ```
 
 ## 🤝 **Contributing**
@@ -142,8 +161,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🏢 **About**
 
-Developed by [Embed Centrum](https://github.com/balaji-embedcentrum) for professional automotive software development teams working with Product Line Engineering, Functional Safety, and Cybersecurity.
+Developed by [Embed Centrum](https://github.com/balaji-embedcentrum) for professional systems engineers working in safety-critical industries requiring Model Based Systems Engineering (MBSE) approaches and standards compliance.
 
 ---
 
-**⭐ If this extension helps your development workflow, please consider giving it a star on [GitHub](https://github.com/balaji-embedcentrum/sylang)!** 
+**⭐ If this extension helps your systems engineering workflow, please consider giving it a star on [GitHub](https://github.com/balaji-embedcentrum/sylang)!** 
