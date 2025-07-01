@@ -37,7 +37,7 @@
       {
         "id": "sylang-functions",
         "aliases": ["Sylang Functions", "sylang-fun"],
-        "extensions": [".fun"],
+        "extensions": [".fun", ".fma"],
         "configuration": "./language-configuration.json"
       },
       {
@@ -56,6 +56,30 @@
         "id": "sylang-security",
         "aliases": ["Sylang Security", "sylang-security"],
         "extensions": [".tra", ".thr", ".sgo", ".sre", ".ast", ".sec"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-components",
+        "aliases": ["Sylang Components", "sylang-cmp"],
+        "extensions": [".cmp", ".sub", ".req"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-software",
+        "aliases": ["Sylang Software", "sylang-mod"],
+        "extensions": [".mod", ".prt"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-electronics",
+        "aliases": ["Sylang Electronics", "sylang-ckt"],
+        "extensions": [".ckt"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-mechanics",
+        "aliases": ["Sylang Mechanics", "sylang-asm"],
+        "extensions": [".asm"],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -84,6 +108,26 @@
         "language": "sylang-security",
         "scopeName": "source.sylang.security",
         "path": "./syntaxes/sylang-security.tmGrammar.json"
+      },
+      {
+        "language": "sylang-components",
+        "scopeName": "source.sylang.components",
+        "path": "./syntaxes/sylang-components.tmGrammar.json"
+      },
+      {
+        "language": "sylang-software",
+        "scopeName": "source.sylang.software",
+        "path": "./syntaxes/sylang-software.tmGrammar.json"
+      },
+      {
+        "language": "sylang-electronics",
+        "scopeName": "source.sylang.electronics",
+        "path": "./syntaxes/sylang-electronics.tmGrammar.json"
+      },
+      {
+        "language": "sylang-mechanics",
+        "scopeName": "source.sylang.mechanics",
+        "path": "./syntaxes/sylang-mechanics.tmGrammar.json"
       }
     ],
     "snippets": [
@@ -106,6 +150,22 @@
       {
         "language": "sylang-security",
         "path": "./snippets/security.json"
+      },
+      {
+        "language": "sylang-components",
+        "path": "./snippets/components.json"
+      },
+      {
+        "language": "sylang-software",
+        "path": "./snippets/software.json"
+      },
+      {
+        "language": "sylang-electronics",
+        "path": "./snippets/electronics.json"
+      },
+      {
+        "language": "sylang-mechanics",
+        "path": "./snippets/mechanics.json"
       }
     ],
     "commands": [

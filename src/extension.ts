@@ -19,7 +19,7 @@ export class SylangExtension {
             snippetFile: 'productline.json'
         },
         'sylang-functions': {
-            fileExtensions: ['.fun'],
+            fileExtensions: ['.fun', '.fma'],
             keywords: ['systemfunctions', 'function', 'name', 'description', 'owner', 'tags', 'safetylevel', 'enables'],
             snippetFile: 'functions.json'
         },
@@ -30,13 +30,33 @@ export class SylangExtension {
         },
         'sylang-safety': {
             fileExtensions: ['.itm', '.sgl', '.haz', '.rsk', '.fsr'],
-            keywords: ['safety', 'hazard', 'risk', 'requirement', 'goal', 'item', 'safetylevel', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM', 'functionalsafetyrequirements', 'derivedfrom', 'asil', 'allocatedto', 'verification', 'rationale'],
+            keywords: ['safety', 'hazard', 'risk', 'requirement', 'goal', 'item', 'safetylevel', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM', 'functionalsafetyrequirements', 'derivedfrom', 'asil', 'allocatedto', 'verification', 'rationale', 'safetygoal', 'safetymeasures', 'measure', 'enabledby', 'verificationcriteria', 'criterion', 'scenario', 'functionalrequirement', 'safetyfunction', 'satisfies', 'implements', 'shall', 'should', 'may', 'will'],
             snippetFile: 'safety.json'
         },
         'sylang-security': {
             fileExtensions: ['.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'],
             keywords: ['security', 'threat', 'asset', 'requirement', 'goal', 'TARA', 'cybersecurity'],
             snippetFile: 'security.json'
+        },
+        'sylang-components': {
+            fileExtensions: ['.cmp', '.sub', '.req'],
+            keywords: ['component', 'subsystem', 'Subsystem', 'requirement', 'name', 'description', 'owner', 'tags', 'safetylevel', 'aggregatedby', 'partof', 'enables', 'implements', 'interfaces', 'interface', 'type', 'protocol', 'direction', 'voltage', 'width', 'safety_level', 'Communication', 'Digital', 'Analog', 'Input', 'Output', 'Bidirectional', 'SPI', 'I2C', 'CAN', 'LIN', 'UART', 'CMOS', 'TTL'],
+            snippetFile: 'components.json'
+        },
+        'sylang-software': {
+            fileExtensions: ['.mod', '.prt'],
+            keywords: ['module', 'software', 'part', 'algorithm', 'service', 'task', 'process', 'thread', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'implements', 'interfaces', 'input', 'output', 'returns', 'parameters', 'execution', 'timing', 'memory', 'cpu_usage', 'priority', 'dependencies', 'version', 'license', 'real-time', 'non-real-time', 'synchronous', 'asynchronous', 'high', 'medium', 'low', 'critical', 'non-critical'],
+            snippetFile: 'software.json'
+        },
+        'sylang-electronics': {
+            fileExtensions: ['.ckt'],
+            keywords: ['circuit', 'board', 'chip', 'ic', 'pcb', 'schematic', 'layout', 'trace', 'via', 'pad', 'pin', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'interfaces', 'voltage', 'current', 'power', 'frequency', 'impedance', 'capacitance', 'resistance', 'inductance', 'tolerance', 'package', 'footprint', 'placement', '3.3V', '5V', '12V', '24V', 'GND', 'VCC', 'VDD', 'VSS', 'CMOS', 'TTL', 'LVDS', 'differential', 'single-ended', 'SMD', 'THT', 'BGA', 'QFP', 'SOIC'],
+            snippetFile: 'electronics.json'
+        },
+        'sylang-mechanics': {
+            fileExtensions: ['.asm'],
+            keywords: ['assembly', 'part', 'component', 'mechanism', 'actuator', 'sensor', 'bracket', 'housing', 'mounting', 'fastener', 'gear', 'spring', 'bearing', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'material', 'dimensions', 'weight', 'tolerance', 'finish', 'coating', 'hardness', 'strength', 'temperature_range', 'pressure_rating', 'lifecycle', 'maintenance', 'steel', 'aluminum', 'plastic', 'rubber', 'titanium', 'carbon_fiber', 'stainless', 'anodized', 'painted', 'galvanized', 'static', 'dynamic', 'rotating', 'linear'],
+            snippetFile: 'mechanics.json'
         }
     };
 
@@ -100,10 +120,14 @@ export class SylangExtension {
                 { scheme: 'file', language: 'sylang-functions' },
                 { scheme: 'file', language: 'sylang-features' },
                 { scheme: 'file', language: 'sylang-safety' },
-                { scheme: 'file', language: 'sylang-security' }
+                { scheme: 'file', language: 'sylang-security' },
+                { scheme: 'file', language: 'sylang-components' },
+                { scheme: 'file', language: 'sylang-software' },
+                { scheme: 'file', language: 'sylang-electronics' },
+                { scheme: 'file', language: 'sylang-mechanics' }
             ],
             synchronize: {
-                fileEvents: vscode.workspace.createFileSystemWatcher('**/*.{ple,fun,fml,itm,sgl,haz,rsk,fsr,tra,thr,sgo,sre,ast,sec}')
+                fileEvents: vscode.workspace.createFileSystemWatcher('**/*.{ple,fun,fma,fml,itm,sgl,haz,rsk,fsr,tra,thr,sgo,sre,ast,sec,cmp,sub,req,mod,prt,ckt,asm}')
             }
         };
 
