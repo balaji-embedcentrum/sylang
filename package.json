@@ -1,7 +1,7 @@
 {
-  "name": "sylang-language-support",
-  "displayName": "Sylang Language Support",
-  "description": "Professional IDE support for Sylang DSL - Complete Product Line Engineering toolkit with syntax highlighting, validation, cross-file navigation, and IntelliSense for automotive safety & security",
+  "name": "sylang",
+  "displayName": "Sylang",
+  "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
   "version": "1.0.0",
   "publisher": "balaji-embedcentrum",
   "repository": {
@@ -24,24 +24,29 @@
   ],
   "keywords": [
     "sylang",
-    "product-line-engineering",
+    "systems-engineering",
+    "safety-engineering", 
+    "mbse",
+    "model-based-systems-engineering",
     "automotive",
-    "safety",
-    "security",
-    "dsl",
-    "language-server",
-    "asil",
+    "aerospace", 
+    "medical",
+    "safety-standards",
     "functional-safety",
-    "cybersecurity",
+    "asil",
+    "iso-26262",
+    "do-178c",
+    "iec-62304",
+    "language-server",
+    "dsl",
     "requirements",
-    "components",
-    "embedded-systems"
+    "hazard-analysis",
+    "cybersecurity"
   ],
   "galleryBanner": {
     "color": "#1e1e1e",
     "theme": "dark"
   },
-  "icon": "icon.png",
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
