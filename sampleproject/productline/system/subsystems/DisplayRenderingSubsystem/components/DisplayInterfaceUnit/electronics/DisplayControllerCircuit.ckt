@@ -1,0 +1,14 @@
+electronicscircuit DisplayControllerCircuit
+  name "Display Controller Circuit"
+  description "Electronics circuit providing hardware support for display control, frame buffer management, and video memory operations"
+  owner "Electronics Team"
+  tags "display-controller", "frame-buffer", "video-memory", "hardware-control"
+  safetylevel ASIL-B
+  partof DisplayInterfaceUnit
+  implements FrameBufferManager, VideoMemoryController, PixelLevelController
+  interfaces
+    input display_signals "Display control signals and video data streams"
+    input memory_commands "Video memory commands and buffer management instructions"
+    output display_controller "Hardware display control and signal processing"
+    output frame_buffer "Hardware frame buffer management and synchronization"
+    output memory_interface "Video memory interface and GPU resource control"

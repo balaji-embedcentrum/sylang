@@ -1,0 +1,8 @@
+Subsystem SystemOrchestrationSubsystem
+  name "System Orchestration Subsystem"
+  description "Provides overall system coordination and integration management."
+  owner "Systems Engineering"
+  tags "orchestration", "integration", "coordination"
+  safetylevel ASIL-D
+  enables EPBSystem
+  implements CoreSystemOrchestrator 

@@ -1,0 +1,14 @@
+electronicscircuit CANInterfaceCircuit
+  name "CAN Interface Circuit"
+  description "Electronics circuit providing CAN transceiver functionality, frame processing, and bitrate control"
+  owner "Electronics Team"
+  tags "CAN-interface", "transceiver", "frame-processing", "bitrate-control"
+  safetylevel ASIL-D
+  partof StandardsComplianceUnit
+  implements CANFrameFormatValidator, CANBitrateController
+  interfaces
+    input can_bus_signals "CAN bus differential signals and communication data"
+    input can_control_signals "CAN transceiver control signals and configuration commands"
+    output can_transceiver "CAN bus transceiver functionality and signal conditioning"
+    output can_frame_processor "Hardware CAN frame processing and validation"
+    output can_bitrate_controller "CAN bitrate control and timing synchronization"

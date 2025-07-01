@@ -1,0 +1,41 @@
+component FaultManagementUnit
+  name "Fault Management Unit"
+  description "Component responsible for fault classification, correlation, isolation, and anomaly detection"
+  owner "Diagnostics Team"
+  tags "fault", "classification", "correlation", "isolation", "anomaly"
+  safetylevel ASIL-D
+  aggregatedby DiagnosticSubsystem
+  
+  interfaces
+    interface Fault_Data_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Symptom_Data_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Fault_Classification_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Isolation_Control_Output
+      type Digital
+      safety_level ASIL-D
+      response_time "50ms"
+      direction Output
+      
+    interface Fault_History_Interface
+      type Digital
+      protocol "Internal Storage"
+      direction Bidirectional
+      
+    interface Anomaly_Alert_Output
+      type Digital
+      priority "High"
+      direction Output
+      
+  implements FaultClassificationAlgorithm, FaultHistoryManager, SymptomCorrelationEngine, FaultIsolationController, AnomalyDetectionEngine 

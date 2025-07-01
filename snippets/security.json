@@ -1,0 +1,96 @@
+{
+  "Security Goal": {
+    "prefix": "goal",
+    "body": [
+      "goal ${1:GoalName}",
+      "  name \"${2:Security Goal Name}\"",
+      "  description \"${3:Security goal description}\"",
+      "  owner \"${4:Security Team}\"",
+      "  tags \"${5:security}\", \"${6:goal}\"",
+      "  cybersecurity-level ${7|CAL1,CAL2,CAL3,CAL4|}"
+    ],
+    "description": "Security goal definition"
+  },
+  "Threat": {
+    "prefix": "threat",
+    "body": [
+      "threat ${1:ThreatName}",
+      "  name \"${2:Threat Name}\"",
+      "  description \"${3:Threat description}\"",
+      "  impact ${4|Low,Medium,High,Very High|}",
+      "  likelihood ${5|Very Low,Low,Medium,High,Very High|}",
+      "  attack-path \"${6:Attack path description}\"",
+      "  owner \"${7:Security Team}\"",
+      "  tags \"${8:threat}\", \"${9:cybersecurity}\""
+    ],
+    "description": "Threat definition"
+  },
+  "Asset": {
+    "prefix": "asset",
+    "body": [
+      "asset ${1:AssetName}",
+      "  name \"${2:Asset Name}\"",
+      "  description \"${3:Asset description}\"",
+      "  value ${4|Low,Medium,High,Very High|}",
+      "  confidentiality ${5|Low,Medium,High,Very High|}",
+      "  integrity ${6|Low,Medium,High,Very High|}",
+      "  availability ${7|Low,Medium,High,Very High|}",
+      "  owner \"${8:Security Team}\""
+    ],
+    "description": "Security asset definition"
+  },
+  "Security Requirement": {
+    "prefix": "requirement",
+    "body": [
+      "requirement ${1:RequirementName}",
+      "  name \"${2:Security Requirement Name}\"",
+      "  description \"${3:Requirement description}\"",
+      "  cybersecurity-level ${4|CAL1,CAL2,CAL3,CAL4|}",
+      "  verification \"${5:Verification method}\"",
+      "  owner \"${6:Security Team}\"",
+      "  tags \"${7:security}\", \"${8:requirement}\""
+    ],
+    "description": "Security requirement definition"
+  },
+  "TARA": {
+    "prefix": "tara",
+    "body": [
+      "TARA ${1:TARAName}",
+      "  name \"${2:Threat Assessment and Risk Analysis}\"",
+      "  description \"${3:TARA description}\"",
+      "  scope \"${4:Analysis scope}\"",
+      "  methodology \"${5:Analysis methodology}\"",
+      "  owner \"${6:Security Team}\"",
+      "  date \"${7:2025-01-01}\""
+    ],
+    "description": "Threat Assessment and Risk Analysis"
+  },
+  "Attack Path": {
+    "prefix": "attack",
+    "body": [
+      "attack-path \"${1:Attack vector} -> ${2:Attack method} -> ${3:Target asset}\""
+    ],
+    "description": "Attack path description"
+  },
+  "Cybersecurity Level": {
+    "prefix": "cal",
+    "body": [
+      "cybersecurity-level ${1|CAL1,CAL2,CAL3,CAL4|}"
+    ],
+    "description": "Cybersecurity assurance level"
+  },
+  "Impact": {
+    "prefix": "impact",
+    "body": [
+      "impact ${1|Low,Medium,High,Very High|}"
+    ],
+    "description": "Security impact level"
+  },
+  "Likelihood": {
+    "prefix": "likelihood",
+    "body": [
+      "likelihood ${1|Very Low,Low,Medium,High,Very High|}"
+    ],
+    "description": "Attack likelihood"
+  }
+} 

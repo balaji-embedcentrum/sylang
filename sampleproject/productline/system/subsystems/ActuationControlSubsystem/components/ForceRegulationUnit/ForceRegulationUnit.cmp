@@ -1,0 +1,42 @@
+component ForceRegulationUnit
+  name "Force Regulation Unit"
+  description "Component responsible for force calculation, regulation algorithms, and load compensation"
+  owner "Hardware Team"
+  tags "force", "regulation", "calculation", "load", "compensation"
+  safetylevel ASIL-C
+  aggregatedby ActuationControlSubsystem
+  interfaces
+    interface Force_Sensor_Primary
+      type Analog
+      range "0-10V representing 0-5000N"
+      accuracy "±0.1%"
+      direction Input
+      
+    interface Force_Sensor_Secondary
+      type Analog
+      range "0-10V representing 0-5000N"
+      accuracy "±0.1%"
+      direction Input
+      
+    interface Load_Sensor
+      type Analog
+      range "4-20mA representing variable load"
+      direction Input
+      
+    interface Force_Command
+      type Digital
+      resolution "16-bit"
+      update_rate "1kHz"
+      direction Input
+      
+    interface Actuator_Control
+      type Analog
+      range "0-10V"
+      direction Output
+      
+    interface Regulation_Status
+      type Digital
+      safety_level ASIL-C
+      direction Output
+      
+  implements ForceCalculationEngine, LoadCompensationController 

@@ -1,0 +1,12 @@
+circuit ControlSignalCircuit
+  name "Position Control Signal Circuit"
+  description "Electronics circuit for position control signal generation, actuator command interfaces, and control output processing"
+  owner "Electronics Team"
+  tags "control", "signal", "actuator", "output"
+  safetylevel ASIL-D
+  partof PositionControlUnit
+  
+  interfaces
+    Control_Input "Position control command inputs"
+    Actuator_Output "Actuator control signal outputs"
+    Control_Feedback "Control loop feedback signals" 

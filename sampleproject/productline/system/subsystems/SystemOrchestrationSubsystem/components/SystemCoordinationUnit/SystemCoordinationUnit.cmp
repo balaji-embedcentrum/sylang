@@ -1,0 +1,40 @@
+component SystemCoordinationUnit
+  name "System Coordination Unit"
+  description "Component responsible for system initialization, resource allocation, and inter-subsystem coordination"
+  owner "Systems Engineering"
+  tags "initialization", "coordination", "resource", "allocation", "configuration"
+  safetylevel ASIL-D
+  aggregatedby SystemOrchestrationSubsystem
+  
+  interfaces
+    interface System_Bus
+      type Communication
+      protocol "CAN 2.0B"
+      direction Bidirectional
+      
+    interface Resource_Control_Interface
+      type Digital
+      protocol "Internal"
+      direction Bidirectional
+      
+    interface Subsystem_Coordination_Bus
+      type Communication
+      protocol "CAN 2.0B"
+      direction Bidirectional
+      
+    interface Mode_Control_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Configuration_Interface
+      type Digital
+      protocol "EEPROM"
+      direction Bidirectional
+      
+    interface Initialization_Status_Output
+      type Digital
+      safety_level ASIL-D
+      direction Output
+      
+  implements SystemInitializationManager, ResourceAllocationController, InterSubsystemCoordinator, SystemModeManager, ConfigurationManager 

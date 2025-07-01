@@ -1,0 +1,43 @@
+component PositionControlUnit
+  name "Position Control Unit"
+  description "Component responsible for actuator position tracking and closed-loop feedback control"
+  owner "Hardware Team"
+  tags "position", "control", "tracking", "feedback", "encoder"
+  safetylevel ASIL-D
+  aggregatedby ActuationControlSubsystem
+  interfaces
+    interface Primary_Encoder
+      type Digital
+      protocol "Incremental quadrature encoder"
+      resolution "4096 pulses per revolution"
+      direction Input
+      
+    interface Secondary_Encoder
+      type Digital
+      protocol "Absolute encoder, SPI interface"
+      resolution "18-bit absolute position"
+      direction Input
+      
+    interface Position_Command
+      type Digital
+      resolution "24-bit"
+      units "micrometers"
+      direction Input
+      
+    interface Velocity_Feedback
+      type Analog
+      range "±10V representing ±1000mm/s"
+      direction Output
+      
+    interface Position_Status
+      type Digital
+      protocol "CAN 2.0B"
+      update_rate "1kHz"
+      direction Output
+      
+    interface Reference_Signal
+      type Digital
+      type Index_Pulse
+      direction Input
+      
+  implements ActuatorPositionTracker 

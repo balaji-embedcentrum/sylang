@@ -1,0 +1,41 @@
+component SensorInterfaceUnit
+  name "Sensor Interface Unit"
+  description "Component responsible for sensor data acquisition, calibration, filtering, and sensor fusion"
+  owner "Hardware Team"
+  tags "sensor", "acquisition", "calibration", "filtering", "fusion", "redundancy"
+  safetylevel ASIL-D
+  aggregatedby SensorMonitoringSubsystem
+  
+  interfaces
+    interface Position_Sensor_Input
+      type Analog
+      range "0-10V representing position"
+      accuracy "±0.1%"
+      direction Input
+      
+    interface Calibration_Data_Interface
+      type Digital
+      protocol "EEPROM"
+      direction Bidirectional
+      
+    interface Environmental_Input
+      type Analog
+      range "Temperature, humidity sensors"
+      direction Input
+      
+    interface Filtered_Sensor_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Fusion_Data_Output
+      type Digital
+      protocol "CAN 2.0B"
+      direction Output
+      
+    interface Diagnostic_Status_Output
+      type Digital
+      safety_level ASIL-D
+      direction Output
+      
+  implements SensorDataAcquisition, SensorCalibrationManager, PositionAccuracyValidator, SensorSignalFilter, SensorFusionProcessor, EnvironmentalCompensator, SensorRedundancyManager, SensorDiagnosticAgent 

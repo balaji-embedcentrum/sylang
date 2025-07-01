@@ -1,0 +1,120 @@
+{
+  "SystemFeatures Container": {
+    "prefix": "systemfeatures",
+    "body": [
+      "systemfeatures ${1:ContainerName}",
+      "  feature ${2:FeatureName} ${3|mandatory,optional,alternative|}",
+      "    name \"${4:Display Name}\"",
+      "    description \"${5:Feature description}\"",
+      "    owner \"${6:Team Name}\"",
+      "    tags \"${7:tag1}\", \"${8:tag2}\"",
+      "    safetylevel ${9|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Complete system features container with feature"
+  },
+  "Mandatory Feature": {
+    "prefix": "mandatory",
+    "body": [
+      "feature ${1:FeatureName} mandatory",
+      "  name \"${2:Display Name}\"",
+      "  description \"${3:Feature description}\"",
+      "  owner \"${4:Team Name}\"",
+      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Mandatory feature definition"
+  },
+  "Optional Feature": {
+    "prefix": "optional",
+    "body": [
+      "feature ${1:FeatureName} optional",
+      "  name \"${2:Display Name}\"",
+      "  description \"${3:Feature description}\"",
+      "  owner \"${4:Team Name}\"",
+      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Optional feature definition"
+  },
+  "Alternative Features": {
+    "prefix": "alternative",
+    "body": [
+      "feature ${1:FeatureGroup} alternative",
+      "  name \"${2:Feature Group Name}\"",
+      "  description \"${3:Group description}\"",
+      "  owner \"${4:Team Name}\"",
+      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "",
+      "  feature ${6:Option1} alternative",
+      "    name \"${7:Option 1 Name}\"",
+      "    description \"${8:Option 1 description}\"",
+      "",
+      "  feature ${9:Option2} alternative",
+      "    name \"${10:Option 2 Name}\"",
+      "    description \"${11:Option 2 description}\""
+    ],
+    "description": "Alternative features group (exactly one must be selected)"
+  },
+  "Or Features": {
+    "prefix": "or",
+    "body": [
+      "feature ${1:FeatureGroup} or",
+      "  name \"${2:Feature Group Name}\"",
+      "  description \"${3:Group description}\"",
+      "  owner \"${4:Team Name}\"",
+      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "",
+      "  feature ${6:Option1} or",
+      "    name \"${7:Option 1 Name}\"",
+      "    description \"${8:Option 1 description}\"",
+      "",
+      "  feature ${9:Option2} or",
+      "    name \"${10:Option 2 Name}\"",
+      "    description \"${11:Option 2 description}\""
+    ],
+    "description": "Or features group (at least one must be selected)"
+  },
+  "Basic Feature": {
+    "prefix": "feature",
+    "body": [
+      "feature ${1:FeatureName} ${2|mandatory,optional,alternative,or|}",
+      "  name \"${3:Display Name}\"",
+      "  description \"${4:Description}\"",
+      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Basic feature structure"
+  },
+  "Feature Name": {
+    "prefix": "name",
+    "body": [
+      "name \"${1:Display Name}\""
+    ],
+    "description": "Feature display name"
+  },
+  "Feature Description": {
+    "prefix": "desc",
+    "body": [
+      "description \"${1:Feature description}\""
+    ],
+    "description": "Feature description"
+  },
+  "Feature Owner": {
+    "prefix": "owner",
+    "body": [
+      "owner \"${1:Team Name}\""
+    ],
+    "description": "Feature owner"
+  },
+  "Feature Tags": {
+    "prefix": "tags",
+    "body": [
+      "tags \"${1:tag1}\", \"${2:tag2}\", \"${3:tag3}\""
+    ],
+    "description": "Feature tags"
+  },
+  "Safety Level": {
+    "prefix": "safety",
+    "body": [
+      "safetylevel ${1|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Feature safety level"
+  }
+} 

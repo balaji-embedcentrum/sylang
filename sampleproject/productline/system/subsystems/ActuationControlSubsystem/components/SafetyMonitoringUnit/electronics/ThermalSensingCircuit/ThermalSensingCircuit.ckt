@@ -1,0 +1,14 @@
+circuit ThermalSensingCircuit
+  name "Thermal Sensing Circuit"
+  description "Electronics circuit for temperature sensor interfaces, thermal monitoring, and overtemperature protection"
+  owner "Electronics Team"
+  tags "thermal", "temperature", "sensing", "protection"
+  safetylevel ASIL-C
+  partof SafetyMonitoringUnit
+  
+  implements TemperatureSensorProcessor
+  
+  interfaces
+    Temperature_Sensor_Input "Temperature sensor measurement inputs"
+    Thermal_Status_Output "Thermal monitoring status outputs"
+    Overtemperature_Protection "Thermal protection trigger signals" 

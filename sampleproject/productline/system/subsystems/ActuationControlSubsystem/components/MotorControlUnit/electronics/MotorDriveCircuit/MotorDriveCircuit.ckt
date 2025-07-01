@@ -1,0 +1,14 @@
+circuit MotorDriveCircuit
+  name "Motor Drive Power Circuit"
+  description "Electronics circuit for motor power drive, PWM control, and motor protection with high-current switching capability"
+  owner "Electronics Team"
+  tags "motor", "drive", "PWM", "power"
+  safetylevel ASIL-D
+  partof MotorControlUnit
+  
+  implements PWMGenerationController
+  
+  interfaces
+    Motor_Power_Output "High-current motor power outputs"
+    PWM_Control_Input "PWM control signal inputs"
+    Motor_Protection "Motor protection and feedback" 

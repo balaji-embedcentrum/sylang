@@ -1,0 +1,35 @@
+component FeedbackControlUnit
+  name "Feedback Control Unit"
+  description "Component responsible for visual state control, feedback coordination, and theme management"
+  owner "HMI Team"
+  tags "visual", "feedback", "coordination", "theme", "accessibility"
+  safetylevel QM
+  aggregatedby HMIControlSubsystem
+  
+  interfaces
+    interface Visual_State_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+    interface Display_Output
+      type Digital
+      protocol "LVDS"
+      direction Output
+      
+    interface Feedback_Control_Output
+      type Digital
+      protocol "PWM"
+      direction Output
+      
+    interface Theme_Configuration_Input
+      type Digital
+      protocol "EEPROM"
+      direction Input
+      
+    interface Accessibility_Settings_Input
+      type Digital
+      protocol "CAN 2.0B"
+      direction Input
+      
+  implements VisualStateController, FeedbackCoordinator, VisualThemeManager, AccessibilityManager 

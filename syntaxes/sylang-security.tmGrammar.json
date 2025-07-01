@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Security",
+  "scopeName": "source.sylang.security",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#security-keywords" },
+    { "include": "#strings" },
+    { "include": "#attributes" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sylang",
+          "begin": "//",
+          "end": "$"
+        },
+        {
+          "name": "comment.block.sylang",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "security-keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.security.sylang",
+          "match": "\\b(security|threat|asset|requirement|goal|TARA|cybersecurity)\\b"
+        },
+        {
+          "name": "keyword.other.sylang",
+          "match": "\\b(name|description|owner|tags|impact|likelihood|attack-path)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.sylang",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.sylang",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.sylang",
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*[\":])"
+        }
+      ]
+    }
+  }
+} 

@@ -1,0 +1,35 @@
+component SwitchManagementUnit
+  name "Switch Management Unit"
+  description "Component responsible for switch configuration, signal debouncing, and switch diagnostics"
+  owner "HMI Team"
+  tags "switch", "configuration", "debounce", "state", "diagnostics"
+  safetylevel ASIL-B
+  aggregatedby HMIControlSubsystem
+  
+  interfaces
+    interface Switch_Configuration_Interface
+      type Digital
+      protocol "I2C"
+      direction Bidirectional
+      
+    interface Raw_Switch_Input
+      type Digital
+      protocol "GPIO"
+      direction Input
+      
+    interface Debounced_Switch_Output
+      type Digital
+      protocol "Internal"
+      direction Output
+      
+    interface Switch_State_Data
+      type Digital
+      protocol "Internal"
+      direction Bidirectional
+      
+    interface Diagnostic_Control
+      type Digital
+      protocol "CAN 2.0B"
+      direction Bidirectional
+      
+  implements SwitchConfigurationManager, InputSignalDebouncer, SwitchStateManager, SwitchDiagnosticAgent 

@@ -1,0 +1,8 @@
+Subsystem CommunicationSubsystem
+  name "Communication Subsystem"
+  description "Manages external communication protocols and data exchange."
+  owner "Diagnostics Team"
+  tags "communication", "protocol", "interface"
+  safetylevel ASIL-C
+  enables ReportingProtocol, OBDProtocol, ProprietaryProtocol
+  implements CommunicationProtocolManager, OBDComplianceInterface, ProprietaryCommStack 

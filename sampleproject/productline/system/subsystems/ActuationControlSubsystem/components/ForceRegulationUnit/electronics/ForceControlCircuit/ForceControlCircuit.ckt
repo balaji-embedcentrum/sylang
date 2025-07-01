@@ -1,0 +1,11 @@
+circuit ForceControlCircuit
+  name "Force Control Interface Circuit"
+  description "Electronics circuit for force sensor interfaces, load cell conditioning, and force control signal processing"
+  owner "Electronics Team"
+  tags "force", "sensor", "load-cell", "conditioning"
+  safetylevel ASIL-C
+  partof ForceRegulationUnit
+  
+  interfaces
+    Force_Sensor_Input "Load cell and force sensor interfaces"
+    Force_Control_Output "Force control command outputs" 

@@ -1,0 +1,76 @@
+{
+  "ProductLine Definition": {
+    "prefix": "productline",
+    "body": [
+      "productline ${1:ProductLineName}",
+      "  description \"${2:A comprehensive description of the product line}\"",
+      "  owner \"${3:Team Name}\", \"${4:Department}\"",
+      "  domain \"${5:automotive}\", \"${6:safety}\"",
+      "  compliance \"${7:ISO 26262}\", \"${8:ASPICE}\"",
+      "  firstrelease \"${9:2025-01-01}\"",
+      "  tags \"${10:tag1}\", \"${11:tag2}\", \"${12:tag3}\"",
+      "  safetylevel ${13|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  region \"${14:Global}\", \"${15:Europe}\", \"${16:North America}\""
+    ],
+    "description": "Complete product line definition template"
+  },
+  "Basic ProductLine": {
+    "prefix": "ple",
+    "body": [
+      "productline ${1:Name}",
+      "  description \"${2:Description}\"",
+      "  owner \"${3:Team}\"",
+      "  safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Basic product line structure"
+  },
+  "Description": {
+    "prefix": "desc",
+    "body": [
+      "description \"${1:Enter description here}\""
+    ],
+    "description": "Description attribute"
+  },
+  "Owner": {
+    "prefix": "owner",
+    "body": [
+      "owner \"${1:Team Name}\", \"${2:Department}\""
+    ],
+    "description": "Owner attribute with team and department"
+  },
+  "Safety Level": {
+    "prefix": "safety",
+    "body": [
+      "safetylevel ${1|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Safety level definition"
+  },
+  "Tags": {
+    "prefix": "tags",
+    "body": [
+      "tags \"${1:tag1}\", \"${2:tag2}\", \"${3:tag3}\""
+    ],
+    "description": "Tags for categorization"
+  },
+  "Compliance": {
+    "prefix": "compliance",
+    "body": [
+      "compliance \"${1:ISO 26262}\", \"${2:ASPICE}\""
+    ],
+    "description": "Compliance standards"
+  },
+  "Domain": {
+    "prefix": "domain",
+    "body": [
+      "domain \"${1:automotive}\", \"${2:safety}\""
+    ],
+    "description": "Application domain"
+  },
+  "Region": {
+    "prefix": "region",
+    "body": [
+      "region \"${1:Global}\", \"${2:Europe}\", \"${3:North America}\""
+    ],
+    "description": "Geographic regions"
+  }
+} 

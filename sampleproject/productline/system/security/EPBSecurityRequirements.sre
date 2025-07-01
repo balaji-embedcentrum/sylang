@@ -1,0 +1,313 @@
+securityrequirements EPBSecurityRequirements
+  name "EPB System - Cybersecurity Requirements"
+  description "Detailed cybersecurity requirements derived from security goals per ISO 21434"
+  standard "ISO 21434 - Cybersecurity Requirements Implementation"
+  
+  productlinereference ElectricParkingBrakeSystem
+  systemreference EPBSafety, EPBFeatures, EPBFunctions
+  securityreference EPBSecurity
+  assetsreference EPBAssets
+  threatsreference EPBThreats
+  tarareference EPBSecurityTARA
+  securitygoalsreference EPBSecurityGoals
+
+  // ========================================
+  // COMMUNICATION CONTROL REQUIREMENTS (CAL4)
+  // ========================================
+  
+  requirement SRE_EPB_001
+    description "EPB CAN messages shall include cryptographic message authentication codes to prevent injection attacks"
+    derivedfrom SG_SEC_001
+    cal CAL4
+    rationale "Prevents unauthorized brake commands via CAN bus injection attacks"
+    allocatedto MessageValidationEngine, SecurityProcessor
+    verification "Message authentication testing with invalid MAC rejection verification"
+    
+  requirement SRE_EPB_002
+    description "EPB communication messages shall include sequence numbers and timestamps to prevent replay attacks"
+    derivedfrom SG_SEC_001
+    cal CAL4
+    rationale "Ensures message freshness and prevents replay of captured brake commands"
+    allocatedto MessageValidationEngine, HMICoordinationEngine
+    verification "Replay attack testing with timestamped message rejection verification"
+    
+  requirement SRE_EPB_003
+    description "EPB system shall detect and respond to network flooding attacks within 100ms"
+    derivedfrom SG_SEC_001
+    cal CAL4
+    rationale "Maintains brake availability under denial of service attacks"
+    allocatedto CommHealthMonitor, AnomalyDetectionEngine
+    verification "Network flooding test with response time measurement"
+    
+  requirement SRE_EPB_004
+    description "EPB shall maintain emergency brake functionality during communication disruption"
+    derivedfrom SG_SEC_001
+    cal CAL4
+    rationale "Ensures safety-critical brake function availability under cyberattack"
+    allocatedto EmergencyDetectionLogic, SystemModeManager
+    verification "Communication isolation testing with brake function verification"
+    
+  requirement SRE_EPB_005
+    description "EPB message validation shall reject malformed or corrupted CAN frames within 10ms"
+    derivedfrom SG_SEC_001
+    cal CAL4
+    rationale "Prevents processing of potentially malicious message content"
+    allocatedto MessageValidationEngine, SensorSignalFilter
+    verification "Malformed message injection with rejection timing verification"
+
+  // ========================================
+  // PHYSICAL ACCESS CONTROL REQUIREMENTS (CAL3)
+  // ========================================
+  
+  requirement SRE_EPB_006
+    description "EPB diagnostic interface shall require multi-factor authentication for access"
+    derivedfrom SG_SEC_002
+    cal CAL3
+    rationale "Prevents unauthorized access via diagnostic ports"
+    allocatedto AccessControlManager, SessionManager
+    verification "Diagnostic access testing with authentication bypass attempts"
+    
+  requirement SRE_EPB_007
+    description "EPB diagnostic sessions shall be limited to 30 minutes maximum duration"
+    derivedfrom SG_SEC_002
+    cal CAL3
+    rationale "Limits exposure window for unauthorized diagnostic access"
+    allocatedto SessionManager, SystemModeManager
+    verification "Session timeout testing with automatic termination verification"
+    
+  requirement SRE_EPB_008
+    description "EPB configuration parameters shall be protected with integrity verification"
+    derivedfrom SG_SEC_002
+    cal CAL3
+    rationale "Detects unauthorized modification of system configuration"
+    allocatedto CalibrationManager, SystemHealthSupervisor
+    verification "Configuration tampering detection with integrity failure verification"
+    
+  requirement SRE_EPB_009
+    description "EPB shall log all diagnostic access attempts and configuration changes"
+    derivedfrom SG_SEC_002
+    cal CAL3
+    rationale "Provides audit trail for forensic analysis of security incidents"
+    allocatedto SecurityLogger, AuditManager
+    verification "Audit log completeness testing with event verification"
+    
+  requirement SRE_EPB_010
+    description "EPB diagnostic connectors shall include tamper-evident seals"
+    derivedfrom SG_SEC_002
+    cal CAL3
+    rationale "Provides physical evidence of unauthorized access attempts"
+    allocatedto InterfaceHealthMonitor, TamperDetectionService
+    verification "Physical tampering detection with seal integrity verification"
+
+  // ========================================
+  // SENSOR DATA INTEGRITY REQUIREMENTS (CAL3)
+  // ========================================
+  
+  requirement SRE_EPB_011
+    description "EPB sensor signals shall be validated using redundant sensor fusion algorithms"
+    derivedfrom SG_SEC_003
+    cal CAL3
+    rationale "Detects sensor manipulation through cross-validation of multiple inputs"
+    allocatedto SensorFusionEngine, AnomalyDetectionEngine
+    verification "Sensor spoofing testing with anomaly detection verification"
+    
+  requirement SRE_EPB_012
+    description "EPB shall detect sensor signal anomalies and trigger diagnostic alerts within 50ms"
+    derivedfrom SG_SEC_003
+    cal CAL3
+    rationale "Provides rapid detection of sensor manipulation attempts"
+    allocatedto AnomalyDetectionEngine, DiagnosticSystemController
+    verification "Sensor anomaly injection with detection timing verification"
+    
+  requirement SRE_EPB_013
+    description "EPB calibration data shall be cryptographically signed and verified during startup"
+    derivedfrom SG_SEC_003
+    cal CAL3
+    rationale "Ensures integrity of calibration parameters against tampering"
+    allocatedto CalibrationManager, SecurityProcessor
+    verification "Calibration data tampering with signature verification failure"
+    
+  requirement SRE_EPB_014
+    description "EPB sensor fusion shall maintain operation with up to 33% sensor compromise"
+    derivedfrom SG_SEC_003
+    cal CAL3
+    rationale "Provides resilient operation under partial sensor compromise"
+    allocatedto SensorFusionEngine, FailsafeActivationController
+    verification "Multiple sensor failure testing with continued operation verification"
+
+  // ========================================
+  // ACCESS CONTROL AND PRIVILEGE REQUIREMENTS (CAL3)
+  // ========================================
+  
+  requirement SRE_EPB_015
+    description "EPB safety-critical functions shall be isolated from service and diagnostic operations"
+    derivedfrom SG_SEC_004
+    cal CAL3
+    rationale "Prevents privilege escalation from service access to safety functions"
+    allocatedto SystemModeManager, SafetyMonitoringProcessor
+    verification "Privilege escalation testing with access isolation verification"
+    
+  requirement SRE_EPB_016
+    description "EPB service credentials shall expire after 24 hours and require renewal"
+    derivedfrom SG_SEC_004
+    cal CAL3
+    rationale "Limits temporal exposure of compromised service credentials"
+    allocatedto AccessControlManager, SessionManager
+    verification "Credential expiration testing with automatic invalidation verification"
+    
+  requirement SRE_EPB_017
+    description "EPB shall enforce role-based access control with minimum necessary privileges"
+    derivedfrom SG_SEC_004
+    cal CAL3
+    rationale "Prevents unauthorized access to functions beyond legitimate requirements"
+    allocatedto AccessControlManager, UserInputHandler
+    verification "Role-based access testing with privilege boundary verification"
+    
+  requirement SRE_EPB_018
+    description "EPB security violations shall trigger immediate session termination and logging"
+    derivedfrom SG_SEC_004
+    cal CAL3
+    rationale "Provides rapid response to privilege escalation attempts"
+    allocatedto SecurityLogger, SessionManager
+    verification "Security violation testing with immediate termination verification"
+
+  // ========================================
+  // CRYPTOGRAPHIC PROTECTION REQUIREMENTS (CAL3)
+  // ========================================
+  
+  requirement SRE_EPB_019
+    description "EPB cryptographic keys shall be stored in tamper-resistant hardware security modules"
+    derivedfrom SG_SEC_005
+    cal CAL3
+    rationale "Protects encryption keys from physical extraction attacks"
+    allocatedto SecurityProcessor, PowerSupplyManager
+    verification "Physical tampering testing with key protection verification"
+    
+  requirement SRE_EPB_020
+    description "EPB firmware shall be cryptographically signed and verified during secure boot"
+    derivedfrom SG_SEC_005
+    cal CAL3
+    rationale "Ensures firmware integrity and prevents execution of modified code"
+    allocatedto SystemHealthSupervisor, SecurityProcessor
+    verification "Firmware tampering testing with boot failure verification"
+    
+  requirement SRE_EPB_021
+    description "EPB safety algorithms shall be protected with control flow integrity mechanisms"
+    derivedfrom SG_SEC_005
+    cal CAL3
+    rationale "Prevents manipulation of safety-critical algorithm execution"
+    allocatedto SafetyMonitoringProcessor, FailsafeActivationController
+    verification "Algorithm manipulation testing with integrity protection verification"
+    
+  requirement SRE_EPB_022
+    description "EPB cryptographic operations shall use approved algorithms with minimum 256-bit key length"
+    derivedfrom SG_SEC_005
+    cal CAL3
+    rationale "Provides adequate cryptographic strength against known attack methods"
+    allocatedto SecurityProcessor, MessageValidationEngine
+    verification "Cryptographic strength testing with algorithm compliance verification"
+
+  // ========================================
+  // SUPPLY CHAIN SECURITY REQUIREMENTS (CAL2)
+  // ========================================
+  
+  requirement SRE_EPB_023
+    description "EPB hardware components shall include unique authentication identifiers"
+    derivedfrom SG_SEC_006
+    cal CAL2
+    rationale "Enables detection of counterfeit or malicious components"
+    allocatedto ComponentVerificationService, SystemHealthSupervisor
+    verification "Component authentication testing with counterfeit detection verification"
+    
+  requirement SRE_EPB_024
+    description "EPB firmware shall include digital signatures from authorized suppliers"
+    derivedfrom SG_SEC_006
+    cal CAL2
+    rationale "Verifies software authenticity and supply chain integrity"
+    allocatedto SupplyChainMonitor, SecurityProcessor
+    verification "Firmware signature testing with unauthorized software rejection"
+    
+  requirement SRE_EPB_025
+    description "EPB shall perform component integrity verification at startup and periodically during operation"
+    derivedfrom SG_SEC_006
+    cal CAL2
+    rationale "Detects supply chain compromises after deployment"
+    allocatedto ComponentVerificationService, SystemHealthSupervisor
+    verification "Component integrity testing with compromise detection verification"
+    
+  requirement SRE_EPB_026
+    description "EPB security incident response shall include supply chain compromise procedures"
+    derivedfrom SG_SEC_006
+    cal CAL2
+    rationale "Provides structured response to supply chain security incidents"
+    allocatedto EmergencyDetectionLogic, AuditManager
+    verification "Incident response testing with supply chain scenario verification"
+
+  // ========================================
+  // MONITORING AND RESPONSE REQUIREMENTS (CAL3)
+  // ========================================
+  
+  requirement SRE_EPB_027
+    description "EPB shall maintain comprehensive security event logging with tamper protection"
+    derivedfrom SG_SEC_002, SG_SEC_004
+    cal CAL3
+    rationale "Provides forensic evidence and supports incident investigation"
+    allocatedto SecurityLogger, AuditManager
+    verification "Log tampering testing with integrity protection verification"
+    
+  requirement SRE_EPB_028
+    description "EPB security monitoring shall detect and alert on anomalous behavior patterns"
+    derivedfrom SG_SEC_001, SG_SEC_003
+    cal CAL3
+    rationale "Enables proactive detection of sophisticated attack attempts"
+    allocatedto AnomalyDetectionEngine, SymptomCorrelationEngine
+    verification "Anomaly detection testing with pattern recognition verification"
+    
+  requirement SRE_EPB_029
+    description "EPB shall implement graceful degradation under confirmed cyberattack scenarios"
+    derivedfrom SG_SEC_001, SG_SEC_003
+    cal CAL3
+    rationale "Maintains essential brake functionality during security incidents"
+    allocatedto SystemModeManager, FailsafeActivationController
+    verification "Attack scenario testing with graceful degradation verification"
+    
+  requirement SRE_EPB_030
+    description "EPB security status shall be reported to vehicle cybersecurity management system"
+    derivedfrom SG_SEC_001, SG_SEC_002
+    cal CAL3
+    rationale "Enables vehicle-level cybersecurity monitoring and coordination"
+    allocatedto HMICoordinationEngine, CommHealthMonitor
+    verification "Security status reporting testing with communication verification"
+
+  calmatrix
+    cal CAL4
+      count 5
+      requirements SRE_EPB_001, SRE_EPB_002, SRE_EPB_003, SRE_EPB_004, SRE_EPB_005
+      priority "Critical implementation - required for production"
+      
+    cal CAL3
+      count 21
+      requirements SRE_EPB_006, SRE_EPB_007, SRE_EPB_008, SRE_EPB_009, SRE_EPB_010, SRE_EPB_011, SRE_EPB_012, SRE_EPB_013, SRE_EPB_014, SRE_EPB_015, SRE_EPB_016, SRE_EPB_017, SRE_EPB_018, SRE_EPB_019, SRE_EPB_020, SRE_EPB_021, SRE_EPB_022, SRE_EPB_027, SRE_EPB_028, SRE_EPB_029, SRE_EPB_030
+      priority "High implementation - required before production"
+      
+    cal CAL2
+      count 4
+      requirements SRE_EPB_023, SRE_EPB_024, SRE_EPB_025, SRE_EPB_026
+      priority "Medium implementation - required for supply chain security"
+
+  implementationpriority
+    phase Development
+      requirements SRE_EPB_001, SRE_EPB_002, SRE_EPB_019, SRE_EPB_020, SRE_EPB_021
+      rationale "Core cryptographic and integrity foundations"
+      
+    phase Integration
+      requirements SRE_EPB_003, SRE_EPB_004, SRE_EPB_011, SRE_EPB_015, SRE_EPB_027
+      rationale "System-level security integration and monitoring"
+      
+    phase Testing
+      requirements SRE_EPB_005, SRE_EPB_012, SRE_EPB_018, SRE_EPB_028, SRE_EPB_029
+      rationale "Security validation and response mechanisms"
+      
+    phase Production
+      requirements SRE_EPB_006, SRE_EPB_007, SRE_EPB_023, SRE_EPB_024, SRE_EPB_030
+      rationale "Operational security and supply chain verification" 

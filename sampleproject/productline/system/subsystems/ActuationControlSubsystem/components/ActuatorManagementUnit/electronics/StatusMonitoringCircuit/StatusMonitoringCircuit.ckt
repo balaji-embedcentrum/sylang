@@ -1,0 +1,11 @@
+circuit StatusMonitoringCircuit
+  name "Status Monitoring Input Circuit"
+  description "Electronics circuit for monitoring system status inputs including calibration mode and backup status"
+  owner "Electronics Team"
+  tags "status", "monitoring", "input", "feedback"
+  safetylevel ASIL-D
+  partof ActuatorManagementUnit
+  
+  interfaces
+    Calibration_Mode "3.3V CMOS digital input"
+    Backup_Status "ASIL-D safety level digital input" 

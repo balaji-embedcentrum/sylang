@@ -1,0 +1,81 @@
+{
+  "SystemFunctions Container": {
+    "prefix": "systemfunctions",
+    "body": [
+      "systemfunctions ${1:ContainerName}",
+      "    function ${2:FunctionName}",
+      "        name \"${3:Display Name}\"",
+      "        description \"${4:Function description}\"",
+      "        owner \"${5:Team Name}\"",
+      "        tags \"${6:tag1}\", \"${7:tag2}\"",
+      "        safetylevel ${8|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "        enables ${9:FeatureName}"
+    ],
+    "description": "Complete system functions container with function"
+  },
+  "Function Definition": {
+    "prefix": "function",
+    "body": [
+      "function ${1:FunctionName}",
+      "    name \"${2:Display Name}\"",
+      "    description \"${3:Function description}\"",
+      "    owner \"${4:Team Name}\"",
+      "    tags \"${5:tag1}\", \"${6:tag2}\"",
+      "    safetylevel ${7|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "    enables ${8:EnabledFeatures}"
+    ],
+    "description": "Complete function definition"
+  },
+  "Basic Function": {
+    "prefix": "func",
+    "body": [
+      "function ${1:Name}",
+      "    name \"${2:Display Name}\"",
+      "    description \"${3:Description}\"",
+      "    safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Basic function structure"
+  },
+  "Function Name": {
+    "prefix": "name",
+    "body": [
+      "name \"${1:Display Name}\""
+    ],
+    "description": "Function display name"
+  },
+  "Function Description": {
+    "prefix": "desc",
+    "body": [
+      "description \"${1:Function description}\""
+    ],
+    "description": "Function description"
+  },
+  "Function Owner": {
+    "prefix": "owner",
+    "body": [
+      "owner \"${1:Team Name}\""
+    ],
+    "description": "Function owner"
+  },
+  "Function Tags": {
+    "prefix": "tags",
+    "body": [
+      "tags \"${1:tag1}\", \"${2:tag2}\", \"${3:tag3}\""
+    ],
+    "description": "Function tags"
+  },
+  "Function Enables": {
+    "prefix": "enables",
+    "body": [
+      "enables ${1:Feature1}, ${2:Feature2}"
+    ],
+    "description": "Features enabled by this function"
+  },
+  "Safety Level": {
+    "prefix": "safety",
+    "body": [
+      "safetylevel ${1|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+    ],
+    "description": "Function safety level"
+  }
+} 
