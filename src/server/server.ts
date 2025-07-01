@@ -11,16 +11,14 @@ import {
     TextDocumentPositionParams,
     TextDocumentSyncKind,
     InitializeResult,
-    Hover,
     Location,
     Range,
     DefinitionParams,
-    ReferenceParams
+    ReferenceParams,
+    Hover
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import * as fs from 'fs';
-import * as path from 'path';
 
 // Create a connection for the server
 const connection = createConnection(ProposedFeatures.all);
@@ -136,6 +134,7 @@ connection.onInitialize((params: InitializeParams) => {
 
 connection.onInitialized(() => {
     if (hasConfigurationCapability) {
+        // Register for all configuration changes.
         connection.client.register(DidChangeConfigurationNotification.type, undefined);
     }
     if (hasWorkspaceFolderCapability) {
@@ -143,11 +142,22 @@ connection.onInitialized(() => {
             connection.console.log('Workspace folder change event received.');
         });
     }
-    
-    // Scan workspace for all Sylang files and build symbol index
+
+    // Start workspace indexing
     if (workspaceRoot) {
-        connection.console.log(`Scanning workspace: ${workspaceRoot}`);
-        scanWorkspaceForSymbols(workspaceRoot);
+        connection.console.log('[Sylang] Starting workspace symbol indexing...');
+        connection.sendNotification('sylang/indexingStarted');
+        
+        try {
+            scanWorkspaceForSymbols(workspaceRoot);
+            connection.console.log('[Sylang] Workspace symbol indexing completed successfully');
+            connection.sendNotification('sylang/indexingCompleted');
+        } catch (error) {
+            connection.console.error(`[Sylang] Workspace indexing failed: ${error}`);
+            connection.sendNotification('sylang/indexingFailed', { error: String(error) });
+        }
+    } else {
+        connection.console.log('[Sylang] No workspace root found - skipping workspace indexing');
     }
 });
 
@@ -583,52 +593,71 @@ function getKeywordDocumentation(word: string): string | null {
 
 // Workspace scanning for cross-file navigation
 function scanWorkspaceForSymbols(workspacePath: string): void {
-    const sylangExtensions = ['.ple', '.fun', '.fma', '.fml', '.sgl', '.haz', '.rsk', '.fsr', 
-                             '.cmp', '.sub', '.req', '.mod', '.prt', '.ckt', '.asm', 
-                             '.itm', '.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'];
+    const fs = require('fs');
+    const path = require('path');
+    
+    let fileCount = 0;
     
     function scanDirectory(dirPath: string): void {
         try {
-            const items = fs.readdirSync(dirPath);
+            const entries = fs.readdirSync(dirPath, { withFileTypes: true });
             
-            for (const item of items) {
-                const fullPath = path.join(dirPath, item);
-                const stat = fs.statSync(fullPath);
+            for (const entry of entries) {
+                const fullPath = path.join(dirPath, entry.name);
                 
-                if (stat.isDirectory()) {
-                    // Skip hidden directories and node_modules
-                    if (!item.startsWith('.') && item !== 'node_modules') {
+                if (entry.isDirectory()) {
+                    // Skip common directories that don't contain Sylang files
+                    if (!['node_modules', '.git', '.vscode', 'dist', 'build', 'out'].includes(entry.name)) {
                         scanDirectory(fullPath);
                     }
-                } else if (stat.isFile()) {
-                    const ext = path.extname(item);
+                } else if (entry.isFile()) {
+                    // Check if it's a Sylang file
+                    const ext = path.extname(entry.name);
+                    const sylangExtensions = ['.ple', '.fun', '.fma', '.fml', '.sgl', '.haz', '.rsk', '.fsr', 
+                                            '.cmp', '.sub', '.req', '.mod', '.prt', '.ckt', '.asm', '.itm', 
+                                            '.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'];
+                    
                     if (sylangExtensions.includes(ext)) {
                         try {
                             const content = fs.readFileSync(fullPath, 'utf8');
                             const uri = `file://${fullPath}`;
-                            const document = TextDocument.create(uri, 'sylang', 0, content);
-                            symbolIndex.indexDocument(document);
-                            connection.console.log(`Indexed symbols from: ${fullPath}`);
+                            
+                            // Create a mock document for indexing
+                            const document = {
+                                uri: uri,
+                                getText: () => content,
+                                languageId: getLanguageIdFromUri(uri),
+                                version: 1
+                            };
+                            
+                            symbolIndex.indexDocument(document as any);
+                            fileCount++;
+                            
+                            if (fileCount % 10 === 0) {
+                                connection.console.log(`[Sylang] Indexed ${fileCount} files...`);
+                            }
                         } catch (error) {
-                            connection.console.log(`Error reading file ${fullPath}: ${error}`);
+                            connection.console.warn(`[Sylang] Failed to index file ${fullPath}: ${error}`);
                         }
                     }
                 }
             }
         } catch (error) {
-            connection.console.log(`Error scanning directory ${dirPath}: ${error}`);
+            connection.console.warn(`[Sylang] Failed to scan directory ${dirPath}: ${error}`);
         }
     }
     
+    connection.console.log(`[Sylang] Scanning workspace: ${workspacePath}`);
     scanDirectory(workspacePath);
-    connection.console.log('Workspace symbol indexing completed');
+    connection.console.log(`[Sylang] Workspace indexing complete. Indexed ${fileCount} Sylang files.`);
 }
 
 // Symbol Index for Go to Definition and Find References
 interface SymbolInfo {
     name: string;
     location: Location;
-    type: 'requirement' | 'component' | 'goal' | 'feature' | 'function' | 'module' | 'circuit' | 'assembly';
+    type: 'requirement' | 'component' | 'goal' | 'feature' | 'function' | 'module' | 'circuit' | 'assembly' | 'hazard';
+    isDefinition: boolean; // New field to distinguish definitions from references
 }
 
 class SylangSymbolIndex {
@@ -641,17 +670,24 @@ class SylangSymbolIndex {
     }
 
     findDefinition(symbolName: string): Location | null {
-        const symbols = this.symbols.get(symbolName);
-        if (!symbols || symbols.length === 0) {
+        const symbolList = this.symbols.get(symbolName);
+        if (!symbolList || symbolList.length === 0) {
             return null;
         }
-        // Return the first occurrence as definition
-        return symbols[0]!.location;
+        
+        // Prioritize actual definitions over references
+        const definitions = symbolList.filter(s => s.isDefinition);
+        if (definitions.length > 0) {
+            return definitions[0]!.location; // Return first definition found
+        }
+        
+        // Fallback to first occurrence if no explicit definitions found
+        return symbolList[0]!.location;
     }
 
     findReferences(symbolName: string): Location[] {
-        const symbols = this.symbols.get(symbolName);
-        return symbols ? symbols.map(s => s.location) : [];
+        const symbolList = this.symbols.get(symbolName);
+        return symbolList ? symbolList.map(s => s.location) : [];
     }
 
     clear(): void {
@@ -674,7 +710,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'component'
+                    type: 'component',
+                    isDefinition: true
                 });
             }
 
@@ -685,7 +722,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'module'
+                    type: 'module',
+                    isDefinition: true
                 });
             }
 
@@ -696,7 +734,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'circuit'
+                    type: 'circuit',
+                    isDefinition: true
                 });
             }
 
@@ -707,7 +746,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'assembly'
+                    type: 'assembly',
+                    isDefinition: true
                 });
             }
 
@@ -718,7 +758,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'function'
+                    type: 'function',
+                    isDefinition: true
                 });
             }
 
@@ -729,7 +770,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, reqMatch.index + reqMatch[1]!.length + 1, lineNumber, reqMatch.index + reqMatch[0]!.length)),
-                    type: 'requirement'
+                    type: 'requirement',
+                    isDefinition: true
                 });
             }
 
@@ -740,7 +782,20 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, goalMatch.index + goalMatch[1]!.length + 1, lineNumber, goalMatch.index + goalMatch[0]!.length)),
-                    type: 'goal'
+                    type: 'goal',
+                    isDefinition: true
+                });
+            }
+
+            // Index hazard definitions: hazard H_ACT_001
+            const hazardDefMatch = line.match(/^\s*(hazard)\s+(H_[A-Z]{2,4}_\d{3})\b/);
+            if (hazardDefMatch && hazardDefMatch[2]) {
+                const symbolName = hazardDefMatch[2];
+                this.addSymbol({
+                    name: symbolName,
+                    location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
+                    type: 'hazard',
+                    isDefinition: true
                 });
             }
 
@@ -751,7 +806,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'requirement'
+                    type: 'requirement',
+                    isDefinition: true
                 });
             }
 
@@ -762,7 +818,8 @@ class SylangSymbolIndex {
                 this.addSymbol({
                     name: symbolName,
                     location: Location.create(uri, Range.create(lineNumber, line.indexOf(symbolName), lineNumber, line.indexOf(symbolName) + symbolName.length)),
-                    type: 'requirement'
+                    type: 'requirement',
+                    isDefinition: true
                 });
             }
 
@@ -775,7 +832,8 @@ class SylangSymbolIndex {
                         this.addSymbol({
                             name: comp,
                             location: Location.create(uri, Range.create(lineNumber, line.indexOf(comp), lineNumber, line.indexOf(comp) + comp.length)),
-                            type: 'component'
+                            type: 'component',
+                            isDefinition: false
                         });
                     }
                 });
@@ -790,22 +848,41 @@ class SylangSymbolIndex {
                         this.addSymbol({
                             name: ref,
                             location: Location.create(uri, Range.create(lineNumber, line.indexOf(ref), lineNumber, line.indexOf(ref) + ref.length)),
-                            type: 'requirement'
+                            type: 'requirement',
+                            isDefinition: false
                         });
                     }
                 });
             }
 
-            // Index hazard references: hazard H_ACT_002, H_ACT_003
-            const hazardMatch = line.match(/\b(hazard)\s+([A-Z_0-9,\s]*)/);
-            if (hazardMatch && hazardMatch[2]) {
-                const hazards = hazardMatch[2].split(',').map(h => h.trim());
+            // Index hazard references in functions_affected: functions_affected "MotorDriveController", "ActuatorPositionTracker"
+            const functionsAffectedMatch = line.match(/\bfunctions_affected\s+"([^"]+)"/g);
+            if (functionsAffectedMatch) {
+                functionsAffectedMatch.forEach(match => {
+                    const functionNameMatch = match.match(/"([^"]+)"/);
+                    if (functionNameMatch && functionNameMatch[1]) {
+                        const functionName = functionNameMatch[1];
+                        this.addSymbol({
+                            name: functionName,
+                            location: Location.create(uri, Range.create(lineNumber, line.indexOf(functionName), lineNumber, line.indexOf(functionName) + functionName.length)),
+                            type: 'function',
+                            isDefinition: false
+                        });
+                    }
+                });
+            }
+
+            // Index hazard references in comma-separated lists: hazard H_ACT_002, H_ACT_003
+            const hazardRefMatch = line.match(/\b(hazard)\s+([A-Z_0-9,\s]*)/);
+            if (hazardRefMatch && hazardRefMatch[2] && !line.match(/^\s*hazard\s+H_/)) { // Exclude definitions
+                const hazards = hazardRefMatch[2].split(',').map(h => h.trim());
                 hazards.forEach(haz => {
                     if (haz && /^H_[A-Z]{2,4}_\d{3}$/.test(haz)) {
                         this.addSymbol({
                             name: haz,
                             location: Location.create(uri, Range.create(lineNumber, line.indexOf(haz), lineNumber, line.indexOf(haz) + haz.length)),
-                            type: 'requirement'
+                            type: 'hazard',
+                            isDefinition: false
                         });
                     }
                 });

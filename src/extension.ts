@@ -132,7 +132,25 @@ export class SylangExtension {
         };
 
         this.languageClient = new LanguageClient('sylangLanguageServer', 'Sylang Language Server', serverOptions, clientOptions);
+        
+        // Start the client and add notification handlers
         await this.languageClient.start();
+        
+        // Add notification handlers for indexing progress
+        // Handle indexing started notification
+        this.languageClient.onNotification('sylang/indexingStarted', () => {
+            vscode.window.showInformationMessage('Sylang: Building workspace symbol index...');
+        });
+
+        // Handle indexing completed notification
+        this.languageClient.onNotification('sylang/indexingCompleted', () => {
+            vscode.window.showInformationMessage('Sylang: Workspace indexing complete! Cross-file navigation is now available.');
+        });
+
+        // Handle indexing failed notification
+        this.languageClient.onNotification('sylang/indexingFailed', (params: { error: string }) => {
+            vscode.window.showErrorMessage(`Sylang: Workspace indexing failed: ${params.error}`);
+        });
     }
 
     private registerCommands(context: vscode.ExtensionContext): void {
