@@ -19,9 +19,13 @@ import {
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { SafetyValidator } from '../languages/safety/SafetyValidator';
 
 // Create a connection for the server
 const connection = createConnection(ProposedFeatures.all);
+
+// Initialize safety validator
+const safetyValidator = new SafetyValidator();
 
 // Create a simple text document manager
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -35,7 +39,7 @@ let workspaceRoot: string | null = null;
 interface LanguageConfig {
     fileExtensions: string[];
     keywords: string[];
-    validators: ((document: TextDocument) => Diagnostic[])[];
+    validators: ((document: TextDocument) => Diagnostic[] | Promise<Diagnostic[]>)[];
 }
 
 const languageConfigs: Record<string, LanguageConfig> = {
@@ -221,10 +225,21 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
     const config = languageConfigs[languageId];
 
     if (config) {
-        // Run all validators for this language type
-        config.validators.forEach(validator => {
-            diagnostics.push(...validator(textDocument));
-        });
+        // Run all validators for this language type (handle both sync and async)
+        for (const validator of config.validators) {
+            try {
+                const result = await validator(textDocument);
+                diagnostics.push(...result);
+            } catch (error) {
+                console.error(`[validateTextDocument] Validator error for ${textDocument.uri}:`, error);
+                diagnostics.push({
+                    severity: DiagnosticSeverity.Error,
+                    range: Range.create(0, 0, 0, 0),
+                    message: `Validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    source: 'Sylang Validator'
+                });
+            }
+        }
     }
 
     // Generic validation common to all Sylang types
@@ -337,9 +352,40 @@ function validateFeatures(document: TextDocument): Diagnostic[] {
     return diagnostics;
 }
 
-function validateSafety(_document: TextDocument): Diagnostic[] {
-    // Safety-specific validation logic
-    return [];
+async function validateSafety(document: TextDocument): Promise<Diagnostic[]> {
+    try {
+        // Convert TextDocument to vscode.TextDocument format
+        const vscodeDocument = {
+            uri: { fsPath: document.uri, path: document.uri },
+            getText: () => document.getText(),
+            lineAt: (line: number) => ({ text: document.getText().split('\n')[line] || '' }),
+            lineCount: document.getText().split('\n').length,
+            fileName: document.uri,
+            languageId: 'sylang'
+        } as any;
+        
+        const vscDiagnostics = await safetyValidator.validate(vscodeDocument);
+        
+        // Convert vscode diagnostics to language server protocol diagnostics
+        return vscDiagnostics.map(diag => ({
+            severity: diag.severity as DiagnosticSeverity,
+            range: {
+                start: { line: diag.range.start.line, character: diag.range.start.character },
+                end: { line: diag.range.end.line, character: diag.range.end.character }
+            },
+            message: diag.message,
+            source: diag.source || 'Sylang Safety Validator',
+            code: diag.code as string
+        }));
+    } catch (error) {
+        console.error('[validateSafety] Error:', error);
+        return [{
+            severity: DiagnosticSeverity.Error,
+            range: Range.create(0, 0, 0, 0),
+            message: `Safety validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            source: 'Sylang Safety Validator'
+        }];
+    }
 }
 
 function validateSecurity(_document: TextDocument): Diagnostic[] {
@@ -751,7 +797,7 @@ class SylangSymbolIndex {
                 });
             }
 
-            // Index function definitions: function VehicleSpeedAnalyzer
+            // Index function definitions: def function VehicleSpeedAnalyzer
             const functionMatch = line.match(/^\s*(function)\s+([A-Z][a-zA-Z0-9_]*)/);
             if (functionMatch && functionMatch[2]) {
                 const symbolName = functionMatch[2];

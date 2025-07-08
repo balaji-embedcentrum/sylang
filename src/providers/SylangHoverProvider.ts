@@ -17,7 +17,7 @@ export class SylangHoverProvider implements vscode.HoverProvider {
             'productline': '**Product Line Definition**\n\nDefines a family of related products with shared and variable features.\n\n*Syntax:* `productline <name>`',
             'systemfunctions': '**System Functions Container**\n\nContainer for defining system-level functions and their relationships.\n\n*Syntax:* `systemfunctions <name>`',
             'systemfeatures': '**System Features Container**\n\nContainer for defining feature models with variability.\n\n*Syntax:* `systemfeatures <name>`',
-            'function': '**Function Definition**\n\nDefines a system function with properties and relationships.\n\n*Properties:* name, description, owner, tags, safetylevel, enables',
+            'function': '**def function Definition**\n\nDefines a system def function with properties and relationships.\n\n*Properties:* name, description, owner, tags, safetylevel, enables',
             'feature': '**Feature Definition**\n\nDefines a feature in the product line with variability type.\n\n*Types:* mandatory, optional, alternative, or',
             'mandatory': '**Mandatory Feature**\n\nFeature that must be present in all product variants.\n\n*Usage:* `feature <name> mandatory`',
             'optional': '**Optional Feature**\n\nFeature that may or may not be present in product variants.\n\n*Usage:* `feature <name> optional`',

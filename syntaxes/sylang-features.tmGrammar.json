@@ -6,6 +6,7 @@
     { "include": "#comments" },
     { "include": "#keywords" },
     { "include": "#variability" },
+    { "include": "#constraints" },
     { "include": "#strings" },
     { "include": "#safety-levels" },
     { "include": "#attributes" }
@@ -28,8 +29,12 @@
     "keywords": {
       "patterns": [
         {
+          "name": "keyword.control.definition.sylang",
+          "match": "\\bdef\\b"
+        },
+        {
           "name": "keyword.control.sylang",
-          "match": "\\b(systemfeatures|feature)\\b"
+          "match": "\\b(def\\s+systemfeatures|def\\s+feature|def\\s+constraints|systemfeatures|feature|constraints)\\b"
         },
         {
           "name": "keyword.other.sylang",
@@ -42,6 +47,14 @@
         {
           "name": "keyword.other.variability.sylang",
           "match": "\\b(mandatory|optional|alternative|or)\\b"
+        }
+      ]
+    },
+    "constraints": {
+      "patterns": [
+        {
+          "name": "keyword.other.constraint.sylang",
+          "match": "\\b(requires|excludes)\\b"
         }
       ]
     },

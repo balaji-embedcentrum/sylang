@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.0",
+  "version": "1.0.20",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -25,11 +25,11 @@
   "keywords": [
     "sylang",
     "systems-engineering",
-    "safety-engineering", 
+    "safety-engineering",
     "mbse",
     "model-based-systems-engineering",
     "automotive",
-    "aerospace", 
+    "aerospace",
     "medical",
     "safety-standards",
     "functional-safety",
@@ -53,56 +53,114 @@
     "languages": [
       {
         "id": "sylang-productline",
-        "aliases": ["Sylang ProductLine", "sylang-ple"],
-        "extensions": [".ple"],
+        "aliases": [
+          "Sylang ProductLine",
+          "sylang-ple"
+        ],
+        "extensions": [
+          ".ple"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-functions",
-        "aliases": ["Sylang Functions", "sylang-fun"],
-        "extensions": [".fun", ".fma"],
+        "aliases": [
+          "Sylang Functions",
+          "sylang-fun"
+        ],
+        "extensions": [
+          ".fun",
+          ".fma"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-features",
-        "aliases": ["Sylang Features", "sylang-fml"],
-        "extensions": [".fml"],
+        "aliases": [
+          "Sylang Features",
+          "sylang-fml"
+        ],
+        "extensions": [
+          ".fml"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-safety",
-        "aliases": ["Sylang Safety", "sylang-safety"],
-        "extensions": [".itm", ".sgl", ".haz", ".rsk", ".fsr"],
+        "aliases": [
+          "Sylang Safety",
+          "sylang-safety"
+        ],
+        "extensions": [
+          ".itm",
+          ".sgl",
+          ".haz",
+          ".rsk",
+          ".fsr"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-security",
-        "aliases": ["Sylang Security", "sylang-security"],
-        "extensions": [".tra", ".thr", ".sgo", ".sre", ".ast", ".sec"],
+        "aliases": [
+          "Sylang Security",
+          "sylang-security"
+        ],
+        "extensions": [
+          ".tra",
+          ".thr",
+          ".sgo",
+          ".sre",
+          ".ast",
+          ".sec"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-components",
-        "aliases": ["Sylang Components", "sylang-cmp"],
-        "extensions": [".cmp", ".sub", ".req"],
+        "aliases": [
+          "Sylang Components",
+          "sylang-cmp"
+        ],
+        "extensions": [
+          ".cmp",
+          ".sub",
+          ".req"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-software",
-        "aliases": ["Sylang Software", "sylang-mod"],
-        "extensions": [".mod", ".prt"],
+        "aliases": [
+          "Sylang Software",
+          "sylang-mod"
+        ],
+        "extensions": [
+          ".mod",
+          ".prt"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-electronics",
-        "aliases": ["Sylang Electronics", "sylang-ckt"],
-        "extensions": [".ckt"],
+        "aliases": [
+          "Sylang Electronics",
+          "sylang-ckt"
+        ],
+        "extensions": [
+          ".ckt"
+        ],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-mechanics",
-        "aliases": ["Sylang Mechanics", "sylang-asm"],
-        "extensions": [".asm"],
+        "aliases": [
+          "Sylang Mechanics",
+          "sylang-asm"
+        ],
+        "extensions": [
+          ".asm"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -201,6 +259,73 @@
         "command": "sylang.format",
         "title": "Format Sylang File",
         "category": "Sylang"
+      },
+      {
+        "command": "sylang.generateProject",
+        "title": "🚀 Generate Sylang Project",
+        "category": "Sylang",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "sylang.analyzePleFml",
+        "title": "📊 Analyze .ple/.fml Files",
+        "category": "Sylang",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "sylang.validatePleFml",
+        "title": "✅ Validate All .ple/.fml Files",
+        "category": "Sylang",
+        "icon": "$(check)"
+      },
+      {
+        "command": "sylang.validateWorkspace",
+        "title": "Validate Workspace",
+        "category": "Sylang"
+      },
+      {
+        "command": "sylang.refreshSymbols",
+        "title": "Refresh Symbols",
+        "category": "Sylang"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "sylang.generateProject",
+          "title": "Generate Sylang Project"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "sylang.validate",
+          "when": "resourceExtname =~ /\\.(ple|fun|fma|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
+          "group": "sylang@1"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "sylang.core.submenu",
+          "when": "resourceExtname =~ /\\.(ple|fun|fma|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
+          "group": "sylang@1"
+        }
+      ],
+      "sylang.core.submenu": [
+        {
+          "command": "sylang.validate",
+          "group": "1_validate@1"
+        },
+        {
+          "command": "sylang.format",
+          "group": "1_validate@2"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "sylang.core.submenu",
+        "label": "🔧 Sylang Tools",
+        "icon": "$(tools)"
       }
     ],
     "configuration": {
@@ -242,10 +367,10 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
+    "tree-sitter": "^0.20.4",
     "vscode-languageclient": "^8.1.0",
     "vscode-languageserver": "^8.1.0",
     "vscode-languageserver-textdocument": "^1.0.8",
-    "tree-sitter": "^0.20.4",
     "web-tree-sitter": "^0.20.8"
   }
-} 
+}

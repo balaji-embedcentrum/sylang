@@ -27,6 +27,10 @@
     "keywords": {
       "patterns": [
         {
+          "name": "keyword.control.definition.sylang",
+          "match": "\\b(def)\\b"
+        },
+        {
           "name": "keyword.control.sylang",
           "match": "\\b(productline)\\b"
         },

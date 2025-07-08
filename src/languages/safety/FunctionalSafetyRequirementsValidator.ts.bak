@@ -1,0 +1,551 @@
+import * as vscode from 'vscode';
+import { BaseSafetyValidator } from './BaseSafetyValidator';
+import { LanguageConfig } from '../../config/LanguageConfigs';
+
+export class FunctionalSafetyRequirementsValidator extends BaseSafetyValidator {
+    
+    constructor() {
+        // Create a basic language config for functional safety requirements files
+        const reqConfig: LanguageConfig = {
+            id: 'sylang-safety',
+            keywords: ['def', 'functionalsafetyrequirements', 'requirement', 'name', 'description', 'asil', 'verification'],
+            requiredProperties: ['name', 'description', 'asil', 'verification'],
+            validPropertyValues: {
+                asil: ['A', 'B', 'C', 'D', 'QM']
+            }
+        };
+        super(reqConfig);
+    }
+
+    protected getDefinitionKeywords(): string[] {
+        return ['functionalsafetyrequirements', 'requirement'];
+    }
+
+    protected async validateDocumentLevelRules(document: vscode.TextDocument): Promise<void> {
+        await this.validateRequirementsStructure(document);
+        await this.validateRequirementCompleteness(document);
+        await this.validateTraceability(document);
+    }
+
+    protected async validateLanguageSpecificRules(document: vscode.TextDocument, lineIndex: number, line: string): Promise<void> {
+        const trimmedLine = line.trim();
+
+        // Validate requirement definitions
+        if (trimmedLine.startsWith('def requirement ')) {
+            this.validateRequirementDefinition(document, lineIndex, line);
+        }
+
+        // Validate ASIL levels
+        if (trimmedLine.includes('asil ')) {
+            this.validateASILLevel(document, lineIndex, line);
+        }
+
+        // Validate verification methods
+        if (trimmedLine.includes('verification ')) {
+            this.validateVerificationMethod(document, lineIndex, line);
+        }
+
+        // Validate traceability
+        if (trimmedLine.includes('safetygoal ') || trimmedLine.includes('hazard ')) {
+            this.validateRequirementTraceability(document, lineIndex, line);
+        }
+    }
+
+    public override async validate(document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
+        this.diagnostics = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+
+        // Validate file must start with 'def functionalsafetyrequirements'
+        if (!text.trim().startsWith('def functionalsafetyrequirements')) {
+            this.addError(0, 'Functional safety requirements files (.fsr) must start with "def functionalsafetyrequirements <identifier>"');
+        }
+
+        // Validate line-by-line content
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line || line.trim().length === 0 || line.trim().startsWith('//')) {
+                continue;
+            }
+
+            await this.validateLine(document, i, line);
+        }
+
+        // Validate overall structure and consistency
+        await this.validateOverallStructure(document);
+
+        return this.diagnostics;
+    }
+
+    private async validateLine(document: vscode.TextDocument, lineIndex: number, line: string): Promise<void> {
+        const trimmedLine = line.trim();
+
+        // Common validations from base class - handled by parent
+        await this.validateCrossFileReferences(document, lineIndex, line);
+        this.validateASILConsistency(document, lineIndex, line);
+        this.validateSafetyNamingConventions(document, lineIndex, line);
+
+        // Specific validations for .fsr files
+        this.validateRequirementDefinitions(document, lineIndex, line);
+        this.validateRequirementProperties(document, lineIndex, line);
+        await this.validateSafetyGoalReferences(document, lineIndex, line);
+        await this.validateFunctionAllocation(document, lineIndex, line);
+        this.validateVerificationMethods(document, lineIndex, line);
+    }
+
+    private validateRequirementDefinitions(document: vscode.TextDocument, lineIndex: number, line: string): void {
+        const trimmedLine = line.trim();
+
+        // Validate requirement definitions
+        if (trimmedLine.startsWith('def requirement ')) {
+            const reqMatch = trimmedLine.match(/def\s+requirement\s+([A-Z][A-Z0-9_]*)/);
+            if (reqMatch) {
+                const reqId = reqMatch[1];
+                
+                // Validate naming convention: FSR_SYSTEM_NNN
+                if (!reqId.match(/^FSR_[A-Z]{3}_\d{3}$/)) {
+                    this.addError(lineIndex, `Requirement ID '${reqId}' must follow pattern FSR_XXX_NNN (e.g., FSR_SYS_001)`);
+                }
+                
+                // Check for duplicate requirement IDs in the document
+                const text = document.getText();
+                const reqMatches = (text.match(new RegExp(`def\\s+requirement\\s+${reqId}`, 'g')) || []);
+                if (reqMatches.length > 1) {
+                    this.addError(lineIndex, `Duplicate requirement ID '${reqId}' found in this file`);
+                }
+            }
+        }
+    }
+
+    private validateRequirementProperties(document: vscode.TextDocument, lineIndex: number, line: string): void {
+        const trimmedLine = line.trim();
+
+        // Validate description property
+        if (trimmedLine.startsWith('description ') && this.isWithinRequirementDefinition(document, lineIndex)) {
+            const descriptionValue = trimmedLine.replace('description ', '').trim();
+            if (!descriptionValue.startsWith('"') || !descriptionValue.endsWith('"')) {
+                this.addError(lineIndex, 'Requirement descriptions must be quoted strings');
+                return;
+            }
+            
+            const description = descriptionValue.slice(1, -1);
+            
+            // Validate requirement language (should use "shall", "should", "may")
+            const requirementKeywords = ['shall', 'should', 'may', 'will', 'must'];
+            if (!requirementKeywords.some(keyword => description.toLowerCase().includes(keyword))) {
+                this.addWarning(lineIndex, `Requirement description should use requirement keywords: ${requirementKeywords.join(', ')}`);
+            }
+            
+            // Check for measurable/verifiable language
+            const measurableKeywords = ['within', 'maximum', 'minimum', 'exactly', 'at least', 'no more than', 'between'];
+            const hasMeasurable = measurableKeywords.some(keyword => description.toLowerCase().includes(keyword));
+            if (!hasMeasurable) {
+                this.addInfo(lineIndex, 'Consider making requirement more measurable with specific criteria');
+            }
+            
+            // Check description length
+            if (description.length < 20) {
+                this.addWarning(lineIndex, 'Requirement description should be more detailed');
+            }
+        }
+
+        // Validate rationale property
+        if (trimmedLine.startsWith('rationale ') && this.isWithinRequirementDefinition(document, lineIndex)) {
+            const rationaleValue = trimmedLine.replace('rationale ', '').trim();
+            if (!rationaleValue.startsWith('"') || !rationaleValue.endsWith('"')) {
+                this.addError(lineIndex, 'Rationale must be a quoted string');
+                return;
+            }
+            
+            const rationale = rationaleValue.slice(1, -1);
+            if (rationale.length < 15) {
+                this.addWarning(lineIndex, 'Rationale should provide detailed justification for the requirement');
+            }
+        }
+
+        // Validate verification property
+        if (trimmedLine.startsWith('verification ') && this.isWithinRequirementDefinition(document, lineIndex)) {
+            const verificationValue = trimmedLine.replace('verification ', '').trim();
+            if (!verificationValue.startsWith('"') || !verificationValue.endsWith('"')) {
+                this.addError(lineIndex, 'Verification method must be a quoted string');
+                return;
+            }
+            
+            const verification = verificationValue.slice(1, -1);
+            
+            // Validate verification methods
+            const validMethods = [
+                'inspection', 'analysis', 'demonstration', 'test',
+                'simulation', 'review', 'static analysis', 'dynamic testing',
+                'hardware-in-the-loop', 'software-in-the-loop', 'integration test'
+            ];
+            
+            const hasValidMethod = validMethods.some(method => verification.toLowerCase().includes(method));
+            if (!hasValidMethod) {
+                this.addWarning(lineIndex, `Verification method should specify valid approach: ${validMethods.join(', ')}`);
+            }
+        }
+    }
+
+    private async validateSafetyGoalReferences(document: vscode.TextDocument, lineIndex: number, line: string): Promise<void> {
+        const trimmedLine = line.trim();
+
+        // Validate derivedfrom references to safety goals
+        if (trimmedLine.startsWith('derivedfrom ')) {
+            const derivedFromValue = trimmedLine.replace('derivedfrom ', '').trim();
+            const goalRefs = derivedFromValue.split(',').map(ref => ref.trim());
+            const context = await this.initializeValidationContext();
+            
+            for (const goalRef of goalRefs) {
+                if (!context.safetyGoals.has(goalRef)) {
+                    this.addError(lineIndex, `Safety goal '${goalRef}' not found in safety goals files. Available goals: ${Array.from(context.safetyGoals).join(', ')}`);
+                }
+                
+                // Validate safety goal naming convention
+                if (!goalRef.match(/^SG_[A-Z]{3}_\d{3}$/)) {
+                    this.addWarning(lineIndex, `Safety goal ID '${goalRef}' should follow pattern SG_XXX_NNN (e.g., SG_SYS_001)`);
+                }
+            }
+            
+            // Validate ASIL consistency with referenced safety goals
+            await this.validateASILConsistencyWithGoals(document, lineIndex, goalRefs);
+        }
+    }
+
+    private async validateFunctionAllocation(document: vscode.TextDocument, lineIndex: number, line: string): Promise<void> {
+        const trimmedLine = line.trim();
+
+        // Validate allocatedto references to functions
+        if (trimmedLine.startsWith('allocatedto ')) {
+            const allocatedToValue = trimmedLine.replace('allocatedto ', '').trim();
+            const functionRefs = allocatedToValue.split(',').map(ref => ref.trim());
+            const context = await this.initializeValidationContext();
+            
+            for (const funcRef of functionRefs) {
+                if (!context.functions.has(funcRef)) {
+                    this.addError(lineIndex, `Function '${funcRef}' not found in function files. Available functions: ${Array.from(context.functions.keys()).join(', ')}`);
+                }
+                
+                // Validate function naming convention
+                if (!funcRef.match(/^[A-Z][a-zA-Z0-9]*$/)) {
+                    this.addWarning(lineIndex, `Function reference '${funcRef}' should use PascalCase naming`);
+                }
+            }
+            
+            // Validate allocation completeness
+            if (functionRefs.length === 0) {
+                this.addError(lineIndex, 'Requirements must be allocated to at least one function');
+            }
+        }
+    }
+
+    private validateVerificationMethods(document: vscode.TextDocument, lineIndex: number, line: string): void {
+        const trimmedLine = line.trim();
+
+        // Validate verification methods match ASIL level requirements
+        if (trimmedLine.startsWith('verification ') && this.isWithinRequirementDefinition(document, lineIndex)) {
+            const verificationValue = trimmedLine.replace('verification ', '').trim();
+            const verification = verificationValue.slice(1, -1); // Remove quotes
+            
+            // Get ASIL level for current requirement
+            const asilLevel = this.getRequirementASIL(document, lineIndex);
+            if (asilLevel) {
+                this.validateVerificationMethodForASIL(lineIndex, verification, asilLevel);
+            }
+        }
+    }
+
+    private getRequirementASIL(document: vscode.TextDocument, lineIndex: number): string | null {
+        const lines = document.getText().split('\n');
+        
+        // Find the current requirement block
+        let reqStart = lineIndex;
+        let reqEnd = lineIndex;
+        
+        // Find requirement start
+        for (let i = lineIndex; i >= 0; i--) {
+            if (lines[i].trim().startsWith('def requirement ')) {
+                reqStart = i;
+                break;
+            }
+        }
+        
+        // Find requirement end
+        for (let i = lineIndex; i < lines.length; i++) {
+            if (lines[i].trim().startsWith('def requirement ') && i > lineIndex) {
+                reqEnd = i;
+                break;
+            }
+            if (i === lines.length - 1) {
+                reqEnd = i;
+                break;
+            }
+        }
+        
+        // Look for ASIL level in the requirement block
+        for (let i = reqStart; i <= reqEnd; i++) {
+            const line = lines[i].trim();
+            const asilMatch = line.match(/asil\s+([A-D]|QM)/);
+            if (asilMatch) {
+                return asilMatch[1];
+            }
+        }
+        
+        return null;
+    }
+
+    private validateVerificationMethodForASIL(lineIndex: number, verification: string, asilLevel: string): void {
+        const verificationLower = verification.toLowerCase();
+        
+        // ASIL D requirements
+        if (asilLevel === 'D') {
+            if (!verificationLower.includes('test') && !verificationLower.includes('analysis')) {
+                this.addWarning(lineIndex, 'ASIL D requirements typically require rigorous testing or formal analysis');
+            }
+            
+            if (verificationLower.includes('inspection') && !verificationLower.includes('test')) {
+                this.addWarning(lineIndex, 'ASIL D requirements should not rely solely on inspection - consider testing or analysis');
+            }
+        }
+        
+        // ASIL C requirements
+        if (asilLevel === 'C') {
+            if (verificationLower.includes('inspection') && !verificationLower.includes('test') && !verificationLower.includes('analysis')) {
+                this.addWarning(lineIndex, 'ASIL C requirements should include testing or analysis beyond inspection');
+            }
+        }
+        
+        // QM requirements
+        if (asilLevel === 'QM') {
+            if (verificationLower.includes('formal') || verificationLower.includes('exhaustive')) {
+                this.addInfo(lineIndex, 'QM requirements may not need formal or exhaustive verification methods');
+            }
+        }
+    }
+
+    private async validateASILConsistencyWithGoals(document: vscode.TextDocument, lineIndex: number, goalRefs: string[]): Promise<void> {
+        // Get ASIL level of current requirement
+        const reqASIL = this.getRequirementASIL(document, lineIndex);
+        if (!reqASIL) return;
+        
+        // Check ASIL levels of referenced safety goals
+        const safetyGoalFiles = await vscode.workspace.findFiles('**/*.sgl', '**/node_modules/**');
+        
+        for (const goalRef of goalRefs) {
+            for (const fileUri of safetyGoalFiles) {
+                const doc = await vscode.workspace.openTextDocument(fileUri);
+                const content = doc.getText();
+                
+                if (content.includes(`def goal ${goalRef}`)) {
+                    // Find ASIL level for this goal
+                    const goalBlockMatch = content.match(new RegExp(`def\\s+goal\\s+${goalRef}[\\s\\S]*?asil\\s+([A-D]|QM)`, 'i'));
+                    if (goalBlockMatch) {
+                        const goalASIL = goalBlockMatch[1];
+                        
+                        // Requirement ASIL should match or be lower than goal ASIL
+                        const asilHierarchy = { 'QM': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4 };
+                        const reqLevel = asilHierarchy[reqASIL as keyof typeof asilHierarchy] || 0;
+                        const goalLevel = asilHierarchy[goalASIL as keyof typeof asilHierarchy] || 0;
+                        
+                        if (reqLevel > goalLevel) {
+                            this.addError(lineIndex, `Requirement ASIL ${reqASIL} is higher than parent safety goal ${goalRef} ASIL ${goalASIL}. Requirement ASIL should be ≤ parent goal ASIL`);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    private isWithinRequirementDefinition(document: vscode.TextDocument, lineIndex: number): boolean {
+        const lines = document.getText().split('\n');
+        
+        // Look backwards from current line to find the most recent 'def requirement'
+        for (let i = lineIndex; i >= 0; i--) {
+            const line = lines[i].trim();
+            if (line.startsWith('def requirement ')) {
+                return true;
+            }
+            if (line.startsWith('def ') && !line.startsWith('def requirement ')) {
+                return false; // Found another definition
+            }
+        }
+        return false;
+    }
+
+    private async validateOverallStructure(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        
+        // Validate that there's exactly one functionalsafetyrequirements definition
+        const fsrMatches = text.match(/def\s+functionalsafetyrequirements/g);
+        if (!fsrMatches) {
+            this.addError(0, 'Missing "def functionalsafetyrequirements" definition');
+        } else if (fsrMatches.length > 1) {
+            this.addError(0, 'Multiple "def functionalsafetyrequirements" definitions found. Only one is allowed per file.');
+        }
+
+        // Validate that each requirement has required properties
+        await this.validateRequirementCompleteness(document);
+
+        // Validate cross-references to safety goals file
+        await this.validateSafetyGoalsReference(document);
+
+        // Validate requirement coverage
+        await this.validateRequirementCoverage(document);
+
+        // Validate ASIL distribution
+        this.validateASILDistribution(document);
+
+        // Validate traceability chain
+        await this.validateTraceabilityChain(document);
+    }
+
+    private async validateRequirementCompleteness(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        const reqMatches = text.matchAll(/def\s+requirement\s+([A-Z][A-Z0-9_]*)/g);
+        
+        for (const match of reqMatches) {
+            const reqId = match[1];
+            const reqIndex = match.index!;
+            
+            // Find the end of this requirement definition
+            const lines = text.split('\n');
+            const startLineIndex = text.substring(0, reqIndex).split('\n').length - 1;
+            
+            let endLineIndex = lines.length;
+            for (let i = startLineIndex + 1; i < lines.length; i++) {
+                if (lines[i].trim().startsWith('def requirement ')) {
+                    endLineIndex = i;
+                    break;
+                }
+            }
+            
+            const reqSection = lines.slice(startLineIndex, endLineIndex).join('\n');
+            
+            // Check for required properties
+            const requiredProperties = ['description', 'derivedfrom', 'asil', 'rationale', 'allocatedto', 'verification'];
+            for (const property of requiredProperties) {
+                if (!reqSection.includes(`${property} `)) {
+                    this.addError(startLineIndex, `Requirement '${reqId}' is missing required property: ${property}`);
+                }
+            }
+        }
+    }
+
+    private async validateSafetyGoalsReference(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        const safetyGoalsMatch = text.match(/safetygoals\s+([A-Za-z][A-Za-z0-9_]*)/);
+        
+        if (safetyGoalsMatch) {
+            const safetyGoalsRef = safetyGoalsMatch[1];
+            const context = await this.initializeValidationContext();
+            if (!context.safetyFiles.has(safetyGoalsRef)) {
+                this.addError(0, `Referenced safety goals '${safetyGoalsRef}' not found in workspace`);
+            }
+        } else {
+            this.addWarning(0, 'No safety goals reference found. Consider adding "safetygoals <identifier>" to link to parent safety goals');
+        }
+    }
+
+    private async validateRequirementCoverage(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        
+        // Get all safety goals that should be covered
+        const context = await this.initializeValidationContext();
+        const availableGoals = context.safetyGoals;
+        
+        // Get all safety goals referenced in derivedfrom
+        const derivedFromMatches = text.matchAll(/derivedfrom\s+([A-Z][A-Z0-9_,\s]*)/g);
+        const referencedGoals = new Set<string>();
+        
+        for (const match of derivedFromMatches) {
+            const goalRefs = match[1].split(',').map(ref => ref.trim());
+            goalRefs.forEach(goal => referencedGoals.add(goal));
+        }
+        
+        // Check for unreferenced safety goals
+        for (const goal of availableGoals) {
+            if (!referencedGoals.has(goal)) {
+                this.addWarning(0, `Safety goal '${goal}' is not covered by any functional safety requirement`);
+            }
+        }
+        
+        // Check coverage ratio
+        const coverageRatio = referencedGoals.size / Math.max(availableGoals.size, 1);
+        if (coverageRatio < 0.8) {
+            this.addWarning(0, `Low safety goal coverage: ${Math.round(coverageRatio * 100)}%. Consider adding requirements to cover missing goals`);
+        }
+    }
+
+    private validateASILDistribution(document: vscode.TextDocument): void {
+        const text = document.getText();
+        
+        // Count requirements by ASIL level
+        const asilCounts = { 'QM': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0 };
+        const asilMatches = text.matchAll(/asil\s+([A-D]|QM)/g);
+        
+        for (const match of asilMatches) {
+            const asil = match[1] as keyof typeof asilCounts;
+            asilCounts[asil]++;
+        }
+        
+        const totalReqs = Object.values(asilCounts).reduce((sum, count) => sum + count, 0);
+        
+        // Validate distribution makes sense
+        if (totalReqs > 0) {
+            const highASILRatio = (asilCounts.C + asilCounts.D) / totalReqs;
+            
+            if (highASILRatio > 0.7) {
+                this.addInfo(0, 'High proportion of ASIL C/D requirements. Ensure this is justified by system criticality');
+            }
+            
+            if (asilCounts.D > asilCounts.A + asilCounts.B + asilCounts.C) {
+                this.addWarning(0, 'More ASIL D requirements than A+B+C combined. Verify ASIL assignment accuracy');
+            }
+        }
+    }
+
+    private async validateTraceabilityChain(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        
+        // Check that requirements form proper traceability chain
+        // Requirements → Safety Goals → Hazards → Risk Assessment → Item Definition
+        
+        const reqMatches = text.matchAll(/def\s+requirement\s+([A-Z][A-Z0-9_]*)/g);
+        let incompleteTraceability = 0;
+        
+        for (const match of reqMatches) {
+            const reqId = match[1];
+            const reqIndex = match.index!;
+            
+            // Check if requirement has proper traceability
+            const lines = text.split('\n');
+            const startLineIndex = text.substring(0, reqIndex).split('\n').length - 1;
+            
+            let hasDerivation = false;
+            let hasAllocation = false;
+            let hasVerification = false;
+            
+            // Check requirement properties
+            for (let i = startLineIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.startsWith('def requirement ') && i > startLineIndex) {
+                    break; // Next requirement
+                }
+                
+                if (line.startsWith('derivedfrom ')) hasDerivation = true;
+                if (line.startsWith('allocatedto ')) hasAllocation = true;
+                if (line.startsWith('verification ')) hasVerification = true;
+            }
+            
+            if (!hasDerivation || !hasAllocation || !hasVerification) {
+                incompleteTraceability++;
+            }
+        }
+        
+        if (incompleteTraceability > 0) {
+            this.addWarning(0, `${incompleteTraceability} requirements have incomplete traceability. Ensure all requirements have derivedfrom, allocatedto, and verification properties`);
+        }
+    }
+} 
