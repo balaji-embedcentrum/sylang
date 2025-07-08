@@ -9,9 +9,8 @@ export class SylangFormattingProvider implements vscode.DocumentFormattingEditPr
     ): vscode.ProviderResult<vscode.TextEdit[]> {
         
         const edits: vscode.TextEdit[] = [];
-        const tabSize = options.tabSize || 2;
-        const insertSpaces = options.insertSpaces;
-        const indent = insertSpaces ? ' '.repeat(tabSize) : '\t';
+        // Always use tabs for Sylang files, regardless of VS Code settings
+        const indent = '\t';
         
         let currentIndentLevel = 0;
         const lines = document.getText().split('\n');

@@ -3,9 +3,9 @@
     "prefix": "systemfunctions",
     "body": [
       "systemfunctions ${1:ContainerName}",
-      "    function ${2:FunctionName}",
+      "    def function ${2:FunctionName}",
       "        name \"${3:Display Name}\"",
-      "        description \"${4:Function description}\"",
+      "        description \"${4:def function description}\"",
       "        owner \"${5:Team Name}\"",
       "        tags \"${6:tag1}\", \"${7:tag2}\"",
       "        safetylevel ${8|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
@@ -13,58 +13,58 @@
     ],
     "description": "Complete system functions container with function"
   },
-  "Function Definition": {
+  "def function Definition": {
     "prefix": "function",
     "body": [
-      "function ${1:FunctionName}",
+      "def function ${1:FunctionName}",
       "    name \"${2:Display Name}\"",
-      "    description \"${3:Function description}\"",
+      "    description \"${3:def function description}\"",
       "    owner \"${4:Team Name}\"",
       "    tags \"${5:tag1}\", \"${6:tag2}\"",
       "    safetylevel ${7|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
       "    enables ${8:EnabledFeatures}"
     ],
-    "description": "Complete function definition"
+    "description": "Complete def function definition"
   },
   "Basic Function": {
     "prefix": "func",
     "body": [
-      "function ${1:Name}",
+      "def function ${1:Name}",
       "    name \"${2:Display Name}\"",
       "    description \"${3:Description}\"",
       "    safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
     ],
-    "description": "Basic function structure"
+    "description": "Basic def function structure"
   },
-  "Function Name": {
+  "def function Name": {
     "prefix": "name",
     "body": [
       "name \"${1:Display Name}\""
     ],
-    "description": "Function display name"
+    "description": "def function display name"
   },
-  "Function Description": {
+  "def function Description": {
     "prefix": "desc",
     "body": [
-      "description \"${1:Function description}\""
+      "description \"${1:def function description}\""
     ],
-    "description": "Function description"
+    "description": "def function description"
   },
-  "Function Owner": {
+  "def function Owner": {
     "prefix": "owner",
     "body": [
       "owner \"${1:Team Name}\""
     ],
-    "description": "Function owner"
+    "description": "def function owner"
   },
-  "Function Tags": {
+  "def function Tags": {
     "prefix": "tags",
     "body": [
       "tags \"${1:tag1}\", \"${2:tag2}\", \"${3:tag3}\""
     ],
-    "description": "Function tags"
+    "description": "def function tags"
   },
-  "Function Enables": {
+  "def function Enables": {
     "prefix": "enables",
     "body": [
       "enables ${1:Feature1}, ${2:Feature2}"
@@ -76,6 +76,6 @@
     "body": [
       "safetylevel ${1|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
     ],
-    "description": "Function safety level"
+    "description": "def function safety level"
   }
 } 

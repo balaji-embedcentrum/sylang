@@ -7,6 +7,7 @@
     { "include": "#safety-keywords" },
     { "include": "#strings" },
     { "include": "#safety-levels" },
+    { "include": "#def-keyword" },
     { "include": "#attributes" }
   ],
   "repository": {
@@ -24,19 +25,43 @@
         }
       ]
     },
+    "def-keyword": {
+      "patterns": [
+        {
+          "name": "keyword.control.def.sylang",
+          "match": "\\bdef\\b"
+        }
+      ]
+    },
     "safety-keywords": {
       "patterns": [
         {
           "name": "keyword.control.safety.sylang",
-          "match": "\\b(functionalsafetyrequirements|requirement|safety|hazard|risk|goal|item)\\b"
+          "match": "\\b(hazardanalysis|hazardidentification|riskassessment|safetygoals|functionalsafetyrequirements)\\b"
+        },
+        {
+          "name": "keyword.control.safety-structure.sylang",
+          "match": "\\b(itemdef|operationalscenarios|safetyconcept|hazardcategories|subsystemhazards|scenarios|safetygoalsdef|safetymeasures|verificationcriteria)\\b"
+        },
+        {
+          "name": "keyword.control.safety-definition.sylang",
+          "match": "\\b(goal|hazard|scenario|measure|criterion|category|subsystem|boundary|vehiclestate|drivingstate|environment|assumption|principle|condition)\\b"
         },
         {
           "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|severity|probability|controllability|verification|rationale)\\b"
+          "match": "\\b(name|description|owner|tags|severity|probability|controllability|verification|rationale|methodology|context|conditions|consequences|enabledby|functions_affected|assessment|riskcriteria|exposure|asilmatrix|determination)\\b"
         },
         {
           "name": "keyword.other.reference.sylang", 
-          "match": "\\b(derivedfrom|derivedFrom|allocatedto|allocatedTo|asil|ASIL)\\b"
+          "match": "\\b(derivedfrom|derivedFrom|allocatedto|allocatedTo|hazardanalysis|riskassessment|hazardidentification|safetygoals|productline|systemfeatures|systemfunctions|subsystems)\\b"
+        },
+        {
+          "name": "keyword.other.structure.sylang",
+          "match": "\\b(includes|excludes|operationalconditions|vehiclestates|driverstates|environments|overallsafetystrategy|assumptionsofuse|safetymeasures|verificationcriteria|requirements|references)\\b"
+        },
+        {
+          "name": "keyword.other.methodology.sylang",
+          "match": "\\b(FMEA|HAZOP|STPA|FTA|ETA)\\b"
         }
       ]
     },
@@ -44,11 +69,11 @@
       "patterns": [
         {
           "name": "constant.language.safety-level.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM)\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD]|S[123]|E[1234]|C[123])\\b"
         },
         {
           "name": "keyword.other.safety.sylang",
-          "match": "\\b(safetylevel)\\b"
+          "match": "\\b(safetylevel|asil|mandatory|optional|alternative|or)\\b"
         }
       ]
     },

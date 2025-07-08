@@ -1,0 +1,184 @@
+# SYLANG LANGUAGE SPECIFICATION
+# Complete syntax documentation for all Sylang Domain-Specific Languages
+
+## OVERVIEW
+Sylang is a family of domain-specific languages for safety-critical systems engineering.
+All Sylang files use indentation-based syntax (exactly 2 spaces per level, no tabs).
+
+## FILE EXTENSIONS & TYPES
+
+### Product Line Engineering (.ple)
+- **Extension**: `.ple`
+- **Top-level keyword**: `productline`
+- **Purpose**: Define product line architecture and metadata
+- **Keywords**: productline, domain, compliance, firstrelease, region
+
+### Feature Modeling (.fml) 
+- **Extension**: `.fml`
+- **Top-level keyword**: `systemfeatures`
+- **Purpose**: Define feature models and variability
+- **Keywords**: systemfeatures, feature, enables
+- **Variability types**: mandatory, optional, alternative, or
+
+### def function Modeling (.fun, .fma)
+- **Extensions**: `.fun`, `.fma`
+- **Top-level keyword**: `systemfunctions`
+- **Purpose**: Define system functions and their relationships
+- **Keywords**: systemfunctions, function, enables, allocatedto
+
+### Safety Engineering (.itm, .sgl, .haz, .rsk, .fsr)
+- **Extensions**: `.itm` (items), `.sgl` (safety goals), `.haz` (hazards), `.rsk` (risks), `.fsr` (functional safety requirements)
+- **Top-level keywords**: safetygoal, safetygoals, goal, functionalsafetyrequirements, requirement
+- **Keywords**: safety, hazard, risk, item, allocatedto, derivedfrom, satisfies, implements, severity, probability, controllability, verification, rationale, enabledby, verificationcriteria, criterion
+
+### Security Engineering (.tra, .thr, .sgo, .sre, .ast, .sec)
+- **Extensions**: `.tra` (threat analysis), `.thr` (threats), `.sgo` (security goals), `.sre` (security requirements), `.ast` (assets), `.sec` (security)
+- **Keywords**: security, threat, asset, tara, cybersecurity
+
+### Component Engineering (.cmp, .sub, .req)
+- **Extensions**: `.cmp` (components), `.sub` (subsystems), `.req` (requirements)
+- **Keywords**: component, subsystem, interface, protocol, direction, voltage, partof, implements, allocatedto, type, width, range, frequency, baudrate, resolution
+
+### Software Engineering (.mod, .prt)
+- **Extensions**: `.mod` (modules), `.prt` (parts)
+- **Keywords**: module, algorithm, service, execution, timing, priority, runtime, memory, cpu, schedule, interrupt, task, thread, process
+
+### Electronics Engineering (.ckt)
+- **Extension**: `.ckt` (circuits)
+- **Keywords**: circuit, voltage, current, power, frequency, package, pin, signal, analog, digital, ground, supply, reference, differential, singleended, impedance, capacitance, inductance, resistance
+
+### Mechanical Engineering (.asm)
+- **Extension**: `.asm` (assemblies)
+- **Keywords**: assembly, part, component, mechanism, actuator, sensor, bracket, housing, mounting, fastener, gear, spring, bearing, material, dimensions, weight, tolerance, finish, coating, hardness, strength, temperature_range, pressure_rating, lifecycle, maintenance
+
+## SYNTAX RULES
+
+### 1. INDENTATION
+- **CRITICAL**: Exactly 2 spaces per indentation level
+- **NO TABS ALLOWED**
+- **NO 1, 3, 4+ space indentation**
+
+### 2. IDENTIFIERS
+- **Unquoted names**: ElectricParkingBrakeSystem, EPBSystem, TestFeature1
+- **Start with uppercase or lowercase letter**
+- **Can contain letters, numbers, underscores**
+
+### 3. STRING VALUES
+- **Always quoted**: "EPB System", "Test description"
+- **Multiple values**: "val1", "val2", "val3"
+
+### 4. SAFETY LEVELS
+- **Unquoted keywords**: ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM
+
+### 5. FEATURE VARIABILITY TYPES
+- **mandatory**: Required feature
+- **optional**: Optional feature  
+- **alternative**: Exactly one from group must be selected
+- **or**: One or more from group can be selected
+
+### 6. CORE KEYWORDS (ALL FILES)
+- **name**: Human-readable name (quoted string)
+- **description**: Detailed description (quoted string)  
+- **owner**: Responsible party (quoted string or comma-separated)
+- **tags**: Categorization tags (comma-separated quoted strings)
+- **safetylevel**: Safety classification (ASIL-A/B/C/D or QM)
+
+## EXAMPLE SYNTAX
+
+### Product Line (.ple)
+```
+productline ElectricParkingBrakeSystem
+  description "A family of electronic parking brake systems"
+  owner "Chassis Team", "Braking Systems Group"
+  domain "automotive", "safety"
+  compliance "ISO 26262", "ASPICE"
+  firstrelease "2025-01-01"
+  tags "EPB", "brake", "electronic", "safety"
+  safetylevel ASIL-D
+  region "Global", "Europe", "North America"
+```
+
+### Features (.fml)
+```
+systemfeatures EPBFeatures
+  feature EPBSystem mandatory
+    name "EPB System"
+    description "The root feature for the entire EPB system"
+    owner "Systems Engineering"
+    tags "EPB", "root"
+    safetylevel ASIL-D
+
+    feature UserInterface mandatory
+      name "User Interface"
+      description "Driver interaction features"
+      
+      feature SwitchType alternative
+        name "Switch Type"
+        
+        feature PushPullSwitch alternative
+          name "Push-Pull Switch"
+          
+        feature RockerSwitch alternative
+          name "Rocker Switch"
+```
+
+### Functions (.fun)
+```
+systemfunctions EPBFunctions
+  def function CoreSystemOrchestrator
+    name "Core System Orchestrator"
+    description "Main orchestration engine"
+    owner "Systems Engineering"
+    tags "orchestration", "system"
+    safetylevel ASIL-D
+    enables EPBSystem
+```
+
+## VALIDATION RULES
+
+### 1. FILE-LEVEL CONSTRAINTS
+- **ONE top-level keyword per file**: Only one `productline` per .ple file, one `systemfeatures` per .fml file, etc.
+- **ONE file type per project**: Only one .ple file per workspace, only one .fml file per workspace
+- **CORRECT file extension**: `productline` only in .ple files, `systemfeatures` only in .fml files
+
+### 2. INDENTATION CONSTRAINTS  
+- **Exact 2-space indentation**: No 1, 3, 4+ spaces
+- **No tabs**: Only spaces for indentation
+- **Consistent hierarchy**: Child elements must be exactly one level deeper than parent
+
+### 3. KEYWORD CONSTRAINTS
+- **Valid keywords only**: Each file type has specific allowed keywords
+- **Lowercase keywords**: All keywords must be lowercase (except safety levels and variability types)
+- **No typos**: Strict spelling validation with suggestions
+
+### 4. FEATURE VARIABILITY CONSTRAINTS (.fml files)
+- **Mixed mandatory/optional**: Can mix mandatory and optional features
+- **Consistent alternative groups**: All siblings in alternative group must be "alternative"  
+- **Consistent or groups**: All siblings in or group must be "or"
+- **No mixing variability types**: Cannot mix alternative/or with each other
+
+### 5. STRUCTURAL ORDER (.ple files)
+- **Required order**: name → description → owner → domain → compliance → firstrelease → tags → safetylevel → region
+
+## ERROR TYPES
+
+### 1. SYNTAX ERRORS
+- Unknown keyword with suggestions
+- Invalid indentation (tabs, wrong spacing)
+- Wrong file extension for keyword
+
+### 2. STRUCTURAL ERRORS  
+- Multiple top-level keywords in same file
+- Multiple files of same type in project
+- Incorrect element ordering
+
+### 3. SEMANTIC ERRORS
+- Invalid safety level values
+- Inconsistent feature variability types
+- Missing required fields
+
+## COMPLETION & SNIPPETS
+- Context-aware completions based on current position
+- Tab navigation through snippet placeholders
+- File-type specific keyword suggestions
+- Template generation for common patterns 

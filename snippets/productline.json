@@ -3,14 +3,15 @@
     "prefix": "productline",
     "body": [
       "productline ${1:ProductLineName}",
-      "  description \"${2:A comprehensive description of the product line}\"",
-      "  owner \"${3:Team Name}\", \"${4:Department}\"",
-      "  domain \"${5:automotive}\", \"${6:safety}\"",
-      "  compliance \"${7:ISO 26262}\", \"${8:ASPICE}\"",
-      "  firstrelease \"${9:2025-01-01}\"",
-      "  tags \"${10:tag1}\", \"${11:tag2}\", \"${12:tag3}\"",
-      "  safetylevel ${13|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
-      "  region \"${14:Global}\", \"${15:Europe}\", \"${16:North America}\""
+      "  name \"${2:ProductLineName}\"",
+      "  description \"${3:A comprehensive description of the product line}\"",
+      "  owner \"${4:Team Name}\", \"${5:Department}\"",
+      "  domain \"${6:automotive}\", \"${7:safety}\"",
+      "  compliance \"${8:ISO 26262}\", \"${9:ASPICE}\"",
+      "  firstrelease \"${10:2025-01-01}\"",
+      "  tags \"${11:tag1}\", \"${12:tag2}\", \"${13:tag3}\"",
+      "  safetylevel ${14|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}",
+      "  region \"${15:Global}\", \"${16:Europe}\", \"${17:North America}\""
     ],
     "description": "Complete product line definition template"
   },
@@ -18,9 +19,10 @@
     "prefix": "ple",
     "body": [
       "productline ${1:Name}",
-      "  description \"${2:Description}\"",
-      "  owner \"${3:Team}\"",
-      "  safetylevel ${4|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+      "  name \"${2:Name}\"",
+      "  description \"${3:Description}\"",
+      "  owner \"${4:Team}\"",
+      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
     ],
     "description": "Basic product line structure"
   },

@@ -76,9 +76,11 @@
     "prefix": "feature",
     "body": [
       "feature ${1:FeatureName} ${2|mandatory,optional,alternative,or|}",
-      "  name \"${3:Display Name}\"",
-      "  description \"${4:Description}\"",
-      "  safetylevel ${5|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
+      "  name \"${3:Feature Name}\"",
+      "  description \"${4:Description of the feature}\"",
+      "  owner \"${5:Team Name}\"",
+      "  tags \"${6:tag1}\", \"${7:tag2}\"",
+      "  safetylevel ${8|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
     ],
     "description": "Basic feature structure"
   },
@@ -116,5 +118,43 @@
       "safetylevel ${1|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
     ],
     "description": "Feature safety level"
+  },
+  "Constraints Section": {
+    "prefix": "constraints",
+    "body": [
+      "constraints",
+      "  ${1:FeatureA} requires ${2:FeatureB}",
+      "  ${3:FeatureC} excludes ${4:FeatureD}",
+      "  ${0}"
+    ],
+    "description": "Complete constraints section with examples"
+  },
+  "Requires Constraint": {
+    "prefix": "requires",
+    "body": [
+      "${1:FeatureA} requires ${2:FeatureB}"
+    ],
+    "description": "Feature requires constraint"
+  },
+  "Excludes Constraint": {
+    "prefix": "excludes", 
+    "body": [
+      "${1:FeatureA} excludes ${2:FeatureB}"
+    ],
+    "description": "Feature excludes constraint"
+  },
+  "Requires Constraint Template": {
+    "prefix": "requires-template",
+    "body": [
+      "${1:SourceFeature} requires ${2:TargetFeature}"
+    ],
+    "description": "Feature requires constraint template"
+  },
+  "Excludes Constraint Template": {
+    "prefix": "excludes-template",
+    "body": [
+      "${1:SourceFeature} excludes ${2:TargetFeature}"
+    ],
+    "description": "Feature excludes constraint template"
   }
 } 

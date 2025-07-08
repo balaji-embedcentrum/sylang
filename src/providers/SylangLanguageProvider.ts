@@ -119,7 +119,7 @@ export class ConcreteSylangProvider extends SylangLanguageProvider {
     }
 }
 
-// Factory function for creating language providers - makes it easy to add new DSLs
+// Factory def function for creating language providers - makes it easy to add new DSLs
 export class LanguageProviderFactory {
     public static createProvider(
         languageId: string, 
