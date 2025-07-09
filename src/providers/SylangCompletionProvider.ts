@@ -267,7 +267,20 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
     }
 
     private getIndentLevel(line: string): number {
-        return line.length - line.trimStart().length;
+        const leadingWhitespace = line.match(/^(\s*)/)?.[1] || '';
+        
+        // If using tabs, count them directly
+        if (leadingWhitespace.includes('\t') && !leadingWhitespace.includes(' ')) {
+            return leadingWhitespace.length; // Each tab = 1 level
+        }
+        
+        // If using spaces, count groups of 2
+        if (leadingWhitespace.includes(' ') && !leadingWhitespace.includes('\t')) {
+            return Math.floor(leadingWhitespace.length / 2); // Each 2 spaces = 1 level
+        }
+        
+        // Mixed or no indentation
+        return 0;
     }
 
     private createTemplates(): void {

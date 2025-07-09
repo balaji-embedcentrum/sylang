@@ -1,0 +1,219 @@
+def hazardidentification InverterHazards
+	name "Automotive Inverter System - Comprehensive Hazard Identification"
+	description "Systematic identification of all potential hazards in the inverter system using FMEA and HAZOP methodologies"
+	hazardanalysis InverterSafety
+	methodology "FMEA", "HAZOP", "STPA"
+	
+	hazardcategories
+		category UncontrolledTorque
+			description "Inverter provides unintended or uncontrolled torque output"
+			severity "High potential for vehicle accidents and loss of control"
+			
+		category LossOfPropulsion
+			description "Inverter fails to provide required torque for vehicle propulsion"
+			severity "Risk of vehicle stopping unexpectedly in traffic"
+			
+		category ThermalHazards
+			description "Excessive temperature leading to component damage or fire"
+			severity "Risk of fire, toxic gas emission, or thermal injury"
+			
+		category ElectricalHazards
+			description "High voltage exposure or electrical faults"
+			severity "Risk of electric shock, burns, or electrocution"
+			
+		category ControlMalfunctions
+			description "Loss of proper motor control causing erratic behavior"
+			severity "Unpredictable vehicle behavior and potential accidents"
+			
+		category CommunicationFailures
+			description "Loss of communication with vehicle systems"
+			severity "Lack of coordination with other safety systems"
+
+	subsystemhazards
+		subsystem PowerConversion
+			def hazard H_PWR_001
+				name "Uncontrolled IGBT Switching"
+				description "IGBT switches activate without control commands"
+				cause "Gate driver failure, EMI interference, component degradation"
+				effect "Uncontrolled motor torque, potential vehicle acceleration"
+				category UncontrolledTorque
+				functions_affected "PowerElectronicsController", "MotorControlAlgorithmEngine"
+				
+			def hazard H_PWR_002
+				name "DC Bus Overvoltage"
+				description "DC bus voltage exceeds safe operating limits"
+				cause "Regenerative braking overcharge, voltage regulator failure"
+				effect "Component damage, insulation breakdown, fire risk"
+				category ElectricalHazards
+				functions_affected "PowerElectronicsController", "OvervoltageProtectionUnit"
+				
+			def hazard H_PWR_003
+				name "Power Stage Complete Failure"
+				description "Total loss of power electronics switching capability"
+				cause "Multiple IGBT failure, gate driver failure, power supply loss"
+				effect "Complete loss of motor control and propulsion"
+				category LossOfPropulsion
+				functions_affected "PowerElectronicsController", "SafetyMonitoringEngine"
+				
+			def hazard H_PWR_004
+				name "Short Circuit in Power Stage"
+				description "Electrical short circuit in high power switching circuit"
+				cause "Component failure, insulation breakdown, mechanical damage"
+				effect "High fault current, fire risk, component destruction"
+				category ElectricalHazards
+				functions_affected "ShortCircuitDetector", "OvercurrentProtectionUnit"
+
+		subsystem MotorControl
+			def hazard H_MOT_001
+				name "Torque Control Algorithm Failure"
+				description "Motor control algorithm produces incorrect torque commands"
+				cause "Software fault, calibration error, sensor input corruption"
+				effect "Unexpected vehicle acceleration or deceleration"
+				category UncontrolledTorque
+				functions_affected "MotorControlAlgorithmEngine", "TorqueManagementProcessor"
+				
+			def hazard H_MOT_002
+				name "Vector Control Instability"
+				description "Field-oriented control becomes unstable"
+				cause "Control parameter drift, feedback loop corruption"
+				effect "Motor torque oscillation, vehicle handling issues"
+				category ControlMalfunctions
+				functions_affected "MotorControlAlgorithmEngine", "TorqueManagementProcessor"
+				
+			def hazard H_MOT_003
+				name "Speed Control Runaway"
+				description "Speed control system commands excessive torque"
+				cause "Speed sensor failure, control logic error"
+				effect "Uncontrolled vehicle acceleration"
+				category UncontrolledTorque
+				functions_affected "SpeedRegulationController", "MotorControlAlgorithmEngine"
+				
+			def hazard H_MOT_004
+				name "Regenerative Braking Failure"
+				description "Loss of regenerative braking capability"
+				cause "Control algorithm failure, power stage fault"
+				effect "Increased braking distance, collision risk"
+				category LossOfPropulsion
+				functions_affected "RegenerativeBrakingController", "PowerElectronicsController"
+
+		subsystem ThermalManagement
+			def hazard H_THM_001
+				name "Cooling System Failure"
+				description "Loss of adequate cooling for power components"
+				cause "Coolant leak, pump failure, radiator blockage"
+				effect "Component overheating, thermal protection activation"
+				category ThermalHazards
+				functions_affected "ThermalManagementSystem", "CoolantFlowController"
+				
+			def hazard H_THM_002
+				name "Temperature Sensor Failure"
+				description "Incorrect temperature measurement"
+				cause "Sensor degradation, wiring fault, calibration drift"
+				effect "Inadequate thermal protection, potential overheating"
+				category ThermalHazards
+				functions_affected "ThermalProtectionMonitor", "TemperatureSensingInterface"
+				
+			def hazard H_THM_003
+				name "Thermal Runaway"
+				description "Uncontrolled temperature rise despite cooling"
+				cause "Excessive power dissipation, cooling system inadequacy"
+				effect "Component damage, fire risk, toxic gas emission"
+				category ThermalHazards
+				functions_affected "ThermalProtectionMonitor", "ThermalManagementSystem"
+
+		subsystem SafetySystems
+			def hazard H_SAF_001
+				name "Isolation Monitoring Failure"
+				description "Failure to detect high voltage isolation breakdown"
+				cause "Monitoring circuit failure, sensor degradation"
+				effect "Undetected isolation loss, electric shock risk"
+				category ElectricalHazards
+				functions_affected "IsolationMonitoringSystem", "SafetyMonitoringEngine"
+				
+			def hazard H_SAF_002
+				name "Overcurrent Protection Failure"
+				description "Failure to detect and limit excessive current"
+				cause "Current sensor failure, protection logic error"
+				effect "Component damage, fire risk from overcurrent"
+				category ElectricalHazards
+				functions_affected "OvercurrentProtectionUnit", "SafetyMonitoringEngine"
+				
+			def hazard H_SAF_003
+				name "Safety Monitoring System Failure"
+				description "Loss of overall safety monitoring capability"
+				cause "Processor failure, software fault, power loss"
+				effect "Loss of safety oversight, undetected hazardous conditions"
+				category ControlMalfunctions
+				functions_affected "SafetyMonitoringEngine", "PowerElectronicsController"
+
+		subsystem SensorInterfaces
+			def hazard H_SEN_001
+				name "Current Sensor Failure"
+				description "Incorrect or missing motor current measurements"
+				cause "Sensor degradation, EMI interference, wiring fault"
+				effect "Incorrect torque control, potential motor damage"
+				category ControlMalfunctions
+				functions_affected "CurrentSensingInterface", "MotorControlAlgorithmEngine"
+				
+			def hazard H_SEN_002
+				name "Position Sensor Failure"
+				description "Incorrect rotor position feedback"
+				cause "Sensor damage, magnetic interference, calibration loss"
+				effect "Loss of motor synchronization, torque disturbances"
+				category ControlMalfunctions
+				functions_affected "PositionSensingInterface", "MotorControlAlgorithmEngine"
+				
+			def hazard H_SEN_003
+				name "Sensor Signal Corruption"
+				description "Multiple sensor signals corrupted simultaneously"
+				cause "EMI burst, power supply noise, ground fault"
+				effect "Complete loss of motor control feedback"
+				category LossOfPropulsion
+				functions_affected "SensorInterfaceController", "SafetyMonitoringEngine"
+
+		subsystem CommunicationInterfaces
+			def hazard H_COM_001
+				name "CAN Bus Communication Loss"
+				description "Loss of communication with vehicle systems"
+				cause "Bus fault, connector corrosion, EMI interference"
+				effect "Loss of coordination with other vehicle systems"
+				category CommunicationFailures
+				functions_affected "CANBusController", "CommunicationInterface"
+				
+			def hazard H_COM_002
+				name "Message Corruption"
+				description "Corrupted control messages from vehicle systems"
+				cause "EMI interference, bus overload, connector issues"
+				effect "Incorrect torque commands, system coordination errors"
+				category ControlMalfunctions
+				functions_affected "CANBusController", "SafetyMonitoringEngine"
+
+		subsystem PowerModes
+			def hazard H_PWM_001
+				name "Unexpected Mode Transition"
+				description "Involuntary transition between power modes"
+				cause "Software fault, EMI interference, power supply glitch"
+				effect "Temporary loss of function, unexpected behavior"
+				category ControlMalfunctions
+				functions_affected "PowerModeManager", "SafetyMonitoringEngine"
+
+	environmentalconditions
+		condition LowTemperatureOperation
+			name "Low Temperature Operation"
+			description "Operation in extreme cold affecting component performance"
+			scenarios ExtremeLowTemperature
+			hazards H_PWR_003, H_PWM_001
+
+		condition HighTemperatureOperation
+			name "High Temperature Operation"  
+			description "Operation in extreme heat affecting cooling capacity"
+			scenarios ExtremeHighTemperature
+			hazards H_THM_003, H_THM_001
+
+		condition EMIEnvironment
+			name "High EMI Environment"
+			description "Strong electromagnetic interference affecting electronics"
+			scenarios NormalDrivingOperation, HighPerformanceDriving
+			hazards H_COM_001, H_SEN_003
+
+	standards "ISO 26262", "IEC 61508" 

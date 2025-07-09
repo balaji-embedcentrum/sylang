@@ -25,7 +25,7 @@ Your Sylang extension now supports **workspace-wide symbol indexing** with **Go 
 - `enabledby VehicleSpeedAnalyzer` → finds component definition
 - `allocatedto SystemMonitoringUnit` → jumps to component
 - `derivedfrom SG_EPB_001` → navigates to safety goal
-- `implements ActuatorSelectionLogic` → finds function definition
+- `implements ActuatorSelectionLogic` → finds def function definition
 - `partof ActuationControlSubsystem` → jumps to subsystem
 
 ## **🧪 Testing Instructions**

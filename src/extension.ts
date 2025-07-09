@@ -177,7 +177,7 @@ class SylangExtension {
         console.log(`[Sylang] - Starts with 'sylang-': ${languageId.startsWith('sylang-')}`);
         
         const sylangExtensions = ['.ple', '.fml', '.fun', '.sub', '.cmp', '.req', 
-                                 '.haz', '.rsk', '.fsr', '.tra', '.thr', '.sgo', 
+                                 '.haz', '.rsk', '.fsr', '.itm', '.sgl', '.tra', '.thr', '.sgo', 
                                  '.sre', '.ast', '.sec', '.mod', '.prt', '.ckt', '.asm'];
         const hasSylangExtension = sylangExtensions.some(ext => document.fileName.endsWith(ext));
         console.log(`[Sylang] - Has Sylang extension: ${hasSylangExtension}`);

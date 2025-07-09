@@ -1,0 +1,109 @@
+def safetygoals InverterSafetyGoals
+	name "Automotive Inverter System - Safety Goals and Requirements"
+	description "Safety goals derived from HARA and functional safety requirements per ISO 26262"
+	hazardanalysis InverterSafety
+	riskassessment InverterRiskAssessment
+	hazardidentification InverterHazards
+	
+	safetygoalsdef
+		methodology "Derived from HARA results per ISO 26262-3"
+		principle "One safety goal per hazardous event at vehicle level"
+		asilassignment "Based on risk assessment S×E×C determination"
+		verification "Each goal must be verifiable and measurable"
+
+	safetygoals	
+		def goal SG_INV_001
+			name "Prevention of Uncontrolled Vehicle Acceleration"
+			description "The inverter system shall not provide unintended torque output that could cause uncontrolled vehicle acceleration"
+			hazard H_PWR_001, H_MOT_001, H_MOT_003
+			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+			asil D
+			safetymeasures
+				def measure SM_001 "Redundant torque monitoring and validation"
+					enabledby PowerElectronicsController, MotorControlAlgorithmEngine
+				def measure SM_002 "Independent torque calculation and cross-checking"
+					enabledby TorqueManagementProcessor, SafetyMonitoringEngine
+				def measure SM_003 "Immediate torque shutoff capability"
+					enabledby SafetyMonitoringEngine, OvercurrentProtectionUnit
+				def measure SM_004 "Hardware-based torque limiting protection"
+					enabledby PowerElectronicsController, ShortCircuitDetector
+			
+		def goal SG_INV_002
+			name "Prevention of High Voltage Exposure"
+			description "The inverter system shall maintain electrical isolation and prevent exposure to dangerous high voltages"
+			hazard H_PWR_002, H_SAF_001, H_SAF_002
+			scenario SCEN_001_NormalDriving, SCEN_004_StartupShutdown
+			asil D
+			safetymeasures
+				def measure SM_005 "Continuous isolation resistance monitoring"
+					enabledby IsolationMonitoringSystem, SafetyMonitoringEngine
+				def measure SM_006 "Immediate shutdown upon isolation failure"
+					enabledby SafetyMonitoringEngine, PowerElectronicsController
+				def measure SM_007 "Redundant high voltage protection systems"
+					enabledby OvervoltageProtectionUnit, OvercurrentProtectionUnit
+				def measure SM_008 "Independent isolation monitoring circuits"
+					enabledby IsolationMonitoringSystem, ThermalProtectionMonitor
+				
+		def goal SG_INV_003
+			name "Prevention of Thermal Fire Hazard"
+			description "The inverter system shall prevent uncontrolled temperature rise that could lead to fire or toxic gas emission"
+			hazard H_THM_003, H_PWR_004
+			scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
+			asil C
+			safetymeasures
+				def measure SM_009 "Multi-level thermal protection with progressive derating"
+					enabledby ThermalProtectionMonitor, ThermalManagementSystem
+				def measure SM_010 "Independent temperature monitoring systems"
+					enabledby TemperatureSensingInterface, ThermalProtectionMonitor
+				def measure SM_011 "Thermal runaway detection and shutdown"
+					enabledby ThermalManagementSystem, SafetyMonitoringEngine
+				def measure SM_012 "Cooling system health monitoring"
+					enabledby CoolantFlowController, ThermalManagementSystem
+			
+		def goal SG_INV_004
+			name "Maintenance of Vehicle Propulsion Availability"
+			description "The inverter system shall maintain adequate propulsion capability to ensure vehicle mobility and traffic safety"
+			hazard H_PWR_003, H_SEN_003, H_MOT_004
+			scenario SCEN_001_NormalDriving, SCEN_003_RegenerativeBraking
+			asil B
+			safetymeasures
+				def measure SM_013 "Graceful degradation with reduced power mode"
+					enabledby PowerModeManager, SafetyMonitoringEngine
+				def measure SM_014 "Sensor redundancy and fusion for critical measurements"
+					enabledby SensorInterfaceController, CurrentSensingInterface, PositionSensingInterface
+				def measure SM_015 "Backup control algorithms for sensor failures"
+					enabledby MotorControlAlgorithmEngine, SensorInterfaceController
+				def measure SM_016 "Limp-home mode with basic propulsion capability"
+					enabledby PowerElectronicsController, PowerModeManager
+				
+		def goal SG_INV_005
+			name "Prevention of Motor Control Instability"
+			description "The inverter system shall provide stable motor control without oscillations or erratic behavior that could affect vehicle handling"
+			hazard H_MOT_002, H_SEN_001, H_SEN_002
+			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+			asil C
+			safetymeasures
+				def measure SM_017 "Control loop stability monitoring and compensation"
+					enabledby MotorControlAlgorithmEngine, TorqueManagementProcessor
+				def measure SM_018 "Sensor signal validation and filtering"
+					enabledby SensorInterfaceController, CurrentSensingInterface
+				def measure SM_019 "Adaptive control algorithms for varying conditions"
+					enabledby MotorControlAlgorithmEngine, SpeedRegulationController
+				def measure SM_020 "Predictable fallback control modes"
+					enabledby SafetyMonitoringEngine, MotorControlAlgorithmEngine
+			
+		def goal SG_INV_006
+			name "Reliable Communication with Vehicle Systems"
+			description "The inverter system shall maintain critical communication with vehicle systems for coordinated safety functions"
+			hazard H_COM_001, H_COM_002
+			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+			asil B
+			safetymeasures
+				def measure SM_021 "Communication watchdog and timeout protection"
+					enabledby CANBusController, CommunicationInterface
+				def measure SM_022 "Message validation and error detection"
+					enabledby CANBusController, SafetyMonitoringEngine
+				def measure SM_023 "Local autonomous operation during communication loss"
+					enabledby PowerElectronicsController, SafetyMonitoringEngine
+				def measure SM_024 "Redundant communication paths for critical messages"
+					enabledby CommunicationInterface, EthernetProcessor 

@@ -1,0 +1,9 @@
+productlne TestProject
+  descriptio "Test project with typos"
+  ower "Test Owner"
+  dmain "automotive"
+  compilance "ISO 26262"
+  firstrlease "2024-01-01"
+  tgs "test", "typo"
+  safetylvel ASIL-B
+  regon "Global" 

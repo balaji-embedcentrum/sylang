@@ -30,7 +30,7 @@
 
 ### 🎯 **Comprehensive Snippets**
 - ✅ **Product Line templates** with full property sets
-- ✅ **Function definition templates** with enables relationships
+- ✅ **def function definition templates** with enables relationships
 - ✅ **Feature modeling templates** with variability types
 - ✅ **Safety element templates** (goals, hazards, risks, requirements)
 - ✅ **Security element templates** (threats, assets, TARA, requirements)
@@ -78,7 +78,7 @@ LanguageProviderFactory.registerNewDSL(config);
 | Extension | Type | Description |
 |-----------|------|-------------|
 | `.ple` | Product Line | Product family definitions |
-| `.fun` | Functions | System function specifications |
+| `.fun` | Functions | System def function specifications |
 | `.fml` | Features | Feature models with variability |
 | `.itm/.sgl/.haz/.rsk/.fsr` | Safety | ISO 26262 safety analysis |
 | `.tra/.thr/.sgo/.sre/.ast/.sec` | Security | Cybersecurity analysis |

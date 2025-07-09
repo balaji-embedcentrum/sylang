@@ -51,3 +51,4 @@ jspm_packages/
 # Test files (keeping some sample files but excluding test outputs)
 test-*.fsr
 debug-*.fsr 
+sampleproject/

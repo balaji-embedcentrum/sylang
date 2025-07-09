@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { BaseValidator } from '../languages/base/BaseValidator';
 import { FeaturesValidator } from '../languages/features/FeaturesValidator';
-import { ProductLineValidator } from '../languages/productline/ProductLineValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
+import { SafetyValidator } from '../languages/safety/SafetyValidator';
+import { ProductLineValidator } from '../languages/productline/ProductLineValidator';
 import { getLanguageConfig } from '../config/LanguageConfigs';
 
 export class ValidationEngine {
@@ -15,7 +16,7 @@ export class ValidationEngine {
     }
 
     private initializeValidators(): void {
-        // Initialize validators for each file type
+        // Initialize validators for each file type using LanguageConfigs
         try {
             const featuresConfig = getLanguageConfig('sylang-features');
             if (featuresConfig) {
@@ -32,6 +33,7 @@ export class ValidationEngine {
                 this.validators.set('sylang-functions', new FunctionsValidator(functionsConfig));
             }
 
+            // For safety files, we'll handle them separately in validateDocument
             console.log('[ValidationEngine] Initialized validators for:', Array.from(this.validators.keys()));
         } catch (error) {
             console.error('[ValidationEngine] Error initializing validators:', error);
@@ -45,18 +47,32 @@ export class ValidationEngine {
             console.log(`[ValidationEngine] Validating: ${document.fileName}`);
             console.log(`[ValidationEngine] Language ID: ${document.languageId}`);
 
-            // Get the appropriate validator for this file type
-            const validator = this.validators.get(document.languageId);
-            
-            if (!validator) {
-                console.log(`[ValidationEngine] No validator found for language: ${document.languageId}`);
-                this.diagnosticCollection.set(document.uri, []);
-                return;
-            }
+            let diagnostics: vscode.Diagnostic[] = [];
 
-            // Run validation
-            console.log(`[ValidationEngine] Running validation with ${validator.constructor.name}`);
-            const diagnostics = await validator.validate(document);
+            // Check if it's a safety file (by extension)
+            const fileName = document.fileName;
+            const extension = fileName.split('.').pop();
+            const safetyExtensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo'];
+            
+            if (safetyExtensions.includes(extension || '')) {
+                // Use simple SafetyValidator for all safety files
+                const safetyValidator = new SafetyValidator();
+                console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);
+                diagnostics = await safetyValidator.validate(document);
+            } else {
+                // Get the appropriate validator for this file type
+                const validator = this.validators.get(document.languageId);
+                
+                if (!validator) {
+                    console.log(`[ValidationEngine] No validator found for language: ${document.languageId}`);
+                    this.diagnosticCollection.set(document.uri, []);
+                    return;
+                }
+
+                // Run validation
+                console.log(`[ValidationEngine] Running validation with ${validator.constructor.name}`);
+                diagnostics = await validator.validate(document);
+            }
 
             // Set diagnostics
             this.diagnosticCollection.set(document.uri, diagnostics);
@@ -74,7 +90,7 @@ export class ValidationEngine {
 
     public async validateWorkspace(): Promise<void> {
         try {
-            const sylangFiles = await vscode.workspace.findFiles('**/*.{ple,fml,fun,sub,cmp,req,haz,rsk,fsr,ast,sec,sgo}', '**/node_modules/**');
+            const sylangFiles = await vscode.workspace.findFiles('**/*.{ple,fml,fun,sub,cmp,req,haz,rsk,fsr,itm,sgl,ast,sec,sgo}', '**/node_modules/**');
             
             console.log(`[ValidationEngine] Validating ${sylangFiles.length} Sylang files in workspace`);
             
@@ -91,4 +107,4 @@ export class ValidationEngine {
         this.diagnosticCollection.dispose();
         console.log('[ValidationEngine] Disposed');
     }
-} 
+}

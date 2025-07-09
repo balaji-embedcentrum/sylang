@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sylang - Systems and Safety Engineering Language</title>
+    <meta name="description" content="Sylang is a domain-specific language for Model Based Systems Engineering (MBSE) in safety-critical industries: Automotive, Aerospace, and Medical devices.">
+    <meta name="keywords" content="Sylang, Systems Engineering, Safety Engineering, MBSE, Model Based Systems Engineering, Automotive, Aerospace, Medical, ISO 26262, DO-178C, IEC 62304">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../icon.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --background-color: #ffffff;
+            --sidebar-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --code-bg: #1e293b;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #60a5fa;
+            --primary-dark: #3b82f6;
+            --secondary-color: #94a3b8;
+            --accent-color: #22d3ee;
+            --background-color: #0f172a;
+            --sidebar-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --code-bg: #0f172a;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tagline {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-item.sub-item {
+            padding-left: 2.5rem;
+            font-size: 0.8125rem;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            min-height: 100vh;
+            min-width: 0; /* Prevents flex item from overflowing */
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--background-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--sidebar-bg);
+        }
+
+        .content-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        /* Typography */
+        .content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .content h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 3rem 0 1.5rem;
+            line-height: 1.3;
+            scroll-margin-top: 2rem;
+        }
+
+        .content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 2.5rem 0 1rem;
+            line-height: 1.4;
+            scroll-margin-top: 2rem;
+        }
+
+        .content h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 2rem 0 1rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .content strong {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content ul, .content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .content li strong {
+            color: var(--primary-color);
+        }
+
+        /* Code blocks */
+        .content pre {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .content pre {
+            background: #0f172a;
+            border-color: #1e293b;
+        }
+
+        .content code {
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.875rem;
+        }
+
+        .content p code {
+            background: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .content p code {
+            background: #334155;
+            color: #60a5fa;
+        }
+
+        /* Links */
+        .content a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Tables */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: var(--background-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .content th, .content td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content th {
+            background: var(--sidebar-bg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Feature cards */
+        .feature-card {
+            background: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .feature-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .main-content {
+                margin-left: 280px;
+            }
+
+            .content-wrapper {
+                max-width: 900px;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .content-wrapper {
+                padding: 1rem;
+            }
+
+            .content h1 {
+                font-size: 2rem;
+            }
+
+            .content h2 {
+                font-size: 1.5rem;
+            }
+
+            .hero {
+                margin: -1.5rem -1rem 2rem;
+                padding: 2rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content-wrapper {
+                padding: 0.75rem;
+            }
+
+            .hero {
+                margin: -0.75rem -0.75rem 1.5rem;
+                padding: 1.5rem 0.75rem;
+            }
+
+            .content h1 {
+                font-size: 1.75rem;
+            }
+
+            .content h2 {
+                font-size: 1.25rem;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        /* Scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hero section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 3rem 0;
+            margin: -2rem -2rem 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .hero::before {
+            background: linear-gradient(135deg, #1e40af 0%, #0891b2 100%);
+        }
+
+        .hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+        }
+
+        /* Feature grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <img src="../icon.png" alt="Sylang Logo" />
+                    </div>
+                    <div class="logo-text">Sylang</div>
+                </div>
+                <div class="tagline">Systems & Safety Engineering</div>
+            </div>
+            <div class="nav-menu" id="nav-menu">
+                <!-- Navigation will be generated dynamically -->
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+                <button class="theme-toggle" id="theme-toggle">🌓</button>
+            </div>
+            <div class="content-wrapper">
+                <div class="loading" id="loading">Loading documentation...</div>
+                <div class="content" id="content" style="display: none;">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+    <script>
+        class SylangDocs {
+            constructor() {
+                this.content = null;
+                this.navigation = [];
+                this.isDarkMode = this.getStoredTheme() === 'dark' || 
+                    (!this.getStoredTheme() && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                this.init();
+            }
+
+            async init() {
+                try {
+                    this.initializeTheme();
+                    await this.loadMarkdown();
+                    this.generateNavigation();
+                    this.renderContent();
+                    this.bindEvents();
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Error loading documentation:', error);
+                    document.getElementById('loading').textContent = 'Error loading documentation. Please try again.';
+                }
+            }
+
+            getStoredTheme() {
+                return localStorage.getItem('sylang-theme');
+            }
+
+            initializeTheme() {
+                if (this.isDarkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+                
+                // Update toggle button
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.textContent = this.isDarkMode ? '☀️' : '🌙';
+                }
+            }
+
+            async loadMarkdown() {
+                const response = await fetch('content.md');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const markdown = await response.text();
+                this.content = marked.parse(markdown);
+            }
+
+            generateNavigation() {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = this.content;
+                
+                const headers = tempDiv.querySelectorAll('h1, h2, h3, h4');
+                this.navigation = Array.from(headers).map((header, index) => {
+                    const id = this.generateId(header.textContent);
+                    header.id = id;
+                    
+                    return {
+                        id,
+                        text: header.textContent,
+                        level: parseInt(header.tagName.charAt(1)),
+                        element: header
+                    };
+                });
+
+                this.content = tempDiv.innerHTML;
+                this.renderNavigation();
+            }
+
+            generateId(text) {
+                return text
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .trim();
+            }
+
+            renderNavigation() {
+                const navMenu = document.getElementById('nav-menu');
+                navMenu.innerHTML = '';
+
+                this.navigation.forEach(item => {
+                    const link = document.createElement('a');
+                    link.href = `#${item.id}`;
+                    link.textContent = item.text;
+                    link.className = `nav-item ${item.level > 2 ? 'sub-item' : ''}`;
+                    link.onclick = (e) => this.handleNavClick(e, item.id);
+                    navMenu.appendChild(link);
+                });
+
+                // Re-bind mobile menu close events after navigation is rendered
+                this.bindMobileNavClose();
+            }
+
+            bindMobileNavClose() {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (window.innerWidth <= 768) {
+                            document.getElementById('sidebar').classList.remove('open');
+                        }
+                    });
+                });
+            }
+
+            renderContent() {
+                const contentEl = document.getElementById('content');
+                
+                // Add hero section for the main title
+                if (this.content.includes('<h1>Sylang</h1>')) {
+                    this.content = this.content.replace(
+                        '<h1>Sylang</h1>\n<p><strong>Systems and Safety Engineering Language</strong></p>',
+                        `
+                        <div class="hero">
+                            <h1>Sylang</h1>
+                            <p><strong>Systems and Safety Engineering Language</strong></p>
+                            <p>Model Based Systems Engineering for Safety-Critical Industries</p>
+                        </div>
+                        `
+                    );
+                }
+
+                contentEl.innerHTML = this.content;
+                
+                // Highlight code blocks
+                Prism.highlightAllUnder(contentEl);
+            }
+
+            handleNavClick(e, targetId) {
+                e.preventDefault();
+                
+                // Update active state
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                e.target.classList.add('active');
+
+                // Smooth scroll to target
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+
+            bindEvents() {
+                // Handle scroll for active navigation
+                window.addEventListener('scroll', () => this.handleScroll());
+                
+                // Handle resize for responsive behavior
+                window.addEventListener('resize', () => this.handleResize());
+                
+                // Theme toggle
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', () => this.toggleTheme());
+                }
+                
+                // Mobile menu toggle
+                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                const sidebar = document.getElementById('sidebar');
+                if (mobileMenuBtn && sidebar) {
+                    mobileMenuBtn.addEventListener('click', () => {
+                        sidebar.classList.toggle('open');
+                    });
+                    
+                    // Close sidebar when clicking outside on mobile
+                    document.addEventListener('click', (e) => {
+                        if (window.innerWidth <= 768 && 
+                            !sidebar.contains(e.target) && 
+                            !mobileMenuBtn.contains(e.target) &&
+                            sidebar.classList.contains('open')) {
+                            sidebar.classList.remove('open');
+                        }
+                    });
+                }
+                
+
+            }
+
+            toggleTheme() {
+                this.isDarkMode = !this.isDarkMode;
+                
+                if (this.isDarkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('sylang-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('sylang-theme', 'light');
+                }
+                
+                // Update toggle button
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.textContent = this.isDarkMode ? '☀️' : '🌙';
+                }
+            }
+
+            handleScroll() {
+                const scrollY = window.scrollY;
+                const headerOffset = 100;
+                
+                let activeId = null;
+                
+                this.navigation.forEach(item => {
+                    const element = document.getElementById(item.id);
+                    if (element) {
+                        const offsetTop = element.offsetTop - headerOffset;
+                        if (scrollY >= offsetTop) {
+                            activeId = item.id;
+                        }
+                    }
+                });
+
+                // Update active navigation item
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === `#${activeId}`) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            handleResize() {
+                // Handle mobile navigation if needed
+                if (window.innerWidth <= 768) {
+                    // Mobile-specific logic can go here
+                }
+            }
+
+            hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            }
+        }
+
+        // Initialize the documentation site
+        document.addEventListener('DOMContentLoaded', () => {
+            new SylangDocs();
+        });
+
+        // Configure Prism for custom Sylang syntax highlighting
+        Prism.languages.sylang = {
+            'keyword': /\b(?:safetygoal|component|hazard|functionalrequirement|systemfeatures|productline|systemfunctions|interfaces|interface|safetymeasures|measure|verificationcriteria|criterion|specification|feature|safetygoals|goal|functions_affected|name|description|safetylevel|allocatedto|derivedfrom|owner|cause|effect|category|severity|probability|controllability|effectiveness|method|acceptance|satisfies|implements|partof|type|direction|protocol|voltage|width|range|rationale|mandatory|optional|alternative|firstrelease|region|domain|compliance|tags|enables)\b/,
+            'safety-level': /\b(?:ASIL-[A-D]|QM|DAL-[A-E]|SIL-[1-4])\b/,
+            'identifier': /\b[A-Z][A-Z0-9_]*\b/,
+            'string': /"(?:[^"\\]|\\.)*"/,
+            'number': /\b\d+(?:\.\d+)?\b/,
+            'punctuation': /[{}[\];(),.:]/
+        };
+    </script>
+</body>
+</html> 

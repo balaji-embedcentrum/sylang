@@ -1,0 +1,26 @@
+{
+  "name": "sylang-website",
+  "version": "1.0.0",
+  "description": "Official website for Sylang - Systems and Safety Engineering Language",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "npx http-server -p 8000 -c-1",
+    "build": "echo 'No build process needed - static files ready for deployment'",
+    "deploy": "echo 'Copy files to your hosting provider'"
+  },
+  "keywords": [
+    "sylang",
+    "systems-engineering", 
+    "safety-engineering",
+    "mbse",
+    "documentation",
+    "static-site"
+  ],
+  "author": "Embed Centrum",
+  "license": "MIT",
+  "homepage": "https://sylang.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/balaji-embedcentrum/sylang"
+  }
+} 

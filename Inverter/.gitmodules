@@ -1,0 +1,12 @@
+# Root level git submodules for the entire project
+# Example submodules that span multiple domains:
+
+# [submodule "shared-standards"]
+#     path = shared-standards
+#     url = https://github.com/yourorg/iso26262-templates.git
+#     branch = main
+
+# [submodule "common-libraries"] 
+#     path = common-libraries
+#     url = https://github.com/yourorg/sylang-common.git
+#     branch = main
