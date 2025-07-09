@@ -1,0 +1,10 @@
+def productline AutomotiveInverter
+	name "Automotive Electric Vehicle Inverter"
+	description "High-performance automotive inverter system for electric vehicle propulsion and power management"
+	owner "Power Electronics Team", "Controls Team"
+	domain "automotive", "electric-vehicle", "power-electronics"
+	compliance "ISO 26262", "ASPICE", "IEC 61508"
+	firstrelease "2025-03-01"
+	tags "inverter", "electric-vehicle", "power-electronics", "automotive", "ASIL-D"
+	safetylevel ASIL-D
+	region "Global", "Europe", "North America", "Asia"

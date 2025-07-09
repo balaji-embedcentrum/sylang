@@ -1,0 +1,8 @@
+productline TestProductLine1
+  description "First productline"
+ owner "Team A"  // Wrong indentation (1 space instead of 2)
+  domain "automotive"
+
+productline TestProductLine2  // ERROR: Second productline keyword in same file
+  description "Second productline"
+  owner "Team B" 

@@ -1,0 +1,40 @@
+systemfeatures TestFeatures
+  feature TestFeature mandatory
+    name "Test Feature"
+    description "Testing all validation fixes"
+    owner "Test Team"
+    safetylevel ASIL-B
+
+  feature OptionalFeature optional
+    name "Optional Feature"
+    description "An optional feature"
+    owner "Test Team"
+    safetylevel QM
+
+  feature OptionalFeature optional
+    name "Duplicate Feature"
+    description "This should trigger duplicate identifier error"
+    owner "Test Team"
+    safetylevel QM
+
+  feature AlternativeGroup alternative
+    name "Alternative Group"
+    description "Group of alternatives"
+    owner "Test Team"
+    safetylevel ASIL-A
+
+    feature Option1 alternative
+      name "Option 1"
+      description "First option"
+      safetylevel QM
+
+    feature Option2 alternative
+      name "Option 2"
+      description "Second option"
+      safetylevel QM
+
+  constraints
+    TestFeature requires OptionalFeature
+    Option1 excludes Option2
+    NonExistentFeature requires TestFeature
+    TestFeature excludes UndefinedFeature 

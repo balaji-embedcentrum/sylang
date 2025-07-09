@@ -1,0 +1,21 @@
+# Windsurf Rules for component-engineering
+
+## Domain: Component Engineering
+
+Focus on component teams own & control with expertise in:
+- Sylang .cmp, .sub, .req, .mod, .prt, .ckt, .asm files
+- Engineering best practices for this domain
+- Safety-critical systems development
+- Cross-domain traceability
+
+## Key Responsibilities:
+- Electronics
+- Mechanical
+- Software
+
+Generate code that follows:
+1. Domain-specific engineering patterns
+2. Proper safety annotations (ASIL levels)
+3. Clear ownership and responsibility
+4. Traceability to requirements
+5. Compliance with relevant standards

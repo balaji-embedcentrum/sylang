@@ -238,22 +238,28 @@ export abstract class BaseValidator {
         this.diagnostics.push(diagnostic);
     }
 
-    // Basic indentation validation - checks for tabs vs spaces
+    // Basic indentation validation - accepts both tabs OR 2-space indentation
     protected validateBasicIndentation(line: string, lineIndex: number): void {
         const trimmedLine = line.trim();
         if (trimmedLine.length === 0 || trimmedLine.startsWith('//')) return;
 
         const leadingWhitespace = line.match(/^(\s*)/)?.[1] || '';
-        
-        // Check if there are any spaces in the leading whitespace
-        if (leadingWhitespace.includes(' ')) {
-            this.addDiagnostic(lineIndex, 0, leadingWhitespace.length, 'Use tabs for indentation, not spaces. Each indentation level should be one tab.', 'spaces-not-allowed');
-        }
+        if (leadingWhitespace.length === 0) return; // No indentation to validate
         
         // Check if tabs and spaces are mixed
         if (leadingWhitespace.includes('\t') && leadingWhitespace.includes(' ')) {
-            this.addDiagnostic(lineIndex, 0, leadingWhitespace.length, 'Do not mix tabs and spaces for indentation. Use only tabs.', 'mixed-indentation');
+            this.addDiagnostic(lineIndex, 0, leadingWhitespace.length, 'Do not mix tabs and spaces for indentation. Use either tabs OR 2-space indentation consistently.', 'mixed-indentation');
+            return;
         }
+        
+        // If using spaces, validate they are in groups of 2
+        if (leadingWhitespace.includes(' ') && !leadingWhitespace.includes('\t')) {
+            if (leadingWhitespace.length % 2 !== 0) {
+                this.addDiagnostic(lineIndex, 0, leadingWhitespace.length, 'When using spaces for indentation, use exactly 2 spaces per indentation level. Tabs are also acceptable.', 'invalid-space-indentation');
+            }
+        }
+        
+        // If using tabs, that's fine (no additional validation needed)
     }
 
     // Common property validation for all file types
@@ -267,9 +273,20 @@ export abstract class BaseValidator {
 
     // Utility methods
     protected getIndentLevel(line: string): number {
-        // Count number of leading tabs
-        const match = line.match(/^(\t*)/);
-        return match && match[1] ? match[1].length : 0;
+        const leadingWhitespace = line.match(/^(\s*)/)?.[1] || '';
+        
+        // If using tabs, count them directly
+        if (leadingWhitespace.includes('\t') && !leadingWhitespace.includes(' ')) {
+            return leadingWhitespace.length; // Each tab = 1 level
+        }
+        
+        // If using spaces, count groups of 2
+        if (leadingWhitespace.includes(' ') && !leadingWhitespace.includes('\t')) {
+            return Math.floor(leadingWhitespace.length / 2); // Each 2 spaces = 1 level
+        }
+        
+        // Mixed or no indentation
+        return 0;
     }
 
     protected extractSafetyLevel(line: string): string | null {

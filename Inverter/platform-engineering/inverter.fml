@@ -1,0 +1,249 @@
+def systemfeatures InverterFeatures
+	def feature InverterSystem mandatory
+		name "Inverter System"
+		description "Root feature for automotive electric vehicle inverter system"
+		owner "Power Electronics Team"
+		tags "inverter", "root-feature"
+		safetylevel ASIL-D
+
+		def feature PowerConversion mandatory
+			name "Power Conversion System"
+			description "Core DC to AC power conversion functionality for electric motor drive"
+			owner "Power Electronics Team"
+			tags "power-conversion", "DC-AC", "switching"
+			safetylevel ASIL-D
+
+			def feature DCBusManagement or
+				name "DC Bus Management"
+				description "High-voltage DC bus voltage regulation and management system"
+				owner "Power Electronics Team"
+				tags "DC-bus", "voltage-regulation", "capacitor-management"
+				safetylevel ASIL-D
+
+			def feature IGBTDrivers or
+				name "IGBT Driver Circuits"
+				description "Gate driver circuits for IGBT power switching devices"
+				owner "Power Electronics Team"
+				tags "IGBT", "gate-drivers", "switching-control"
+				safetylevel ASIL-D
+
+		def feature MotorControl optional
+			name "Motor Control System"
+			description "Advanced motor control algorithms and field-oriented control"
+			owner "Controls Team"
+			tags "motor-control", "FOC", "vector-control"
+			safetylevel ASIL-D
+
+			def feature VectorControl mandatory
+				name "Vector Control Algorithm"
+				description "Field-oriented control for precise torque and speed regulation"
+				owner "Controls Team"
+				tags "vector-control", "FOC", "torque-control"
+				safetylevel ASIL-D
+
+			def feature SpaceVectorPWM mandatory
+				name "Space Vector PWM"
+				description "Space vector pulse width modulation for efficient motor drive"
+				owner "Controls Team"
+				tags "SVPWM", "PWM", "modulation"
+				safetylevel ASIL-C
+
+			def feature TorqueControl mandatory
+				name "Torque Control System"
+				description "Precise torque control and torque vectoring capabilities"
+				owner "Controls Team"
+				tags "torque-control", "torque-vectoring", "precision"
+				safetylevel ASIL-D
+
+			def feature SpeedControl optional
+				name "Speed Control System"
+				description "Motor speed regulation and cruise control support"
+				owner "Controls Team"
+				tags "speed-control", "regulation", "cruise-support"
+				safetylevel ASIL-C
+
+		def feature ThermalManagement mandatory
+			name "Thermal Management System"
+			description "Active thermal monitoring and cooling system management"
+			owner "Thermal Team"
+			tags "thermal", "cooling", "temperature-monitoring"
+			safetylevel ASIL-C
+
+			def feature CoolingMethod alternative
+				name "Cooling Method"
+				description "Choose primary cooling method"
+				owner "Thermal Team"
+				tags "cooling-method"
+				safetylevel ASIL-C
+
+				def feature CoolantControl alternative
+					name "Coolant Flow Control"
+					description "Liquid cooling system control and pump management"
+					owner "Thermal Team"
+					tags "coolant", "liquid-cooling", "pump-control"
+					safetylevel ASIL-B
+
+				def feature FanControl alternative
+					name "Cooling Fan Control"
+					description "Variable speed fan control for air cooling management"
+					owner "Thermal Team"
+					tags "fan-control", "air-cooling", "variable-speed"
+					safetylevel QM
+
+		def feature SafetySystems mandatory
+			name "Functional Safety Systems"
+			description "Comprehensive safety monitoring and fault management"
+			owner "Safety Team"
+			tags "safety", "fault-detection", "ASIL-D"
+			safetylevel ASIL-D
+
+			def feature OvervoltageProtection mandatory
+				name "Overvoltage Protection"
+				description "DC bus and AC output overvoltage protection systems"
+				owner "Safety Team"
+				tags "overvoltage", "protection", "safety"
+				safetylevel ASIL-D
+
+			def feature OvercurrentProtection mandatory
+				name "Overcurrent Protection"
+				description "Phase current and DC bus overcurrent protection"
+				owner "Safety Team"
+				tags "overcurrent", "protection", "current-limiting"
+				safetylevel ASIL-D
+
+			def feature ShortCircuitProtection mandatory
+				name "Short Circuit Protection"
+				description "Fast short circuit detection and protection system"
+				owner "Safety Team"
+				tags "short-circuit", "protection", "fast-detection"
+				safetylevel ASIL-D
+
+			def feature OvertemperatureProtection mandatory
+				name "Overtemperature Protection"
+				description "Junction and coolant temperature monitoring and protection"
+				owner "Safety Team"
+				tags "overtemperature", "thermal-protection", "monitoring"
+				safetylevel ASIL-C
+
+			def feature IsolationMonitoring mandatory
+				name "Isolation Monitoring"
+				description "High-voltage isolation monitoring and fault detection"
+				owner "Safety Team"
+				tags "isolation", "HV-monitoring", "insulation"
+				safetylevel ASIL-D
+
+		def feature CommunicationInterfaces mandatory
+			name "Communication Interfaces"
+			description "Vehicle network communication and data exchange"
+			owner "Communication Team"
+			tags "communication", "CAN", "vehicle-network"
+			safetylevel ASIL-C
+
+			def feature CANInterface mandatory
+				name "CAN Bus Interface"
+				description "Controller Area Network interface for vehicle communication"
+				owner "Communication Team"
+				tags "CAN", "bus-interface", "automotive"
+				safetylevel ASIL-C
+
+			def feature EthernetInterface optional
+				name "Automotive Ethernet"
+				description "High-speed Ethernet interface for advanced diagnostics"
+				owner "Communication Team"
+				tags "ethernet", "diagnostics", "high-speed"
+				safetylevel QM
+
+		def feature Diagnostics mandatory
+			name "Diagnostic Systems"
+			description "Comprehensive system diagnostics and fault reporting"
+			owner "Diagnostics Team"
+			tags "diagnostics", "fault-reporting", "OBD"
+			safetylevel ASIL-C
+
+			def feature OBDCompliance mandatory
+				name "OBD-II Compliance"
+				description "On-board diagnostics compliance for regulatory requirements"
+				owner "Diagnostics Team"
+				tags "OBD", "compliance", "regulations"
+				safetylevel ASIL-C
+
+			def feature FaultMemory mandatory
+				name "Fault Memory Management"
+				description "Non-volatile fault memory storage and retrieval system"
+				owner "Diagnostics Team"
+				tags "fault-memory", "non-volatile", "storage"
+				safetylevel ASIL-C
+
+		def feature SensorInterfaces mandatory
+			name "Sensor Interface Systems"
+			description "Interfaces for position, current, and temperature sensors"
+			owner "Sensor Team"
+			tags "sensors", "interfaces", "measurement"
+			safetylevel ASIL-D
+
+			def feature CurrentSensing mandatory
+				name "Current Sensing"
+				description "Phase current measurement using hall-effect sensors"
+				owner "Sensor Team"
+				tags "current-sensing", "hall-effect", "measurement"
+				safetylevel ASIL-D
+
+			def feature PositionSensing mandatory
+				name "Position Sensing"
+				description "Rotor position sensing using resolver or encoder"
+				owner "Sensor Team"
+				tags "position-sensing", "resolver", "encoder"
+				safetylevel ASIL-D
+
+			def feature TemperatureSensing mandatory
+				name "Temperature Sensing"
+				description "IGBT junction and coolant temperature measurement"
+				owner "Sensor Team"
+				tags "temperature-sensing", "thermal-monitoring", "NTC"
+				safetylevel ASIL-C
+
+		def feature PowerModes mandatory
+			name "Power Mode Management"
+			description "System power state management and energy optimization"
+			owner "Power Management Team"
+			tags "power-modes", "energy-optimization", "state-management"
+			safetylevel ASIL-B
+
+			def feature SleepMode optional
+				name "Sleep Mode"
+				description "Low-power sleep mode for energy conservation"
+				owner "Power Management Team"
+				tags "sleep-mode", "low-power", "energy-saving"
+				safetylevel QM
+
+		def feature RegenerativeBraking optional
+			name "Regenerative Braking"
+			description "Energy recovery during braking and deceleration"
+			owner "Controls Team"
+			tags "regenerative-braking", "energy-recovery", "efficiency"
+			safetylevel ASIL-C
+
+		def feature EMCCompliance mandatory
+			name "EMC Compliance"
+			description "Electromagnetic compatibility and interference management"
+			owner "EMC Team"
+			tags "EMC", "electromagnetic", "compliance"
+			safetylevel QM
+
+			def feature EMIFiltering mandatory
+				name "EMI Filtering"
+				description "Electromagnetic interference filtering and suppression"
+				owner "EMC Team"
+				tags "EMI", "filtering", "suppression"
+				safetylevel QM
+
+	constraints
+		requires PowerConversion, MotorControl, SafetySystems, SensorInterfaces
+		requires VectorControl when MotorControl
+		requires IGBTDrivers when PowerConversion
+		requires CurrentSensing and PositionSensing when MotorControl
+		requires OvervoltageProtection and OvercurrentProtection when SafetySystems
+		requires CANInterface when CommunicationInterfaces
+		requires OBDCompliance when Diagnostics
+		excludes CoolantControl and FanControl
+		excludes SleepMode when RegenerativeBraking

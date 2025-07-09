@@ -142,8 +142,9 @@ systemfunctions EPBFunctions
 - **CORRECT file extension**: `productline` only in .ple files, `systemfeatures` only in .fml files
 
 ### 2. INDENTATION CONSTRAINTS  
-- **Exact 2-space indentation**: No 1, 3, 4+ spaces
-- **No tabs**: Only spaces for indentation
+- **Flexible indentation**: Use either tabs OR 2-space indentation consistently
+- **No mixing**: Don't mix tabs and spaces in the same file
+- **Consistent depth**: Each level must be exactly 1 tab OR 2 spaces deeper
 - **Consistent hierarchy**: Child elements must be exactly one level deeper than parent
 
 ### 3. KEYWORD CONSTRAINTS

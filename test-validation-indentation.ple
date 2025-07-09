@@ -1,0 +1,5 @@
+productline TestIndentation
+	description "Uses tab instead of spaces"  // ERROR: Tab indentation
+   owner "Wrong spacing"  // ERROR: 3 spaces instead of 2
+    domain "automotive"  // ERROR: 4 spaces instead of 2
+  compliance "ISO 26262"  // CORRECT: 2 spaces 

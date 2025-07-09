@@ -1,0 +1,130 @@
+def systemfeatures ISO26580TestFeatures
+  def feature SystemRoot mandatory
+    name "System Root"
+    description "Root feature for testing ISO 26580 compliance"
+    owner "Test Team"
+    safetylevel ASIL-D
+
+    // Valid: mandatory siblings can be mandatory or optional
+    def feature ValidMandatoryGroup mandatory
+      name "Valid Mandatory Group"
+      description "This group follows ISO 26580 rules"
+      owner "Test Team"
+      safetylevel ASIL-B
+
+      def feature MandatoryFeature1 mandatory
+        name "Mandatory Feature 1"
+        description "First mandatory feature"
+        owner "Test Team"
+        safetylevel ASIL-B
+
+      def feature OptionalFeature1 optional
+        name "Optional Feature 1"
+        description "Optional feature mixed with mandatory - this is valid"
+        owner "Test Team"
+        safetylevel QM
+
+      def feature MandatoryFeature2 mandatory
+        name "Mandatory Feature 2"
+        description "Another mandatory feature"
+        owner "Test Team"
+        safetylevel ASIL-B
+
+    // INVALID: mandatory cannot be mixed with alternative
+    def feature InvalidMandatoryGroup mandatory
+      name "Invalid Mandatory Group"
+      description "This group violates ISO 26580 rules"
+      owner "Test Team"
+      safetylevel ASIL-B
+
+      def feature MandatoryFeature3 mandatory
+        name "Mandatory Feature 3"
+        description "Mandatory feature"
+        owner "Test Team"
+        safetylevel ASIL-B
+
+      def feature AlternativeFeature1 alternative
+        name "Alternative Feature 1"
+        description "ERROR: Alternative cannot be sibling of mandatory"
+        owner "Test Team"
+        safetylevel QM
+
+    // Valid: alternative siblings must all be alternative
+    def feature ValidAlternativeGroup alternative
+      name "Valid Alternative Group"
+      description "All siblings are alternative - valid"
+      owner "Test Team"
+      safetylevel ASIL-C
+
+      def feature AlternativeOption1 alternative
+        name "Alternative Option 1"
+        description "First alternative option"
+        owner "Test Team"
+        safetylevel ASIL-C
+
+      def feature AlternativeOption2 alternative
+        name "Alternative Option 2"
+        description "Second alternative option"
+        owner "Test Team"
+        safetylevel ASIL-C
+
+    // INVALID: alternative mixed with optional
+    def feature InvalidAlternativeGroup alternative
+      name "Invalid Alternative Group"
+      description "Mixed alternative and optional - invalid"
+      owner "Test Team"
+      safetylevel ASIL-C
+
+      def feature AlternativeOption3 alternative
+        name "Alternative Option 3"
+        description "Alternative option"
+        owner "Test Team"
+        safetylevel ASIL-C
+
+      def feature OptionalFeature2 optional
+        name "Optional Feature 2"
+        description "ERROR: Optional cannot be sibling of alternative"
+        owner "Test Team"
+        safetylevel QM
+
+    // Valid: or siblings must all be or
+    def feature ValidOrGroup or
+      name "Valid Or Group"
+      description "All siblings are or - valid"
+      owner "Test Team"
+      safetylevel QM
+
+      def feature OrOption1 or
+        name "Or Option 1"
+        description "First or option"
+        owner "Test Team"
+        safetylevel QM
+
+      def feature OrOption2 or
+        name "Or Option 2"
+        description "Second or option"
+        owner "Test Team"
+        safetylevel QM
+
+    // INVALID: or mixed with mandatory
+    def feature InvalidOrGroup or
+      name "Invalid Or Group"
+      description "Mixed or and mandatory - invalid"
+      owner "Test Team"
+      safetylevel QM
+
+      def feature OrOption3 or
+        name "Or Option 3"
+        description "Or option"
+        owner "Test Team"
+        safetylevel QM
+
+      def feature MandatoryFeature4 mandatory
+        name "Mandatory Feature 4"
+        description "ERROR: Mandatory cannot be sibling of or"
+        owner "Test Team"
+        safetylevel ASIL-B
+
+  constraints
+    MandatoryFeature1 requires OptionalFeature1
+    AlternativeOption1 excludes AlternativeOption2 

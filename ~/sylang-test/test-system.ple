@@ -1,0 +1,11 @@
+productline ElectronicParkingBrakeSystem
+  description "Electronic parking brake system for automotive applications"
+  owner "Chassis Team", "Braking Systems Group"
+  domain "automotive", "safety"
+  compliance "ISO 26262", "ASPICE"
+  safetylevel ASIL-D
+  region "Global", "Europe", "North America"
+  version "2.1.0"
+  firstrelease "2023-Q1"
+
+// Test file for Sylang AI functionality 

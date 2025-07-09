@@ -1,0 +1,17 @@
+// This file has intentional errors to test validation
+
+// ERROR: Should start with def hazardanalysis
+invalidstart SomeAnalysis
+  name "Test Analysis"
+  
+  // ERROR: Missing required sections like operationalscenarios, vehiclestates, safetyconcept
+  itemdef
+    productline TestProduct
+    
+  // ERROR: Invalid def type
+  def invalidtype BadIdentifier
+    description "This should be flagged"
+    
+  // ERROR: Invalid identifier (should be PascalCase)
+  def scenario bad_identifier
+    description "This has bad naming" 

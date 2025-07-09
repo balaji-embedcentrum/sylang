@@ -1,0 +1,11 @@
+# Git submodules for mechanical/modules
+# Add your modules-specific submodules here, for example:
+# [submodule "modules-common"]
+#     path = modules-common
+#     url = https://github.com/yourorg/mechanical-modules-common.git
+#     branch = main
+
+# [submodule "modules-libraries"]
+#     path = modules-libraries
+#     url = https://github.com/yourorg/modules-libs.git
+#     branch = main

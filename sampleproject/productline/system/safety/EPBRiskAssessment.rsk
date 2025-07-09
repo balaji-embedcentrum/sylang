@@ -1,286 +1,9 @@
-riskassessment EPBRiskAssessment
+def riskassessment EPBRiskAssessment
   name "EPB System - Risk Assessment and ASIL Determination"
   description "Comprehensive risk assessment using S×E×C methodology per ISO 26262"  
   hazardanalysis EPBSafety
   hazardidentification EPBHazards
   methodology "ISO 26262 S×E×C Risk Assessment"
-  
-  scenarios
-    scenario SCEN_ACT_001_MotorRunaway
-      description "Motor continues beyond position causing excessive force"
-      context "Actuator control failure during brake application"
-      conditions "Motor controller fault, position feedback loss, electrical noise"
-      consequences "Excessive clamping force, potential component damage, fire risk"
-      
-    scenario SCEN_ACT_002_ActuatorSeizure
-      description "Cannot apply EPB when parking on hill"
-      context "Mechanical failure prevents actuator movement"
-      conditions "Mechanical wear, contamination, extreme temperature, corrosion"
-      consequences "Vehicle rollaway, collision risk, inability to secure vehicle"
-      
-    scenario SCEN_ACT_003_PositionSensorFailure
-      description "Incorrect position feedback leads to insufficient brake force"
-      context "Position sensing system provides false or missing data"
-      conditions "Sensor damage, wiring fault, EMI interference, calibration drift"
-      consequences "Inadequate brake force, vehicle rollaway, driver uncertainty"
-      
-    scenario SCEN_PWR_001_PowerLoss
-      description "Power loss during brake application leaves insufficient force"
-      context "Electrical system failure during critical parking operation"
-      conditions "Electrical fault, fuse failure, battery disconnect, wiring damage"
-      consequences "Brake stuck in current position, insufficient holding force"
-      
-    scenario SCEN_ENV_001_ThermalOverload
-      description "Component overheats and reduces performance"
-      context "Thermal protection system activates due to excessive heat"
-      conditions "Excessive duty cycle, cooling system failure, high ambient temperature"
-      consequences "Reduced performance, component damage, thermal shutdown"
-      
-    scenario SCEN_ACT_006_CableBreakage
-      description "Cable breaks leaving no brake force"
-      context "Mechanical failure of cable-type actuation system"
-      conditions "Cable wear, corrosion, excessive force, fatigue failure"
-      consequences "Complete loss of parking brake function, vehicle rollaway"
-      
-    scenario SCEN_CAL_001_CalibrationDrift
-      description "Gradual loss of system effectiveness over time"
-      context "Component aging affects system calibration accuracy"
-      conditions "Component aging, wear, temperature cycling, usage patterns"
-      consequences "Insufficient brake force on steep grades, performance degradation"
-      
-    scenario SCEN_HMI_001_SwitchStuck
-      description "Control switch remains in activated state"
-      context "Physical switch mechanism fails in activated position"
-      conditions "Mechanical jamming, liquid contamination, switch mechanism wear"
-      consequences "Unintended activation, driver confusion, vehicle behavior changes"
-      
-    scenario SCEN_HMI_002_NoSwitchResponse
-      description "Cannot command system when needed"
-      context "Switch activation not registered by control system"
-      conditions "Electrical fault, mechanical damage, connector corrosion"
-      consequences "Cannot operate system, loss of primary control method"
-      
-    scenario SCEN_HMI_003_FalseStatus
-      description "Incorrect status indication to user"
-      context "Status indication system shows incorrect system state"
-      conditions "LED failure, wiring fault, software error, display malfunction"
-      consequences "User makes wrong decisions based on false information"
-      
-    scenario SCEN_HMI_004_NoStatusIndication
-      description "No status information available to user"
-      context "Status indication system completely fails"
-      conditions "Display failure, power loss, communication fault, wiring damage"
-      consequences "User cannot determine system state, operational uncertainty"
-      
-    scenario SCEN_EMI_001_SpuriousActivation
-      description "System activates without user input"
-      context "Electromagnetic interference causes false signals"
-      conditions "EMI interference, electrical noise, software fault, poor grounding"
-      consequences "Unexpected system activation, unpredictable behavior"
-      
-    scenario SCEN_SW_001_MultipleInterpretation
-      description "Single input interpreted as multiple commands"
-      context "Software timing or processing error"
-      conditions "Contact bounce, software timing error, interrupt conflicts"
-      consequences "Unpredictable system behavior, rapid state changes"
-      
-    scenario SCEN_SEN_001_SensorDrift
-      description "Gradual sensor inaccuracy leads to poor performance"
-      context "Sensor accuracy degrades over time"
-      conditions "Sensor aging, temperature effects, magnetic interference, contamination"
-      consequences "Progressive loss of effectiveness, undetected degradation"
-      
-    scenario SCEN_SEN_002_SensorNoise
-      description "Noisy signals cause erratic system behavior"
-      context "Electrical noise corrupts sensor signals"
-      conditions "EMI, poor grounding, cable damage, connector corrosion"
-      consequences "Erratic behavior, inconsistent performance"
-      
-    scenario SCEN_SEN_003_SensorDisconnection
-      description "Complete loss of sensor feedback"
-      context "Physical disconnection of sensor"
-      conditions "Connector corrosion, cable damage, vibration, connector failure"
-      consequences "Loss of feedback, system uncertainty, potential failure"
-      
-    scenario SCEN_ENV_002_EnvironmentalContamination
-      description "Environmental factors degrade system performance"
-      context "System exposed to harsh environmental conditions"
-      conditions "Environmental exposure, seal failure, contamination ingress"
-      consequences "Degraded performance, component wear, premature failure"
-      
-    scenario SCEN_SEN_005_CableTensionFailure
-      description "Cannot detect cable condition before failure"
-      context "Cable health monitoring system fails"
-      conditions "Sensor damage, calibration loss, monitoring system fault"
-      consequences "Undetected cable problems, sudden failure risk"
-      
-    scenario SCEN_AUT_001_UnintendedActivation
-      description "Automation activates when not appropriate"
-      context "Automation system incorrectly determines activation conditions are met"
-      conditions "Faulty sensors, software logic error, sensor fusion fault"
-      consequences "Unexpected activation during inappropriate conditions"
-      
-    scenario SCEN_AUT_002_FailureToActivate
-      description "Automation doesn't engage when conditions are met"
-      context "Automation system fails to recognize proper activation conditions"
-      conditions "Logic error, sensor failure, communication fault, software bug"
-      consequences "System doesn't activate when expected, user disappointment"
-      
-    scenario SCEN_AUT_003_LogicMalfunction
-      description "Automation provides incorrect assistance"
-      context "Automation logic produces wrong output"
-      conditions "Logic error, sensor input fault, software bug, timing issue"
-      consequences "Incorrect system behavior, user confusion"
-      
-    scenario SCEN_AUT_004_ReleaseLogicError
-      description "System releases at wrong time"
-      context "Release logic makes incorrect decision"
-      conditions "Sensor fusion fault, logic error, timing fault, communication delay"
-      consequences "Unexpected release, loss of user confidence"
-      
-    scenario SCEN_AUT_005_ArbitrationConflict
-      description "Conflicting commands cause erratic behavior"
-      context "Multiple automation functions provide conflicting commands"
-      conditions "Logic error, communication delay, priority fault, race condition"
-      consequences "Unpredictable behavior, system oscillation"
-      
-    scenario SCEN_DIA_001_FalseFaultDetection
-      description "System reports faults that don't exist"
-      context "Diagnostic system generates false positive results"
-      conditions "Diagnostic algorithm error, sensor noise, threshold settings"
-      consequences "Unnecessary system shutdown, user frustration"
-      
-    scenario SCEN_DIA_002_MissedFaultDetection
-      description "Real faults not detected by diagnostic system"
-      context "Diagnostic system fails to identify actual problems"
-      conditions "Diagnostic coverage gap, algorithm fault, sensor limitation"
-      consequences "Hazardous failures go undetected, safety degradation"
-      
-    scenario SCEN_DIA_003_DiagnosticSystemFailure
-      description "Entire diagnostic system becomes non-functional"
-      context "Complete failure of health monitoring capability"
-      conditions "Software fault, hardware failure, power loss, communication fault"
-      consequences "No health monitoring, blind operation"
-      
-    scenario SCEN_COM_001_CommunicationFailure
-      description "Loss of communication with other systems"
-      context "Communication network fails or degrades"
-      conditions "Bus short, termination failure, EMI, connector issues"
-      consequences "Cannot receive commands or send status, isolation"
-      
-    scenario SCEN_COM_002_MessageCorruption
-      description "Communication messages corrupted during transmission"
-      context "Data integrity compromised during transmission"
-      conditions "EMI interference, bus errors, voltage transients"
-      consequences "Wrong commands executed, erroneous data"
-      
-    scenario SCEN_COM_003_CommunicationDelay
-      description "Excessive delay in message transmission"
-      context "Communication system experiences significant latency"
-      conditions "Bus overload, priority conflicts, network congestion"
-      consequences "Delayed response, timing violations"
-      
-    scenario SCEN_SAF_001_EmergencyReleaseFailure
-      description "Manual emergency release mechanism fails"
-      context "Backup release mechanism is inoperable"
-      conditions "Mechanical seizure, cable break, access blockage, corrosion"
-      consequences "Cannot release system in emergency, safety risk"
-      
-    scenario SCEN_SAF_002_SafetyMonitoringFailure
-      description "Safety monitoring system fails"
-      context "Safety critical path monitoring becomes inoperative"
-      conditions "Monitor software fault, hardware failure, power loss"
-      consequences "Hazards not detected or mitigated, safety degradation"
-      
-    scenario SCEN_DIS_001_DisplayInformationError
-      description "Wrong information shown on display"
-      context "Display system shows incorrect status information"
-      conditions "Display driver fault, communication error, software bug"
-      consequences "User receives wrong information, poor decisions"
-      
-    scenario SCEN_INP_001_InputProcessingDelay
-      description "Significant delay between input and recognition"
-      context "Input processing system experiences high latency"
-      conditions "Software processing fault, hardware timing issue, overload"
-      consequences "Delayed response, user may repeat input"
-      
-    scenario SCEN_SYS_001_ResourceAllocationConflict
-      description "System resources incorrectly allocated"
-      context "Resource management system fails to properly distribute resources"
-      conditions "Orchestration software fault, priority conflicts, resource exhaustion"
-      consequences "System components cannot function properly"
-      
-    scenario SCEN_SYS_002_ModeTransitionError
-      description "System fails to properly transition between modes"
-      context "System state machine experiences transition fault"
-      conditions "State machine error, timing fault, event sequence error"
-      consequences "System stuck in wrong operational mode"
-      
-    scenario SCEN_SYS_003_TotalSystemFailure
-      description "Complete system becomes non-functional"
-      context "Catastrophic failure affecting entire system"
-      conditions "Power loss, ECU failure, software crash, multiple component failure"
-      consequences "No system functionality available"
-      
-    scenario SCEN_SYS_004_PartialSystemDegradation
-      description "Some functions work, others don't - unpredictable behavior"
-      context "System operates in degraded state with uncertain behavior"
-      conditions "Partial component failure, communication loss, software fault"
-      consequences "Unpredictable system behavior, user confusion"
-      
-    scenario SCEN_SW_002_SoftwareCorruption
-      description "Control software becomes corrupted"
-      context "Software integrity compromised"
-      conditions "Memory fault, EMI, power glitch, software bug"
-      consequences "Erratic or non-functional behavior"
-      
-    scenario SCEN_SYS_006_IntegrationFailure
-      description "System fails to integrate properly with other vehicle systems"
-      context "Inter-system communication or coordination fails"
-      conditions "Communication protocol mismatch, timing conflicts, version incompatibility"
-      consequences "Coordination problems with other systems"
-      
-    scenario SCEN_ENV_003_ExtremeTemperature
-      description "System performance degraded by temperature extremes"
-      context "Operation outside normal temperature specifications"
-      conditions "Operating outside temperature specifications, cooling failure"
-      consequences "Reduced functionality or component damage"
-      
-    scenario SCEN_EMI_002_EMIInterference
-      description "EMI causes false signals and erratic behavior"
-      context "Electromagnetic interference affects system operation"
-      conditions "Radio transmitters, electrical equipment, lightning, poor shielding"
-      consequences "False signals, corrupted communication"
-      
-    scenario SCEN_ENV_004_CorrosionContamination
-      description "Environmental contamination causes mechanical problems"
-      context "Corrosive environment degrades components"
-      conditions "Salt, moisture, chemicals, dirt, seal failure"
-      consequences "Mechanical binding, electrical faults"
-      
-    scenario SCEN_ENV_005_VibrationShock
-      description "Mechanical stress affects component reliability"
-      context "Physical stress from vehicle operation"
-      conditions "Road conditions, vehicle operation, accidents, mounting failure"
-      consequences "Mechanical wear, electrical connection faults"
-      
-    scenario SCEN_USE_001_HighSpeedMisuse
-      description "User applies system while moving at high speed"
-      context "Inappropriate system use during high-speed operation"
-      conditions "User confusion, panic, misunderstanding, accidental activation"
-      consequences "Vehicle instability, loss of control"
-      
-    scenario SCEN_USE_002_MaintenanceError
-      description "Improper maintenance degrades safety"
-      context "Maintenance procedures performed incorrectly"
-      conditions "Technician error, wrong procedures, inadequate training"
-      consequences "Component damage, safety degradation"
-      
-    scenario SCEN_USE_003_AccessoryInterference
-      description "Aftermarket equipment interferes with system"
-      context "Non-standard equipment affects system operation"
-      conditions "Improper installation, electrical interference, incompatibility"
-      consequences "System malfunction, false signals"
   
   riskcriteria
     severity
@@ -320,56 +43,56 @@ riskassessment EPBRiskAssessment
   assessment
     subsystem ActuationControlSubsystem
     
-    hazard H_ACT_001 "Actuator Motor Runaway"
-      scenario SCEN_ACT_001_MotorRunaway
+    hazard H_ACT_001
+      scenario SCEN_001_NormalParking
       severity S2 "Severe brake damage, potential fire hazard"
       exposure E2 "Medium - could occur during aggressive use"
       controllability C2 "Driver can turn off ignition, use manual release"
       asil B
       rationale "Excessive force could damage brake components but driver has emergency options"
       
-    hazard H_ACT_002 "Actuator Seizure"  
-      scenario SCEN_ACT_002_ActuatorSeizure
+    hazard H_ACT_002
+      scenario SCEN_002_SteepHillParking
       severity S3 "Vehicle rollaway causing fatal accident"
       exposure E2 "Medium - depends on parking situations and component life"
       controllability C3 "Driver cannot control vehicle movement once rolling"
       asil D
       rationale "Critical safety hazard - vehicle rollaway with fatal consequences"
       
-    hazard H_ACT_003 "Position Sensor Failure"
-      scenario SCEN_ACT_003_PositionSensorFailure
+    hazard H_ACT_003
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
       severity S3 "Vehicle rollaway on incline"
       exposure E3 "High - sensors subject to wear and environmental effects"
       controllability C2 "Driver may notice unusual behavior and take action"
       asil D
       rationale "High exposure combined with potential fatal consequences"
       
-    hazard H_ACT_004 "Power Supply Interruption"
-      scenario SCEN_PWR_001_PowerLoss
+    hazard H_ACT_004
+      scenario SCEN_002_SteepHillParking, SCEN_005_EmergencyApplication
       severity S3 "Vehicle rollaway if parked on incline"
       exposure E2 "Medium - electrical faults are possible but not frequent"
       controllability C3 "Driver may not detect issue until vehicle moves"
       asil D
       rationale "Fatal consequences if power lost during critical parking situations"
       
-    hazard H_ACT_005 "Thermal Overload"
-      scenario SCEN_ENV_001_ThermalOverload
+    hazard H_ACT_005
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
       severity S2 "Insufficient brake force, potential component damage"
       exposure E1 "Low - requires extreme duty cycle or cooling failure"
       controllability C1 "Driver can usually detect thermal issues and take action"
       asil A
       rationale "Lower exposure and good controllability reduce risk"
       
-    hazard H_ACT_006 "Cable Breakage (Cable-Type)"
-      scenario SCEN_ACT_006_CableBreakage
+    hazard H_ACT_006
+      scenario SCEN_002_SteepHillParking
       severity S3 "Complete loss of parking brake function"
       exposure E2 "Medium - cables subject to wear over vehicle lifetime"
       controllability C3 "Driver cannot detect until vehicle moves"
       asil D
       rationale "Complete loss of function with fatal potential"
       
-    hazard H_ACT_007 "Calibration Drift"
-      scenario SCEN_CAL_001_CalibrationDrift
+    hazard H_ACT_007
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
       severity S2 "Insufficient brake force on steep grades"
       exposure E3 "High - normal aging process affects all systems"
       controllability C2 "Driver may notice reduced performance over time"
@@ -379,316 +102,235 @@ riskassessment EPBRiskAssessment
   assessment
     subsystem HMIControlSubsystem
     
-    hazard H_HMI_001 "Switch Stuck Activated"
-      scenario SCEN_HMI_001_SwitchStuck
+    hazard H_HMI_001
+      scenario SCEN_003_StopAndGoTraffic, SCEN_001_NormalParking
       severity S2 "Unexpected vehicle behavior, potential accident"
       exposure E1 "Low - requires specific contamination conditions"
       controllability C1 "Driver can turn off vehicle or use manual release"
       asil A
       rationale "Driver has good control options to mitigate"
       
-    hazard H_HMI_002 "Switch Not Responsive"
-      scenario SCEN_HMI_002_NoSwitchResponse
+    hazard H_HMI_002
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
       severity S3 "Cannot secure vehicle when parking"
       exposure E2 "Medium - switches subject to wear and damage"
       controllability C2 "Driver can use alternative parking strategies"
       asil C
       rationale "Critical function loss but some controllability remains"
       
-    hazard H_HMI_003 "False Status Indication"
-      scenario SCEN_HMI_003_FalseStatus
+    hazard H_HMI_003
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
       severity S3 "Vehicle rolls away after driver exits"
-      exposure E2 "Medium - display and wiring subject to faults"
-      controllability C3 "Driver cannot detect until vehicle moves"
+      exposure E2 "Medium - display components subject to failure"
+      controllability C3 "Driver trusts false indication and leaves vehicle"
       asil D
-      rationale "False indication leads to dangerous driver decisions"
+      rationale "False security leads to fatal consequences"
       
-    hazard H_HMI_004 "No Status Indication"
-      scenario SCEN_HMI_004_NoStatusIndication
-      severity S2 "Driver uncertainty leads to inappropriate actions"
-      exposure E2 "Medium - display systems have typical failure rates"
+    hazard H_HMI_004
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S2 "Driver uncertainty about system state"
+      exposure E2 "Medium - display systems subject to failure"
       controllability C1 "Driver can verify through other means"
       asil B
-      rationale "Driver can use alternative verification methods"
+      rationale "Driver has alternative ways to verify system state"
       
-    hazard H_HMI_005 "Spurious Switch Activation"
-      scenario SCEN_EMI_001_SpuriousActivation
-      severity S3 "Vehicle instability, potential loss of control"
-      exposure E1 "Low - requires specific EMI or fault conditions"
-      controllability C2 "Driver can release brake or control vehicle"
-      asil B
-      rationale "Serious consequences but lower exposure probability"
-      
-    hazard H_HMI_006 "Multiple Switch Interpretation"
-      scenario SCEN_SW_001_MultipleInterpretation
-      severity S2 "Unpredictable brake behavior"
-      exposure E2 "Medium - software timing issues possible"
-      controllability C1 "Driver can stop activating switch"
+    hazard H_HMI_005
+      scenario SCEN_003_StopAndGoTraffic, SCEN_004_HillStartAssist
+      severity S2 "Unexpected system activation"
+      exposure E1 "Low - requires specific EMI conditions"
+      controllability C1 "Driver can override with controls"
       asil A
-      rationale "Driver can directly control the input causing the problem"
+      rationale "Low exposure and good driver control options"
+      
+    hazard H_HMI_006
+      scenario SCEN_003_StopAndGoTraffic
+      severity S2 "Erratic system behavior"
+      exposure E1 "Low - requires specific software timing conditions"
+      controllability C2 "Driver can recognize and adapt"
+      asil A
+      rationale "Recognizable pattern allows driver adaptation"
 
   assessment
     subsystem SensorMonitoringSubsystem
     
-    hazard H_SEN_001 "Position Sensor Drift"
-      scenario SCEN_SEN_001_SensorDrift
-      severity S3 "Vehicle rollaway on steep incline"
-      exposure E3 "High - all sensors drift over time"
+    hazard H_SEN_001
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S2 "Insufficient brake force"
+      exposure E3 "High - normal sensor aging"
       controllability C2 "Driver may notice performance degradation"
+      asil C
+      rationale "High exposure but gradual degradation allows detection"
+      
+    hazard H_SEN_002
+      scenario SCEN_001_NormalParking, SCEN_003_StopAndGoTraffic
+      severity S2 "Erratic system behavior"
+      exposure E2 "Medium - depends on electrical environment"
+      controllability C2 "Driver can recognize erratic behavior"
+      asil B
+      rationale "Recognizable symptoms allow driver response"
+      
+    hazard H_SEN_003
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S3 "Loss of position feedback, uncertain brake state"
+      exposure E2 "Medium - connectors subject to environmental damage"
+      controllability C3 "Driver may not detect until failure occurs"
       asil D
-      rationale "High exposure with potential fatal consequences"
+      rationale "Sudden loss of feedback with fatal potential"
       
-    hazard H_SEN_002 "Sensor Signal Noise"
-      scenario SCEN_SEN_002_SensorNoise
-      severity S2 "Inconsistent brake performance"
-      exposure E2 "Medium - EMI and electrical noise occur regularly"
-      controllability C2 "Driver can observe erratic behavior and take action"
-      asil B
-      rationale "Moderate exposure and controllability"
-      
-    hazard H_SEN_003 "Sensor Disconnection"
-      scenario SCEN_SEN_003_SensorDisconnection
-      severity S3 "Cannot determine brake state, potential rollaway"
-      exposure E1 "Low - requires physical damage or severe corrosion"
-      controllability C3 "System may fail silently"
-      asil B
-      rationale "Lower exposure balances high severity"
-      
-    hazard H_SEN_004 "Environmental Contamination"
-      scenario SCEN_ENV_002_EnvironmentalContamination
-      severity S2 "Reduced brake effectiveness"
+    hazard H_SEN_004
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S2 "Gradual performance degradation"
       exposure E3 "High - environmental exposure is constant"
-      controllability C1 "Driver can maintain and clean system"
-      asil B
-      rationale "High exposure but good maintenance controllability"
+      controllability C2 "Driver may notice reduced performance"
+      asil C
+      rationale "High exposure but gradual onset allows adaptation"
       
-    hazard H_SEN_005 "Cable Tension Sensor Failure"
-      scenario SCEN_SEN_005_CableTensionFailure
-      severity S3 "Undetected cable degradation leads to complete failure"
-      exposure E2 "Medium - sensors can fail over vehicle lifetime"
-      controllability C3 "Failure may not be apparent to driver"
+    hazard H_SEN_005
+      scenario SCEN_002_SteepHillParking
+      severity S3 "Undetected cable failure leading to system loss"
+      exposure E2 "Medium - cable systems subject to wear"
+      controllability C3 "Driver unaware until cable fails"
       asil D
-      rationale "Hidden failure mode with potential fatal consequences"
+      rationale "Hidden failure mode with sudden failure potential"
 
   assessment
     subsystem AutomationLogicSubsystem
     
-    hazard H_AUT_001 "Auto-Hold Unintended Activation"
-      scenario SCEN_AUT_001_UnintendedActivation
-      severity S3 "Vehicle instability, potential loss of control"
-      exposure E2 "Medium - sensor failures or logic errors possible"
-      controllability C2 "Driver can override with throttle or manual release"
-      asil C
-      rationale "Serious consequences but driver has override options"
+    hazard H_AUT_001
+      scenario SCEN_003_StopAndGoTraffic, SCEN_004_HillStartAssist
+      severity S2 "Unexpected braking during driving"
+      exposure E2 "Medium - depends on sensor reliability"
+      controllability C1 "Driver can override immediately"
+      asil B
+      rationale "Good driver override capability reduces risk"
       
-    hazard H_AUT_002 "Auto-Hold Failure to Activate"
-      scenario SCEN_AUT_002_FailureToActivate
-      severity S3 "Collision when vehicle moves unexpectedly"
-      exposure E2 "Medium - depends on logic complexity and sensor reliability"
-      controllability C3 "Driver may not expect vehicle movement"
+    hazard H_AUT_002
+      scenario SCEN_003_StopAndGoTraffic, SCEN_004_HillStartAssist
+      severity S3 "Vehicle rolls when driver expects hold"
+      exposure E2 "Medium - logic and sensor dependent"
+      controllability C3 "Driver may not react quickly enough"
       asil D
-      rationale "Unexpected vehicle behavior with severe consequences"
+      rationale "False security leads to dangerous situations"
       
-    hazard H_AUT_003 "Hill-Start Assist Malfunction"
-      scenario SCEN_AUT_003_LogicMalfunction
-      severity S2 "Vehicle rolls back or lurches forward"
-      exposure E3 "High - hill-start conditions are common"
-      controllability C2 "Driver can compensate with manual control"
+    hazard H_AUT_003
+      scenario SCEN_004_HillStartAssist
+      severity S3 "Vehicle rollback or unexpected braking"
+      exposure E2 "Medium - depends on sensor and logic reliability"
+      controllability C2 "Driver can usually react to unexpected behavior"
       asil C
-      rationale "High exposure but some driver controllability"
+      rationale "Critical function but some driver awareness possible"
       
-    hazard H_AUT_004 "Release Logic Error"
-      scenario SCEN_AUT_004_ReleaseLogicError
-      severity S3 "Vehicle moves when driver expects it stationary"
-      exposure E2 "Medium - logic errors in complex systems possible"
-      controllability C3 "Unexpected release gives driver little reaction time"
-      asil D
-      rationale "Unexpected behavior with potential fatal consequences"
-      
-    hazard H_AUT_005 "Arbitration Conflict"
-      scenario SCEN_AUT_005_ArbitrationConflict
-      severity S2 "Unpredictable brake behavior"
-      exposure E1 "Low - requires multiple simultaneous faults"
-      controllability C2 "Driver can take manual control"
-      asil A
-      rationale "Lower exposure and reasonable controllability"
+    hazard H_AUT_004
+      scenario SCEN_003_StopAndGoTraffic, SCEN_004_HillStartAssist
+      severity S2 "Unpredictable automation behavior"
+      exposure E2 "Medium - software and timing dependent"
+      controllability C2 "Driver can learn to adapt to patterns"
+      asil B
+      rationale "Predictable patterns allow driver adaptation"
 
   assessment
     subsystem DiagnosticSubsystem
     
-    hazard H_DIA_001 "False Fault Detection"
-      scenario SCEN_DIA_001_FalseFaultDetection
-      severity S2 "Loss of EPB functionality when needed"
-      exposure E2 "Medium - diagnostic algorithms can have false positives"
-      controllability C1 "Driver can use manual release or override"
-      asil B
-      rationale "Moderate impact with good manual alternatives"
+    hazard H_DIA_001
+      scenario SCEN_001_NormalParking, SCEN_003_StopAndGoTraffic
+      severity S1 "Unnecessary system shutdown"
+      exposure E2 "Medium - depends on diagnostic algorithm quality"
+      controllability C1 "Driver aware of unnecessary shutdown"
+      asil QM
+      rationale "Low severity and good controllability"
       
-    hazard H_DIA_002 "Missed Fault Detection"
-      scenario SCEN_DIA_002_MissedFaultDetection
-      severity S3 "System operates with hidden faults until catastrophic failure"
-      exposure E2 "Medium - diagnostic coverage gaps possible"
-      controllability C3 "Driver unaware of degraded safety state"
+    hazard H_DIA_002
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S3 "Undetected system degradation"
+      exposure E2 "Medium - depends on diagnostic coverage"
+      controllability C3 "Driver unaware of hidden failures"
       asil D
-      rationale "Hidden degradation leading to catastrophic failure"
+      rationale "Hidden failures can lead to fatal consequences"
       
-    hazard H_DIA_003 "Diagnostic System Failure"
-      scenario SCEN_DIA_003_DiagnosticSystemFailure
-      severity S2 "Cannot detect other system faults"
-      exposure E1 "Low - diagnostic systems typically robust"
-      controllability C2 "Driver can perform manual checks"
-      asil A
-      rationale "Lower exposure with some manual alternatives"
+    hazard H_DIA_003
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S3 "No fault detection capability"
+      exposure E1 "Low - diagnostic systems generally reliable"
+      controllability C3 "Driver unaware of diagnostic loss"
+      asil C
+      rationale "Low exposure but high consequence when it occurs"
+      
+    hazard H_DIA_004
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S3 "Continued operation with undetected issues"
+      exposure E2 "Medium - depends on system complexity"
+      controllability C3 "Driver unaware of developing problems"
+      asil D
+      rationale "Delayed detection allows problems to escalate"
 
   assessment
     subsystem CommunicationSubsystem
     
-    hazard H_COM_001 "CAN Bus Failure"
-      scenario SCEN_COM_001_CommunicationFailure
-      severity S3 "Loss of integration with safety systems"
-      exposure E1 "Low - CAN systems generally reliable"
-      controllability C2 "Driver can operate EPB manually"
-      asil B
-      rationale "Lower exposure with manual operation possible"
-      
-    hazard H_COM_002 "Message Corruption"
-      scenario SCEN_COM_002_MessageCorruption
-      severity S3 "Unexpected EPB behavior causing accidents"
-      exposure E2 "Medium - EMI and bus errors occur in automotive environment"
-      controllability C2 "Driver may notice unusual behavior"
+    hazard H_COM_001
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S3 "Unable to coordinate system operation"
+      exposure E1 "Low - communication systems generally reliable"
+      controllability C3 "Driver unaware of communication loss"
       asil C
-      rationale "Significant exposure with some driver awareness"
+      rationale "Low exposure but critical when it occurs"
       
-    hazard H_COM_003 "Communication Delay"
-      scenario SCEN_COM_003_CommunicationDelay
-      severity S2 "Delayed brake application in emergency"
-      exposure E2 "Medium - bus loading and timing issues possible"
-      controllability C1 "Driver can repeat command or use manual methods"
+    hazard H_COM_002
+      scenario SCEN_001_NormalParking, SCEN_003_StopAndGoTraffic
+      severity S2 "Incorrect commands or status"
+      exposure E2 "Medium - depends on EMI environment"
+      controllability C2 "Driver may notice incorrect behavior"
       asil B
-      rationale "Moderate consequences with good alternatives"
+      rationale "Some observability allows driver response"
+      
+    hazard H_COM_003
+      scenario SCEN_003_StopAndGoTraffic, SCEN_004_HillStartAssist
+      severity S2 "Delayed system responses"
+      exposure E2 "Medium - depends on network loading"
+      controllability C2 "Driver can adapt to delayed responses"
+      asil B
+      rationale "Delays are usually observable and adaptable"
+      
+    hazard H_COM_004
+      scenario SCEN_003_StopAndGoTraffic
+      severity S2 "Delayed or dropped messages"
+      exposure E2 "Medium - depends on system design margins"
+      controllability C2 "Driver can recognize degraded performance"
+      asil B
+      rationale "Performance degradation is usually noticeable"
 
   assessment
-    system
+    subsystem SafetySubsystem
     
-    hazard H_SYS_003 "Total System Failure"
-      scenario SCEN_SYS_003_TotalSystemFailure
-      severity S3 "No parking brake functionality"
-      exposure E1 "Low - requires multiple simultaneous failures"
-      controllability C1 "Manual release and alternative parking methods available"
-      asil B
-      rationale "Lower exposure with manual alternatives"
-      
-    hazard H_SYS_004 "Partial System Degradation"
-      scenario SCEN_SYS_004_PartialSystemDegradation
-      severity S3 "Driver cannot predict system behavior"
-      exposure E2 "Medium - partial failures more likely than total failure"
-      controllability C3 "Difficult for driver to assess actual system state"
-      asil D
-      rationale "Unpredictable behavior more dangerous than complete failure"
-      
-    hazard H_SYS_005 "Software Corruption"
-      scenario SCEN_SW_002_SoftwareCorruption
-      severity S3 "Unpredictable and potentially dangerous EPB operation"
-      exposure E1 "Low - automotive software typically protected"
-      controllability C2 "Driver can power cycle or use manual override"
-      asil B
-      rationale "Lower exposure with reset and manual alternatives"
-      
-    hazard H_SYS_006 "Integration Failure"
-      scenario SCEN_SYS_006_IntegrationFailure
-      severity S3 "Degraded overall vehicle safety"
-      exposure E2 "Medium - integration issues possible with complex systems"
-      controllability C2 "Driver can disable conflicting systems"
+    hazard H_SAF_001
+      scenario SCEN_001_NormalParking, SCEN_002_SteepHillParking
+      severity S3 "Loss of safety oversight"
+      exposure E1 "Low - safety systems designed for high reliability"
+      controllability C3 "Driver unaware of safety system status"
       asil C
-      rationale "Integration issues have moderate exposure and some controllability"
-
-  assessment
-    environment
-    
-    hazard H_ENV_001 "Extreme Temperature Effects"
-      scenario SCEN_ENV_003_ExtremeTemperature
-      severity S2 "Reduced EPB effectiveness"
-      exposure E3 "High - extreme temperatures occur regularly"
-      controllability C1 "Driver can take precautions and monitor performance"
-      asil B
-      rationale "High exposure but good preventive measures available"
+      rationale "Critical function but low exposure due to design"
       
-    hazard H_ENV_002 "EMI Interference"
-      scenario SCEN_EMI_002_EMIInterference
-      severity S2 "Unpredictable EPB operation"
-      exposure E2 "Medium - EMI sources present in automotive environment"
-      controllability C2 "Driver can identify and avoid EMI sources"
-      asil B
-      rationale "Moderate exposure and controllability"
-      
-    hazard H_ENV_003 "Corrosion and Contamination"
-      scenario SCEN_ENV_004_CorrosionContamination
-      severity S2 "Reduced or lost EPB functionality"
-      exposure E3 "High - environmental exposure inevitable"
-      controllability C1 "Regular maintenance can prevent or detect issues"
-      asil B
-      rationale "High exposure balanced by maintenance controllability"
-      
-    hazard H_ENV_004 "Vibration and Shock"
-      scenario SCEN_ENV_005_VibrationShock
-      severity S2 "Loss of EPB components"
-      exposure E3 "High - vehicle vibration is constant"
-      controllability C1 "Design margins and maintenance can address"
-      asil B
-      rationale "High exposure but addressed through design and maintenance"
-
-  assessment
-    usage
-    
-    hazard H_USE_001 "Driver Misuse - High Speed Application"
-      scenario SCEN_USE_001_HighSpeedMisuse
-      severity S3 "Vehicle instability, potential fatal accident"
-      exposure E1 "Low - most drivers understand proper use"
-      controllability C2 "Driver can release brake, other drivers can avoid"
-      asil B
-      rationale "Low exposure due to driver training and system design"
-      
-    hazard H_USE_002 "Maintenance Error"
-      scenario SCEN_USE_002_MaintenanceError
-      severity S2 "Reduced EPB reliability"
-      exposure E2 "Medium - maintenance errors occur regularly"
-      controllability C1 "Proper training and procedures can prevent"
-      asil A
-      rationale "Good control through proper training and procedures"
-      
-    hazard H_USE_003 "Accessory Installation Interference"
-      scenario SCEN_USE_003_AccessoryInterference
-      severity S2 "EPB malfunction due to interference"
-      exposure E1 "Low - requires specific incompatible installations"
-      controllability C1 "Proper installation procedures can prevent"
+    hazard H_SAF_002
+      scenario SCEN_001_NormalParking, SCEN_003_StopAndGoTraffic
+      severity S1 "Unnecessary availability loss"
+      exposure E2 "Medium - depends on threshold settings"
+      controllability C1 "Driver aware of system shutdown"
       asil QM
-      rationale "Low exposure with good preventive measures available"
+      rationale "Low severity, good controllability"
+      
+    hazard H_SAF_003
+      scenario SCEN_005_EmergencyApplication
+      severity S3 "Hazard escalation before mitigation"
+      exposure E1 "Low - safety systems designed for fast response"
+      controllability C3 "Emergency situations limit driver options"
+      asil C
+      rationale "Low exposure but critical in emergency scenarios"
+      
+    hazard H_SAF_004
+      scenario SCEN_005_EmergencyApplication, SCEN_007_MaintenanceMode
+      severity S3 "Cannot achieve safe state in emergency"
+      exposure E1 "Low - emergency systems designed for reliability"
+      controllability C3 "Emergency situations limit alternatives"
+      asil C
+      rationale "Critical emergency function with low but critical exposure"
 
-  risktreatment
-    highestrisk "ASIL D hazards require most stringent safety measures"
-    prioritization
-      ASIL_D "H_ACT_002, H_ACT_003, H_ACT_004, H_ACT_006, H_HMI_003, H_SEN_001, H_SEN_005, H_AUT_002, H_AUT_004, H_DIA_002, H_SYS_004"
-      ASIL_C "H_ACT_007, H_HMI_002, H_AUT_001, H_AUT_003, H_COM_002, H_SYS_006" 
-      ASIL_B "H_ACT_001, H_HMI_004, H_HMI_005, H_SEN_002, H_SEN_004, H_DIA_001, H_COM_001, H_COM_003, H_SYS_003, H_SYS_005, H_ENV_001, H_ENV_002, H_ENV_003, H_ENV_004, H_USE_001"
-      ASIL_A "H_ACT_005, H_HMI_001, H_HMI_006, H_AUT_005, H_DIA_003, H_USE_002"
-      QM "H_USE_003"
 
-  validationrequirements
-    ASIL_D_validation
-      requirement "Independent verification and validation"
-      requirement "Fault injection testing" 
-      requirement "Hardware-software integration testing"
-      requirement "Field testing under extreme conditions"
-      
-    ASIL_C_validation
-      requirement "Verification and validation with review"
-      requirement "Integration testing"
-      requirement "System level testing"
-      
-    ASIL_B_validation
-      requirement "Verification and validation"
-      requirement "Unit and integration testing"
-      
-    ASIL_A_validation
-      requirement "Verification with review"
-      requirement "Unit testing"

@@ -24,7 +24,7 @@
     ["'", "'"]
   ],
   "indentationRules": {
-    "increaseIndentPattern": "^\\s*(feature|function|productline|systemfunctions|systemfeatures|constraints)\\s+.*$",
+    "increaseIndentPattern": "^\\s*(def\\s+)?(feature|function|productline|systemfunctions|systemfeatures|constraints)\\s+.*$",
     "decreaseIndentPattern": "^\\s*$"
   },
   "folding": {

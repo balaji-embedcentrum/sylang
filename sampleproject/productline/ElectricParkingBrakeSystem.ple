@@ -1,10 +1,10 @@
-productline ElectricParkingBrakeSystem
-  description "A family of electronic parking brake systems for automotive applications. Provides electronic actuation, safety, and integration with vehicle features."
-  owner "Chassis Team", "Braking Systems Group"
-  domain "automotive", "safety"
-  compliance "ISO 26262", "ASPICE"
-  firstrelease "2025-01-01"
-  tags "EPB", "brake", "electronic", "safety"
-  safetylevel ASIL-D
-  region "Global", "Europe", "North America"
+def productline ElectricParkingBrakeSystem
+	description "A family of electronic parking brake systems for automotive applications. Provides electronic actuation, safety, and integration with vehicle features."
+	owner "Chassis Team", "Braking Systems Group"
+	domain "automotive", "safety"
+	compliance "ISO 26262", "ASPICE"
+	firstrelease "2025-01-01"
+	tags "EPB", "brake", "electronic", "safety"
+	safetylevel ASIL-D
+	region "Global", "Europe", "North America"
 

@@ -1,0 +1,11 @@
+# Git submodules for safety-engineering domain
+# Add your submodules here, for example:
+# [submodule "shared-libraries"]
+#     path = shared-libraries
+#     url = https://github.com/yourorg/shared-libraries.git
+#     branch = main
+
+# [submodule "standards-compliance"]
+#     path = standards-compliance
+#     url = https://github.com/yourorg/iso26262-templates.git
+#     branch = main
