@@ -17,15 +17,15 @@ def hazardidentification EPBHazards
       description "EPB fails to release when commanded"  
       severity "Vehicle cannot be driven"
       
-    category PartialFailure
+    def category PartialFailure
       description "EPB provides insufficient or excessive force"
       severity "Unpredictable braking behavior"
       
-    category DelayedResponse
+    def category DelayedResponse
       description "EPB responds too slowly to commands"
       severity "Driver confusion and potential accidents"
       
-    category MisleadingIndication
+    def category MisleadingIndication
       description "Incorrect status information to driver"
       severity "Driver makes wrong decisions"
 
