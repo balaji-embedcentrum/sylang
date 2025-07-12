@@ -4,7 +4,7 @@ def hazardanalysis EPBSafety
   owner "Functional Safety Team"
   reviewers "Systems Engineering", "Safety Engineering", "Hardware Team", "Software Team"
   
-  itemdef
+  def item EPBSafetyItem
     productline ElectricParkingBrakeSystem
     systemfeatures EPBFeatures
     systemfunctions EPBFunctions
@@ -84,24 +84,24 @@ def hazardanalysis EPBSafety
       driverstate TrainedTechnician
       
     operationalconditions
-      condition TEMP_RANGE_001
+      def condition TEMP_RANGE_001
         range "Operating: -40°C to +85°C"
         range "Storage: -50°C to +105°C"
         impact "Affects actuator performance and sensor accuracy"
         
-      condition HUMID_RANGE_001
+      def condition HUMID_RANGE_001
         range "5% to 95% relative humidity"
         impact "Potential corrosion and electrical issues"
         
-      condition VIB_STD_001
+      def condition VIB_STD_001
         standard "ISO 16750-3"
         impact "Mechanical wear and sensor accuracy"
         
-      condition EMI_STD_001
+      def condition EMI_STD_001
         standard "ISO 11452"
         impact "Electronic interference and false signals"
         
-      condition VOLT_RANGE_001
+      def condition VOLT_RANGE_001
         range "9V to 16V nominal (automotive 12V system)"
         range "6V to 32V extended (load dump, cold crank)"
         impact "System functionality and safety margins"
@@ -137,7 +137,7 @@ def hazardanalysis EPBSafety
         characteristics "Mobile phone, passengers, other distractions"
         
       def drivingstate FatiguedDriver
-        description "Tired or drowsy driver"
+        desciption "Tired or drowsy driver"
         characteristics "Reduced reaction time, potential microsleep"
         
       def drivingstate ImpairedDriver
@@ -179,29 +179,49 @@ def hazardanalysis EPBSafety
         
       def environment ENV_SERVICE
         description "Service facility or roadside"
-        conditions TEMP_RANGE_001, HUMID_RANGE_001
+        con=itions TEMP_RANGE_001, HUMID_RANGE_001
 
   safetyconcept
-    def overallsafetystrategy STRATEGY_001
-      principle PRIN_001 "Prevention of unintended vehicle movement"
-      principle PRIN_002 "Reliable brake application when commanded"
-      principle PRIN_003 "Fail-safe behavior in case of system failures" 
-      principle PRIN_004 "Clear feedback to driver about EPB status"
-      principle PRIN_005 "Emergency manual override capability"
-      principle PRIN_006 "Integration with vehicle safety architecture"
+    safetystrategy
+      def principle PRIN_001 
+        description "Prevention of unintended vehicle movement"
+      def principle PRIN_002 
+        description "Reliable brake application when commanded"
+      def principle PRIN_003 
+        description "Fail-safe behavior in case of system failures" 
+      def principle PRIN_004 
+        description "Clear feedback to driver about EPB status"
+      def principle PRIN_005 
+        description "Emergency manual override capability"
+      def principle PRIN_006 
+        description "Integration with vehicle safety architecture"
       
-    def assumptionsofuse ASSUMPTIONS_001
-      assumption ASSUMP_001 "Driver is trained in EPB operation"
-      assumption ASSUMP_002 "Vehicle is maintained per manufacturer specifications"
-      assumption ASSUMP_003 "EPB is used within design operating conditions"
-      assumption ASSUMP_004 "Emergency manual release is accessible and functional"
-      assumption ASSUMP_005 "Vehicle electrical system provides stable power"
-      assumption ASSUMP_006 "Communication buses function within specifications"
+    assumptionsofuse
+      def assuption ASSUMP_001 
+        description "Driver is trained in EPB operation"
+      def assumption ASSUMP_002 
+        description "Vehicle is maintained per manufacturer specifications"
+      def assumption ASSUMP_003 
+        description "EPB is used within design operating conditions"
+      def assumption ASSUMP_004 
+        description "Emergency manual release is accessible and functional"
+      def assumption ASSUMP_005 
+        description "Vehicle electrical system provides stable power"
+      def assumption ASSUMP_006 
+        description "Communication buses function within specifications"
       
-    def foreseesablemisuse MISUSE_001
-      misuse MISUSE_CASE_001 "Attempting to apply EPB while vehicle is moving at high speed"
-      misuse MISUSE_CASE_002 "Using EPB as primary braking system instead of service brakes"
-      misuse MISUSE_CASE_003 "Tampering with or modifying EPB components"
-      misuse MISUSE_CASE_004 "Ignoring EPB warning indicators or fault messages"
-      misuse MISUSE_CASE_005 "Operating vehicle with known EPB malfunctions"
-      misuse MISUSE_CASE_006 "Improper use of manual emergency release"
+    foreseesablemisuse
+      def misuse MISUSE_CASE_001 
+        description "Attempting to apply EPB while vehicle is moving at high speed"
+      def misuse MISUSE_CASE_002 
+        desciption "Using EPB as primary braking system instead of service brakes"
+      def misuse MISUSE_CASE_003 
+        description "Tampering with or modifying EPB components"
+      def misuse MISUSE_CASE_004 
+        description "Ignoring EPB warning indicators or fault messages"
+      def misuse MISUSE_CASE_005 
+        description "Operating vehicle with known EPB malfunctions"
+      def misuse MISUSE_CASE_006 
+        description "Improper use of manual emergency release"
+
+ 

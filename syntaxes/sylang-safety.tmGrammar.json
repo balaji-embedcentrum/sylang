@@ -4,11 +4,13 @@
   "scopeName": "source.sylang.safety",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#def-statements" },
+    { "include": "#section-headers" },
     { "include": "#safety-keywords" },
-    { "include": "#strings" },
+    { "include": "#property-keywords" },
     { "include": "#safety-levels" },
-    { "include": "#def-keyword" },
-    { "include": "#attributes" }
+    { "include": "#strings" },
+    { "include": "#identifiers" }
   ],
   "repository": {
     "comments": {
@@ -25,43 +27,50 @@
         }
       ]
     },
-    "def-keyword": {
+    "def-statements": {
       "patterns": [
+        {
+          "match": "\\b(def)\\s+(item|scenario|condition|vehiclestate|drivingstate|environment|boundary|overallsafetystrategy|principle|assumptionsofuse|foreseesablemisuse|goal|hazard|measure|criterion|hazardanalysis)\\b",
+          "captures": {
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "entity.name.type.sylang" }
+          }
+        },
         {
           "name": "keyword.control.def.sylang",
           "match": "\\bdef\\b"
         }
       ]
     },
+    "section-headers": {
+      "patterns": [
+        {
+          "name": "keyword.control.section.sylang",
+          "match": "^\\s*(operationalscenarios|operationalconditions|vehiclestates|driverstates|environments|safetyconcept|itemdef|hazardanalysis|riskassessment|safetygoals|functionalsafetyrequirements)\\b"
+        }
+      ]
+    },
     "safety-keywords": {
       "patterns": [
         {
-          "name": "keyword.control.safety.sylang",
-          "match": "\\b(hazardanalysis|hazardidentification|riskassessment|safetygoals|functionalsafetyrequirements)\\b"
+          "name": "keyword.other.safety-structure.sylang",
+          "match": "\\b(principle|assumption|misuse|includes|excludes|systemboundaries|subsystems)\\b"
         },
         {
-          "name": "keyword.control.safety-structure.sylang",
-          "match": "\\b(itemdef|operationalscenarios|safetyconcept|hazardcategories|subsystemhazards|scenarios|safetygoalsdef|safetymeasures|verificationcriteria)\\b"
-        },
-        {
-          "name": "keyword.control.safety-definition.sylang",
-          "match": "\\b(goal|hazard|scenario|measure|criterion|category|subsystem|boundary|vehiclestate|drivingstate|environment|assumption|principle|condition)\\b"
-        },
-        {
-          "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|severity|probability|controllability|verification|rationale|methodology|context|conditions|consequences|enabledby|functions_affected|assessment|riskcriteria|exposure|asilmatrix|determination)\\b"
-        },
-        {
-          "name": "keyword.other.reference.sylang", 
-          "match": "\\b(derivedfrom|derivedFrom|allocatedto|allocatedTo|hazardanalysis|riskassessment|hazardidentification|safetygoals|productline|systemfeatures|systemfunctions|subsystems)\\b"
-        },
-        {
-          "name": "keyword.other.structure.sylang",
-          "match": "\\b(includes|excludes|operationalconditions|vehiclestates|driverstates|environments|overallsafetystrategy|assumptionsofuse|safetymeasures|verificationcriteria|requirements|references)\\b"
+          "name": "keyword.other.safety-reference.sylang",
+          "match": "\\b(productline|systemfeatures|systemfunctions|vehiclestate|environment|driverstate|conditions)\\b"
         },
         {
           "name": "keyword.other.methodology.sylang",
-          "match": "\\b(FMEA|HAZOP|STPA|FTA|ETA)\\b"
+          "match": "\\b(FMEA|HAZOP|STPA|FTA|ETA|HARA)\\b"
+        }
+      ]
+    },
+    "property-keywords": {
+      "patterns": [
+        {
+          "name": "keyword.other.property.sylang",
+          "match": "\\b(name|description|owner|reviewers|tags|severity|probability|controllability|verification|rationale|methodology|context|conditions|consequences|characteristics|range|impact|standard)\\b"
         }
       ]
     },
@@ -92,11 +101,15 @@
         }
       ]
     },
-    "attributes": {
+    "identifiers": {
       "patterns": [
         {
-          "name": "entity.name.tag.sylang",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*[\":])"
+          "name": "entity.name.function.sylang",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        },
+        {
+          "name": "variable.other.sylang",
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
         }
       ]
     }
