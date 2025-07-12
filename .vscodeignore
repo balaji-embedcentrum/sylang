@@ -1,104 +1,89 @@
-# INCLUDE necessary runtime dependencies for language server
-# Exclude only dev dependencies that aren't needed at runtime
-node_modules/@types/
-node_modules/typescript/
-node_modules/.bin/
+# Development files and directories
+.vscode/**
+.vscode-test/**
+src/**
+test/**
+test-*.ts
+test-*.js
+test-*.md
+*.test.ts
+*.test.js
 
-# Include these critical runtime dependencies:
-# - vscode-languageclient (for LSP client)
-# - vscode-languageserver (for LSP server)
-# - vscode-languageserver-textdocument (for text handling)
-# - tree-sitter (for syntax parsing)
-# - web-tree-sitter (for browser compatibility)
-
-# Build logs and debug files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build and source files (only include compiled output)
-src/**/*.ts
-src/**/*.map
+# Build artifacts
 tsconfig.json
-webpack.config.js
-rollup.config.js
-
-# IDE and editor files
-.vscode/
-.cursor/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Git files
-.git/
+tslint.json
+.eslintrc.json
 .gitignore
 .gitattributes
-.gitmodules
 
-# Test files and directories
-test/
-tests/
-**/test/**
-**/*test*
-test-*.ple
-test-*.fun
+# Node.js
+node_modules/**
+npm-debug.log
+yarn-error.log
+package-lock.json
+package-lock 2.json
+
+# Documentation and development files
+.github/**
+.travis.yml
+.appveyor.yml
+.coveralls.yml
+.nyc_output/**
+coverage/**
+docs/**
+website/**
+
+# Test files
 test-*.fml
+test-*.ple
 test-*.sgl
-debug-*.fsr
-test-typos.fsr
-test-validation-example.fsr
+test-*.itm
+test-*.fun
+test-*.asm
+test-*.ckt
+test-*.cmp
+test-*.mod
+test-*.prt
+test-*.sub
+test-*.req
+test-*.haz
+test-*.rsk
+test-*.fsr
+test-*.tra
+test-*.thr
+test-*.sgo
+test-*.sre
+test-*.ast
+test-*.sec
+test-*.fma
 test-cross-file-navigation.md
+test-example.ple
+test-fml-fixes.fml
+test-indentation-validation.fml
+test-iso26580-validation.fml
+test-itm-errors.itm
+test-itm-validation.itm
+test-simple-features.fml
+test-simple-typo.fml
+test-tab-indentation.fml
 test-universal-sylang.sgl
+test-validation-fixed.fml
+test-validation-fixed.ple
+test-validation-indentation.ple
+test-validation-ple.ple
+test-validation-spacing.ple
+test-validation-wrong-file.fun
+TESTING_INSTRUCTIONS.md
 
-# Sample and example projects
-sampleproject/
-examples/
-sample/
-demo/
+# Sample and example files
+sampleproject/**
+~/sylang-test/**
 
-# Documentation and website
-website/
-docs/
-documentation/
-*.md
-!README.md
-COMPLETION_SUMMARY.md
-
-# User directories and files
-~/
-home/
-
-# Old builds and packages
-*.vsix
-
-# Logs and temporary files
+# Other development files
+.claude/**
+*.map
 *.log
-tmp/
-temp/
-.tmp/
-
-# Development files
-webpack.config.*
-rollup.config.*
-babel.config.*
-jest.config.*
-*.config.js
-*.config.ts
-
-# Misc
-.env
-.env.*
-coverage/
-.nyc_output/
-.eslintcache 
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db 
