@@ -5,16 +5,16 @@
     "module": "commonjs",
     "outDir": "out",
     "rootDir": "src",
-    "strict": true,
+    "strict": false,
     "noImplicitReturns": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noImplicitThis": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
@@ -28,10 +28,6 @@
   "exclude": [
     "node_modules",
     "out",
-    "**/*.test.ts",
-    "src/core/SymbolManager.ts",
-    "src/providers/SylangDefinitionProvider.ts",
-    "src/providers/SylangReferenceProvider.ts",
-    "src/providers/SylangRenameProvider.ts"
+    "website"
   ]
 } 

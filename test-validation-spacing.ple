@@ -1,5 +1,0 @@
-productline TestSpacing
- description "One space instead of two"
-   owner "Three spaces instead of two"  
-     domain "Five spaces instead of two"
-  compliance "ISO 26262" 

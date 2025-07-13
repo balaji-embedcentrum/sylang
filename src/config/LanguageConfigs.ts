@@ -26,11 +26,15 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Functions', 'sylang-fun'],
         extensions: ['.fun', '.fma'],
         keywords: [
-            'def', 'systemfunctions', 'function', 'name', 'description', 'owner', 
-            'tags', 'safetylevel', 'enables', 'allocatedto'
+            'def', 'functiongroup', 'function', 'name', 'description', 'category', 'owner', 
+            'tags', 'asil', 'partof', 'enables', 'allocatedto', 'feature'
         ],
         snippetFile: 'functions.json',
-        validationRules: ['required-fields', 'safety-levels', 'function-structure', 'def-keyword']
+        validationRules: ['required-fields', 'safety-levels', 'function-structure', 'def-keyword'],
+        validPropertyValues: {
+            'partof': ['product', 'system', 'subsystem', 'component', 'module', 'unit', 'assembly', 'circuit', 'part'],
+            'asil': ['QM', 'A', 'B', 'C', 'D']
+        }
     },
     'sylang-features': {
         id: 'sylang-features',

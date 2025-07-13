@@ -1,0 +1,7 @@
+def system ComplexInverterSystem
+  name "Advanced Power Inverter System"
+  description "High-performance electric vehicle inverter with advanced control and safety features"
+  owner "Power Electronics Team"
+  tags "inverter", "power-conversion", "electric-vehicle", "automotive"
+  asil D
+  contains subsystem PowerElectronicsSubsystem, ControlSubsystem, ThermalManagementSubsystem, ProtectionSubsystem, CommunicationSubsystem, MonitoringSubsystem, PowerInputSubsystem, PowerOutputSubsystem 

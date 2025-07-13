@@ -8,7 +8,7 @@ export class FunctionsValidator extends BaseValidator {
     }
 
     protected getDefinitionKeywords(): string[] {
-        return ['systemfunctions', 'function'];
+        return ['functiongroup', 'function'];
     }
 
     protected async validateLanguageSpecificRules(
@@ -18,14 +18,19 @@ export class FunctionsValidator extends BaseValidator {
     ): Promise<void> {
         const trimmedLine = line.trim();
 
-        // Validate def systemfunctions syntax
-        if (trimmedLine.startsWith('def systemfunctions')) {
-            await this.validateSystemfunctionsDefinition(lineIndex, trimmedLine);
+        // Validate def functiongroup syntax
+        if (trimmedLine.startsWith('def functiongroup')) {
+            await this.validateFunctiongroupDefinition(lineIndex, trimmedLine);
         }
 
         // Validate def function syntax
         if (trimmedLine.startsWith('def function')) {
             await this.validateFunctionDefinition(lineIndex, trimmedLine);
+        }
+
+        // Validate partof property
+        if (trimmedLine.startsWith('partof ')) {
+            await this.validatePartofProperty(lineIndex, trimmedLine);
         }
 
         // Validate enables cross-file references to features
@@ -45,30 +50,72 @@ export class FunctionsValidator extends BaseValidator {
         await this.validateFunctionsHierarchicalIndentation(document);
     }
 
-    private async validateSystemfunctionsDefinition(lineIndex: number, trimmedLine: string): Promise<void> {
-        const systemfunctionsMatch = trimmedLine.match(/^def\s+systemfunctions\s+(\w+)/);
-        if (!systemfunctionsMatch) {
+    private async validateFunctiongroupDefinition(lineIndex: number, trimmedLine: string): Promise<void> {
+        const functiongroupMatch = trimmedLine.match(/^def\s+functiongroup\s+(\w+)/);
+        if (!functiongroupMatch) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'Invalid systemfunctions syntax. Expected: def systemfunctions <SystemName>',
+                'Invalid functiongroup syntax. Expected: def functiongroup <FunctiongroupName>',
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'invalid-systemfunctions-syntax';
+            diagnostic.code = 'invalid-functiongroup-syntax';
             this.diagnostics.push(diagnostic);
             return;
         }
 
-        const systemfunctionsName = systemfunctionsMatch[1] || '';
+        const functiongroupName = functiongroupMatch[1] || '';
         
-        if (!/^[A-Z][a-zA-Z0-9]*$/.test(systemfunctionsName)) {
+        if (!/^[A-Z][a-zA-Z0-9]*$/.test(functiongroupName)) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'System functions name should start with uppercase letter and contain only letters and numbers',
+                'Functiongroup name should start with uppercase letter and contain only letters and numbers',
                 vscode.DiagnosticSeverity.Warning
             );
-            diagnostic.code = 'invalid-systemfunctions-name';
+            diagnostic.code = 'invalid-functiongroup-name';
+            this.diagnostics.push(diagnostic);
+        }
+    }
+
+    private async validatePartofProperty(lineIndex: number, trimmedLine: string): Promise<void> {
+        const partofMatch = trimmedLine.match(/^partof\s+(.+)$/);
+        if (!partofMatch) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                'Invalid partof property. Expected format: partof <value>',
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'invalid-partof-property';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+
+        const partofValue = partofMatch[1]?.trim();
+        if (!partofValue) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                'partof value is required',
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'missing-partof-value';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+
+        // Get valid partof enum values from language config
+        const validPartofValues = this.languageConfig.validPropertyValues?.['partof'] || [];
+        
+        if (validPartofValues.length > 0 && !validPartofValues.includes(partofValue)) {
+            const range = new vscode.Range(lineIndex, trimmedLine.indexOf(partofValue), lineIndex, trimmedLine.indexOf(partofValue) + partofValue.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                `Invalid partof value '${partofValue}'. Valid values are: ${validPartofValues.join(', ')}`,
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'invalid-partof-value';
             this.diagnostics.push(diagnostic);
         }
     }

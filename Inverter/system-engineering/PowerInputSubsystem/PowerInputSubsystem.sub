@@ -1,0 +1,8 @@
+def subsystem PowerInputSubsystem
+  name "Power Input Subsystem"
+  description "Conditions and filters DC input power from battery or DC source."
+  owner "Power Input Team"
+  tags "input", "filtering", "conditioning", "power-modes"
+  asil C
+  enables feature PowerModes, SleepMode
+  implements function PowerModeManager, SleepModeController 

@@ -1,0 +1,7 @@
+def system ErrorSystem
+  name Error System
+  description "System with missing quotes"
+  owner "Test Team"
+  tags "error", "test"
+  asil D
+  contains subsystem TestSubsystem 

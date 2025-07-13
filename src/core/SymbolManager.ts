@@ -33,22 +33,29 @@ export class SymbolManager {
         let documentSymbols: SymbolDefinition[] = [];
         let documentReferences: SymbolReference[] = [];
         
-        if (languageConfig.id === 'sylang-safety' || languageConfig.id === 'sylang-components') {
-            // Specialized parsing for safety and components files (including .req, .sub)
-            const extension = document.fileName.split('.').pop() || '';
-            if (extension === 'haz') {
-                ({ definitions: documentSymbols, references: documentReferences } = this.parseHazardDocument(document));
-            } else if (extension === 'rsk') {
-                ({ definitions: documentSymbols, references: documentReferences } = this.parseRiskDocument(document));
-            } else if (extension === 'sgl') {
-                ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyGoalsDocument(document));
-            } else if (extension === 'req') {
-                ({ definitions: documentSymbols, references: documentReferences } = this.parseRequirementsDocument(document));
-            } else if (extension === 'sub') {
-                ({ definitions: documentSymbols, references: documentReferences } = this.parseSubsystemDocument(document));
-            } else {
-                ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyDocument(document));
-            }
+        // Get file extension for specialized parsing
+        const extension = document.fileName.split('.').pop() || '';
+        
+        if (extension === 'haz') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseHazardDocument(document));
+        } else if (extension === 'rsk') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseRiskDocument(document));
+        } else if (extension === 'sgl') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyGoalsDocument(document));
+        } else if (extension === 'req') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseRequirementsDocument(document));
+        } else if (extension === 'sub') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseSubsystemDocument(document));
+        } else if (extension === 'fun' || extension === 'fma') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseFunctionsDocument(document));
+        } else if (extension === 'fml') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseFeaturesDocument(document));
+        } else if (extension === 'ple') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseProductLineDocument(document));
+        } else if (extension === 'sys') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseSystemDocument(document));
+        } else if (languageConfig.id === 'sylang-safety') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyDocument(document));
         } else {
             // Existing general parsing for other languages
             const text = document.getText();
@@ -958,5 +965,249 @@ export class SymbolManager {
             'subsystem': ['name', 'description', 'owner', 'tags', 'safetylevel', 'asil', 'enables', 'implements']
         };
         return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    /**
+     * Parse functions document (.fun, .fma files)
+     */
+    private parseFunctionsDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.trim();
+            if (!line || line.startsWith('//')) continue;
+
+            const indentLevel = this.getIndentLevel(currentLine);
+
+            // Update context stack based on indentation
+            while (contextStack.length > indentLevel) {
+                contextStack.pop();
+            }
+
+            // Parse definitions and update context
+            if (line.startsWith('def ')) {
+                const parts = line.split(/\s+/);
+                if (parts.length >= 3) {
+                    const keyword = parts[1]; // functiongroup, function
+                    const name = parts[2];
+
+                    if (keyword && this.isFunctionsContainerKeyword(keyword)) {
+                        // Container definition
+                        contextStack[indentLevel] = keyword;
+                        if (name) {
+                            definitions.push({
+                                name: name,
+                                kind: keyword,
+                                location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                                container: contextStack.slice(0, indentLevel).join('.'),
+                                properties: new Map(),
+                                range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                            });
+                        }
+                    } else if (keyword === 'function' && name) {
+                        // Function definition
+                        contextStack[indentLevel] = 'function';
+                        definitions.push({
+                            name: name,
+                            kind: 'function',
+                            location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                            container: contextStack.slice(0, indentLevel).join('.'),
+                            properties: new Map(),
+                            range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                        });
+                    }
+                }
+            } else if (this.isFunctionsPropertyKeyword(line.split(/\s+/)[0], contextStack[contextStack.length - 1] || '')) {
+                // Property line - look for references in enables
+                if (line.startsWith('enables')) {
+                    const enablesMatch = line.match(/enables\s+(?:feature\s+)?(.+)/);
+                    if (enablesMatch && enablesMatch[1]) {
+                        const features = enablesMatch[1].split(',').map(f => f.trim());
+                        for (const feature of features) {
+                            if (feature) {
+                                const startPos = line.indexOf(feature);
+                                if (startPos >= 0) {
+                                    references.push({
+                                        name: feature,
+                                        location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                                        context: 'enables',
+                                        range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + feature.length)
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    private isFunctionsContainerKeyword(keyword: string): boolean {
+        return keyword === 'functiongroup';
+    }
+
+    private isFunctionsPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'function': ['name', 'description', 'category', 'owner', 'tags', 'asil', 'partof', 'enables', 'allocatedto']
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    /**
+     * Parse features document (.fml files)
+     */
+    private parseFeaturesDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.trim();
+            if (!line || line.startsWith('//')) continue;
+
+            const indentLevel = this.getIndentLevel(currentLine);
+
+            // Update context stack based on indentation
+            while (contextStack.length > indentLevel) {
+                contextStack.pop();
+            }
+
+            // Parse definitions and update context
+            if (line.startsWith('def ')) {
+                const parts = line.split(/\s+/);
+                if (parts.length >= 3) {
+                    const keyword = parts[1]; // systemfeatures, feature
+                    const name = parts[2];
+
+                    if (keyword === 'systemfeatures') {
+                        contextStack[indentLevel] = keyword;
+                        definitions.push({
+                            name: name,
+                            kind: keyword,
+                            location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                            container: contextStack.slice(0, indentLevel).join('.'),
+                            properties: new Map(),
+                            range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                        });
+                    } else if (keyword === 'feature') {
+                        contextStack[indentLevel] = 'feature';
+                        definitions.push({
+                            name: name,
+                            kind: 'feature',
+                            location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                            container: contextStack.slice(0, indentLevel).join('.'),
+                            properties: new Map(),
+                            range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                        });
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    /**
+     * Parse product line document (.ple files)
+     */
+    private parseProductLineDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.trim();
+            if (!line || line.startsWith('//')) continue;
+
+            // Parse productline definition
+            if (line.startsWith('def productline')) {
+                const parts = line.split(/\s+/);
+                if (parts.length >= 3) {
+                    const name = parts[2];
+                    definitions.push({
+                        name: name,
+                        kind: 'productline',
+                        location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                        container: '',
+                        properties: new Map(),
+                        range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                    });
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    /**
+     * Parse system document (.sys files)
+     */
+    private parseSystemDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.trim();
+            if (!line || line.startsWith('//')) continue;
+
+            // Parse system definition
+            if (line.startsWith('def system')) {
+                const parts = line.split(/\s+/);
+                if (parts.length >= 3) {
+                    const name = parts[2];
+                    definitions.push({
+                        name: name,
+                        kind: 'system',
+                        location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                        container: '',
+                        properties: new Map(),
+                        range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                    });
+                }
+            }
+            // Look for contains references
+            else if (line.startsWith('contains')) {
+                const containsMatch = line.match(/contains\s+(.+)/);
+                if (containsMatch) {
+                    const systems = containsMatch[1].split(',').map(s => s.trim().replace(/"/g, ''));
+                    for (const system of systems) {
+                        if (system) {
+                            const startPos = line.indexOf(system);
+                            references.push({
+                                name: system,
+                                location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                                context: 'contains',
+                                range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + system.length)
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
     }
 }
