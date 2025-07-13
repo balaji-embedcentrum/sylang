@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 interface CompletionContext {
-    type: 'top-level' | 'after-systemfeatures' | 'after-productline' | 'inside-feature' | 'inside-itm' | 'inside-def' | 'inside-haz' | 'inside-rsk' | 'inside-sgl' | 'inside-req' | 'inside-sub';
+    type: 'top-level' | 'after-systemfeatures' | 'after-productline' | 'inside-feature' | 'inside-itm' | 'inside-def' | 'inside-haz' | 'inside-rsk' | 'inside-sgl' | 'inside-req' | 'inside-sub' | 'inside-sys' | 'inside-fun';
     parentKeyword: string | null;
     indentLevel: number;
 }
@@ -178,6 +178,30 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                             };
                         }
                     }
+
+                    // Add for .sys files
+                    if (document.fileName.endsWith('.sys')) {
+                        if (prevText.startsWith('def ') && this.getIndentLevel(line.text) > this.getIndentLevel(prevLine.text)) {
+                            const defType = prevText.split(' ')[1] || null;
+                            return {
+                                type: 'inside-sys',
+                                parentKeyword: defType,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
+
+                    // Add for .fun files
+                    if (document.fileName.endsWith('.fun')) {
+                        if (prevText.startsWith('def ') && this.getIndentLevel(line.text) > this.getIndentLevel(prevLine.text)) {
+                            const defType = prevText.split(' ')[1] || null;
+                            return {
+                                type: 'inside-fun',
+                                parentKeyword: defType,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
                     
                     if (['operationalscenarios', 'safetyconcept', 'systemboundaries', 'subsystems', 'includes', 'excludes', 'safetystrategy', 'assumptionsofuse', 'foreseeablemisuse'].includes(prevText) && this.getIndentLevel(line.text) > 0) {
                         return {
@@ -281,6 +305,18 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
             case 'inside-sub':
                 // Inside .sub sections/containers
                 completions.push(...this.getSubSectionCompletions(context.parentKeyword || ''));
+                this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                break;
+
+            case 'inside-sys':
+                // Inside .sys sections/containers
+                completions.push(...this.getSysSectionCompletions(context.parentKeyword || ''));
+                this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                break;
+
+            case 'inside-fun':
+                // Inside .fun sections/containers
+                completions.push(...this.getFunSectionCompletions(context.parentKeyword || ''));
                 this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
                 break;
 
@@ -738,6 +774,44 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         return completions;
     }
 
+    private getSysSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'system':
+                // System properties
+                completions.push(this.createPropertyCompletion('name', 'name "System Name"', 'System name'));
+                completions.push(this.createPropertyCompletion('description', 'description "System description"', 'System description'));
+                completions.push(this.createPropertyCompletion('owner', 'owner "Team Name"', 'System owner'));
+                completions.push(this.createPropertyCompletion('tags', 'tags "tag1", "tag2"', 'System tags'));
+                completions.push(this.createPropertyCompletion('asil', 'asil D', 'ASIL level'));
+                completions.push(this.createPropertyCompletion('contains', 'contains subsystem SubsystemName', 'Contains subsystems'));
+                break;
+        }
+        return completions;
+    }
+
+    private getFunSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'functiongroup':
+                // Functions container - suggest function definitions
+                completions.push(this.createFunctionDefinitionTemplate());
+                break;
+            case 'function':
+                // Function properties
+                completions.push(this.createPropertyCompletion('name', 'name "Function Name"', 'Function name'));
+                completions.push(this.createPropertyCompletion('description', 'description "Function description"', 'Function description'));
+                completions.push(this.createPropertyCompletion('category', 'category ${1|product,system,subsystem,component,module,unit,assembly,circuit,part|}', 'Function category'));
+                completions.push(this.createPropertyCompletion('owner', 'owner "Team Name"', 'Function owner'));
+                completions.push(this.createPropertyCompletion('tags', 'tags "tag1", "tag2"', 'Function tags'));
+                completions.push(this.createPropertyCompletion('asil', 'asil ${1|QM,A,B,C,D|}', 'ASIL level'));
+                completions.push(this.createPropertyCompletion('partof', 'partof ${1|product,system,subsystem,component,module,unit,assembly,circuit,part|}', 'Part of hierarchy'));
+                completions.push(this.createPropertyCompletion('enables', 'enables feature FeatureName', 'Enables features'));
+                break;
+        }
+        return completions;
+    }
+
     private createRequirementTemplate(): vscode.CompletionItem {
         const item = new vscode.CompletionItem('def requirement (template)', vscode.CompletionItemKind.Snippet);
         item.insertText = new vscode.SnippetString([
@@ -778,6 +852,84 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         item.documentation = new vscode.MarkdownString('**Subsystem**\n\nFull template for .sub file.');
         item.filterText = 'def subsystem';
         item.sortText = '0_def_subsystem';
+        return item;
+    }
+
+    private createSystemTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def system (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def system ${1:ID}',
+            '  name "${2:Name}"',
+            '  description "${3:Description}"',
+            '  owner "${4:Owner}"',
+            '  tags "${5:Tag1}", "${6:Tag2}"',
+            '  asil ${7|QM,A,B,C,D|}',
+            '  contains subsystem ${8:Subsystem1}, ${9:Subsystem2}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'System Template';
+        item.documentation = new vscode.MarkdownString('**System**\n\nFull template for .sys file.');
+        item.filterText = 'def system';
+        item.sortText = '0_def_system';
+        return item;
+    }
+
+    private createFunctionDefinitionTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def function (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def function ${1:FunctionName}',
+            '  name "${2:Function Name}"',
+            '  description "${3:Function description}"',
+            '  owner "${4:Team Name}"',
+            '  tags "${5:tag1}", "${6:tag2}"',
+            '  asil ${7|QM,A,B,C,D|}',
+            '  enables feature ${8:FeatureName}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Function Definition Template';
+        item.documentation = new vscode.MarkdownString('**Function Definition**\n\nComplete template for function definition in .fun files.');
+        item.filterText = 'def function';
+        item.sortText = '0_def_function';
+        return item;
+    }
+
+    private createSystemfunctionsTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def systemfunctions (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def systemfunctions ${1:SystemName}',
+            '  def function ${2:FunctionName}',
+            '    name "${3:Function Name}"',
+            '    description "${4:Function description}"',
+            '    owner "${5:Team Name}"',
+            '    tags "${6:tag1}", "${7:tag2}"',
+            '    asil ${8|QM,A,B,C,D|}',
+            '    enables feature ${9:FeatureName}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'System Functions Template';
+        item.documentation = new vscode.MarkdownString('**System Functions**\n\nComplete template for .fun file with systemfunctions container.');
+        item.filterText = 'def systemfunctions';
+        item.sortText = '0_def_systemfunctions';
+        return item;
+    }
+
+    private createSubsystemfunctionsTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def subsystemfunctions (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def subsystemfunctions ${1:SubsystemName}',
+            '  def function ${2:FunctionName}',
+            '    name "${3:Function Name}"',
+            '    description "${4:Function description}"',
+            '    owner "${5:Team Name}"',
+            '    tags "${6:tag1}", "${7:tag2}"',
+            '    asil ${8|QM,A,B,C,D|}',
+            '    enables feature ${9:FeatureName}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Subsystem Functions Template';
+        item.documentation = new vscode.MarkdownString('**Subsystem Functions**\n\nComplete template for .fun file with subsystemfunctions container.');
+        item.filterText = 'def subsystemfunctions';
+        item.sortText = '0_def_subsystemfunctions';
         return item;
     }
 
@@ -999,6 +1151,11 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         }
         if (this.languageId === 'sylang-components') {
             items.push(this.createSubsystemDefinitionTemplate());
+            items.push(this.createSystemTemplate());
+        }
+        if (this.languageId === 'sylang-functions') {
+            items.push(this.createSystemfunctionsTemplate());
+            items.push(this.createSubsystemfunctionsTemplate());
         }
         
         return items.filter(item => item !== undefined);
@@ -1127,6 +1284,10 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                 return ['def', 'name', 'description', 'type', 'source', 'derivedfrom', 'asil', 'rationale', 'allocatedto', 'verificationcriteria', 'status'];
             case 'inside-sub':
                 return ['name', 'description', 'owner', 'tags', 'safetylevel', 'asil', 'enables', 'implements'];
+            case 'inside-sys':
+                return ['name', 'description', 'owner', 'tags', 'asil', 'contains'];
+            case 'inside-fun':
+                return ['name', 'description', 'owner', 'tags', 'asil', 'enables'];
             default:
                 return this.keywords;
         }

@@ -1,0 +1,7 @@
+def system InverterSystem 
+  name "Power Inverter System"
+  description "Converts DC power to AC power with high efficiency and reliability."
+  owner "Power Electronics Team"
+  tags "inverter", "power", "conversion", "electronics"
+  asil D
+  contains subsystem PowerElectronicsSubsystem, ControlSubsystem, ThermalManagementSubsystem, ProtectionSubsystem, CommunicationSubsystem, MonitoringSubsystem, PowerInputSubsystem, PowerOutputSubsystem 

@@ -15,9 +15,10 @@ export class SylangHoverProvider implements vscode.HoverProvider {
         // Comprehensive documentation for Sylang keywords
         const docs = {
             'productline': '**Product Line Definition**\n\nDefines a family of related products with shared and variable features.\n\n*Syntax:* `productline <name>`',
-            'systemfunctions': '**System Functions Container**\n\nContainer for defining system-level functions and their relationships.\n\n*Syntax:* `systemfunctions <name>`',
+            'functiongroup': '**Function Group Container**\n\nDefines a container for functions regardless of hierarchy level. Replaces systemfunctions/subsystemfunctions with a more generic approach.\n\n*Syntax:* `def functiongroup <GroupName>`\n\n*Example:*\n```\ndef functiongroup ActuationControlFunctions\n  def function MotorDriveController\n    name "Motor Drive Controller"\n    description "Controls motor drive circuits"\n    category subsystem\n    owner "Hardware Team"\n    tags "motor", "drive", "power"\n    asil D\n    partof subsystem\n    enables feature ActuationSystemManager\n```',
+            'systemfunctions': '**⚠️ Deprecated - System Functions Container**\n\n*This keyword is deprecated. Use `functiongroup` instead.*\n\nDefines a container for system-level functions and their relationships.\n\n*Syntax:* `def systemfunctions <SystemName>`\n\n*Example:*\n```\ndef systemfunctions InverterSystemFunctions\n  def function PowerElectronicsController\n    name "Power Electronics Controller"\n    description "Main controller for power electronics"\n    owner "Power Electronics Team"\n    tags "power", "controller"\n    asil D\n    enables feature PowerConversion\n```',
             'systemfeatures': '**System Features Container**\n\nContainer for defining feature models with variability.\n\n*Syntax:* `systemfeatures <name>`',
-            'function': '**def function Definition**\n\nDefines a system def function with properties and relationships.\n\n*Properties:* name, description, owner, tags, safetylevel, enables',
+            'function': '**def function Definition**\n\nDefines a system def function with properties and relationships.\n\n*Properties:* name, description, category, owner, tags, asil, partof, enables',
             'feature': '**Feature Definition**\n\nDefines a feature in the product line with variability type.\n\n*Types:* mandatory, optional, alternative, or',
             'mandatory': '**Mandatory Feature**\n\nFeature that must be present in all product variants.\n\n*Usage:* `feature <name> mandatory`',
             'optional': '**Optional Feature**\n\nFeature that may or may not be present in product variants.\n\n*Usage:* `feature <name> optional`',
@@ -25,10 +26,12 @@ export class SylangHoverProvider implements vscode.HoverProvider {
             'or': '**Or-Features**\n\nAt least one feature from the group must be selected.\n\n*Usage:* `feature <name> or`',
             'name': '**Display Name**\n\nHuman-readable name for the element.\n\n*Format:* `name "Display Name"`',
             'description': '**Description**\n\nDetailed description of the element.\n\n*Format:* `description "Detailed text"`',
+            'category': '**Function Category**\n\nSpecifies the functional category of the element.\n\n*Format:* `category <level>`\n\n*Valid values:* product, system, subsystem, component, module, unit, assembly, circuit, part',
             'owner': '**Owner**\n\nTeam or person responsible for the element.\n\n*Format:* `owner "Team Name"`',
             'tags': '**Tags**\n\nCategorization tags for grouping and filtering.\n\n*Format:* `tags "tag1", "tag2", "tag3"`',
+            'partof': '**Part Of Hierarchy**\n\nSpecifies which level of the system hierarchy this element belongs to.\n\n*Format:* `partof <level>`\n\n*Valid values:*\n- **product**: Product-level element\n- **system**: System-level element\n- **subsystem**: Subsystem-level element\n- **component**: Component-level element\n- **module**: Module-level element\n- **unit**: Unit-level element\n- **assembly**: Assembly-level element\n- **circuit**: Circuit-level element\n- **part**: Part-level element\n\n*Example:* `partof subsystem`',
             'safetylevel': '**Safety Level**\n\nISO 26262 Automotive Safety Integrity Level.\n\n*Values:* ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM\n\n- **ASIL-D**: Highest integrity level\n- **ASIL-C**: High integrity level\n- **ASIL-B**: Medium integrity level\n- **ASIL-A**: Low integrity level\n- **QM**: Quality Management (no ASIL)',
-            'enables': '**Enables Relationship**\n\nDefines what features or functions this element enables.\n\n*Format:* `enables Feature1, Feature2`',
+            'enables': '**Enables Relationship**\n\nDefines what features or functions this element enables.\n\n*Formats:* \n- `enables Feature1, Feature2` (legacy format)\n- `enables feature FeatureName1, FeatureName2` (.fun files)\n\n*Example (.fun):*\n```\nenables feature PowerConversion, MotorControl\n```\n\n*Note:* Functions can enable one or more features defined in .fml files.',
             'domain': '**Domain**\n\nApplication domain or industry sector.\n\n*Examples:* automotive, aerospace, industrial',
             'compliance': '**Compliance Standards**\n\nStandards and regulations this element complies with.\n\n*Examples:* ISO 26262, ASPICE, ISO 21448',
             'firstrelease': '**First Release**\n\nDate of the first release or availability.\n\n*Format:* `firstrelease "YYYY-MM-DD"`',
@@ -67,7 +70,7 @@ export class SylangHoverProvider implements vscode.HoverProvider {
             'characteristics': '**Characteristics Property**\n\nDefines characteristics of a state.',
             'conditions': '**Conditions Property**\n\nList of conditions for an environment.',
             'driverstate': '**Driver State Reference**\n\nReferences a driver state.',
-            'category': '**Hazard Category**\n\nDefines a hazard category.',
+            'hazardcategory': '**Hazard Category**\n\nDefines a hazard category.',
             'hazard': '**Hazard Definition**\n\nDefines a specific hazard.',
             'subsystem': '**Subsystem Reference**\n\nReferences a subsystem for hazards.',
             'methodology': '**Methodology**\n\nDefines methodologies used.',
@@ -85,7 +88,7 @@ export class SylangHoverProvider implements vscode.HoverProvider {
             'enabledby': '**Enabled By Property (deprecated)**\n\nUse "enabledby function" instead to specify functions that enable the measure.',
             'hazardidentification': '**Hazard Identification Reference**\n\nReferences hazard identification analysis.\n\n*Format:* `hazardidentification <HazardID>`',
             'riskassessment': '**Risk Assessment Reference**\n\nReferences risk assessment analysis.\n\n*Format:* `riskassessment <RiskID>`',
-            'asil': '**ASIL Level**\n\nAutomotive Safety Integrity Level for the goal.\n\n*Values:* A, B, C, D',
+            'asil': '**ASIL Property**\n\nAutomotive Safety Integrity Level according to ISO 26262.\n\n*Values:* QM, A, B, C, D\n\n*Usage:* `asil <level>`\n\n*Examples:*\n- `asil D` - Highest integrity level\n- `asil C` - High integrity level  \n- `asil B` - Medium integrity level\n- `asil A` - Low integrity level\n- `asil QM` - Quality Management (no ASIL)\n\n*Note:* Use without "ASIL-" prefix in .sys files.',
             
             // .req keywords
             'reqsection': '**Requirements Section Definition**\n\nDefines a section of functional safety requirements.\n\n*Usage:* `def reqsection <identifier>`',
@@ -99,7 +102,14 @@ export class SylangHoverProvider implements vscode.HoverProvider {
             'status': '**Status Property**\n\nStatus of the requirement.\n\n*Valid values:* draft, review, approved',
             
             // Additional subsystem-specific keyword
-            'implements': '**Implements Property**\n\nFunctions implemented by the subsystem.\n\n*Usage:* `implements function Function1, Function2`'
+            'implements': '**Implements Property**\n\nFunctions implemented by the subsystem.\n\n*Usage:* `implements function Function1, Function2`',
+            
+            // System-specific keywords (.sys files)
+            'system': '**System Definition**\n\nDefines a system with its properties and contained subsystems.\n\n*Syntax:* `def system <SystemName>`\n\n*Example:*\n```\ndef system InverterSystem\n  name "Power Inverter System"\n  description "Converts DC power to AC power"\n  owner "Power Electronics Team"\n  tags "inverter", "power", "conversion"\n  asil D\n  contains subsystem PowerElectronicsSubsystem, ControlSubsystem\n```',
+            'contains': '**Contains Property**\n\nSpecifies the subsystems contained within the system.\n\n*Syntax:* `contains subsystem <SubsystemName1>, <SubsystemName2>, ...`\n\n*Example:*\n```\ncontains subsystem PowerElectronicsSubsystem, ControlSubsystem, ThermalManagementSubsystem\n```\n\n*Note:* All subsystems must be listed on the same line, separated by commas.',
+            
+            // Function-specific keywords (.fun files)
+            'subsystemfunctions': '**⚠️ Deprecated - Subsystem Functions Container**\n\n*This keyword is deprecated. Use `functiongroup` instead.*\n\nDefines a container for subsystem-level functions.\n\n*Syntax:* `def subsystemfunctions <SubsystemName>`\n\n*Example:*\n```\ndef subsystemfunctions ControlSubsystemFunctions\n  def function MotorControlAlgorithmEngine\n    name "Motor Control Algorithm Engine"\n    description "Advanced motor control algorithms"\n    owner "Controls Team"\n    tags "motor-control", "algorithms"\n    asil D\n    enables feature VectorControl\n```'
         };
 
         Object.entries(docs).forEach(([keyword, documentation]) => {
@@ -120,7 +130,7 @@ export class SylangHoverProvider implements vscode.HoverProvider {
         
         const range = document.getWordRangeAtPosition(position);
         if (!range) {
-            return;
+            return undefined;
         }
 
         const word = document.getText(range);
@@ -162,6 +172,6 @@ export class SylangHoverProvider implements vscode.HoverProvider {
             }
         }
 
-        return;
+        return undefined;
     }
 }

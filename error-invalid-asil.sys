@@ -1,0 +1,7 @@
+def system ErrorSystem
+  name "Error System"
+  description "System with invalid ASIL"
+  owner "Test Team"
+  tags "error", "test"
+  asil X
+  contains subsystem TestSubsystem 

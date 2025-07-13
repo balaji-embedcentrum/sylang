@@ -1,0 +1,8 @@
+def subsystem MonitoringSubsystem
+  name "Monitoring Subsystem"
+  description "Monitors system health, diagnostics, and performance parameters."
+  owner "Diagnostics Team"
+  tags "monitoring", "diagnostics", "health", "sensors"
+  asil C
+  enables feature Diagnostics, OBDCompliance, FaultMemory, SensorInterfaces, CurrentSensing, PositionSensing, TemperatureSensing
+  implements function DiagnosticCoordinator, OBDComplianceInterface, FaultMemoryManager, SensorInterfaceController, CurrentSensingInterface, PositionSensingInterface, TemperatureSensingInterface 

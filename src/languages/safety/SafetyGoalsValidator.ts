@@ -249,9 +249,9 @@ export class SafetyGoalsValidator {
                         (prevRow[j] || 0) + 1,
                         (currentRow[j - 1] || 0) + 1,
                         (prevRow[j - 1] || 0) + cost
-                    );
-                }
+                );
             }
+        }
         }
         const finalRow = matrix[a.length];
         return finalRow ? (finalRow[b.length] || 0) : 0;

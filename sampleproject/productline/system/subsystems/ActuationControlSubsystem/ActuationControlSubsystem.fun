@@ -1,25 +1,27 @@
-subsystemfunctions ActuationControlSubsystem
-  function MotorDriveController
+def functiongroup ActuationControlSubsystemFunctions
+  def function MotorDriveController
     name "Motor Drive Controller"
     description "Controls motor drive circuits and power management for actuator systems."
+    category subsystem
     owner "Hardware Team"
     tags "motor", "drive", "power"
-    safetylevel ASIL-D
-    compose ActuationSystemManager
-    performedby ActuationControlSubsystem
+    asil D
+    enables feature ActuationSystemManager
 
-  function ActuatorSelectionLogic
+
+  def function ActuatorSelectionLogic
     name "Actuator Selection Logic"
     description "Implements logic for selecting and switching between different actuator types based on configuration."
+    category subsystem
     owner "Hardware Team"
     tags "actuator", "selection", "logic"
-    safetylevel ASIL-D
-    compose ActuatorTypeSelector
-    performedby ActuationControlSubsystem
+    asil D
+    enables feature ActuatorTypeSelector
 
-  function ForceCalculationEngine
+
+  def function ForceCalculationEngine
     name "Force Calculation Engine"
-    description "Calculates required clamping forces and manages force regulation algorithms."
+    description "Calculates required clamping forces and manages force regulation algori."
     owner "Hardware Team"
     tags "force", "calculation", "algorithms"
     safetylevel ASIL-C

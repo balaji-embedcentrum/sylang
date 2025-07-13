@@ -1,15 +1,18 @@
-def systemfunctions EPBFunctions
+def functiongroup EPBFunctions
 	def function CoreSystemOrchestrator
 		name "Core System Orchestrator"
 		description "Main orchestration engine for the entire EPB system architecture and coordination."
+		category system
 		owner "Systems Engineering"
 		tags "orchestration", "system", "architecture"
 		safetylevel ASIL-D
-		enables EPBSystem
+		enables feature EPBSystem
+
 
 	def function HMIInterfaceProcessor
 		name "HMI Interface Processor"
 		description "Central processor for all human-machine interface operations and user interactions."
+		category system
 		owner "HMI Team"  
 		tags "HMI", "processor", "interface"
 		safetylevel ASIL-B

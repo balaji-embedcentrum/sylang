@@ -8,6 +8,7 @@ import { RiskValidator } from '../languages/safety/RiskValidator';
 import { SafetyGoalsValidator } from '../languages/safety/SafetyGoalsValidator';
 import { RequirementsValidator } from '../languages/components/RequirementsValidator';
 import { SubsystemValidator } from '../languages/subsystem/SubsystemValidator'; // New import
+import { SystemValidator } from '../languages/system/SystemValidator'; // New import
 import { ProductLineValidator } from '../languages/productline/ProductLineValidator';
 import { getLanguageConfig } from '../config/LanguageConfigs';
 
@@ -57,11 +58,11 @@ export class ValidationEngine {
             // Check if it's a safety or other file (by extension)
             const fileName = document.fileName;
             const extension = fileName.split('.').pop();
-            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub'];
+            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys'];
             
             if (extensions.includes(extension || '')) {
                 // Use appropriate validator based on extension
-                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator;
+                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator;
                 if (extension === 'haz') {
                     validator = new HazardValidator();
                     console.log(`[ValidationEngine] Running HazardValidator for .${extension} file`);
@@ -77,6 +78,9 @@ export class ValidationEngine {
                 } else if (extension === 'sub') {
                     validator = new SubsystemValidator();
                     console.log(`[ValidationEngine] Running SubsystemValidator for .${extension} file`);
+                } else if (extension === 'sys') {
+                    validator = new SystemValidator();
+                    console.log(`[ValidationEngine] Running SystemValidator for .${extension} file`);
                 } else {
                     validator = new SafetyValidator();
                     console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);
