@@ -1,4 +1,4 @@
-def systemfunctions InverterFunctions
+def functiongroup InverterFunctions
 	def function PowerElectronicsController
 		name "Power Electronics Controller"
 		description "Main controller for all power electronics operations and switching control"

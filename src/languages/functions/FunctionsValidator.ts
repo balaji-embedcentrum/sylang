@@ -40,8 +40,8 @@ export class FunctionsValidator extends BaseValidator {
     }
 
     protected async validateDocumentLevelRules(document: vscode.TextDocument): Promise<void> {
-        // Check for single systemfunctions keyword in file
-        await this.validateSingleSystemfunctionsKeyword(document);
+        // Check for single functiongroup keyword in file
+        await this.validateSingleFunctiongroupKeyword(document);
 
         // Check for single .fun file in workspace
         await this.validateSingleFunFileInWorkspace(document);
@@ -214,43 +214,43 @@ export class FunctionsValidator extends BaseValidator {
         return features;
     }
 
-    private async validateSingleSystemfunctionsKeyword(document: vscode.TextDocument): Promise<void> {
+    private async validateSingleFunctiongroupKeyword(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
         const lines = text.split('\n');
-        let systemfunctionsCount = 0;
-        let firstSystemfunctionsLine = -1;
+        let functiongroupCount = 0;
+        let firstFunctiongroupLine = -1;
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (!line) continue;
             
             const trimmedLine = line.trim();
-            if (trimmedLine.startsWith('def systemfunctions')) {
-                systemfunctionsCount++;
-                if (firstSystemfunctionsLine === -1) {
-                    firstSystemfunctionsLine = i;
+            if (trimmedLine.startsWith('def functiongroup')) {
+                functiongroupCount++;
+                if (firstFunctiongroupLine === -1) {
+                    firstFunctiongroupLine = i;
                 }
             }
         }
 
-        if (systemfunctionsCount === 0) {
+        if (functiongroupCount === 0) {
             const range = new vscode.Range(0, 0, 0, 0);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'Functions file must contain exactly one "def systemfunctions" declaration',
+                'Functions file must contain exactly one "def functiongroup" declaration',
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'missing-systemfunctions-keyword';
+            diagnostic.code = 'missing-functiongroup-keyword';
             this.diagnostics.push(diagnostic);
-        } else if (systemfunctionsCount > 1) {
-            const firstLine = lines[firstSystemfunctionsLine];
-            const range = new vscode.Range(firstSystemfunctionsLine, 0, firstSystemfunctionsLine, firstLine ? firstLine.length : 0);
+        } else if (functiongroupCount > 1) {
+            const firstLine = lines[firstFunctiongroupLine];
+            const range = new vscode.Range(firstFunctiongroupLine, 0, firstFunctiongroupLine, firstLine ? firstLine.length : 0);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                `Multiple "def systemfunctions" declarations found (${systemfunctionsCount}). Only one is allowed per file.`,
+                `Multiple "def functiongroup" declarations found (${functiongroupCount}). Only one is allowed per file.`,
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'multiple-systemfunctions-keywords';
+            diagnostic.code = 'multiple-functiongroup-keywords';
             this.diagnostics.push(diagnostic);
         }
     }
@@ -292,10 +292,10 @@ export class FunctionsValidator extends BaseValidator {
             const trimmedLine = line.trim();
             const indentLevel = this.getIndentLevel(line);
             
-            // Check systemfunctions indentation
-            if (trimmedLine.startsWith('def systemfunctions')) {
+            // Check functiongroup indentation
+            if (trimmedLine.startsWith('def functiongroup')) {
                 if (indentLevel !== 0) {
-                    this.addDiagnostic(i, 0, indentLevel, `systemfunctions must start at column 0. Found ${indentLevel} tabs.`, 'invalid-systemfunctions-indentation');
+                    this.addDiagnostic(i, 0, indentLevel, `functiongroup must start at column 0. Found ${indentLevel} tabs.`, 'invalid-functiongroup-indentation');
                 }
                 systemfunctionsIndent = indentLevel;
                 continue;
@@ -308,7 +308,7 @@ export class FunctionsValidator extends BaseValidator {
                 
                 // Validate function indentation hierarchy
                 if (systemfunctionsIndent === -1) {
-                    this.addDiagnostic(i, 0, line.length, 'Function definition found before systemfunctions declaration', 'function-before-systemfunctions');
+                    this.addDiagnostic(i, 0, line.length, 'Function definition found before functiongroup declaration', 'function-before-functiongroup');
                     continue;
                 }
                 
