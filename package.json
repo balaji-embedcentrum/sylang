@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.27",
+  "version": "1.0.30",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -95,8 +95,18 @@
           ".itm",
           ".sgl",
           ".haz",
-          ".rsk",
           ".fsr"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-risk",
+        "aliases": [
+          "Sylang Risk Assessment",
+          "sylang-risk"
+        ],
+        "extensions": [
+          ".rsk"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -186,6 +196,11 @@
         "path": "./syntaxes/sylang-safety.tmGrammar.json"
       },
       {
+        "language": "sylang-risk",
+        "scopeName": "source.sylang.risk",
+        "path": "./syntaxes/sylang-risk.tmGrammar.json"
+      },
+      {
         "language": "sylang-security",
         "scopeName": "source.sylang.security",
         "path": "./syntaxes/sylang-security.tmGrammar.json"
@@ -226,6 +241,10 @@
       },
       {
         "language": "sylang-safety",
+        "path": "./snippets/safety.json"
+      },
+      {
+        "language": "sylang-risk",
         "path": "./snippets/safety.json"
       },
       {
@@ -354,7 +373,8 @@
     "onLanguage:sylang-functions",
     "onLanguage:sylang-features",
     "onLanguage:sylang-safety",
-    "onLanguage:sylang-security"
+    "onLanguage:sylang-security",
+    "onLanguage:sylang-components"
   ],
   "scripts": {
     "vscode:prepublish": "npm run compile",

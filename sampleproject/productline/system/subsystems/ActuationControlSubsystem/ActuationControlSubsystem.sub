@@ -1,8 +1,8 @@
-Subsystem ActuationControlSubsystem
+def subsystem ActuationControlSubsystem
   name "Actuation Control Subsystem"
   description "Controls physical brake actuators and force regulation mechanisms."
   owner "Hardware Team"
   tags "actuator", "control", "hardware"
   safetylevel ASIL-D
-  enables ActuatorSystem, ActuatorType, ForceControl
-  implements ActuationSystemManager, ActuatorTypeSelector, ForceRegulationModule
+  enables feature ActuatorSystem, ActuatorType, ForceControl
+  implements function ActuationSystemManager, ActuatorTypeSelector, ForceRegulationModule

@@ -50,16 +50,25 @@ export class SafetyValidator {
                 continue;
             }
 
-            // Root level: def hazardanalysis
+            // Root level: def item
             if (level === 0) {
-                if (trimmedLine.startsWith('def hazardanalysis ')) {
+                if (trimmedLine.startsWith('def item ')) {
                     const parts = trimmedLine.split(/\s+/);
                     if (parts.length < 3 || !parts[2] || !/^[A-Z][A-Za-z0-9_]*$/.test(parts[2])) {
-                        this.addError(diagnostics, lineIndex, 'Invalid hazardanalysis declaration: "def hazardanalysis <PascalCaseIdentifier>"');
+                        this.addError(diagnostics, lineIndex, 'Invalid item declaration: "def item <PascalCaseIdentifier>"');
                     }
-                    contextStack = ['hazardanalysis'];
+                    contextStack = ['item'];
+                    hasItem = true;
+                } else if (trimmedLine.match(/^(operationalscenarios|safetyconcept)$/)) {
+                    // Top-level sections
+                    const keyword = trimmedLine.split(' ')[0];
+                    if (keyword) {
+                        contextStack = [keyword];
+                        if (keyword === 'operationalscenarios') hasOperationalScenarios = true;
+                        if (keyword === 'safetyconcept') hasSafetyConcept = true;
+                    }
                 } else {
-                    this.addError(diagnostics, lineIndex, '.itm files must start with "def hazardanalysis <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.itm files must start with "def item <identifier>"');
                 }
                 continue;
             }
@@ -111,7 +120,6 @@ export class SafetyValidator {
                         this.addWarning(diagnostics, lineIndex, `Possible typo in "${keyword}" - assuming "${identified}"`);
                     }
                     contextStack.push(identified || keyword);
-                    if (identified === 'item') hasItem = true;
                     if (identified === 'operationalscenarios') hasOperationalScenarios = true;
                     if (identified === 'operationalconditions') hasOperationalConditions = true;
                     if (identified === 'vehiclestates') hasVehicleStates = true;
@@ -127,7 +135,7 @@ export class SafetyValidator {
         }
 
         // Check required sections
-        if (!hasItem) this.addError(diagnostics, 0, '.itm files must contain "def item <identifier>"');
+        if (!hasItem) this.addError(diagnostics, 0, '.itm files must start with "def item <identifier>"');
         if (!hasOperationalScenarios) this.addError(diagnostics, 0, '.itm files must contain an "operationalscenarios" section');
         if (!hasOperationalConditions) this.addError(diagnostics, 0, '.itm files must contain an "operationalconditions" sub-section');
         if (!hasVehicleStates) this.addError(diagnostics, 0, '.itm files must contain a "vehiclestates" sub-section');
@@ -141,7 +149,6 @@ export class SafetyValidator {
 
     private getValidBlockDefs(context: string): string[] {
         switch (context) {
-            case 'hazardanalysis': return ['item'];
             case 'operationalscenarios': return ['scenario'];
             case 'operationalconditions': return ['condition'];
             case 'vehiclestates': return ['vehiclestate'];
@@ -149,34 +156,33 @@ export class SafetyValidator {
             case 'environments': return ['environment'];
             case 'safetystrategy': return ['principle'];
             case 'assumptionsofuse': return ['assumption'];
-            case 'foreseesablemisuse': return ['misuse'];
+            case 'foreseeablemisuse': return ['misuse'];
+            case 'includes': return ['boundary'];
+            case 'excludes': return ['boundary'];
             default: return [];
         }
     }
 
     private getValidInlineDefs(context: string): string[] {
         switch (context) {
-            case 'includes': 
-            case 'excludes': return ['boundary'];
+            // No inline definitions currently defined
             default: return [];
         }
     }
 
     private getValidContainers(context: string): string[] {
         switch (context) {
-            case 'hazardanalysis': return ['operationalscenarios', 'safetyconcept'];
             case 'item': return ['subsystems', 'systemboundaries'];
             case 'systemboundaries': return ['includes', 'excludes'];
             case 'operationalscenarios': return ['operationalconditions', 'vehiclestates', 'driverstates', 'environments'];
-            case 'safetyconcept': return ['safetystrategy', 'assumptionsofuse', 'foreseesablemisuse'];
+            case 'safetyconcept': return ['safetystrategy', 'assumptionsofuse', 'foreseeablemisuse'];
             default: return [];
         }
     }
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'hazardanalysis': return ['name', 'description', 'owner', 'reviewers'];
-            case 'item': return ['productline', 'systemfeatures', 'systemfunctions'];
+            case 'item': return ['name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions'];
             case 'scenario': return ['description', 'vehiclestate', 'environment', 'driverstate'];
             case 'condition': return ['range', 'impact', 'standard'];
             case 'vehiclestate': return ['description', 'characteristics'];
@@ -185,6 +191,7 @@ export class SafetyValidator {
             case 'principle':
             case 'assumption':
             case 'misuse': return ['description'];
+            case 'boundary': return ['description'];
             default: return [];
         }
     }
@@ -236,8 +243,12 @@ export class SafetyValidator {
 
     // Helpers (unchanged from previous, but included for completeness)
     private validateQuotedString(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string, keyword: string): void {
-        if (!line.match(new RegExp(`^${keyword}\\s+"[^"]*"$`))) {
-            this.addError(diagnostics, lineIndex, `${keyword} must be a quoted string: ${keyword} "text"`);
+        // Accept both inline format: `keyword "text"` and multiline format: `keyword` followed by quoted text
+        const inlinePattern = new RegExp(`^${keyword}\\s+"[^"]*"$`);
+        const keywordOnlyPattern = new RegExp(`^${keyword}$`);
+        
+        if (!inlinePattern.test(line) && !keywordOnlyPattern.test(line)) {
+            this.addError(diagnostics, lineIndex, `${keyword} must be a quoted string: ${keyword} "text" or multiline format`);
         }
     }
 
@@ -271,7 +282,7 @@ export class SafetyValidator {
     }
 
     private identifyKeyword(keyword: string): string {
-        const validKeywords = ['operationalscenarios', 'operationalconditions', 'vehiclestates', 'driverstates', 'environments', 'safetyconcept', 'safetystrategy', 'assumptionsofuse', 'foreseesablemisuse', 'subsystems', 'systemboundaries', 'includes', 'excludes'];
+        const validKeywords = ['operationalscenarios', 'operationalconditions', 'vehiclestates', 'driverstates', 'environments', 'safetyconcept', 'safetystrategy', 'assumptionsofuse', 'foreseeablemisuse', 'subsystems', 'systemboundaries', 'includes', 'excludes'];
         if (validKeywords.includes(keyword)) return keyword;
 
         for (const valid of validKeywords) {

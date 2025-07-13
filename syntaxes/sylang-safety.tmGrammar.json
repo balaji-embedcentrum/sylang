@@ -30,7 +30,7 @@
     "def-statements": {
       "patterns": [
         {
-          "match": "\\b(def)\\s+(item|scenario|condition|vehiclestate|drivingstate|environment|boundary|overallsafetystrategy|principle|assumptionsofuse|foreseesablemisuse|goal|hazard|measure|criterion|hazardanalysis)\\b",
+          "match": "\\b(def)\\s+(item|scenario|condition|vehiclestate|drivingstate|environment|boundary|overallsafetystrategy|safetystrategy|principle|assumptionsofuse|foreseeablemisuse|goal|hazard|measure|criterion|hazardanalysis)\\b",
           "captures": {
             "1": { "name": "keyword.control.def.sylang" },
             "2": { "name": "entity.name.type.sylang" }
@@ -46,7 +46,7 @@
       "patterns": [
         {
           "name": "keyword.control.section.sylang",
-          "match": "^\\s*(operationalscenarios|operationalconditions|vehiclestates|driverstates|environments|safetyconcept|itemdef|hazardanalysis|riskassessment|safetygoals|functionalsafetyrequirements)\\b"
+          "match": "^\\s*(operationalscenarios|operationalconditions|vehiclestates|driverstates|environments|safetyconcept|itemdef|hazardanalysis|riskassessment|safetygoals|safetymeasures|functionalsafetyrequirements)\\b"
         }
       ]
     },
@@ -69,8 +69,12 @@
     "property-keywords": {
       "patterns": [
         {
+          "name": "keyword.other.property.multi-word.sylang",
+          "match": "\\b(enabledby\\s+function)\\b"
+        },
+        {
           "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|reviewers|tags|severity|probability|controllability|verification|rationale|methodology|context|conditions|consequences|characteristics|range|impact|standard)\\b"
+          "match": "\\b(name|description|owner|reviewers|tags|severity|probability|controllability|verification|rationale|methodology|context|conditions|consequences|characteristics|range|impact|standard|cause|effect|category|function|hazard|scenario|item|riskassessment|hazardidentification|mitigation|enabledby)\\b"
         }
       ]
     },

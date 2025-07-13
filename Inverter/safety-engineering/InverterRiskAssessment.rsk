@@ -3,222 +3,351 @@ def riskassessment InverterRiskAssessment
 	description "Comprehensive risk assessment using S×E×C methodology per ISO 26262"
 	hazardanalysis InverterSafety
 	hazardidentification InverterHazards
+	item InverterItem
 	methodology "ISO 26262 S×E×C Risk Assessment"
 	
 	riskcriteria
-		severity
-			S0 "No injuries"
-			S1 "Light to moderate injuries"
-			S2 "Severe to life-threatening injuries (survival probable)"
-			S3 "Life-threatening to fatal injuries (survival uncertain or impossible)"
+		def severity S0
+			description "No injuries"
+		def severity S1
+			description "Light to moderate injuries"
+		def severity S2
+			description "Severe to life-threatening injuries (survival probable)"
+		def severity S3
+			description "Life-threatening to fatal injuries (survival uncertain or impossible)"		
+	
+	
+		def exposure E0 
+			description "Very low probability - highly unlikely during vehicle lifetime"
+		def exposure E1 
+			description "Low probability - likely to happen during vehicle lifetime"
+		def exposure E2 
+			description "Medium probability - likely to happen several times during vehicle lifetime"
+		def exposure E3 
+			description "High probability - likely to happen during most driving situations"
+		def exposure E4 
+			description "Very high probability - occurs frequently in normal operation"
 		
-		exposure
-			E0 "Very low probability - highly unlikely during vehicle lifetime"
-			E1 "Low probability - likely to happen during vehicle lifetime"
-			E2 "Medium probability - likely to happen several times during vehicle lifetime"
-			E3 "High probability - likely to happen during most driving situations"
-			E4 "Very high probability - occurs frequently in normal operation"
-		
-		controllability
-			C0 "Controllable in general - most drivers can act to prevent harm"
-			C1 "Simply controllable - nearly all drivers can act to prevent harm"
-			C2 "Normally controllable - most drivers in most situations can act"
-			C3 "Difficult to control or uncontrollable - few drivers can prevent harm"
+		def controllability C0
+			description "Controllable in general - most drivers can act to prevent harm"
+		def controllability C1
+			description "Simply controllable - nearly all drivers can act to prevent harm"
+		def controllability C2
+			description "Normally controllable - most drivers in most situations can act"
+		def controllability C3
+			description "Difficult to control or uncontrollable - few drivers can prevent harm"
 
-	asilmatrix
-		determination "Based on S×E×C combination per ISO 26262 Part 3"
-		S1E1C1 "QM"   S1E1C2 "QM"   S1E1C3 "A"
-		S1E2C1 "QM"   S1E2C2 "A"    S1E2C3 "B"
-		S1E3C1 "A"    S1E3C2 "B"    S1E3C3 "C"
-		S1E4C1 "A"    S1E4C2 "B"    S1E4C3 "C"
-		S2E1C1 "QM"   S2E1C2 "A"    S2E1C3 "B"
-		S2E2C1 "A"    S2E2C2 "B"    S2E2C3 "C"
-		S2E3C1 "B"    S2E3C2 "C"    S2E3C3 "D"
-		S2E4C1 "B"    S2E4C2 "C"    S2E4C3 "D"
-		S3E1C1 "A"    S3E1C2 "B"    S3E1C3 "C"
-		S3E2C1 "B"    S3E2C2 "C"    S3E2C3 "D"
-		S3E3C1 "C"    S3E3C2 "D"    S3E3C3 "D"
-		S3E4C1 "C"    S3E4C2 "D"    S3E4C3 "D"
+	riskdetermination
+		def risk S1E1C1
+			severity S1
+			exposure E1
+			controllability C1
+			description "S1E1C1"
+		def risk S1E1C2
+			severity S1
+			exposure E1
+			controllability C2
+			description "S1E1C2"
+		def risk S1E1C3	
+			severity S1
+			exposure E1
+			controllability C3
+			description "S1E1C3"
+		def risk S1E2C1
+			severity S1	
+			exposure E2
+			controllability C1
+			description "S1E2C1"
+		def risk S1E2C2
+			severity S1
+			exposure E2		
+			controllability C3
+			description "S1E2C3"
+		def risk S1E3C1
+			severity S1
+			exposure E3
+			controllability C1		
+			description "S1E3C1"
+		def risk S1E3C2
+			severity S1
+			exposure E3
+			controllability C2
+			description "S1E3C2"	
+		def risk S1E3C3
+			severity S1
+			exposure E3
+			controllability C3
+			description "S1E3C3"
+		def risk S1E4C1		
+			severity S1
+			exposure E4
+			controllability C1
+			description "S1E4C1"
+		def risk S1E4C2
+			severity S1			
+			exposure E1
+			controllability C1
+			description "S1E1C1"
+		def risk S1E2C3
+			severity S1
+			exposure E2
+			controllability C3
+			description "S1E2C3"	
+		def risk S2E1C1
+			severity S2
+			exposure E1
+			controllability C1
+			description "S2E1C1"
+		def risk S2E1C2
+			severity S2	
+			exposure E1
+			controllability C2
+			description "S2E1C2"
+		def risk S2E1C3
+			severity S2
+			exposure E1		
+			controllability C3
+			description "S2E1C3"
+		def risk S2E2C1
+			severity S2
+			exposure E2
+			controllability C1		
+			description "S2E2C1"
+		def risk S2E2C2
+			severity S2
+			exposure E2
+			controllability C2
+			description "S2E2C2"			
+		def risk S2E2C3
+			severity S2
+			exposure E2
+			controllability C3
+			description "S2E2C3"
+		def risk S2E3C1		
+			severity S2
+			exposure E3
+			controllability C1
+			description "S2E3C1"
+		def risk S2E3C2
+			severity S2		
+			exposure E3
+			controllability C2
+			description "S2E3C2"
+		def risk S2E3C3
+			severity S2
+			exposure E3		
+			controllability C3
+			description "S2E3C3"
+		def risk S2E4C1
+			severity S2
+			exposure E4
+			controllability C1			
+			description "S2E4C1"
+		def risk S2E4C2
+			severity S2
+			exposure E4
+			controllability C2
+			description "S2E4C2"			
+		def risk S2E4C3
+			severity S2
+			exposure E4
+			controllability C3
+			description "S2E4C3"
+		def risk S3E1C1	
+			severity S3
+			exposure E1
+			controllability C1
+			description "S3E1C1"
+		def risk S3E1C2
+			severity S3	
+			exposure E1
+			controllability C2
+			description "S3E1C2"
+		def risk S3E1C3
+			severity S3
+			exposure E1			
+			controllability C3
+			description "S3E1C3"
+		def risk S3E2C1
+			severity S3
+			exposure E2
+			controllability C1			
+			description "S3E2C1"
+		def risk S3E2C2
+			severity S3
+			exposure E2
+			controllability C2
+			description "S3E2C2"			
+		def risk S3E2C3
+			severity S3
+			exposure E2
+			controllability C3
+			description "S3E2C3"
+		def risk S3E3C1			
+			severity S3
+			exposure E3
+			controllability C1
+			description "S3E3C1"
+		def risk S3E3C2
+			severity S3			
+			exposure E2
+			controllability C3
+			description "S3E2C3"
+		def risk S3E3C1
+			severity S3
+			exposure E3			
+			controllability C3
+			description "S3E3C3"
+		def risk S3E4C1
+			severity S3
+			exposure E4
+			controllability C1		
+			description "S3E4C1"
+		def risk S3E4C2
+			severity S3
+			exposure E4
+			controllability C2
+			description "S3E4C2"			
+		def risk S3E4C3
+			severity S3
+			exposure E4
+			controllability C3
+			description "S3E4C3"
 
-	assessment
+	asildetermination
+		def asil QM
+			risk S1E1C1, S1E1C2, S1E2C1, S2E1C1
+			description "QM"
+		def asil A
+			risk S1E1C3, S1E2C2, S1E3C1, S1E4C1, S2E1C2, S2E2C1, S3E1C1
+			description "A"
+		def asil B
+			risk S1E2C3, S1E3C2, S1E4C2, S2E1C3, S2E3C1, S2E4C1, S3E1C2, S3E2C1
+			description "B"
+		def asil C
+			risk S1E3C3, S1E4C3, S2E2C3, S2E3C2, S2E4C2, S3E1C3, S3E2C2, S3E3C1, S3E4C1
+		def asil D
+			risk S2E3C3, S2E4C3, S2E3C2, S2E4C2, S3E2C3, S3E3C3, S3E4C3
+			description "D"
+	
+
+	asilassessment
 		subsystem PowerConversion
 		
-		hazard H_PWR_001
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from uncontrolled acceleration"
-			exposure E3 "High - IGBT switching occurs continuously during operation"
-			controllability C2 "Driver can use brakes but reaction time may be insufficient"
-			asil D
-			rationale "Continuous exposure to switching events with potential fatal consequences"
-		
-		hazard H_PWR_002
-			scenario SCEN_003_RegenerativeBraking, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from electrical fire or explosion"
-			exposure E2 "Medium - overvoltage events possible during heavy regeneration"
-			controllability C3 "Driver cannot control once electrical failure occurs"
-			asil D
-			rationale "Electrical hazards with potential fatal consequences"
-		
-		hazard H_PWR_003
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S2 "Severe injuries from rear-end collision when vehicle stops"
-			exposure E2 "Medium - power stage components subject to wear and stress"
-			controllability C2 "Driver can steer and use hazard signals"
-			asil B
-			rationale "Significant safety impact but some driver control options available"
-		
-		hazard H_PWR_004
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from electrical fire"
-			exposure E1 "Low - requires multiple simultaneous component failures"
-			controllability C3 "Driver cannot control electrical fire progression"
-			asil C
-			rationale "Fatal potential but lower probability of occurrence"
+			hazard H_PWR_001
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil D
+				rationale "Continuous exposure to switching events with potential fatal consequences"
+			
+			hazard H_PWR_002
+				scenario SCEN_003_RegenerativeBraking, SCEN_002_HighPerformance
+				asil D
+				rationale "Electrical hazards with potential fatal consequences"
+			
+			hazard H_PWR_003
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerforance
+				asil B
+				rationale "Significant safety impact but some driver control options available"
+			
+			hazard H_PWR_004
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil C
+				rationale "Fatal potential but lower probability of occurrence"
 
-	assessment
+	asilassessment
 		subsystem MotorControl
 		
-		hazard H_MOT_001
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from collision due to uncontrolled torque"
-			exposure E3 "High - software algorithms execute continuously"
-			controllability C2 "Driver can use brakes but may have limited reaction time"
-			asil D
-			rationale "High exposure to software execution with potential fatal outcomes"
-		
-		hazard H_MOT_002
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S2 "Severe injuries from loss of vehicle control"
-			exposure E2 "Medium - control instability can develop over time"
-			controllability C2 "Driver can adapt to vehicle behavior patterns"
-			asil B
-			rationale "Recognizable symptoms allow some driver adaptation"
-		
-		hazard H_MOT_003
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from uncontrolled acceleration"
-			exposure E2 "Medium - speed control used frequently in normal operation"
-			controllability C2 "Driver can override with brake pedal"
-			asil C
-			rationale "Speed control usage creates exposure with serious consequences"
-		
-		hazard H_MOT_004
-			scenario SCEN_003_RegenerativeBraking
-			severity S2 "Severe injuries from collision due to increased braking distance"
-			exposure E4 "Very high - regenerative braking used in most driving"
-			controllability C1 "Driver can use friction brakes as backup"
-			asil B
-			rationale "Very high exposure but effective driver countermeasures available"
+			hazard H_MOT_001
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil D
+				rationale "High exposure to software execution with potential fatal outcomes"
+			
+			hazard H_MOT_002
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil B
+				rationale "Recognizable symptoms allow some driver adaptation"
+			
+			hazard H_MOT_003
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil C
+				rationale "Speed control usage creates exposure with serious consequences"
+			
+			hazard H_MOT_004
+				scenario SCEN_003_RegenerativeBraking
+				asil B
+				rationale "Very high exposure but effective driver countermeasures available"
 
-	assessment
+	asilassessment
 		subsystem ThermalManagement
 		
-		hazard H_THM_001
-			scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
-			severity S2 "Severe injuries from component failure or reduced performance"
-			exposure E2 "Medium - cooling systems subject to maintenance and failures"
-			controllability C1 "Driver can reduce power demand and stop safely"
-			asil B
-			rationale "Driver can take preventive action when thermal issues develop"
-		
-		hazard H_THM_002
-			scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
-			severity S2 "Severe injuries from undetected overheating"
-			exposure E3 "High - temperature sensors subject to environmental stress"
-			controllability C2 "Driver may notice performance changes"
-			asil C
-			rationale "High sensor exposure but some symptoms may be noticeable"
-		
-		hazard H_THM_003
-			scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
-			severity S3 "Life-threatening injuries from fire or toxic gas emission"
-			exposure E1 "Low - requires extreme conditions and protection failure"
-			controllability C3 "Driver cannot control thermal runaway once started"
-			asil C
-			rationale "Fatal potential but requires extreme failure conditions"
+			hazard H_THM_001
+				scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
+				asil B
+				rationale "Driver can take preventive action when thermal issues develop"
+			
+			hazard H_THM_002
+				scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
+				asil C
+				rationale "High sensor exposure but some symptoms may be noticeable"
+			
+			hazard H_THM_003
+				scenario SCEN_002_HighPerformance, SCEN_006_ExtremeHeat
+				asil C
+				rationale "Fatal potential but requires extreme failure conditions"
 
-	assessment
+	asilassessment
 		subsystem SafetySystems
 		
-		hazard H_SAF_001
-			scenario SCEN_001_NormalDriving, SCEN_004_StartupShutdown
-			severity S3 "Life-threatening injuries from electric shock"
-			exposure E2 "Medium - isolation systems subject to wear and damage"
-			controllability C3 "Driver cannot detect isolation loss until exposure occurs"
-			asil D
-			rationale "Hidden failure mode with potential fatal consequences"
-		
-		hazard H_SAF_002
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from electrical fire"
-			exposure E2 "Medium - current sensors and protection circuits can fail"
-			controllability C3 "Driver cannot control electrical fire progression"
-			asil D
-			rationale "Critical protection function failure with fatal potential"
-		
-		hazard H_SAF_003
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from undetected hazardous conditions"
-			exposure E2 "Medium - safety monitoring systems subject to failure"
-			controllability C3 "Driver unaware of safety system status"
-			asil D
-			rationale "Loss of safety oversight with potential fatal consequences"
+			hazard H_SAF_001
+				scenario SCEN_001_NormalDriving, SCEN_004_StartupShutdown
+				asil D
+				rationale "Hidden failure mode with potential fatal consequences"
+			
+			hazard H_SAF_002
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil D
+				rationale "Critical protection function failure with fatal potential"
+			
+			hazard H_SAF_003
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil D
+				rationale "Loss of safety oversight with potential fatal consequences"
 
-	assessment
+	asilassessment
 		subsystem SensorInterfaces
 		
-		hazard H_SEN_001
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S2 "Severe injuries from incorrect torque control"
-			exposure E3 "High - current sensors operate continuously"
-			controllability C2 "Driver may notice unusual vehicle behavior"
-			asil C
-			rationale "High exposure to sensor operation with significant safety impact"
-		
-		hazard H_SEN_002
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S2 "Severe injuries from motor control disturbances"
-			exposure E2 "Medium - position sensors subject to wear and interference"
-			controllability C2 "Driver may notice vibration or unusual behavior"
-			asil B
-			rationale "Some symptoms recognizable allowing driver response"
-		
-		hazard H_SEN_003
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S3 "Life-threatening injuries from complete loss of motor control"
-			exposure E1 "Low - requires simultaneous failure of multiple sensors"
-			controllability C3 "Driver cannot control vehicle once motor control lost"
-			asil C
-			rationale "Fatal potential but requires multiple simultaneous failures"
+			hazard H_SEN_001
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil C
+				rationale "High exposure to sensor operation with significant safety impact"
+			
+			hazard H_SEN_002
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil B
+				rationale "Some symptoms recognizable allowing driver response"
+			
+			hazard H_SEN_003
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil C
+				rationale "Fatal potential but requires multiple simultaneous failures"
 
-	assessment
+	asilassessment
 		subsystem CommunicationInterfaces
-		
-		hazard H_COM_001
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S2 "Severe injuries from loss of vehicle system coordination"
-			exposure E2 "Medium - CAN networks subject to interference and faults"
-			controllability C2 "Some systems may continue operating autonomously"
-			asil B
-			rationale "Significant impact but some autonomous operation possible"
-		
-		hazard H_COM_002
-			scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
-			severity S2 "Severe injuries from incorrect torque commands"
-			exposure E2 "Medium - message corruption possible in EMI-rich environment"
-			controllability C2 "Driver may notice erratic behavior"
-			asil B
-			rationale "Potential for recognition and driver response"
+			
+			hazard H_COM_001
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil B
+				rationale "Significant impact but some autonomous operation possible"
+			
+			hazard H_COM_002
+				scenario SCEN_001_NormalDriving, SCEN_002_HighPerformance
+				asil B
+				rationale "Potential for recognition and driver response"
 
-	assessment
+	asilassessment
 		subsystem PowerModes
 		
-		hazard H_PWM_001
-			scenario SCEN_004_StartupShutdown
-			severity S1 "Light injuries from unexpected vehicle behavior"
-			exposure E1 "Low - mode transitions are infrequent"
-			controllability C1 "Driver can restart system or take manual control"
-			asil QM
-			rationale "Limited exposure and good driver control options"
-
-	standards "ISO 26262", "IEC 61508" 
+			hazard H_PWM_001
+				scenario SCEN_004_StartupShutdown
+				asil QM
+				rationale "Limited exposure and good driver control options"

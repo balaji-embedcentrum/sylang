@@ -5,27 +5,27 @@ def hazardidentification InverterHazards
 	methodology "FMEA", "HAZOP", "STPA"
 	
 	hazardcategories
-		category UncontrolledTorque
+		def category UncontrolledTorque
 			description "Inverter provides unintended or uncontrolled torque output"
 			severity "High potential for vehicle accidents and loss of control"
 			
-		category LossOfPropulsion
+		def category LossOfPropulsion
 			description "Inverter fails to provide required torque for vehicle propulsion"
 			severity "Risk of vehicle stopping unexpectedly in traffic"
 			
-		category ThermalHazards
+		def category ThermalHazards
 			description "Excessive temperature leading to component damage or fire"
 			severity "Risk of fire, toxic gas emission, or thermal injury"
 			
-		category ElectricalHazards
+		def category ElectricalHazards
 			description "High voltage exposure or electrical faults"
 			severity "Risk of electric shock, burns, or electrocution"
 			
-		category ControlMalfunctions
+		def category ControlMalfunctions
 			description "Loss of proper motor control causing erratic behavior"
 			severity "Unpredictable vehicle behavior and potential accidents"
 			
-		category CommunicationFailures
+		def category CommunicationFailures
 			description "Loss of communication with vehicle systems"
 			severity "Lack of coordination with other safety systems"
 
@@ -37,7 +37,7 @@ def hazardidentification InverterHazards
 				cause "Gate driver failure, EMI interference, component degradation"
 				effect "Uncontrolled motor torque, potential vehicle acceleration"
 				category UncontrolledTorque
-				functions_affected "PowerElectronicsController", "MotorControlAlgorithmEngine"
+				function PowerElectronicsController, MotorControlAlgorithmEngine
 				
 			def hazard H_PWR_002
 				name "DC Bus Overvoltage"
@@ -196,24 +196,3 @@ def hazardidentification InverterHazards
 				effect "Temporary loss of function, unexpected behavior"
 				category ControlMalfunctions
 				functions_affected "PowerModeManager", "SafetyMonitoringEngine"
-
-	environmentalconditions
-		condition LowTemperatureOperation
-			name "Low Temperature Operation"
-			description "Operation in extreme cold affecting component performance"
-			scenarios ExtremeLowTemperature
-			hazards H_PWR_003, H_PWM_001
-
-		condition HighTemperatureOperation
-			name "High Temperature Operation"  
-			description "Operation in extreme heat affecting cooling capacity"
-			scenarios ExtremeHighTemperature
-			hazards H_THM_003, H_THM_001
-
-		condition EMIEnvironment
-			name "High EMI Environment"
-			description "Strong electromagnetic interference affecting electronics"
-			scenarios NormalDrivingOperation, HighPerformanceDriving
-			hazards H_COM_001, H_SEN_003
-
-	standards "ISO 26262", "IEC 61508" 

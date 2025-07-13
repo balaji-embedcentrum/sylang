@@ -61,7 +61,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'safetygoalsdef', 'safetymeasures', 'verificationcriteria',
             'name', 'description', 'owner', 'tags', 'severity', 'probability', 
             'controllability', 'verification', 'rationale', 'methodology', 
-            'context', 'conditions', 'consequences', 'enabledby', 'functions_affected',
+            'context', 'conditions', 'consequences', 'enabledby', 'enabledby function', 'functions_affected',
             'assessment', 'riskcriteria', 'exposure', 'asilmatrix', 'determination',
             'derivedfrom', 'allocatedto', 'safetylevel', 'asil', 'productline', 
             'systemfeatures', 'systemfunctions', 'subsystems',
@@ -93,13 +93,21 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Components', 'sylang-cmp'],
         extensions: ['.cmp', '.sub', '.req'],
         keywords: [
-            'component', 'subsystem', 'interface', 'protocol', 'direction', 
+            'def', 'component', 'subsystem', 'interface', 'protocol', 'direction', 
             'voltage', 'name', 'description', 'owner', 'tags', 'safetylevel', 
             'partof', 'implements', 'allocatedto', 'type', 'width', 'range', 
-            'frequency', 'baudrate', 'resolution'
+            'frequency', 'baudrate', 'resolution',
+            // .req file keywords
+            'reqsection', 'requirement', 'source', 'derivedfrom', 'asil', 
+            'rationale', 'verificationcriteria', 'status', 'safetygoal',
+            // .req enum values
+            'functionalsafety', 'functional', 'non-functional', 'performance', 
+            'standards', 'legal', 'system', 'software', 'electronics', 'mechanics', 
+            'test', 'stakeholder', 'internal', 'supplier', 'customer', 
+            'QM', 'A', 'B', 'C', 'D', 'draft', 'review', 'approved'
         ],
         snippetFile: 'components.json',
-        validationRules: ['required-fields', 'safety-levels', 'component-structure']
+        validationRules: ['required-fields', 'safety-levels', 'component-structure', 'req-structure']
     },
     'sylang-software': {
         id: 'sylang-software',

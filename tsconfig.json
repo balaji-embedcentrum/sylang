@@ -28,6 +28,10 @@
   "exclude": [
     "node_modules",
     "out",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "src/core/SymbolManager.ts",
+    "src/providers/SylangDefinitionProvider.ts",
+    "src/providers/SylangReferenceProvider.ts",
+    "src/providers/SylangRenameProvider.ts"
   ]
 } 

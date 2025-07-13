@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 interface CompletionContext {
-    type: 'top-level' | 'after-systemfeatures' | 'after-productline' | 'inside-feature';
+    type: 'top-level' | 'after-systemfeatures' | 'after-productline' | 'inside-feature' | 'inside-itm' | 'inside-def' | 'inside-haz' | 'inside-rsk' | 'inside-sgl' | 'inside-req' | 'inside-sub';
     parentKeyword: string | null;
     indentLevel: number;
 }
@@ -88,6 +88,105 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                         indentLevel: this.getIndentLevel(line.text)
                     };
                 }
+
+                // Check for .itm specific contexts
+                if (this.languageId === 'sylang-safety') {
+                    if (prevText.startsWith('def ') && this.getIndentLevel(line.text) > this.getIndentLevel(prevLine.text)) {
+                        const defType = prevText.split(' ')[1];
+                        return {
+                            type: 'inside-def',
+                            parentKeyword: defType || null,
+                            indentLevel: this.getIndentLevel(line.text)
+                        };
+                    }
+                    
+                    // Add for .haz files
+                    if (document.fileName.endsWith('.haz')) {
+                        if (['hazardcategories', 'subsystemhazards', 'systemlevelhazards', 'environmentalhazards', 'usagehazards'].includes(prevText) && this.getIndentLevel(line.text) > 0) {
+                            return {
+                                type: 'inside-haz',
+                                parentKeyword: prevText,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
+
+                    // Add for .rsk files
+                    if (document.fileName.endsWith('.rsk')) {
+                        if (['riskcriteria', 'riskdetermination', 'asildetermination', 'asilassessment'].includes(prevText) && this.getIndentLevel(line.text) > 0) {
+                            return {
+                                type: 'inside-rsk',
+                                parentKeyword: prevText,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                        if (prevText === 'subsystem' && this.getIndentLevel(line.text) > 0) {
+                            return {
+                                type: 'inside-rsk',
+                                parentKeyword: 'subsystem',
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
+
+                    // Add for .sgl files
+                    if (document.fileName.endsWith('.sgl')) {
+                        if (prevText.startsWith('def ') && this.getIndentLevel(line.text) > this.getIndentLevel(prevLine.text)) {
+                            const defType = prevText.split(' ')[1] || null;
+                            return {
+                                type: 'inside-def',
+                                parentKeyword: defType,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                        if (['safetygoals', 'safetymeasures'].includes(prevText) && this.getIndentLevel(line.text) > 0) {
+                            return {
+                                type: 'inside-sgl',
+                                parentKeyword: prevText,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
+
+                    // Add for .req files
+                    if (document.fileName.endsWith('.req')) {
+                        if (prevText.startsWith('def ') && this.getIndentLevel(line.text) > this.getIndentLevel(prevLine.text)) {
+                            const defType = prevText.split(' ')[1] || null;
+                            return {
+                                type: 'inside-def',
+                                parentKeyword: defType,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                        if (prevText === 'reqsection' && this.getIndentLevel(line.text) > 0) {
+                            return {
+                                type: 'inside-req',
+                                parentKeyword: prevText,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
+
+                    // Add for .sub files
+                    if (document.fileName.endsWith('.sub')) {
+                        if (prevText.startsWith('def ') && this.getIndentLevel(line.text) > this.getIndentLevel(prevLine.text)) {
+                            const defType = prevText.split(' ')[1] || null;
+                            return {
+                                type: 'inside-sub',
+                                parentKeyword: defType,
+                                indentLevel: this.getIndentLevel(line.text)
+                            };
+                        }
+                    }
+                    
+                    if (['operationalscenarios', 'safetyconcept', 'systemboundaries', 'subsystems', 'includes', 'excludes', 'safetystrategy', 'assumptionsofuse', 'foreseeablemisuse'].includes(prevText) && this.getIndentLevel(line.text) > 0) {
+                        return {
+                            type: 'inside-itm',
+                            parentKeyword: prevText,
+                            indentLevel: this.getIndentLevel(line.text)
+                        };
+                    }
+                }
                 
                 // Stop at same or lesser indentation (different scope)
                 if (this.getIndentLevel(prevLine.text) <= this.getIndentLevel(line.text) && prevText.length > 0) {
@@ -132,6 +231,59 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                 ['name', 'description', 'owner', 'tags', 'safetylevel'].forEach(k => snippetKeywords.add(k));
                 break;
                 
+            case 'inside-def':
+                // Inside a def in .itm, suggest properties based on def type
+                if (this.languageId === 'sylang-safety') {
+                    completions.push(...this.getItmDefPropertyCompletions(context.parentKeyword || ''));
+                    // Mark .itm property keywords
+                    this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                }
+                break;
+
+            case 'inside-itm':
+                // Inside .itm sections/containers
+                if (this.languageId === 'sylang-safety') {
+                    completions.push(...this.getItmSectionCompletions(context.parentKeyword || ''));
+                    this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                }
+                break;
+
+            case 'inside-haz':
+                // Inside .haz sections/containers
+                if (this.languageId === 'sylang-safety') {
+                    completions.push(...this.getHazSectionCompletions(context.parentKeyword || ''));
+                    this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                }
+                break;
+
+            case 'inside-rsk':
+                // Inside .rsk sections/containers
+                if (this.languageId === 'sylang-safety') {
+                    completions.push(...this.getRskSectionCompletions(context.parentKeyword || ''));
+                    this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                }
+                break;
+
+            case 'inside-sgl':
+                // Inside .sgl sections/containers
+                if (this.languageId === 'sylang-safety') {
+                    completions.push(...this.getSglSectionCompletions(context.parentKeyword || ''));
+                    this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                }
+                break;
+
+            case 'inside-req':
+                // Inside .req sections/containers
+                completions.push(...this.getReqSectionCompletions(context.parentKeyword || ''));
+                this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                break;
+                
+            case 'inside-sub':
+                // Inside .sub sections/containers
+                completions.push(...this.getSubSectionCompletions(context.parentKeyword || ''));
+                this.getRelevantKeywords(context).forEach(k => snippetKeywords.add(k));
+                break;
+
             case 'top-level':
                 // Top level - suggest main templates
                 const topLevelCompletions = this.getTopLevelCompletions();
@@ -202,18 +354,719 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         return this.getPropertyCompletions();
     }
 
+    private getItmDefPropertyCompletions(defType: string): vscode.CompletionItem[] {
+        const propertiesByDef: { [key: string]: string[] } = {
+            'item': ['name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions', 'subsystems', 'systemboundaries'],
+            'scenario': ['description', 'vehiclestate', 'environment', 'driverstate'],
+            'condition': ['range', 'impact', 'standard'],
+            'vehiclestate': ['description', 'characteristics'],
+            'drivingstate': ['description', 'characteristics'],
+            'environment': ['description', 'conditions'],
+            'principle': ['description'],
+            'assumption': ['description'],
+            'misuse': ['description'],
+            'boundary': [] // Inline desc, no indented properties
+        };
+
+        const props = propertiesByDef[defType] || [];
+        return props.map(prop => this.createPropertyCompletion(prop, `${prop} "\${1}"`, `${prop.charAt(0).toUpperCase() + prop.slice(1)} property`));
+    }
+
+    private getItmSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'subsystems':
+                // Suggest subsystem identifier (but since it's list, no template, just keyword)
+                break;
+            case 'systemboundaries':
+                return [
+                    this.createSimpleCompletion('includes'),
+                    this.createSimpleCompletion('excludes')
+                ];
+            case 'includes':
+            case 'excludes':
+                completions.push(this.createBoundaryTemplate());
+                break;
+            case 'operationalscenarios':
+                completions.push(this.createScenarioTemplate());
+                completions.push(this.createSimpleCompletion('operationalconditions'));
+                completions.push(this.createSimpleCompletion('vehiclestates'));
+                completions.push(this.createSimpleCompletion('driverstates'));
+                completions.push(this.createSimpleCompletion('environments'));
+                break;
+            case 'operationalconditions':
+                completions.push(this.createConditionTemplate());
+                break;
+            case 'vehiclestates':
+                completions.push(this.createVehiclestateTemplate());
+                break;
+            case 'driverstates':
+                completions.push(this.createDrivingstateTemplate());
+                break;
+            case 'environments':
+                completions.push(this.createEnvironmentTemplate());
+                break;
+            case 'safetyconcept':
+                completions.push(this.createSimpleCompletion('safetystrategy'));
+                completions.push(this.createAssumptionsofuseTemplate());
+                completions.push(this.createForeseeablemisuseTemplate());
+                break;
+            case 'safetystrategy':
+                completions.push(this.createPrincipleTemplate());
+                break;
+            case 'assumptionsofuse':
+                completions.push(this.createAssumptionTemplate());
+                break;
+            case 'foreseeablemisuse':
+                completions.push(this.createMisuseTemplate());
+                break;
+        }
+        return completions;
+    }
+
+    private getHazSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'hazardcategories':
+                completions.push(this.createCategoryTemplate());
+                break;
+            case 'subsystemhazards':
+                completions.push(this.createSubsystemTemplate());
+                completions.push(this.createHazardTemplate());
+                break;
+            case 'systemlevelhazards':
+            case 'environmentalhazards':
+            case 'usagehazards':
+                completions.push(this.createHazardTemplate());
+                break;
+        }
+        return completions;
+    }
+
+    private createBoundaryTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def boundary (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString('def boundary ${1:BOUND_ID} "${2:Description}"');
+        item.detail = 'Boundary Definition Template';
+        item.documentation = new vscode.MarkdownString('**Boundary Template**\n\nDefines a system boundary with ID and description.');
+        item.filterText = 'def boundary';
+        item.sortText = '0_def_boundary';
+        return item;
+    }
+
+    private createScenarioTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def scenario (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def scenario ${1:SCEN_ID}',
+            '  description "${2:Scenario description}"',
+            '  vehiclestate ${3:StateID}',
+            '  environment ${4:EnvID}',
+            '  driverstate ${5:DriverID}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Scenario Definition Template';
+        item.documentation = new vscode.MarkdownString('**Scenario Template**\n\nDefines an operational scenario.');
+        item.filterText = 'def scenario';
+        item.sortText = '0_def_scenario';
+        return item;
+    }
+
+    private createConditionTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def condition (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def condition ${1:COND_ID}',
+            '  range "${2:Range value}"',
+            '  impact "${3:Impact description}"',
+            '  standard "${4:Standard reference}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Condition Definition Template';
+        item.documentation = new vscode.MarkdownString('**Condition Template**\n\nDefines an operational condition.');
+        item.filterText = 'def condition';
+        item.sortText = '0_def_condition';
+        return item;
+    }
+
+    private createVehiclestateTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def vehiclestate (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def vehiclestate ${1:STATE_ID}',
+            '  description "${2:State description}"',
+            '  characteristics "${3:Characteristics}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Vehicle State Definition Template';
+        item.documentation = new vscode.MarkdownString('**Vehicle State Template**\n\nDefines a vehicle state.');
+        item.filterText = 'def vehiclestate';
+        item.sortText = '0_def_vehiclestate';
+        return item;
+    }
+
+    private createDrivingstateTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def drivingstate (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def drivingstate ${1:STATE_ID}',
+            '  description "${2:State description}"',
+            '  characteristics "${3:Characteristics}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Driving State Definition Template';
+        item.documentation = new vscode.MarkdownString('**Driving State Template**\n\nDefines a driving state.');
+        item.filterText = 'def drivingstate';
+        item.sortText = '0_def_drivingstate';
+        return item;
+    }
+
+    private createEnvironmentTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def environment (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def environment ${1:ENV_ID}',
+            '  description "${2:Environment description}"',
+            '  conditions ${3:COND_ID}, ${4:COND_ID2}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Environment Definition Template';
+        item.documentation = new vscode.MarkdownString('**Environment Template**\n\nDefines an environment.');
+        item.filterText = 'def environment';
+        item.sortText = '0_def_environment';
+        return item;
+    }
+
+    private createPrincipleTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def principle (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def principle ${1:PRIN_ID}',
+            '  description "${2:Principle description}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Principle Definition Template';
+        item.documentation = new vscode.MarkdownString('**Principle Template**\n\nDefines a safety principle.');
+        item.filterText = 'def principle';
+        item.sortText = '0_def_principle';
+        return item;
+    }
+
+    private createAssumptionsofuseTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def assumptionsofuse (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def assumptionsofuse ${1:ASSUMPTIONS_ID}',
+            '  name "${2:Assumptions Name}"',
+            '  description "${3:Description}"',
+            '  methodology "${4:Methodology}"',
+            '  assumption ${5:ASSUMP_ID} "${6:Assumption text}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Assumptions of Use Template';
+        item.documentation = new vscode.MarkdownString('**Assumptions of Use Template**\n\nDefines assumptions of use.');
+        item.filterText = 'def assumptionsofuse';
+        item.sortText = '0_def_assumptionsofuse';
+        return item;
+    }
+
+    private createForeseeablemisuseTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def foreseeablemisuse (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def foreseeablemisuse ${1:MISUSE_ID}',
+            '  name "${2:Misuse Name}"',
+            '  description "${3:Description}"',
+            '  methodology "${4:Methodology}"',
+            '  misuse ${5:MISUSE_CASE_ID} "${6:Misuse text}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Foreseeable Misuse Template';
+        item.documentation = new vscode.MarkdownString('**Foreseeable Misuse Template**\n\nDefines foreseeable misuse.');
+        item.filterText = 'def foreseeablemisuse';
+        item.sortText = '0_def_foreseeablemisuse';
+        return item;
+    }
+
+    private createAssumptionTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('assumption (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString('assumption ${1:ASSUMP_ID} "${2:Assumption text}"');
+        item.detail = 'Assumption Template';
+        item.documentation = new vscode.MarkdownString('**Assumption**\n\nDefines an assumption.');
+        item.filterText = 'assumption';
+        item.sortText = '0_assumption';
+        return item;
+    }
+
+    private createMisuseTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def misuse (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def misuse ${1:MisuseID}',
+            '  description "${2:Description of potential misuse}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Misuse Template';
+        return item;
+    }
+
+    private createCategoryTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def category (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def category ${1:CategoryID}',
+            '  description "${2:Description}"',
+            '  severity "${3:Severity}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Hazard Category Template';
+        item.documentation = new vscode.MarkdownString('**Hazard Category**\n\nDefines a category of hazards with description and severity.');
+        item.filterText = 'def category';
+        item.sortText = '0_def_category';
+        return item;
+    }
+
+    private createSubsystemTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('subsystem (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString('subsystem ${1:SubsystemName}');
+        item.detail = 'Subsystem Reference';
+        item.documentation = new vscode.MarkdownString('**Subsystem**\n\nReferences a subsystem for hazard analysis.');
+        item.filterText = 'subsystem';
+        item.sortText = '0_subsystem';
+        return item;
+    }
+
+    private createHazardTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def hazard (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def hazard ${1:H_ID}',
+            '  name "${2:Name}"',
+            '  description "${3:Description}"',
+            '  cause "${4:Cause}"',
+            '  effect "${5:Effect}"',
+            '  category ${6:CategoryID}',
+            '  function ${7:Func1}, ${8:Func2}',
+            '  mitigation "${9:Mitigation}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Hazard Definition Template';
+        item.documentation = new vscode.MarkdownString('**Hazard Definition**\n\nComplete hazard with cause, effect, and mitigation.');
+        item.filterText = 'def hazard';
+        item.sortText = '0_def_hazard';
+        return item;
+    }
+
+    private createHazardidentificationTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def hazardidentification (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def hazardidentification ${1:ID}',
+            '  name "${2:Name}"',
+            '  description "${3:Description}"',
+            '  hazardanalysis ${4:ReferenceID}',
+            '  methodology "${5:FMEA}", "${6:HAZOP}"',
+            '  ',
+            '  hazardcategories',
+            '    def category ${7:CategoryID}',
+            '      description "${8:Desc}"',
+            '      severity "${9:Severity}"',
+            '  ',
+            '  subsystemhazards',
+            '    subsystem ${10:SubsystemName}',
+            '      def hazard ${11:H_ID}',
+            '        name "${12:Name}"',
+            '        description "${13:Desc}"',
+            '        cause "${14:Cause}"',
+                    '        effect "${15:Effect}"',
+        '        category ${16:CategoryID}',
+        '        function ${17:Func1}, ${18:Func2}',
+        '  ${0}'
+        ].join('\n'));
+        item.detail = 'Hazard Identification Template';
+        item.documentation = new vscode.MarkdownString('**Hazard Identification**\n\nFull template for .haz file.');
+        item.filterText = 'def hazardidentification';
+        item.sortText = '0_def_hazardidentification';
+        return item;
+    }
+
+    private getRskSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'riskcriteria':
+                completions.push(this.createSeverityTemplate());
+                completions.push(this.createExposureTemplate());
+                completions.push(this.createControllabilityTemplate());
+                break;
+            case 'riskdetermination':
+                completions.push(this.createRiskTemplate());
+                break;
+            case 'asildetermination':
+                completions.push(this.createAsilTemplate());
+                break;
+            case 'asilassessment':
+                completions.push(this.createSubsystemRiskTemplate());
+                completions.push(this.createHazardRiskTemplate());
+                break;
+            case 'subsystem':
+                completions.push(this.createHazardRiskTemplate());
+                break;
+        }
+        return completions;
+    }
+
+    private getSglSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'safetygoals':
+                completions.push(this.createGoalTemplate());
+                break;
+            case 'safetymeasures':
+                completions.push(this.createMeasureTemplate());
+                break;
+            case 'goal':
+                completions.push(this.createSafetymeasuresTemplate());
+                break;
+        }
+        return completions;
+    }
+
+    private getReqSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'reqsection':
+                completions.push(this.createRequirementTemplate());
+                break;
+        }
+        return completions;
+    }
+
+    private getSubSectionCompletions(section: string): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        switch (section) {
+            case 'subsystem':
+                // No nested defs, so properties only via keywords
+                break;
+        }
+        return completions;
+    }
+
+    private createRequirementTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def requirement (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def requirement ${1:FSR_ID}',
+            '\tname "${2:Name}"',
+            '\tdescription "${3:Description}"',
+            '\ttype ${4:functionalsafety}',
+            '\tsource ${5:stakeholder}',
+            '\tderivedfrom ${6:safetygoal SG_ID}',
+            '\tasil ${7:D}',
+            '\trationale "${8:Rationale}"',
+            '\tallocatedto ${9:subsystem Component1}, ${10:Component2}',
+            '\tverificationcriteria "${11:Criteria}"',
+            '\tstatus ${12:draft}',
+            '\t${0}'
+        ].join('\n'));
+        item.detail = 'Requirement Definition Template';
+        item.documentation = new vscode.MarkdownString('**Requirement Definition**\n\nComplete template for a functional safety requirement.');
+        item.filterText = 'def requirement';
+        item.sortText = '0_def_requirement';
+        return item;
+    }
+
+    private createSubsystemDefinitionTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def subsystem (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def subsystem ${1:ID}',
+            '  name "${2:Name}"',
+            '  description "${3:Description}"',
+            '  owner "${4:Owner}"',
+            '  tags "${5:Tag1}", "${6:Tag2}"',
+            '  safetylevel ${7|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}',
+            '  enables feature ${8:Feature1}, ${9:Feature2}',
+            '  implements function ${10:Function1}, ${11:Function2}',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Subsystem Template';
+        item.documentation = new vscode.MarkdownString('**Subsystem**\n\nFull template for .sub file.');
+        item.filterText = 'def subsystem';
+        item.sortText = '0_def_subsystem';
+        return item;
+    }
+
+    private createRiskassessmentTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def riskassessment (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def riskassessment ${1:ID}',
+            '  name "${2:Name}"',
+            '  description "${3:Description}"',
+            '  hazardanalysis ${4:ReferenceID}',
+            '  hazardidentification ${5:ReferenceID}',
+            '  item ${6:ItemID}',
+            '  methodology "${7:ISO 26262 S×E×C}"',
+            '  ',
+            '  riskcriteria',
+            '    def severity ${8:S0}',
+            '      description "${9:Description}"',
+            '    def exposure ${10:E0}',
+            '      description "${11:Description}"',
+            '    def controllability ${12:C0}',
+            '      description "${13:Description}"',
+            '  riskdetermination',
+            '    def risk ${14:S1E1C1}',
+            '      severity ${15:S1}',
+            '      exposure ${16:E1}',
+            '      controllability ${17:C1}',
+            '      description "${18:S1E1C1}"',
+            '  asildetermination',
+            '    def asil ${19:QM}',
+            '      risk ${20:S1E1C1}, ${21:S1E1C2}',
+            '      description "${22:QM}"',
+            '  asilassessment',
+            '    subsystem ${23:SubsystemName}',
+            '      hazard ${24:H_ID}',
+            '        scenario ${25:SCEN_ID}, ${26:SCEN_ID2}',
+            '        asil ${27:D}',
+            '        rationale "${28:Rationale}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Risk Assessment Template';
+        item.documentation = new vscode.MarkdownString('**Risk Assessment**\n\nFull template for .rsk file.');
+        item.filterText = 'def riskassessment';
+        item.sortText = '0_def_riskassessment';
+        return item;
+    }
+
+    private createSeverityTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def severity (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def severity ${1:S0}',
+            '  description "${2:Description}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Severity Definition Template';
+        return item;
+    }
+
+    private createExposureTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def exposure (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def exposure ${1:E0}',
+            '  description "${2:Description}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Exposure Definition Template';
+        return item;
+    }
+
+    private createControllabilityTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def controllability (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def controllability ${1:C0}',
+            '  description "${2:Description}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Controllability Definition Template';
+        return item;
+    }
+
+    private createRiskTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def risk (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def risk ${1:S1E1C1}',
+            '  severity ${2:S1}',
+            '  exposure ${3:E1}',
+            '  controllability ${4:C1}',
+            '  description "${5:S1E1C1}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Risk Definition Template';
+        return item;
+    }
+
+    private createAsilTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def asil (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def asil ${1:QM}',
+            '  risk ${2:S1E1C1}, ${3:S1E1C2}',
+            '  description "${4:QM}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'ASIL Definition Template';
+        return item;
+    }
+
+    private createHazardRiskTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('hazard (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'hazard ${1:H_ID}',
+            '  scenario ${2:SCEN_ID}, ${3:SCEN_ID2}',
+            '  asil ${4:D}',
+            '  rationale "${5:Rationale}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Hazard Assessment Template';
+        return item;
+    }
+
+    private createSubsystemRiskTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('subsystem (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString('subsystem ${1:Name}');
+        item.detail = 'Subsystem Reference Template';
+        return item;
+    }
+
+    private createSafetygoalsTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def safetygoals (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def safetygoals ${1:ID}',
+            '\tname "${2:Name}"',
+            '\tdescription "${3:Description}"',
+            '\titem ${4:ItemID}',
+            '\triskassessment ${5:RiskID}',
+            '\thazardidentification ${6:HazID}',
+            '\t',
+            '\tsafetygoals',
+            '\t\tdef goal ${7:SG_ID}',
+            '\t\t\tname "${8:Name}"',
+            '\t\t\tdescription "${9:Description}"',
+            '\t\t\thazard ${10:H_ID1}, ${11:H_ID2}',
+            '\t\t\tscenario ${12:SCEN_ID1}, ${13:SCEN_ID2}',
+            '\t\t\tasil ${14:D}',
+            '\t\t\tsafetymeasures',
+            '\t\t\t\tdef measure ${15:SM_ID}',
+            '\t\t\t\t\tdescription "${16:Description}"',
+            '\t\t\t\t\tenabledby function ${17:Component1}, ${18:Component2}',
+            '\t${0}'
+        ].join('\n'));
+        item.detail = 'Safety Goals Template';
+        item.documentation = new vscode.MarkdownString('**Safety Goals**\n\nFull template for .sgl file.');
+        item.filterText = 'def safetygoals';
+        item.sortText = '0_def_safetygoals';
+        return item;
+    }
+
+    private createGoalTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def goal (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def goal ${1:SG_ID}',
+            '\tname "${2:Name}"',
+            '\tdescription "${3:Description}"',
+            '\thazard ${4:H_ID1}, ${5:H_ID2}',
+            '\tscenario ${6:SCEN_ID1}, ${7:SCEN_ID2}',
+            '\tasil ${8:D}',
+            '\tsafetymeasures',
+            '\t\tdef measure ${9:SM_ID}',
+            '\t\t\tdescription "${10:Description}"',
+            '\t\t\tenabledby function ${11:Component1}, ${12:Component2}',
+            '\t${0}'
+        ].join('\n'));
+        item.detail = 'Goal Definition Template';
+        return item;
+    }
+
+    private createSafetymeasuresTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('safetymeasures (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'safetymeasures',
+            '\tdef measure ${1:SM_ID}',
+            '\t\tdescription "${2:Description}"',
+            '\t\tenabledby function ${3:Component1}, ${4:Component2}',
+            '\t${0}'
+        ].join('\n'));
+        item.detail = 'Safety Measures Section Template';
+        return item;
+    }
+
+    private createMeasureTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def measure (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def measure ${1:SM_ID}',
+            '\tdescription "${2:Description}"',
+            '\tenabledby function ${3:Component1}, ${4:Component2}',
+            '\t${0}'
+        ].join('\n'));
+        item.detail = 'Measure Definition Template';
+        return item;
+    }
+
+    private createSimpleCompletion(keyword: string): vscode.CompletionItem {
+        const item = new vscode.CompletionItem(keyword, vscode.CompletionItemKind.Keyword);
+        item.insertText = keyword;
+        item.detail = `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} Section`;
+        item.sortText = `1_${keyword}`;
+        return item;
+    }
+
     private getTopLevelCompletions(): vscode.CompletionItem[] {
         const items: vscode.CompletionItem[] = [];
         
-        // Add main templates based on language type
-        if (this.languageId === 'sylang-productline') {
-            items.push(this.templates.get('productline')!);
-        }
         if (this.languageId === 'sylang-features') {
             items.push(this.createSystemfeaturesCompletion());
         }
+        if (this.languageId === 'sylang-safety') {
+            items.push(this.createItemTemplate());
+            items.push(this.createHazardidentificationTemplate());
+            items.push(this.createRiskassessmentTemplate());
+            items.push(this.createSafetygoalsTemplate());
+        }
+        if (this.languageId === 'sylang-components') {
+            items.push(this.createSubsystemDefinitionTemplate());
+        }
         
         return items.filter(item => item !== undefined);
+    }
+
+    private createItemTemplate(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('def item (template)', vscode.CompletionItemKind.Snippet);
+        item.insertText = new vscode.SnippetString([
+            'def item ${1:ItemID}',
+            '  name "${2:Name}"',
+            '  description "${3:Description}"',
+            '  owner "${4:Owner}"',
+            '  reviewers "${5:Reviewer1}", "${6:Reviewer2}"',
+            '  ',
+            '  productline ${7:ProductLineID}',
+            '  systemfeatures ${8:FeaturesID}',
+            '  systemfunctions ${9:FunctionsID}',
+            '  subsystems',
+            '    ${10:Subsystem1}',
+            '    ${11:Subsystem2}',
+            '  systemboundaries',
+            '    includes',
+            '      def boundary ${12:BOUND_ID}',
+            '        description "${13:Description}"',
+            '    excludes',
+            '      def boundary ${14:EXCL_ID}',
+            '        description "${15:Description}"',
+            '',
+            'operationalscenarios',
+            '  def scenario ${16:SCEN_ID}',
+            '    description "${17:Scenario desc}"',
+            '    vehiclestate ${18:StateID}',
+            '    environment ${19:EnvID}',
+            '    driverstate ${20:DriverID}',
+            '  operationalconditions',
+            '    def condition ${21:COND_ID}',
+            '      range "${22:Range}"',
+            '      impact "${23:Impact}"',
+            '  vehiclestates',
+            '    def vehiclestate ${24:STATE_ID}',
+            '      description "${25:State desc}"',
+            '      characteristics "${26:Chars}"',
+            '  driverstates',
+            '    def drivingstate ${27:DRIVER_ID}',
+            '      description "${28:Driver desc}"',
+            '      characteristics "${29:Chars}"',
+            '  environments',
+            '    def environment ${30:ENV_ID}',
+            '      description "${31:Env desc}"',
+            '      conditions ${32:COND_ID}',
+            '',
+            'safetyconcept',
+            '  safetystrategy',
+            '    def principle ${33:PRIN_ID}',
+            '      description "${34:Principle desc}"',
+            '  assumptionsofuse',
+            '    def assumption ${35:ASSUMP_ID}',
+            '      description "${36:Assumption desc}"',
+            '  foreseeablemisuse',
+            '    def misuse ${37:MISUSE_ID}',
+            '      description "${38:Misuse desc}"',
+            '  ${0}'
+        ].join('\n'));
+        item.detail = 'Item Template';
+        item.documentation = new vscode.MarkdownString('**Item Definition**\n\nFull template for .itm file.');
+        item.filterText = 'def item';
+        item.sortText = '0_def_item';
+        return item;
     }
 
     private createSystemfeaturesCompletion(): vscode.CompletionItem {
@@ -261,6 +1114,19 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                 return ['name', 'description', 'owner', 'domain', 'compliance', 'firstrelease', 'tags', 'safetylevel', 'region'];
             case 'inside-feature':
                 return ['name', 'description', 'owner', 'tags', 'safetylevel'];
+            case 'inside-def':
+            case 'inside-itm':
+                return ['def', 'name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions', 'subsystems', 'systemboundaries', 'includes', 'excludes', 'boundary', 'operationalscenarios', 'scenario', 'vehiclestate', 'environment', 'driverstate', 'operationalconditions', 'condition', 'range', 'impact', 'standard', 'vehiclestates', 'drivingstate', 'characteristics', 'environments', 'conditions', 'safetyconcept', 'safetystrategy', 'principle', 'assumptionsofuse', 'assumption', 'foreseeablemisuse', 'misuse'];
+            case 'inside-haz':
+                return ['def', 'name', 'description', 'hazardanalysis', 'methodology', 'category', 'subsystem', 'hazard', 'cause', 'effect', 'function', 'mitigation', 'severity'];
+            case 'inside-rsk':
+                return ['def', 'name', 'description', 'hazardanalysis', 'hazardidentification', 'item', 'methodology', 'severity', 'exposure', 'controllability', 'risk', 'asil', 'scenario', 'rationale'];
+            case 'inside-sgl':
+                return ['def', 'name', 'description', 'item', 'riskassessment', 'hazardidentification', 'hazard', 'scenario', 'asil', 'enabledby function'];
+            case 'inside-req':
+                return ['def', 'name', 'description', 'type', 'source', 'derivedfrom', 'asil', 'rationale', 'allocatedto', 'verificationcriteria', 'status'];
+            case 'inside-sub':
+                return ['name', 'description', 'owner', 'tags', 'safetylevel', 'asil', 'enables', 'implements'];
             default:
                 return this.keywords;
         }
@@ -452,4 +1318,4 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
     ): vscode.ProviderResult<vscode.CompletionItem> {
         return item;
     }
-} 
+}
