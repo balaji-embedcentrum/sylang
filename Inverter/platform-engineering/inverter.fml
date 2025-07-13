@@ -121,7 +121,7 @@ def systemfeatures InverterFeatures
 			def feature OvertemperatureProtection mandatory
 				name "Overtemperature Protection"
 				description "Junction and coolant temperature monitoring and protection"
-				owner "Safety Team"
+				owner "Thermal Team"
 				tags "overtemperature", "thermal-protection", "monitoring"
 				safetylevel ASIL-C
 

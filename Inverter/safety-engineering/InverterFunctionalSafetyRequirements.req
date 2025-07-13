@@ -1,0 +1,270 @@
+def reqsection InverterFunctionalSafetyRequirements
+	name "Automotive Inverter System - Functional Safety Requirements"
+	description "High-level functional safety requirements derived from safety goals per ISO 26262"
+
+	// ========================================
+	// TORQUE CONTROL SAFETY REQUIREMENTS (ASIL D)
+	// ======================================== 
+
+	def requirement FSR_INV_001
+		name "Torque Control Monitoring"
+		description "Inverter shall continuously monitor actual torque output and detect deviations from commanded torque greater than 10% within 10ms"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_001	
+		asil D
+		rationale "Early detection of torque control failures to prevent uncontrolled acceleration"
+		allocatedto subsystem PowerElectronicsController, MotorControlAlgorithmEngine
+		verificationcriteria "Torque control monitoring shall detect deviations greater than 10% within 10ms"
+		status draft	
+		
+	def requirement FSR_INV_002
+		name "Torque Limiting"
+		description "Inverter shall limit maximum torque output to safe levels based on vehicle speed and driving conditions"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_001
+		asil D
+		rationale "Prevent excessive torque that could cause loss of vehicle control"
+		allocatedto subsystem TorqueManagementProcessor, SafetyMonitoringEngine
+		verificationcriteria "Torque limiting shall prevent torque output greater than 150% of rated torque"
+		status draft	
+					
+	def requirement FSR_INV_003
+		name "Fail-Safe Torque Shutdown"
+		description "Inverter shall be able to immediately shut off torque output within 50ms upon detection of critical failure"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_001
+		asil D
+		rationale "Immediate response to prevent dangerous torque output"
+		allocatedto subsystem SafetyMonitoringEngine, OvercurrentProtectionUnit
+		verificationcriteria "Fail-safe torque shutdown shall occur within 50ms upon detection of critical failure"
+		status draft	
+
+	// ========================================
+	// HIGH VOLTAGE SAFETY REQUIREMENTS (ASIL D)
+	// ========================================
+	
+	def requirement FSR_INV_004
+		name "High-Voltage Isolation Monitoring"
+		type functionalsafety
+		source stakeholder
+		description "Inverter shall continuously monitor high-voltage isolation resistance and detect values below 100 ohms/volt within 1 second"
+		derivedfrom safetygoal SG_INV_002
+		asil D
+		rationale "Early detection of isolation degradation to prevent electric shock"
+		allocatedto subsystem IsolationMonitoringSystem, SafetyMonitoringEngine
+		verificationcriteria "High-voltage isolation monitoring shall detect values below 100 ohms/volt within 1 second"
+		status draft	
+		
+	def requirement FSR_INV_005
+		name "High-Voltage Isolation Failure Detection"
+		type functionalsafety
+		source stakeholder
+		description "Inverter shall immediately shut down high-voltage systems upon detection of isolation failure"
+		derivedfrom safetygoal SG_INV_002
+		asil D
+		rationale "Immediate protection against high voltage exposure"
+		allocatedto subsystem SafetyMonitoringEngine, PowerElectronicsController
+		verificationcriteria "High-voltage isolation failure shall immediately shut down high-voltage systems"
+		status draft		
+		
+	def requirement FSR_INV_006
+		name "Overvoltage Protection Activation"
+		type functionalsafety
+		source stakeholder
+		description "Inverter overvoltage protection shall activate at 110% of nominal DC bus voltage within 1ms"
+		derivedfrom safetygoal SG_INV_002
+		asil D
+		rationale "Prevent component damage and insulation breakdown"
+		allocatedto subsystem OvervoltageProtectionUnit, PowerElectronicsController
+		verificationcriteria "Overvoltage protection shall activate at 110% of nominal DC bus voltage within 1ms"
+		status draft		
+
+	// ========================================
+	// THERMAL SAFETY REQUIREMENTS (ASIL C)
+	// ========================================
+	
+	def requirement FSR_INV_007
+		name "IGBT Junction Temperature Monitoring"
+		description "Inverter shall monitor IGBT junction temperatures and trigger protection at 125°C with ±5°C accuracy"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_003
+		asil C
+		rationale "Prevent thermal runaway by early temperature detection"
+		allocatedto subsystem ThermalProtectionMonitor, TemperatureSensingInterface
+		verificationcriteria "IGBT junction temperature monitoring shall trigger protection at 125°C with ±5°C accuracy"
+		status draft	
+		
+	def requirement FSR_INV_008
+		name "Progressive Power Derating"
+		description "Inverter shall implement progressive power derating starting at 110°C junction temperature"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal 		SG_INV_003
+		asil C
+		rationale "Gradual power reduction to prevent thermal runaway"
+		allocatedto subsystem ThermalManagementSystem, ThermalProtectionMonitor
+		verificationcriteria "Progressive power derating shall start at 110°C junction temperature"
+		status draft	
+		
+	def requirement FSR_INV_009
+		name "Cooling System Flow Monitoring"
+		description "Inverter cooling system monitoring shall detect flow rate reduction >20% within 5 seconds"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_003
+		asil C
+		rationale "Early detection of cooling system degradation"
+		allocatedto subsystem CoolantFlowController, ThermalManagementSystem
+		verificationcriteria "Cooling system flow monitoring shall detect flow rate reduction >20% within 5 seconds"
+		status draft	
+
+	// ========================================
+	// PROPULSION AVAILABILITY REQUIREMENTS (ASIL B)
+	// ========================================
+	
+	def requirement FSR_INV_010
+		name "Degraded Mode Power Capability"
+		description "Inverter shall maintain minimum 20% power capability in degraded mode"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_004
+		asil B
+		rationale "Ensure basic vehicle mobility during system failures"
+		allocatedto subsystem PowerModeManager, PowerElectronicsController
+		verificationcriteria "Degraded mode power capability shall maintain minimum 20% power capability"
+		status draft	
+		
+	def requirement FSR_INV_011
+		name "Redundant Current Sensor Monitoring"
+		description "Inverter shall use redundant current sensors and detect single sensor failures within one control cycle"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_004
+		asil B
+		rationale "Maintain accurate current measurement for motor control"
+		allocatedto subsystem CurrentSensingInterface, SensorInterfaceController
+		verificationcriteria "Redundant current sensor monitoring shall detect single sensor failures within one control cycle"
+		status draft	
+		
+	def requirement FSR_INV_012
+		name "Regenerative Braking Performance Monitoring"
+		description "Inverter regenerative braking shall detect performance degradation >20% and warn driver"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_004
+		asil B
+		rationale "Maintain expected braking performance for safety"
+		allocatedto subsystem RegenerativeBrakingController, SafetyMonitoringEngine
+		verificationcriteria "Regenerative braking performance monitoring shall detect performance degradation >20% and warn driver"
+		status draft	
+
+	// ========================================
+	// MOTOR CONTROL STABILITY REQUIREMENTS (ASIL C)
+	// ========================================
+	
+	def requirement FSR_INV_013
+		name "Torque Ripple Control"
+		description "Inverter shall maintain torque ripple <5% under all operating conditions"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_005
+		asil C
+		rationale "Prevent vehicle handling issues from motor control instability"
+		allocatedto subsystem MotorControlAlgorithmEngine, TorqueManagementProcessor
+		verificationcriteria "Torque ripple control shall maintain torque ripple <5% under all operating conditions"
+		status draft	
+		
+	def requirement FSR_INV_014
+		name "Rotor Position Validation"
+		description "Inverter shall validate rotor position using multiple sensing methods and detect errors within 2ms"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_005
+		asil C
+		rationale "Accurate rotor position is critical for stable motor control"
+		allocatedto subsystem PositionSensingInterface, SensorInterfaceController
+		verificationcriteria "Rotor position validation shall detect errors within 2ms"
+		status draft	
+		
+	def requirement FSR_INV_015
+		name "Parameter Variation Compensation"
+		description "Inverter control algorithms shall include adaptive compensation for parameter variations"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_005
+		asil C
+		rationale "Maintain stability across component aging and environmental changes"
+		allocatedto subsystem MotorControlAlgorithmEngine, SpeedRegulationController
+		verificationcriteria "Parameter variation compensation shall maintain stability across component aging and environmental changes"
+		status draft	
+
+	// ========================================
+	// COMMUNICATION REQUIREMENTS (ASIL B)
+	// ========================================
+	
+	def requirement FSR_INV_016
+		name "CAN Watchdog Implementation"
+		description "Inverter CAN communication shall implement watchdogs with 100ms timeout for safety-critical messages"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_006
+		asil B
+		rationale "Detect communication failures to maintain system coordination"
+		allocatedto subsystem CANBusController, CommunicationInterface
+		status draft	
+		
+	def requirement FSR_INV_017
+		name "Message Validation"
+		description "Inverter shall validate message content and reject corrupted or unreasonable commands"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_006
+		asil B
+		rationale "Prevent incorrect operation from communication errors"
+		allocatedto subsystem CANBusController, SafetyMonitoringEngine
+		verificationcriteria "CAN Watchdog Implementation shall implement watchdogs with 100ms timeout for safety-critical messages"
+		status draft	
+		
+	def requirement FSR_INV_018
+		name "Local Safety Functionality"
+		description "Inverter shall maintain local safety functions during communication loss for minimum 10 seconds"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_006
+		asil B
+		rationale "Ensure basic safety even when isolated from vehicle network"
+		allocatedto subsystem PowerElectronicsController, SafetyMonitoringEngine
+		verificationcriteria "Local safety functionality shall maintain local safety functions during communication loss for minimum 10 seconds"
+		status draft	
+
+	// ========================================
+	// ELECTRICAL PROTECTION REQUIREMENTS
+	// ========================================
+	
+	def requirement FSR_INV_019
+		name "Short Circuit Detection"
+		description "Inverter short circuit detection shall activate protection within 2 microseconds"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_002
+		asil D
+		rationale "Ultra-fast detection to prevent electrical fire ignition"
+		allocatedto subsystem ShortCircuitDetector, OvercurrentProtectionUnit
+		verificationcriteria "Short circuit detection shall activate protection within 2 microseconds"
+		status draft	
+		
+	def requirement FSR_INV_020
+		name "Overcurrent Protection"
+		description "Inverter overcurrent protection shall limit current to 150% of rated current for maximum 100ms"
+		type functionalsafety
+		source stakeholder
+		derivedfrom safetygoal SG_INV_002
+		asil D
+		rationale "Prevent component damage and fire from excessive current"
+		allocatedto subsystem OvercurrentProtectionUnit, SafetyMonitoringEngine
+		verificationcriteria "Overcurrent protection shall limit current to 150% of rated current for maximum 100ms"
+		status draft	

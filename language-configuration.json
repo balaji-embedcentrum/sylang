@@ -24,12 +24,12 @@
     ["'", "'"]
   ],
   "indentationRules": {
-    "increaseIndentPattern": "^\\s*(def\\s+)?(feature|function|productline|systemfunctions|systemfeatures|constraints)\\s+.*$",
+    "increaseIndentPattern": "^\\s*(def\\s+)?(feature|function|productline|systemfunctions|systemfeatures|constraints|reqsection|requirement)\\s+.*$",
     "decreaseIndentPattern": "^\\s*$"
   },
   "folding": {
     "markers": {
-      "start": "^\\s*(feature|function|productline|systemfunctions|systemfeatures)",
+      "start": "^\\s*(feature|function|productline|systemfunctions|systemfeatures|def\\s+reqsection|def\\s+requirement)",
       "end": "^\\s*$"
     }
   },

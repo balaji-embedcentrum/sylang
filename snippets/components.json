@@ -68,5 +68,45 @@
       "  $0"
     ],
     "description": "Create a digital interface"
+  },
+  "Requirements Section Template": {
+    "prefix": "reqsection",
+    "body": [
+      "def reqsection ${1:ID}",
+      "\tname \"${2:Name}\"",
+      "\tdescription \"${3:Description}\"",
+      "\t",
+      "\tdef requirement ${4:FSR_ID}",
+      "\t\tname \"${5:Name}\"",
+      "\t\tdescription \"${6:Description}\"",
+      "\t\ttype ${7|functionalsafety,functional,non-functional,performance,standards,legal,system,software,electronics,mechanics,test|}",
+      "\t\tsource ${8|stakeholder,internal,supplier,customer|}",
+      "\t\tderivedfrom ${9:safetygoal SG_ID}",
+      "\t\tasil ${10|QM,A,B,C,D|}",
+      "\t\trationale \"${11:Rationale}\"",
+      "\t\tallocatedto ${12:subsystem Component1}, ${13:Component2}",
+      "\t\tverificationcriteria \"${14:Criteria}\"",
+      "\t\tstatus ${15|draft,review,approved|}",
+      "\t\t$0"
+    ],
+    "description": "Create a complete requirements section"
+  },
+  "Requirement Template": {
+    "prefix": "requirement",
+    "body": [
+      "def requirement ${1:FSR_ID}",
+      "\tname \"${2:Name}\"",
+      "\tdescription \"${3:Description}\"",
+      "\ttype ${4|functionalsafety,functional,non-functional,performance,standards,legal,system,software,electronics,mechanics,test|}",
+      "\tsource ${5|stakeholder,internal,supplier,customer|}",
+      "\tderivedfrom ${6:safetygoal SG_ID}",
+      "\tasil ${7|QM,A,B,C,D|}",
+      "\trationale \"${8:Rationale}\"",
+      "\tallocatedto ${9:subsystem Component1}, ${10:Component2}",
+      "\tverificationcriteria \"${11:Criteria}\"",
+      "\tstatus ${12|draft,review,approved|}",
+      "\t$0"
+    ],
+    "description": "Create a single requirement definition"
   }
 } 

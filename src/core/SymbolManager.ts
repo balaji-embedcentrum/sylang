@@ -30,31 +30,46 @@ export class SymbolManager {
      * Parse a document and extract all symbol definitions and references
      */
     public async parseDocument(document: vscode.TextDocument, languageConfig: LanguageConfig): Promise<void> {
-        const documentSymbols: SymbolDefinition[] = [];
-        const documentReferences: SymbolReference[] = [];
+        let documentSymbols: SymbolDefinition[] = [];
+        let documentReferences: SymbolReference[] = [];
         
-        const text = document.getText();
-        const lines = text.split('\n');
-        
-        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-            const line = lines[lineIndex];
-            if (!line) continue;
-            const trimmedLine = line.trim();
-            
-            if (trimmedLine.startsWith('//') || trimmedLine.length === 0) {
-                continue;
-            }
-            
-            // Check for definitions (lines starting with 'def')
-            if (trimmedLine.startsWith('def ')) {
-                const definition = this.parseDefinition(document, lineIndex, trimmedLine, languageConfig);
-                if (definition) {
-                    documentSymbols.push(definition);
-                }
+        if (languageConfig.id === 'sylang-safety' || languageConfig.id === 'sylang-components') {
+            // Specialized parsing for safety and components files (including .req, .sub)
+            const extension = document.fileName.split('.').pop() || '';
+            if (extension === 'haz') {
+                ({ definitions: documentSymbols, references: documentReferences } = this.parseHazardDocument(document));
+            } else if (extension === 'rsk') {
+                ({ definitions: documentSymbols, references: documentReferences } = this.parseRiskDocument(document));
+            } else if (extension === 'sgl') {
+                ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyGoalsDocument(document));
+            } else if (extension === 'req') {
+                ({ definitions: documentSymbols, references: documentReferences } = this.parseRequirementsDocument(document));
+            } else if (extension === 'sub') {
+                ({ definitions: documentSymbols, references: documentReferences } = this.parseSubsystemDocument(document));
             } else {
-                // Check for references (identifiers that are not definitions)
-                const references = this.parseReferences(document, lineIndex, trimmedLine, languageConfig);
-                documentReferences.push(...references);
+                ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyDocument(document));
+            }
+        } else {
+            // Existing general parsing for other languages
+            const text = document.getText();
+            const lines = text.split('\n');
+            
+            for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                const currentLine = lines[lineIndex];
+                if (!currentLine) continue;
+                
+                const line = currentLine.trim();
+                if (!line || line.startsWith('//')) continue;
+                
+                if (line.startsWith('def ')) {
+                    const definition = this.parseDefinition(document, lineIndex, line, languageConfig);
+                    if (definition) {
+                        documentSymbols.push(definition);
+                    }
+                } else {
+                    const references = this.parseReferences(document, lineIndex, line, languageConfig);
+                    documentReferences.push(...references);
+                }
             }
         }
         
@@ -70,179 +85,368 @@ export class SymbolManager {
     }
 
     /**
-     * Parse a definition line (starts with 'def')
+     * Specialized parsing for safety documents (.itm files)
      */
-    private parseDefinition(
-        document: vscode.TextDocument, 
-        lineIndex: number, 
-        line: string, 
-        languageConfig: LanguageConfig
-    ): SymbolDefinition | null {
-        // Remove 'def ' prefix
-        const content = line.substring(4).trim();
-        
-        // Parse based on language type
-        if (languageConfig.id === 'sylang-productline') {
-            return this.parseProductLineDefinition(document, lineIndex, content);
-        } else if (languageConfig.id === 'sylang-features') {
-            return this.parseFeatureDefinition(document, lineIndex, content);
-        } else if (languageConfig.id === 'sylang-functions') {
-            return this.parseFunctionDefinition(document, lineIndex, content);
+    private parseSafetyDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.replace(/\r$/, '');
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
+            const level = this.getIndentLevel(line);
+
+            // Adjust context stack for dedent
+            while (level < contextStack.length) {
+                contextStack.pop();
+            }
+
+            const currentContext = contextStack[contextStack.length - 1] || '';
+
+            if (trimmedLine.startsWith('def ')) {
+                // Parse definition
+                const parts = trimmedLine.substring(4).trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const kind = parts[0];
+                const name = parts[1];
+                let desc = '';
+                if (parts.length > 2 && trimmedLine.endsWith('"')) {
+                    desc = trimmedLine.match(/"([^"]*)"$/)?.[1] || '';
+                }
+
+                if (!kind || !name) continue;
+
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+                const properties = new Map<string, string>();
+                if (desc) properties.set('description', desc);
+
+                definitions.push({
+                    name,
+                    kind,
+                    location,
+                    container: currentContext,
+                    properties,
+                    range
+                });
+
+                // If it's a block def (no inline desc), push to stack for nested properties
+                if (!desc) {
+                    contextStack.push(kind);
+                }
+            } else {
+                // Non-def: container/section, property, or identifier list
+                const keywordMatch = trimmedLine.split(' ')[0];
+                if (!keywordMatch) continue;
+                
+                const keyword = keywordMatch;
+
+                if (this.isContainerKeyword(keyword)) {
+                    contextStack.push(keyword);
+                } else if (this.isPropertyKeyword(keyword, currentContext)) {
+                    // Parse references in property values
+                    const valuePart = trimmedLine.substring(keyword.length).trim();
+                    const refRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+                    let match;
+                    while ((match = refRegex.exec(valuePart)) !== null) {
+                        const refName = match[1];
+                        if (!refName) continue;
+                        
+                        const startPos = line.indexOf(refName);
+                        const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                        const location = new vscode.Location(document.uri, range);
+                        references.push({
+                            name: refName,
+                            location,
+                            context: trimmedLine,
+                            range
+                        });
+                    }
+                } else if (this.isIdentifierListContext(currentContext)) {
+                    // Treat indented identifiers as definitions (e.g., subsystems)
+                    if (/^[A-Z][A-Za-z0-9_]*$/.test(trimmedLine)) {
+                        const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                        const location = new vscode.Location(document.uri, range);
+                        definitions.push({
+                            name: trimmedLine,
+                            kind: currentContext, // e.g., 'subsystem'
+                            location,
+                            properties: new Map(),
+                            range
+                        });
+                    }
+                }
+            }
         }
-        
-        return null;
+
+        return { definitions, references };
     }
 
     /**
-     * Parse product line definition
+     * Specialized parsing for hazard documents (.haz files)
      */
-    private parseProductLineDefinition(
-        document: vscode.TextDocument, 
-        lineIndex: number, 
-        content: string
-    ): SymbolDefinition | null {
-        const match = content.match(/^productline\s+([a-zA-Z_][a-zA-Z0-9_]*)/);
-        if (!match || !match[1]) return null;
-        
-        const name = match[1];
-        const range = new vscode.Range(lineIndex, 0, lineIndex, content.length);
-        const location = new vscode.Location(document.uri, range);
-        
-        return {
-            name,
-            kind: 'productline',
-            location,
-            properties: new Map(),
-            range
-        };
-    }
+    private parseHazardDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
 
-    /**
-     * Parse feature definition
-     */
-    private parseFeatureDefinition(
-        document: vscode.TextDocument, 
-        lineIndex: number, 
-        content: string
-    ): SymbolDefinition | null {
-        // Match: feature <name> [mandatory|optional|alternative|or]
-        const match = content.match(/^(systemfeatures|feature)\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\s+(mandatory|optional|alternative|or))?/);
-        if (!match || !match[1] || !match[2]) return null;
-        
-        const keyword = match[1];
-        const name = match[2];
-        const variability = match[3] || '';
-        
-        const range = new vscode.Range(lineIndex, 0, lineIndex, content.length);
-        const location = new vscode.Location(document.uri, range);
-        
-        const properties = new Map<string, string>();
-        if (variability) {
-            properties.set('variability', variability);
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.replace(/\r$/, '');
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
+            const level = this.getIndentLevel(line);
+
+            // Adjust context stack for dedent
+            while (level < contextStack.length) {
+                contextStack.pop();
+            }
+
+            const currentContext = contextStack[contextStack.length - 1] || '';
+
+            if (trimmedLine.startsWith('def ')) {
+                // Parse definition
+                const parts = trimmedLine.substring(4).trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const kind = parts[0];
+                const name = parts[1];
+                let desc = '';
+                if (parts.length > 2 && trimmedLine.endsWith('"')) {
+                    desc = trimmedLine.match(/"([^"]*)"$/)?.[1] || '';
+                }
+
+                if (!kind || !name) continue;
+
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+                const properties = new Map<string, string>();
+                if (desc) properties.set('description', desc);
+
+                definitions.push({
+                    name,
+                    kind,
+                    location,
+                    container: currentContext,
+                    properties,
+                    range
+                });
+
+                // Push to stack for nested properties
+                contextStack.push(kind);
+            } else if (trimmedLine.startsWith('subsystem ')) {
+                // Handle subsystem declarations in subsystemhazards
+                const subsystemName = trimmedLine.substring(10).trim();
+                if (subsystemName && /^[A-Z][A-Za-z0-9_]*$/.test(subsystemName)) {
+                    const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                    const location = new vscode.Location(document.uri, range);
+                    definitions.push({
+                        name: subsystemName,
+                        kind: 'subsystem',
+                        location,
+                        container: currentContext,
+                        properties: new Map(),
+                        range
+                    });
+                    contextStack.push('subsystem');
+                }
+            } else {
+                // Non-def: container/section, property, or identifier list
+                const keywordMatch = trimmedLine.split(' ')[0];
+                if (!keywordMatch) continue;
+                
+                const keyword = keywordMatch;
+
+                if (this.isHazardContainerKeyword(keyword)) {
+                    contextStack.push(keyword);
+                } else if (this.isHazardPropertyKeyword(keyword, currentContext)) {
+                    // Parse references in property values
+                    const valuePart = trimmedLine.substring(keyword.length).trim();
+                    
+                    // Handle quoted strings and function references
+                    if (keyword === 'functions') {
+                        // Parse function references separated by commas
+                        const functionRefs = valuePart.split(',').map(f => f.trim());
+                        functionRefs.forEach(funcRef => {
+                            if (funcRef && /^[A-Z][A-Za-z0-9_]*$/.test(funcRef)) {
+                                const startPos = line.indexOf(funcRef);
+                                if (startPos !== -1) {
+                                    const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + funcRef.length);
+                                    const location = new vscode.Location(document.uri, range);
+                                    references.push({
+                                        name: funcRef,
+                                        location,
+                                        context: trimmedLine,
+                                        range
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        // Parse other references
+                        const refRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+                        let match;
+                        while ((match = refRegex.exec(valuePart)) !== null) {
+                            const refName = match[1];
+                            if (!refName) continue;
+                            
+                            const startPos = line.indexOf(refName);
+                            if (startPos !== -1) {
+                                const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                                const location = new vscode.Location(document.uri, range);
+                                references.push({
+                                    name: refName,
+                                    location,
+                                    context: trimmedLine,
+                                    range
+                                });
+                            }
+                        }
+                    }
+                }
+            }
         }
-        
-        return {
-            name,
-            kind: keyword,
-            location,
-            properties,
-            range
+
+        return { definitions, references };
+    }
+
+    private getIndentLevel(line: string): number {
+        const match = line.match(/^(\s*)/);
+        return match ? Math.floor(match[0].replace(/\t/g, '  ').length / 2) : 0;
+    }
+
+    private isContainerKeyword(keyword: string): boolean {
+        const containers = ['itemdef', 'operationalscenarios', 'operationalconditions', 'vehiclestates', 'driverstates', 'environments', 'safetyconcept', 'subsystems', 'systemboundaries', 'includes', 'excludes', 'safetystrategy', 'assumptionsofuse', 'foreseeablemisuse'];
+        return containers.includes(keyword);
+    }
+
+    private isPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'item': ['name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions'],
+            'scenario': ['description', 'vehiclestate', 'environment', 'driverstate'],
+            'condition': ['range', 'impact', 'standard'],
+            'vehiclestate': ['description', 'characteristics'],
+            'drivingstate': ['description', 'characteristics'],
+            'environment': ['description', 'conditions'],
+            'principle': ['description'],
+            'assumption': ['description'],
+            'misuse': ['description']
         };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    private isIdentifierListContext(context: string): boolean {
+        return ['subsystems'].includes(context);
+    }
+
+
+
+    /**
+     * Parse definition for general languages (non-safety)
+     */
+    private parseDefinition(document: vscode.TextDocument, lineIndex: number, line: string, languageConfig: LanguageConfig): SymbolDefinition | null {
+        try {
+            // Extract definition from 'def' line
+            const defMatch = line.match(/^def\s+(\w+)\s+(\w+)(?:\s+"([^"]*)")?/);
+            if (!defMatch) return null;
+
+            const kind = defMatch[1];
+            const name = defMatch[2];
+            const description = defMatch[3] || '';
+
+            if (!kind || !name) return null;
+
+            const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+            const location = new vscode.Location(document.uri, range);
+            const properties = new Map<string, string>();
+            
+            if (description) {
+                properties.set('description', description);
+            }
+
+            return {
+                name,
+                kind,
+                location,
+                properties,
+                range
+            };
+        } catch (error) {
+            console.error('Error parsing definition:', error);
+            return null;
+        }
     }
 
     /**
-     * Parse def function definition
+     * Parse references in a line for general languages (non-safety)
      */
-    private parseFunctionDefinition(
-        document: vscode.TextDocument, 
-        lineIndex: number, 
-        content: string
-    ): SymbolDefinition | null {
-        // Match: systemfunctions <name> or def function <name>
-        const match = content.match(/^(systemfunctions|function)\s+([a-zA-Z_][a-zA-Z0-9_]*)/);
-        if (!match || !match[1] || !match[2]) return null;
-        
-        const keyword = match[1];
-        const name = match[2];
-        
-        const range = new vscode.Range(lineIndex, 0, lineIndex, content.length);
-        const location = new vscode.Location(document.uri, range);
-        
-        return {
-            name,
-            kind: keyword,
-            location,
-            properties: new Map(),
-            range
-        };
-    }
-
-    /**
-     * Parse references in a line (identifiers that are not definitions)
-     */
-    private parseReferences(
-        document: vscode.TextDocument, 
-        lineIndex: number, 
-        line: string, 
-        languageConfig: LanguageConfig
-    ): SymbolReference[] {
+    private parseReferences(document: vscode.TextDocument, lineIndex: number, line: string, languageConfig: LanguageConfig): SymbolReference[] {
         const references: SymbolReference[] = [];
         
-        // Find all potential identifiers (words that could be references)
-        const identifierRegex = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
-        let match;
-        
-        while ((match = identifierRegex.exec(line)) !== null) {
-            const identifier = match[1];
-            if (!identifier) continue;
-            const startPos = match.index;
-            const endPos = startPos + identifier.length;
+        try {
+            // Look for identifiers that could be references
+            const identifierRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+            let match;
             
-            // Skip if it's a keyword
-            if (languageConfig.keywords.includes(identifier)) {
-                continue;
+            while ((match = identifierRegex.exec(line)) !== null) {
+                const refName = match[1];
+                if (!refName) continue;
+                
+                const startPos = match.index;
+                const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                const location = new vscode.Location(document.uri, range);
+                
+                references.push({
+                    name: refName,
+                    location,
+                    context: line.trim(),
+                    range
+                });
             }
-            
-            // Skip if it's a property value (after colon or equals)
-            const beforeMatch = line.substring(0, startPos);
-            if (beforeMatch.includes(':') || beforeMatch.includes('=')) {
-                continue;
-            }
-            
-            // This is a potential reference
-            const range = new vscode.Range(lineIndex, startPos, lineIndex, endPos);
-            const location = new vscode.Location(document.uri, range);
-            
-            references.push({
-                name: identifier,
-                location,
-                context: line.trim(),
-                range
-            });
+        } catch (error) {
+            console.error('Error parsing references:', error);
         }
         
         return references;
     }
 
     /**
-     * Find definition for a symbol
+     * Update workspace symbols for a specific document
      */
-    public findDefinition(symbolName: string, document?: vscode.TextDocument): SymbolDefinition | null {
-        // First check in the current document
-        if (document) {
-            const documentKey = document.uri.toString();
-            const documentSymbols = this.symbols.get(documentKey);
-            if (documentSymbols) {
-                const definition = documentSymbols.definitions.find(d => d.name === symbolName);
-                if (definition) {
-                    return definition;
-                }
+    private updateWorkspaceSymbols(documentKey: string, symbols: SymbolDefinition[]): void {
+        this.workspaceSymbols.set(documentKey, symbols);
+    }
+
+    /**
+     * Find definition of a symbol
+     */
+    public findDefinition(symbolName: string, document: vscode.TextDocument): SymbolDefinition | null {
+        // First check current document
+        const documentKey = document.uri.toString();
+        const documentSymbols = this.symbols.get(documentKey);
+        
+        if (documentSymbols) {
+            const definition = documentSymbols.definitions.find(def => def.name === symbolName);
+            if (definition) {
+                return definition;
             }
         }
         
-        // Then check in workspace symbols
-        for (const [_, definitions] of this.workspaceSymbols) {
-            const definition = definitions.find(d => d.name === symbolName);
+        // Then check workspace symbols
+        for (const [_, symbols] of this.workspaceSymbols) {
+            const definition = symbols.find(def => def.name === symbolName);
             if (definition) {
                 return definition;
             }
@@ -252,41 +456,35 @@ export class SymbolManager {
     }
 
     /**
-     * Find all references for a symbol
+     * Find all references to a symbol
      */
     public findReferences(symbolName: string): SymbolReference[] {
         const references: SymbolReference[] = [];
         
+        // Search through all documents
         for (const [_, symbolInfo] of this.symbols) {
-            const symbolRefs = symbolInfo.references.filter(r => r.name === symbolName);
-            references.push(...symbolRefs);
+            const matchingRefs = symbolInfo.references.filter(ref => ref.name === symbolName);
+            references.push(...matchingRefs);
         }
         
         return references;
     }
 
     /**
-     * Get all definitions in the workspace
+     * Get all workspace symbols
      */
-    public getAllDefinitions(): SymbolDefinition[] {
-        const allDefinitions: SymbolDefinition[] = [];
+    public getWorkspaceSymbols(): SymbolDefinition[] {
+        const allSymbols: SymbolDefinition[] = [];
         
-        for (const [_, definitions] of this.workspaceSymbols) {
-            allDefinitions.push(...definitions);
+        for (const [_, symbols] of this.workspaceSymbols) {
+            allSymbols.push(...symbols);
         }
         
-        return allDefinitions;
+        return allSymbols;
     }
 
     /**
-     * Update workspace symbols when a document changes
-     */
-    private updateWorkspaceSymbols(documentUri: string, definitions: SymbolDefinition[]): void {
-        this.workspaceSymbols.set(documentUri, definitions);
-    }
-
-    /**
-     * Clear symbols for a document (when it's deleted or closed)
+     * Clear symbols for a specific document
      */
     public clearDocumentSymbols(documentUri: string): void {
         this.symbols.delete(documentUri);
@@ -294,9 +492,471 @@ export class SymbolManager {
     }
 
     /**
-     * Get symbol information for a document
+     * Clear all symbols
      */
-    public getDocumentSymbols(documentUri: string): SymbolInfo | undefined {
-        return this.symbols.get(documentUri);
+    public clearAllSymbols(): void {
+        this.symbols.clear();
+        this.workspaceSymbols.clear();
     }
-} 
+
+    private isHazardContainerKeyword(keyword: string): boolean {
+        const containers = ['hazardcategories', 'subsystemhazards', 'systemlevelhazards', 'environmentalhazards', 'usagehazards'];
+        return containers.includes(keyword);
+    }
+
+    private isHazardPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'hazardidentification': ['name', 'description', 'hazardanalysis', 'methodology'],
+            'category': ['description', 'severity'],
+            'hazard': ['name', 'description', 'cause', 'effect', 'category', 'functions', 'mitigation'],
+            'subsystem': ['name', 'description'] // for subsystem context
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    /**
+     * Specialized parsing for risk documents (.rsk files)
+     */
+    private parseRiskDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.replace(/\r$/, '');
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
+            const level = this.getIndentLevel(line);
+
+            // Adjust context stack for dedent
+            while (level < contextStack.length) {
+                contextStack.pop();
+            }
+
+            const currentContext = contextStack[contextStack.length - 1] || '';
+
+            if (trimmedLine.startsWith('def ')) {
+                // Parse definition
+                const parts = trimmedLine.substring(4).trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const kind = parts[0];
+                const name = parts[1];
+                let desc = '';
+                if (parts.length > 2 && trimmedLine.endsWith('"')) {
+                    desc = trimmedLine.match(/"([^"]*)"$/)?.[1] || '';
+                }
+
+                if (!kind || !name) continue;
+
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+                const properties = new Map<string, string>();
+                if (desc) properties.set('description', desc);
+
+                definitions.push({
+                    name,
+                    kind,
+                    location,
+                    container: currentContext,
+                    properties,
+                    range
+                });
+
+                // Push to stack for nested properties
+                contextStack.push(kind);
+            } else {
+                // Non-def: container/section, property, or subsystem
+                const keywordMatch = trimmedLine.split(' ')[0];
+                if (!keywordMatch) continue;
+                
+                const keyword = keywordMatch;
+
+                if (this.isRiskContainerKeyword(keyword)) {
+                    contextStack.push(keyword);
+                } else if (this.isRiskPropertyKeyword(keyword, currentContext)) {
+                    // Parse references in property values
+                    const valuePart = trimmedLine.substring(keyword.length).trim();
+                    const refRegex = /\b([A-Z][A-Za-z0-9_]+)\b/g;
+                    let match;
+                    while ((match = refRegex.exec(valuePart)) !== null) {
+                        const refName = match[1];
+                        if (!refName) continue;
+                        
+                        const startPos = line.indexOf(refName);
+                        const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                        const location = new vscode.Location(document.uri, range);
+                        references.push({
+                            name: refName,
+                            location,
+                            context: trimmedLine,
+                            range
+                        });
+                    }
+                } else if (keyword === 'subsystem' && currentContext === 'asilassessment') {
+                    const subsystemName = trimmedLine.substring(9).trim();
+                    if (subsystemName && /^[A-Z][A-Za-z0-9_]*$/.test(subsystemName)) {
+                        const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                        const location = new vscode.Location(document.uri, range);
+                        definitions.push({
+                            name: subsystemName,
+                            kind: 'subsystem',
+                            location,
+                            properties: new Map(),
+                            range
+                        });
+                        contextStack.push('subsystem');
+                    } else {
+                        // Note: diagnostics would be handled by the RiskValidator
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    private isRiskContainerKeyword(keyword: string): boolean {
+        const containers = ['riskcriteria', 'riskdetermination', 'asildetermination', 'asilassessment'];
+        return containers.includes(keyword);
+    }
+
+    private isRiskPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'riskassessment': ['name', 'description', 'hazardanalysis', 'hazardidentification', 'item', 'methodology'],
+            'severity': ['description'],
+            'exposure': ['description'],
+            'controllability': ['description'],
+            'risk': ['severity', 'exposure', 'controllability', 'description'],
+            'asil': ['risk', 'description'],
+            'hazard': ['scenario', 'asil', 'rationale']
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    /**
+     * Specialized parsing for safety goals documents (.sgl files)
+     */
+    private parseSafetyGoalsDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.replace(/\r$/, '');
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
+            const level = this.getIndentLevel(line);
+
+            // Adjust context stack for dedent
+            while (level < contextStack.length) {
+                contextStack.pop();
+            }
+
+            const currentContext = contextStack[contextStack.length - 1] || '';
+
+            if (trimmedLine.startsWith('def ')) {
+                const parts = trimmedLine.substring(4).trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const kind = parts[0];
+                const name = parts[1];
+                let desc = '';
+                if (parts.length > 2 && trimmedLine.endsWith('"')) {
+                    desc = trimmedLine.match(/"([^"]*)"$/)?.[1] || '';
+                }
+
+                if (!kind || !name) continue;
+
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+                const properties = new Map<string, string>();
+                if (desc) properties.set('description', desc);
+
+                definitions.push({
+                    name,
+                    kind,
+                    location,
+                    container: currentContext,
+                    properties,
+                    range
+                });
+
+                // If it's a block def (no inline desc), push to stack for nested properties
+                if (!desc) {
+                    contextStack.push(kind);
+                }
+            } else {
+                const keyword = trimmedLine.split(' ')[0];
+                if (!keyword) continue;
+
+                if (this.isSafetyGoalsContainerKeyword(keyword)) {
+                    contextStack.push(keyword);
+                } else if (this.isSafetyGoalsPropertyKeyword(keyword, currentContext)) {
+                    // Parse references in property values
+                    const valuePart = trimmedLine.substring(keyword.length).trim();
+                    const refRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+                    let match;
+                    while ((match = refRegex.exec(valuePart)) !== null) {
+                        const refName = match[1];
+                        if (!refName) continue;
+                        
+                        const startPos = line.indexOf(refName);
+                        const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                        const location = new vscode.Location(document.uri, range);
+                        references.push({
+                            name: refName,
+                            location,
+                            context: trimmedLine,
+                            range
+                        });
+                    }
+                } else if (trimmedLine.startsWith('enabledby function ')) {
+                    // Special handling for multi-word property "enabledby function"
+                    const valuePart = trimmedLine.substring('enabledby function '.length).trim();
+                    const refRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+                    let match;
+                    while ((match = refRegex.exec(valuePart)) !== null) {
+                        const refName = match[1];
+                        if (!refName) continue;
+                        
+                        const startPos = line.indexOf(refName);
+                        const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                        const location = new vscode.Location(document.uri, range);
+                        references.push({
+                            name: refName,
+                            location,
+                            context: trimmedLine,
+                            range
+                        });
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    private isSafetyGoalsContainerKeyword(keyword: string): boolean {
+        const containers = ['safetygoals', 'safetymeasures'];
+        return containers.includes(keyword);
+    }
+
+    private isSafetyGoalsPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'safetygoals': ['name', 'description', 'item', 'riskassessment', 'hazardidentification'],
+            'goal': ['name', 'description', 'hazard', 'scenario', 'asil'],
+            'measure': ['description'] // Note: 'enabledby function' is handled separately
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    /**
+     * Specialized parsing for requirements documents (.req files)
+     */
+    private parseRequirementsDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const line = lines[lineIndex];
+            if (!line) continue;
+            const cleanLine = line.replace(/\r$/, '');
+            const trimmedLine = cleanLine.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
+            const level = this.getIndentLevel(line);
+
+            // Adjust context stack for dedent
+            while (level < contextStack.length) {
+                contextStack.pop();
+            }
+
+            const currentContext = contextStack[contextStack.length - 1] || '';
+
+            if (trimmedLine.startsWith('def ')) {
+                const parts = trimmedLine.substring(4).trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const kind = parts[0];
+                const name = parts[1];
+                if (!kind || !name) continue;
+                
+                let desc = '';
+                if (parts.length > 2 && trimmedLine.endsWith('"')) {
+                    desc = trimmedLine.match(/"([^"]*)"$/)?.[1] || '';
+                }
+
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+                const properties = new Map<string, string>();
+                if (desc) properties.set('description', desc);
+
+                definitions.push({
+                    name,
+                    kind,
+                    location,
+                    container: currentContext,
+                    properties,
+                    range
+                });
+
+                // If it's a block def (no inline desc), push to stack for nested properties
+                if (!desc) {
+                    contextStack.push(kind);
+                }
+            } else {
+                const keyword = trimmedLine.split(' ')[0];
+                if (!keyword) continue;
+
+                if (this.isRequirementsContainerKeyword(keyword)) {
+                    contextStack.push(keyword);
+                } else if (this.isRequirementsPropertyKeyword(keyword, currentContext)) {
+                    // Parse references in property values
+                    const valuePart = trimmedLine.substring(keyword.length).trim();
+                    const refRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+                    let match;
+                    while ((match = refRegex.exec(valuePart)) !== null) {
+                        const refName = match[1];
+                        if (!refName) continue;
+                        
+                        const startPos = line.indexOf(refName);
+                        const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                        const location = new vscode.Location(document.uri, range);
+                        references.push({
+                            name: refName,
+                            location,
+                            context: trimmedLine,
+                            range
+                        });
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    private isRequirementsContainerKeyword(keyword: string): boolean {
+        return false; // No containers in .req sample
+    }
+
+    private isRequirementsPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'reqsection': ['name', 'description'],
+            'requirement': ['name', 'description', 'type', 'source', 'derivedfrom', 'asil', 'rationale', 'allocatedto', 'verificationcriteria', 'status']
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+
+    /**
+     * Specialized parsing for subsystem documents (.sub files)
+     */
+    private parseSubsystemDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        const contextStack: string[] = [];
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const line = lines[lineIndex];
+            if (!line) continue;
+            const cleanLine = line.replace(/\r$/, '');
+            const trimmedLine = cleanLine.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
+            const level = this.getIndentLevel(line);
+
+            // Adjust context stack for dedent
+            while (level < contextStack.length) {
+                contextStack.pop();
+            }
+
+            const currentContext = contextStack[contextStack.length - 1] || '';
+
+            if (trimmedLine.startsWith('def ')) {
+                const parts = trimmedLine.substring(4).trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const kind = parts[0];
+                const name = parts[1];
+                if (!kind || !name) continue;
+                
+                let desc = '';
+                if (parts.length > 2 && trimmedLine.endsWith('"')) {
+                    desc = trimmedLine.match(/"([^"]*)"$/)?.[1] || '';
+                }
+
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+                const properties = new Map<string, string>();
+                if (desc) properties.set('description', desc);
+
+                definitions.push({
+                    name,
+                    kind,
+                    location,
+                    container: currentContext,
+                    properties,
+                    range
+                });
+
+                // If it's a block def (no inline desc), push to stack for nested properties
+                if (!desc) {
+                    contextStack.push(kind);
+                }
+            } else {
+                const keyword = trimmedLine.split(' ')[0];
+                if (!keyword) continue;
+
+                if (this.isSubsystemContainerKeyword(keyword)) {
+                    contextStack.push(keyword);
+                } else if (this.isSubsystemPropertyKeyword(keyword, currentContext)) {
+                    // Parse references in property values
+                    const valuePart = trimmedLine.substring(keyword.length).trim();
+                    const refRegex = /\b([A-Z][A-Za-z0-9_]*)\b/g;
+                    let match;
+                    while ((match = refRegex.exec(valuePart)) !== null) {
+                        const refName = match[1];
+                        if (!refName) continue;
+                        
+                        const startPos = line.indexOf(refName);
+                        const range = new vscode.Range(lineIndex, startPos, lineIndex, startPos + refName.length);
+                        const location = new vscode.Location(document.uri, range);
+                        references.push({
+                            name: refName,
+                            location,
+                            context: trimmedLine,
+                            range
+                        });
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    private isSubsystemContainerKeyword(keyword: string): boolean {
+        return false; // No containers in .sub sample
+    }
+
+    private isSubsystemPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'subsystem': ['name', 'description', 'owner', 'tags', 'safetylevel', 'asil', 'enables', 'implements']
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
+    }
+}

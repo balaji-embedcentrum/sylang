@@ -3,6 +3,11 @@ import { BaseValidator } from '../languages/base/BaseValidator';
 import { FeaturesValidator } from '../languages/features/FeaturesValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
 import { SafetyValidator } from '../languages/safety/SafetyValidator';
+import { HazardValidator } from '../languages/safety/HazardValidator';
+import { RiskValidator } from '../languages/safety/RiskValidator';
+import { SafetyGoalsValidator } from '../languages/safety/SafetyGoalsValidator';
+import { RequirementsValidator } from '../languages/components/RequirementsValidator';
+import { SubsystemValidator } from '../languages/subsystem/SubsystemValidator'; // New import
 import { ProductLineValidator } from '../languages/productline/ProductLineValidator';
 import { getLanguageConfig } from '../config/LanguageConfigs';
 
@@ -49,16 +54,34 @@ export class ValidationEngine {
 
             let diagnostics: vscode.Diagnostic[] = [];
 
-            // Check if it's a safety file (by extension)
+            // Check if it's a safety or other file (by extension)
             const fileName = document.fileName;
             const extension = fileName.split('.').pop();
-            const safetyExtensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo'];
+            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub'];
             
-            if (safetyExtensions.includes(extension || '')) {
-                // Use simple SafetyValidator for all safety files
-                const safetyValidator = new SafetyValidator();
-                console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);
-                diagnostics = await safetyValidator.validate(document);
+            if (extensions.includes(extension || '')) {
+                // Use appropriate validator based on extension
+                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator;
+                if (extension === 'haz') {
+                    validator = new HazardValidator();
+                    console.log(`[ValidationEngine] Running HazardValidator for .${extension} file`);
+                } else if (extension === 'rsk') {
+                    validator = new RiskValidator();
+                    console.log(`[ValidationEngine] Running RiskValidator for .${extension} file`);
+                } else if (extension === 'sgl') {
+                    validator = new SafetyGoalsValidator();
+                    console.log(`[ValidationEngine] Running SafetyGoalsValidator for .${extension} file`);
+                } else if (extension === 'req') {
+                    validator = new RequirementsValidator();
+                    console.log(`[ValidationEngine] Running RequirementsValidator for .${extension} file`);
+                } else if (extension === 'sub') {
+                    validator = new SubsystemValidator();
+                    console.log(`[ValidationEngine] Running SubsystemValidator for .${extension} file`);
+                } else {
+                    validator = new SafetyValidator();
+                    console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);
+                }
+                diagnostics = await validator.validate(document);
             } else {
                 // Get the appropriate validator for this file type
                 const validator = this.validators.get(document.languageId);

@@ -37,7 +37,7 @@ def hazardidentification EPBHazards
         cause "Motor controller failure, position feedback loss"
         effect "Excessive clamping force, potential component damage"
         category UnintendedActivation
-        functions CableDriveController, PositionSensorInterface
+        function CableDriveController, PositionSensorInterface
         
       def hazard H_ACT_002
         name "Actuator Seizure"
@@ -45,7 +45,7 @@ def hazardidentification EPBHazards
         cause "Mechanical wear, contamination, extreme temperature"
         effect "Cannot apply or release parking brake"
         category FailureToActivate, FailureToRelease
-        functions ActuationSystemManager, SystemHealthSupervisor
+        function ActuationSystemManager, SystemHealthSupervisor
         
       def hazard H_ACT_003
         name "Position Sensor Failure"
@@ -53,7 +53,7 @@ def hazardidentification EPBHazards
         cause "Sensor damage, wiring fault, EMI interference"
         effect "Incorrect force application, uncertain brake status"
         category PartialFailure, MisleadingIndication
-        functions PositionSensorInterface, ForceRegulationModule
+        function PositionSensorInterface, ForceRegulationModule
         
       def hazard H_ACT_004
         name "Power Supply Interruption"
@@ -61,7 +61,7 @@ def hazardidentification EPBHazards
         cause "Electrical fault, fuse failure, battery disconnect"
         effect "Brake stuck in current position"
         category FailureToActivate, FailureToRelease
-        functions ActuationSystemManager, EmergencyReleaseValve
+        function ActuationSystemManager, EmergencyReleaseValve
         
       def hazard H_ACT_005
         name "Thermal Overload"
@@ -69,7 +69,7 @@ def hazardidentification EPBHazards
         cause "Excessive duty cycle, cooling system failure"
         effect "Reduced performance, potential component damage"
         category PartialFailure, DelayedResponse
-        functions SystemHealthSupervisor, ForceRegulationModule
+        function SystemHealthSupervisor, ForceRegulationModule
         
       def hazard H_ACT_006
         name "Cable Breakage (Cable-Type)"
@@ -77,7 +77,7 @@ def hazardidentification EPBHazards
         cause "Cable wear, corrosion, excessive force"
         effect "Loss of braking force transmission"
         category FailureToActivate
-        functions CableDriveController, CableHealthMonitor
+        function CableDriveController, CableHealthMonitor
         
       def hazard H_ACT_007
         name "Calibration Drift"
@@ -85,7 +85,7 @@ def hazardidentification EPBHazards
         cause "Component aging, wear, temperature cycling"
         effect "Incorrect force application, inconsistent performance"
         category PartialFailure
-        functions ActuationSystemManager, FaultDetectionAlgorithm
+        function ActuationSystemManager, FaultDetectionAlgorithm
 
     subsystem HMIControlSubsystem
       def hazard H_HMI_001
@@ -94,7 +94,7 @@ def hazardidentification EPBHazards
         cause "Mechanical jamming, liquid contamination"
         effect "Continuous apply/release commands"
         category UnintendedActivation
-        functions InputDeviceController, HMIInterfaceProcessor
+        function InputDeviceController, HMIInterfaceProcessor
         
       def hazard H_HMI_002
         name "Switch Not Responsive"
@@ -102,7 +102,7 @@ def hazardidentification EPBHazards
         cause "Electrical fault, mechanical damage"
         effect "Cannot command EPB operation"
         category FailureToActivate, FailureToRelease
-        functions InputDeviceController, SystemHealthSupervisor
+        function InputDeviceController, SystemHealthSupervisor
         
       def hazard H_HMI_003
         name "False Status Indication"
@@ -110,7 +110,7 @@ def hazardidentification EPBHazards
         cause "LED failure, wiring fault, software error"
         effect "Driver unaware of actual EPB state"
         category MisleadingIndication
-        functions VisualFeedbackManager, LEDControllerChip
+        function VisualFeedbackManager, LEDControllerChip
         
       def hazard H_HMI_004
         name "No Status Indication"
@@ -118,7 +118,7 @@ def hazardidentification EPBHazards
         cause "Display failure, power loss, communication fault"
         effect "Driver cannot determine EPB state"
         category MisleadingIndication
-        functions VisualFeedbackManager, InstrumentClusterInterface
+        function VisualFeedbackManager, InstrumentClusterInterface
         
       def hazard H_HMI_005
         name "Spurious Switch Activation"
@@ -126,7 +126,7 @@ def hazardidentification EPBHazards
         cause "EMI interference, electrical noise, software fault"
         effect "Unexpected EPB commands"
         category UnintendedActivation
-        functions InputDeviceController, HMIInterfaceProcessor
+        function InputDeviceController, HMIInterfaceProcessor
         
       def hazard H_HMI_006
         name "Multiple Switch Interpretation"
@@ -134,7 +134,7 @@ def hazardidentification EPBHazards
         cause "Contact bounce, software timing error"
         effect "Unpredictable EPB behavior"
         category UnintendedActivation, DelayedResponse
-        functions InputDeviceController, HMIInterfaceProcessor
+        function InputDeviceController, HMIInterfaceProcessor
 
     subsystem SensorMonitoringSubsystem
       def hazard H_SEN_001
@@ -143,7 +143,7 @@ def hazardidentification EPBHazards
         cause "Sensor aging, temperature effects, magnetic interference"
         effect "Incorrect brake force application"
         category PartialFailure
-        functions PositionSensorInterface, FaultDetectionAlgorithm
+        function PositionSensorInterface, FaultDetectionAlgorithm
         
       def hazard H_SEN_002
         name "Sensor Signal Noise"
@@ -151,7 +151,7 @@ def hazardidentification EPBHazards
         cause "EMI, poor grounding, cable damage"
         effect "Erratic actuator behavior"
         category DelayedResponse, PartialFailure
-        functions PositionSensorInterface, SystemHealthSupervisor
+        function PositionSensorInterface, SystemHealthSupervisor
         
       def hazard H_SEN_003
         name "Sensor Disconnection"
@@ -159,7 +159,7 @@ def hazardidentification EPBHazards
         cause "Connector corrosion, cable damage, vibration"
         effect "Loss of position feedback"
         category FailureToActivate, FailureToRelease
-        functions PositionSensorInterface, FaultDetectionAlgorithm
+        function PositionSensorInterface, FaultDetectionAlgorithm
         
       def hazard H_SEN_004
         name "Environmental Contamination"
@@ -167,7 +167,7 @@ def hazardidentification EPBHazards
         cause "Environmental exposure, seal failure"
         effect "Degraded sensor performance"
         category PartialFailure, DelayedResponse
-        functions PositionSensorInterface, SystemHealthSupervisor
+        function PositionSensorInterface, SystemHealthSupervisor
         
       def hazard H_SEN_005
         name "Cable Tension Sensor Failure"
@@ -175,7 +175,7 @@ def hazardidentification EPBHazards
         cause "Sensor damage, calibration loss"
         effect "Undetected cable problems"
         category MisleadingIndication
-        functions CableHealthMonitor, FaultDetectionAlgorithm
+        function CableHealthMonitor, FaultDetectionAlgorithm
 
     subsystem AutomationLogicSubsystem
       def hazard H_AUT_001
@@ -184,7 +184,7 @@ def hazardidentification EPBHazards
         cause "Faulty vehicle speed sensor, software logic error"
         effect "Unexpected braking during driving"
         category UnintendedActivation
-        functions AutoHoldStateMachine, AutomationCoordinator
+        function AutoHoldStateMachine, AutomationCoordinator
         
       def hazard H_AUT_002
         name "Auto-Hold Failure to Activate"
@@ -192,7 +192,7 @@ def hazardidentification EPBHazards
         cause "Logic error, sensor failure, communication fault"
         effect "Vehicle may roll when stopped"
         category FailureToActivate
-        functions AutoHoldStateMachine, ConditionalActivationEngine
+        function AutoHoldStateMachine, ConditionalActivationEngine
         
       def hazard H_AUT_003
         name "Hill-Start Assist Malfunction"
@@ -200,7 +200,7 @@ def hazardidentification EPBHazards
         cause "Incline sensor failure, logic error"
         effect "Vehicle rollback or unexpected braking"
         category FailureToActivate, UnintendedActivation
-        functions HillAssistLogicController, InclinationDetectionService
+        function HillAssistLogicController, InclinationDetectionService
         
       def hazard H_AUT_004
         name "Transition Logic Error"
@@ -208,7 +208,7 @@ def hazardidentification EPBHazards
         cause "Software bug, timing error, sensor mismatch"
         effect "Unpredictable automation behavior"
         category DelayedResponse, PartialFailure
-        functions AutomationCoordinator, ActivationModeSelector
+        function AutomationCoordinator, ActivationModeSelector
 
     subsystem DiagnosticSubsystem
       def hazard H_DIA_001
@@ -217,7 +217,7 @@ def hazardidentification EPBHazards
         cause "Sensor calibration error, software bug"
         effect "Unnecessary system shutdown or warning"
         category MisleadingIndication
-        functions FaultDetectionAlgorithm, DiagnosticReportingGateway
+        function FaultDetectionAlgorithm, DiagnosticReportingGateway
         
       def hazard H_DIA_002
         name "Missed Fault Detection"
@@ -225,7 +225,7 @@ def hazardidentification EPBHazards
         cause "Incomplete diagnostic coverage, sensor failure"
         effect "Undetected system degradation"
         category MisleadingIndication
-        functions FaultDetectionAlgorithm, SystemHealthSupervisor
+        function FaultDetectionAlgorithm, SystemHealthSupervisor
         
       def hazard H_DIA_003
         name "Diagnostic System Failure"
@@ -233,7 +233,7 @@ def hazardidentification EPBHazards
         cause "Hardware failure, software crash"
         effect "Loss of fault detection capability"
         category FailureToActivate
-        functions SystemHealthSupervisor, FaultDetectionAlgorithm
+        function SystemHealthSupervisor, FaultDetectionAlgorithm
         
       def hazard H_DIA_004
         name "Delayed Fault Reporting"
@@ -241,7 +241,7 @@ def hazardidentification EPBHazards
         cause "Processing delay, communication fault"
         effect "Continued operation with undetected issues"
         category DelayedResponse
-        functions DiagnosticReportingGateway, CommunicationProtocolManager
+        function DiagnosticReportingGateway, CommunicationProtocolManager
 
     subsystem CommunicationSubsystem
       def hazard H_COM_001
@@ -250,7 +250,7 @@ def hazardidentification EPBHazards
         cause "Bus controller failure, wiring damage"
         effect "Inability to coordinate system operation"
         category FailureToActivate, FailureToRelease
-        functions CommunicationProtocolManager, CoreSystemOrchestrator
+        function CommunicationProtocolManager, CoreSystemOrchestrator
         
       def hazard H_COM_002
         name "Message Corruption"
@@ -258,7 +258,7 @@ def hazardidentification EPBHazards
         cause "EMI, electrical noise, timing issues"
         effect "Incorrect commands or status information"
         category PartialFailure, MisleadingIndication
-        functions CommunicationProtocolManager, SystemHealthSupervisor
+        function CommunicationProtocolManager, SystemHealthSupervisor
         
       def hazard H_COM_003
         name "Message Timing Error"
@@ -266,7 +266,7 @@ def hazardidentification EPBHazards
         cause "Network congestion, priority issues"
         effect "Uncoordinated system behavior"
         category DelayedResponse
-        functions CommunicationProtocolManager, CoreSystemOrchestrator
+        function CommunicationProtocolManager, CoreSystemOrchestrator
         
       def hazard H_COM_004
         name "Network Congestion"
@@ -274,7 +274,7 @@ def hazardidentification EPBHazards
         cause "Too many messages, inadequate bandwidth"
         effect "Delayed or dropped messages"
         category DelayedResponse
-        functions CommunicationProtocolManager, CoreSystemOrchestrator
+        function CommunicationProtocolManager, CoreSystemOrchestrator
 
     subsystem SafetySubsystem
       def hazard H_SAF_001
@@ -283,7 +283,7 @@ def hazardidentification EPBHazards
         cause "Hardware failure, software crash"
         effect "Loss of safety oversight"
         category FailureToActivate
-        functions SystemHealthSupervisor, FaultDetectionAlgorithm
+        function SystemHealthSupervisor, FaultDetectionAlgorithm
         
       def hazard H_SAF_002
         name "False Safety Activation"
@@ -291,7 +291,7 @@ def hazardidentification EPBHazards
         cause "Overly sensitive thresholds, sensor noise"
         effect "Unnecessary system availability loss"
         category UnintendedActivation
-        functions SystemHealthSupervisor, FaultDetectionAlgorithm
+        function SystemHealthSupervisor, FaultDetectionAlgorithm
         
       def hazard H_SAF_003
         name "Safety Response Delay"
@@ -299,7 +299,7 @@ def hazardidentification EPBHazards
         cause "Processing delay, communication fault"
         effect "Hazard escalation before mitigation"
         category DelayedResponse
-        functions SystemHealthSupervisor, EmergencyReleaseValve
+        function SystemHealthSupervisor, EmergencyReleaseValve
         
       def hazard H_SAF_004
         name "Emergency Stop Failure"
@@ -307,7 +307,7 @@ def hazardidentification EPBHazards
         cause "Hardware failure, power loss"
         effect "Cannot achieve safe state in emergency"
         category FailureToActivate
-        functions EmergencyReleaseValve, SystemHealthSupervisor
+        function EmergencyReleaseValve, SystemHealthSupervisor
 
     subsystem DisplayRenderingSubsystem
       def hazard H_DIS_001
@@ -316,7 +316,7 @@ def hazardidentification EPBHazards
         cause "Hardware failure, software crash"
         effect "Driver unaware of EPB state"
         category MisleadingIndication
-        functions InstrumentClusterInterface, VisualFeedbackManager
+        function InstrumentClusterInterface, VisualFeedbackManager
         
       def hazard H_DIS_002
         name "Incorrect Display Information"
@@ -324,7 +324,7 @@ def hazardidentification EPBHazards
         cause "Software bug, communication error"
         effect "Driver makes incorrect assumptions"
         category MisleadingIndication
-        functions InstrumentClusterInterface, DisplayLayoutEngine
+        function InstrumentClusterInterface, DisplayLayoutEngine
         
       def hazard H_DIS_003
         name "Display Timing Error"
@@ -332,7 +332,7 @@ def hazardidentification EPBHazards
         cause "Processing delay, rendering issues"
         effect "Outdated information to driver"
         category DelayedResponse
-        functions InstrumentClusterInterface, DisplayLayoutEngine
+        function InstrumentClusterInterface, DisplayLayoutEngine
 
     subsystem InputProcessingSubsystem
       def hazard H_INP_001
@@ -341,7 +341,7 @@ def hazardidentification EPBHazards
         cause "Hardware failure, software crash"
         effect "Cannot accept user commands"
         category FailureToActivate, FailureToRelease
-        functions InputDeviceController, HMIInterfaceProcessor
+        function InputDeviceController, HMIInterfaceProcessor
         
       def hazard H_INP_002
         name "Input Misinterpretation"
@@ -349,7 +349,7 @@ def hazardidentification EPBHazards
         cause "Software bug, timing error"
         effect "Wrong action taken"
         category UnintendedActivation
-        functions InputDeviceController, HMIInterfaceProcessor
+        function InputDeviceController, HMIInterfaceProcessor
         
       def hazard H_INP_003
         name "Input Latency"
@@ -357,7 +357,7 @@ def hazardidentification EPBHazards
         cause "Processing delay, queue overflow"
         effect "Delayed response to user commands"
         category DelayedResponse
-        functions InputDeviceController, HMIInterfaceProcessor
+        function InputDeviceController, HMIInterfaceProcessor
 
     subsystem SystemOrchestrationSubsystem
       def hazard H_SYS_001
@@ -366,7 +366,7 @@ def hazardidentification EPBHazards
         cause "Orchestration logic error, communication fault"
         effect "Uncoordinated system behavior"
         category PartialFailure
-        functions CoreSystemOrchestrator, CommunicationProtocolManager
+        function CoreSystemOrchestrator, CommunicationProtocolManager
         
       def hazard H_SYS_002
         name "State Machine Error"
@@ -374,7 +374,7 @@ def hazardidentification EPBHazards
         cause "Software bug, unexpected input sequence"
         effect "Unpredictable system behavior"
         category PartialFailure, UnintendedActivation
-        functions CoreSystemOrchestrator, AutomationCoordinator
+        function CoreSystemOrchestrator, AutomationCoordinator
         
       def hazard H_SYS_003
         name "Resource Contention"
@@ -382,7 +382,7 @@ def hazardidentification EPBHazards
         cause "Resource management error, timing issue"
         effect "Degraded system performance"
         category DelayedResponse
-        functions CoreSystemOrchestrator, ActuationSystemManager
+        function CoreSystemOrchestrator, ActuationSystemManager
         
       def hazard H_SYS_004
         name "System Deadlock"
@@ -390,7 +390,7 @@ def hazardidentification EPBHazards
         cause "Resource locking error, circular dependency"
         effect "System becomes unresponsive"
         category FailureToActivate, FailureToRelease
-        functions CoreSystemOrchestrator, SystemHealthSupervisor
+        function CoreSystemOrchestrator, SystemHealthSupervisor
 
   systemlevelhazards
     def hazard H_SYS_003
@@ -403,7 +403,7 @@ def hazardidentification EPBHazards
       
     def hazard H_SYS_004
       name "Partial System Degradation"
-      description "Some EPB functions work, others don't"
+      description "Some EPB function work, others don't"
       cause "Partial component failure, communication loss"
       effect "Unpredictable system behavior"
       category PartialFailure, MisleadingIndication

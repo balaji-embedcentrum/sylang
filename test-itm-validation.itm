@@ -66,7 +66,7 @@ def hazardanalysis InverterSafetyAnalysis
       description "Expected usage patterns and operational constraints"
       assumptions "Proper installation, qualified maintenance, standard operating environment"
       
-    def foreseesablemisuse InverterMisuse
+    def foreseeablemisuse InverterMisuse
       name "Foreseeable Misuse Scenarios"
       description "Potential misuse cases that must be considered"
       scenarios "Overload operation, improper cooling, unauthorized modifications" 

@@ -9,9 +9,9 @@ This document describes the comprehensive validation rules implemented for `.itm
 ## File Structure Requirements
 
 ### 1. File Header
-- **MUST** start with: `def hazardanalysis <identifier>`
-- Identifier must use PascalCase naming (e.g., `InverterSafety`)
-- Example: `def hazardanalysis InverterSafety`
+- **MUST** start with: `def item <identifier>`
+- Identifier must use PascalCase naming (e.g., `InverterItem`)
+- Example: `def item InverterItem`
 
 ### 2. Required Properties
 Must include these properties with quoted values:
@@ -23,10 +23,14 @@ Must include these properties with quoted values:
 ### 3. Required Sections
 The following sections are mandatory:
 
-#### itemdef
-Defines the item scope and boundaries:
+#### Item Definition
+The item definition includes its properties and boundaries:
 ```sylang
-itemdef
+def item <ItemName>
+  name "Display Name"
+  description "Detailed description"
+  owner "Team Name"
+  reviewers "Team1", "Team2"
   productline <ProductLineName>
   systemfeatures <SystemFeaturesName>
   systemfunctions <SystemFunctionsName>
@@ -35,9 +39,11 @@ itemdef
     <SubsystemName2>
   systemboundaries
     includes
-      def boundary <ID> "Description"
+      def boundary <ID>
+        description "Description"
     excludes
-      def boundary <ID> "Description"
+      def boundary <ID>
+        description "Description"
 ```
 
 #### operationalscenarios
@@ -68,7 +74,7 @@ safetyconcept
     principle <PRIN_ID> "Safety principle"
   def assumptionsofuse <ID>
     assumption <ASSUMP_ID> "Assumption description"
-  def foreseesablemisuse <ID>
+  def foreseeablemisuse <ID>
     misuse <MISUSE_ID> "Misuse case description"
 ```
 
@@ -93,8 +99,8 @@ safetyconcept
 ## Error Types
 
 ### Critical Errors (Red Underlines)
-- Missing `def hazardanalysis` at file start
-- Missing required sections (itemdef, operationalscenarios, vehiclestates, safetyconcept)
+- Missing `def item` at file start
+- Missing required sections (operationalscenarios, vehiclestates, safetyconcept)
 - Invalid def types or keywords
 - Malformed identifiers
 
@@ -106,18 +112,19 @@ safetyconcept
 ## Valid def Types
 
 The following def types are recognized in .itm files:
+- `item` - System item being analyzed
 - `scenario` - Operational scenarios
 - `vehiclestate` - Vehicle operational states
 - `drivingstate` - Driver states
 - `environment` - Environmental conditions
 - `boundary` - System boundaries
-- `overallsafetystrategy` - Safety strategy
-- `assumptionsofuse` - Usage assumptions
-- `foreseesablemisuse` - Foreseeable misuse cases
+- `principle` - Safety principles
+- `assumption` - Usage assumptions
+- `misuse` - Foreseeable misuse cases
 
 ## Valid Section Keywords
 
-### itemdef Section
+### Item Section
 - `productline` - Reference to product line
 - `systemfeatures` - Reference to feature model
 - `systemfunctions` - Reference to functions
@@ -149,20 +156,22 @@ The following def types are recognized in .itm files:
 - `conditions` - Environmental conditions
 
 ### safetyconcept Section
-- `def overallsafetystrategy` - Safety strategy
-- `def assumptionsofuse` - Usage assumptions
-- `def foreseesablemisuse` - Misuse cases
+- `safetystrategy` - Safety strategy section
+- `assumptionsofuse` - Usage assumptions section
+- `foreseeablemisuse` - Misuse cases section
+- `def principle` - Safety principles
+- `def assumption` - Usage assumptions
+- `def misuse` - Misuse cases
 
 ## Example Valid .itm File
 
 ```sylang
-def hazardanalysis InverterSafety
+def item InverterItem
   name "Automotive Electric Vehicle Inverter - Hazard Analysis and Risk Assessment"
   description "Comprehensive HARA documentation for the automotive inverter system"
   owner "Functional Safety Team"
   reviewers "Systems Engineering", "Safety Engineering"
   
-  itemdef
     productline AutomotiveInverter
     systemfeatures InverterFeatures
     systemfunctions InverterFunctions
@@ -173,9 +182,11 @@ def hazardanalysis InverterSafety
     
     systemboundaries
       includes
-        def boundary INV_BOUND_001 "Power electronics switching circuits"
+      def boundary INV_BOUND_001
+        description "Power electronics switching circuits"
       excludes
-        def boundary INV_EXCL_001 "Vehicle traction battery system"
+      def boundary INV_EXCL_001
+        description "Vehicle traction battery system"
   
   operationalscenarios
     def scenario SCEN_001_NormalDriving
@@ -200,14 +211,17 @@ def hazardanalysis InverterSafety
       conditions TEMP_RANGE_001, VOLTAGE_RANGE_001
   
   safetyconcept
-    def overallsafetystrategy STRATEGY_001
-      principle PRIN_001 "Prevention of uncontrolled torque output"
+  safetystrategy
+    def principle PRIN_001
+      description "Prevention of uncontrolled torque output"
     
-    def assumptionsofuse ASSUMPTIONS_001
-      assumption ASSUMP_001 "Driver is trained in electric vehicle operation"
+  assumptionsofuse
+    def assumption ASSUMP_001
+      description "Driver is trained in electric vehicle operation"
     
-    def foreseesablemisuse MISUSE_001
-      misuse MISUSE_CASE_001 "Operating inverter beyond rated power continuously"
+  foreseeablemisuse
+    def misuse MISUSE_CASE_001
+      description "Operating inverter beyond rated power continuously"
 ```
 
 ## Testing
