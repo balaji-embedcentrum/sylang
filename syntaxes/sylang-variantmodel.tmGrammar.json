@@ -7,6 +7,9 @@
       "include": "#comments"
     },
     {
+      "include": "#variantmodel-definition"
+    },
+    {
       "include": "#feature-definition"
     },
     {
@@ -25,6 +28,24 @@
         {
           "match": "#.*$",
           "name": "comment.line.hash.sylang"
+        }
+      ]
+    },
+    "variantmodel-definition": {
+      "patterns": [
+        {
+          "match": "\\b(def)\\s+(variantmodel)\\s+(\\w+)\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "keyword.control.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.sylang"
+            }
+          }
         }
       ]
     },
@@ -52,7 +73,7 @@
     "keywords": {
       "patterns": [
         {
-          "match": "\\b(feature|mandatory|optional|alternative|selected)\\b",
+          "match": "\\b(def|variantmodel|feature|mandatory|optional|alternative|selected)\\b",
           "name": "keyword.control.sylang"
         }
       ]

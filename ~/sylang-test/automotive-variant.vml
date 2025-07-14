@@ -1,33 +1,32 @@
-# Automotive Variant Model Example
-# This file demonstrates the simplified .vml syntax
+def variantmodel AutomotivePremiumVariant
 
-# Core Features (must be selected)
-feature Engine mandatory selected
-    feature Gasoline alternative selected
-    feature Diesel alternative
-    feature Electric alternative
+    # Core Features (must be selected)
+    feature Engine mandatory selected
+        feature Gasoline alternative selected
+        feature Diesel alternative
+        feature Electric alternative
 
-feature Transmission mandatory selected
-    feature Manual alternative
-    feature Automatic alternative selected
+    feature Transmission mandatory selected
+        feature Manual alternative
+        feature Automatic alternative selected
 
-feature Safety mandatory selected
-    feature ABS mandatory selected
-    feature ESP mandatory selected
-    feature LaneKeeping optional selected
+    feature Safety mandatory selected
+        feature ABS mandatory selected
+        feature ESP mandatory selected
+        feature LaneKeeping optional selected
 
-# Optional Features
-feature Comfort optional selected
-    feature AirConditioning optional selected
-    feature HeatedSeats optional
-    feature SunRoof optional
+    # Optional Features
+    feature Comfort optional selected
+        feature AirConditioning optional selected
+        feature HeatedSeats optional
+        feature SunRoof optional
 
-feature Entertainment optional
-    feature BasicRadio alternative selected
-    feature PremiumSound alternative
-    feature Navigation optional selected
+    feature Entertainment optional
+        feature BasicRadio alternative selected
+        feature PremiumSound alternative
+        feature Navigation optional selected
 
-# Economy Features (not selected in this variant)
-feature Economy optional
-    feature EcoMode optional
-    feature BasicInterior optional 
+    # Economy Features (not selected in this variant)
+    feature Economy optional
+        feature EcoMode optional
+        feature BasicInterior optional 

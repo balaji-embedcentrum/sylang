@@ -17,7 +17,7 @@ export class VariantModelValidator extends BaseValidator {
     }
 
     protected getDefinitionKeywords(): string[] {
-        return ['feature'];
+        return ['variantmodel', 'feature'];
     }
 
     protected async validateLanguageSpecificRules(
@@ -32,32 +32,139 @@ export class VariantModelValidator extends BaseValidator {
             return;
         }
 
-        // Validate feature line syntax
-        if (trimmedLine.startsWith('feature ')) {
-            await this.validateFeatureDefinition(lineIndex, trimmedLine);
+        // Validate def variantmodel syntax
+        if (trimmedLine.startsWith('def variantmodel')) {
+            await this.validateVariantModelDefinition(lineIndex, trimmedLine);
+        }
+        // Validate feature line syntax (must be indented)
+        else if (trimmedLine.startsWith('feature ')) {
+            await this.validateFeatureDefinition(document, lineIndex, line, trimmedLine);
         } else {
             this.addDiagnostic(
                 lineIndex,
                 0,
                 trimmedLine.length,
-                'Invalid line. Expected feature definition or comment.',
+                'Invalid line. Expected "def variantmodel", indented feature definition, or comment.',
                 'invalid-line'
             );
         }
     }
 
     protected async validateDocumentLevelRules(document: vscode.TextDocument): Promise<void> {
+        await this.validateSingleVariantModelKeyword(document);
+        await this.validateFileStartsWithVariantModel(document);
         await this.validateSelectionConsistency(document);
         await this.validateIndentationConsistency(document);
     }
 
-    private async validateFeatureDefinition(lineIndex: number, trimmedLine: string): Promise<void> {
+    private async validateVariantModelDefinition(lineIndex: number, trimmedLine: string): Promise<void> {
+        // Validate syntax: def variantmodel <Identifier>
+        const variantModelMatch = trimmedLine.match(/^def\s+variantmodel\s+([A-Z][A-Za-z0-9_]*)$/);
+        
+        if (!variantModelMatch) {
+            this.addDiagnostic(
+                lineIndex,
+                0,
+                trimmedLine.length,
+                'Invalid variant model syntax. Expected: def variantmodel <PascalCaseIdentifier>',
+                'invalid-variantmodel-syntax'
+            );
+            return;
+        }
+
+        const [, identifier] = variantModelMatch;
+        
+        // Validate identifier naming convention (PascalCase)
+        if (!/^[A-Z][A-Za-z0-9_]*$/.test(identifier)) {
+            const identifierStartPos = trimmedLine.indexOf(identifier);
+            this.addDiagnostic(
+                lineIndex,
+                identifierStartPos,
+                identifier.length,
+                'Variant model identifier should use PascalCase naming',
+                'identifier-naming',
+                vscode.DiagnosticSeverity.Warning
+            );
+        }
+    }
+
+    private async validateFileStartsWithVariantModel(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        const lines = text.split('\n');
+        
+        // Find first non-empty, non-comment line
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const trimmedLine = lines[lineIndex].trim();
+            if (trimmedLine && !trimmedLine.startsWith('#')) {
+                if (!trimmedLine.startsWith('def variantmodel')) {
+                    this.addDiagnostic(
+                        lineIndex,
+                        0,
+                        trimmedLine.length,
+                        'Variant model file must start with "def variantmodel <identifier>"',
+                        'missing-variantmodel-header'
+                    );
+                }
+                break;
+            }
+        }
+    }
+
+    private async validateSingleVariantModelKeyword(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        const lines = text.split('\n');
+        let variantModelCount = 0;
+        let firstVariantModelLine = -1;
+        
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const trimmedLine = lines[lineIndex].trim();
+            if (trimmedLine.startsWith('def variantmodel')) {
+                variantModelCount++;
+                if (firstVariantModelLine === -1) {
+                    firstVariantModelLine = lineIndex;
+                }
+            }
+        }
+        
+        if (variantModelCount === 0) {
+            this.addDiagnostic(
+                0,
+                0,
+                0,
+                'Variant model file must contain exactly one "def variantmodel" declaration',
+                'missing-variantmodel-declaration'
+            );
+        } else if (variantModelCount > 1) {
+            this.addDiagnostic(
+                firstVariantModelLine,
+                0,
+                lines[firstVariantModelLine].length,
+                `Multiple "def variantmodel" declarations found (${variantModelCount}). Only one is allowed per file.`,
+                'multiple-variantmodel-declarations'
+            );
+        }
+    }
+
+    private async validateFeatureDefinition(document: vscode.TextDocument, lineIndex: number, line: string, trimmedLine: string): Promise<void> {
+        // Feature lines must be indented (not at root level)
+        const indent = this.getIndentLevel(line);
+        if (indent === 0) {
+            this.addDiagnostic(
+                lineIndex,
+                0,
+                trimmedLine.length,
+                'Feature definitions must be indented under "def variantmodel"',
+                'feature-not-indented'
+            );
+            return;
+        }
+
         const featureMatch = trimmedLine.match(/^feature\s+(\w+)\s+(mandatory|optional|alternative)\s*(selected)?$/);
         
         if (!featureMatch) {
             this.addDiagnostic(
                 lineIndex,
-                0,
+                indent,
                 trimmedLine.length,
                 'Invalid feature syntax. Expected: feature FeatureName variability_type [selected]',
                 'invalid-feature-syntax'
@@ -69,7 +176,7 @@ export class VariantModelValidator extends BaseValidator {
         
         // Validate feature name (should start with uppercase)
         if (!/^[A-Z]/.test(featureName)) {
-            const featureStartPos = trimmedLine.indexOf(featureName);
+            const featureStartPos = line.indexOf(featureName);
             this.addDiagnostic(
                 lineIndex,
                 featureStartPos,
@@ -151,7 +258,7 @@ export class VariantModelValidator extends BaseValidator {
             const line = lines[lineIndex];
             const trimmedLine = line.trim();
             
-            if (!trimmedLine || trimmedLine.startsWith('#')) {
+            if (!trimmedLine || trimmedLine.startsWith('#') || trimmedLine.startsWith('def variantmodel')) {
                 continue;
             }
             
@@ -180,7 +287,7 @@ export class VariantModelValidator extends BaseValidator {
             const line = lines[lineIndex];
             const trimmedLine = line.trim();
             
-            if (!trimmedLine || trimmedLine.startsWith('#')) {
+            if (!trimmedLine || trimmedLine.startsWith('#') || trimmedLine.startsWith('def variantmodel')) {
                 continue;
             }
             

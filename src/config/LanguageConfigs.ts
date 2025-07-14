@@ -125,12 +125,12 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Variant Model', 'sylang-vml'],
         extensions: ['.vml'],
         keywords: [
-            'feature', 'mandatory', 'optional', 'alternative', 'selected'
+            'def', 'variantmodel', 'feature', 'mandatory', 'optional', 'alternative', 'selected'
         ],
         snippetFile: 'variantmodel.json',
         validationRules: [
-            'feature-selection-consistency', 'mandatory-selection-validation', 
-            'alternative-selection-validation', 'indentation-validation'
+            'single-variantmodel', 'feature-selection-consistency', 'mandatory-selection-validation', 
+            'alternative-selection-validation', 'indentation-validation', 'def-keyword'
         ]
     },
     'sylang-safety': {
