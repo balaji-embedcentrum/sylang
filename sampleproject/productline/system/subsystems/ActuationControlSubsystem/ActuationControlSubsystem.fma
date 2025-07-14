@@ -1,36 +1,21 @@
-failuremodeanalysis ActuationControlSubsystem_FailureModeAnalysis
+def failuremodeanalysis ActuationControlSubsystem_FailureModeAnalysis
   
   // ========== MOTOR DRIVE & CONTROL FAILURES ==========
   
-  failuremode ACS_MotorDriveControllerFailure
+  def failuremode ACS_MotorDriveControllerFailure
     name "Motor Drive Controller Failure"
     description "Motor drive controller fails to control motor drive circuits and power management"
-    function MotorDriveController
+    in function MotorDriveController
     severity 10
     occurrence 3
     detection 4
     rpn auto
-    safetylevel ASIL-D
-    causes
-      MCU_PowerRegulationFailure "Motor Control Unit power regulation circuit malfunction"
-      PMU_VoltageRegulationFailure "Power Management Unit voltage regulation system failure"
-      MCU_PWMGenerationFailure "Motor Control Unit PWM signal generation circuit failure"
-      PMU_EfficiencyOptimizationFailure "Power Management Unit efficiency optimization algorithm failure"
-    effects
-      EPB_FailsToEngageBrake "EPB system fails to engage brake mechanism"
-      EPB_FailsToDisengageBrake "EPB system fails to disengage brake mechanism"
-      EPB_LossOfBrakingForceControl "EPB system loses braking force control capability"
-      EPB_UncontrolledActuatorMovement "EPB system exhibits uncontrolled actuator movement"
-    detection
-      ACS_MotorCurrentMonitoring "Actuation Control Subsystem motor current monitoring"
-      ACS_PowerSupplyVoltageMonitoring "Actuation Control Subsystem power supply voltage monitoring"
-      ACS_MotorPositionFeedbackMonitoring "Actuation Control Subsystem motor position feedback monitoring"
-      ACS_ActuatorDiagnosticFeedback "Actuation Control Subsystem actuator diagnostic feedback"
-    mitigation
-      ACS_BackupActuatorActivation "Actuation Control Subsystem backup actuator activation"
-      ACS_EmergencyPowerSupplySwitching "Actuation Control Subsystem emergency power supply switching"
-      ACS_FailsafeBrakeEngagement "Actuation Control Subsystem failsafe brake engagement"
-      ACS_SystemShutdownAndAlert "Actuation Control Subsystem system shutdown and alert"
+    actionpriority high
+    asil D
+    causes MCU_PowerRegulationFailure, PMU_VoltageRegulationFailure, MCU_PWMGenerationFailure, PMU_EfficiencyOptimizationFailure 
+    effects EPB_FailsToEngageBrake, EPB_FailsToDisengageBrake, EPB_LossOfBrakingForceControl, EPB_UncontrolledActuatorMovement
+    detection ACS_MotorCurrentMonitoring, ACS_PowerSupplyVoltageMonitoring, ACS_MotorPositionFeedbackMonitoring, ACS_ActuatorDiagnosticFeedback
+    mitigation ACS_BackupActuatorActivation, ACS_EmergencyPowerSupplySwitching, ACS_FailsafeBrakeEngagement, ACS_SystemShutdownAndAlert
 
   failuremode ACS_MotorCurrentControllerFailure
     name "Motor Current Controller Failure"

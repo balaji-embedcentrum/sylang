@@ -1,0 +1,11 @@
+def block subsystem PowerSubsystem
+	name "Power Electronics Subsystem"
+	description "DC to AC power conversion subsystem with IGBT switching and gate drivers"
+	owner "Power Electronics Team"
+	tags "subsystem", "power-conversion", "igbt", "switching"
+	asil D
+	contains component IGBTComponent, CapacitorComponent, GateDriverComponent
+	partof system InverterSystem
+	enables feature PowerConversion, DCBusManagement
+	implements function PowerElectronicsController, IGBTDrivers
+	interfaces DCBusInterface, ACOutputInterface 

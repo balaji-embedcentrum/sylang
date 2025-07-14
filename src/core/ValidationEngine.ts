@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { BaseValidator } from '../languages/base/BaseValidator';
 import { FeaturesValidator } from '../languages/features/FeaturesValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
+import { FailureModeAnalysisValidator } from '../languages/failuremodeanalysis/FailureModeAnalysisValidator';
+import { FailureModeControlsValidator } from '../languages/failuremodecontrols/FailureModeControlsValidator';
 import { SafetyValidator } from '../languages/safety/SafetyValidator';
 import { HazardValidator } from '../languages/safety/HazardValidator';
 import { RiskValidator } from '../languages/safety/RiskValidator';
@@ -10,6 +12,7 @@ import { RequirementsValidator } from '../languages/components/RequirementsValid
 import { SubsystemValidator } from '../languages/subsystem/SubsystemValidator'; // New import
 import { SystemValidator } from '../languages/system/SystemValidator'; // New import
 import { ProductLineValidator } from '../languages/productline/ProductLineValidator';
+import { BlockValidator } from '../languages/blocks/BlockValidator';
 import { getLanguageConfig } from '../config/LanguageConfigs';
 
 export class ValidationEngine {
@@ -39,6 +42,16 @@ export class ValidationEngine {
                 this.validators.set('sylang-functions', new FunctionsValidator(functionsConfig));
             }
 
+            const failureModeAnalysisConfig = getLanguageConfig('sylang-failuremodeanalysis');
+            if (failureModeAnalysisConfig) {
+                this.validators.set('sylang-failuremodeanalysis', new FailureModeAnalysisValidator(failureModeAnalysisConfig));
+            }
+
+            const failureModeControlsConfig = getLanguageConfig('sylang-failuremodecontrols');
+            if (failureModeControlsConfig) {
+                this.validators.set('sylang-failuremodecontrols', new FailureModeControlsValidator(failureModeControlsConfig));
+            }
+
             // For safety files, we'll handle them separately in validateDocument
             console.log('[ValidationEngine] Initialized validators for:', Array.from(this.validators.keys()));
         } catch (error) {
@@ -58,11 +71,11 @@ export class ValidationEngine {
             // Check if it's a safety or other file (by extension)
             const fileName = document.fileName;
             const extension = fileName.split('.').pop();
-            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys'];
+            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys', 'blk', 'fma', 'fmc'];
             
             if (extensions.includes(extension || '')) {
                 // Use appropriate validator based on extension
-                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator;
+                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator | BlockValidator | FailureModeAnalysisValidator | FailureModeControlsValidator;
                 if (extension === 'haz') {
                     validator = new HazardValidator();
                     console.log(`[ValidationEngine] Running HazardValidator for .${extension} file`);
@@ -81,6 +94,17 @@ export class ValidationEngine {
                 } else if (extension === 'sys') {
                     validator = new SystemValidator();
                     console.log(`[ValidationEngine] Running SystemValidator for .${extension} file`);
+                } else if (extension === 'blk') {
+                    validator = new BlockValidator();
+                    console.log(`[ValidationEngine] Running BlockValidator for .${extension} file`);
+                } else if (extension === 'fma') {
+                    const fmaConfig = getLanguageConfig('sylang-failuremodeanalysis');
+                    validator = new FailureModeAnalysisValidator(fmaConfig!);
+                    console.log(`[ValidationEngine] Running FailureModeAnalysisValidator for .${extension} file`);
+                } else if (extension === 'fmc') {
+                    const fmcConfig = getLanguageConfig('sylang-failuremodecontrols');
+                    validator = new FailureModeControlsValidator(fmcConfig!);
+                    console.log(`[ValidationEngine] Running FailureModeControlsValidator for .${extension} file`);
                 } else {
                     validator = new SafetyValidator();
                     console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);
@@ -117,7 +141,7 @@ export class ValidationEngine {
 
     public async validateWorkspace(): Promise<void> {
         try {
-            const sylangFiles = await vscode.workspace.findFiles('**/*.{ple,fml,fun,sub,cmp,req,haz,rsk,fsr,itm,sgl,ast,sec,sgo}', '**/node_modules/**');
+            const sylangFiles = await vscode.workspace.findFiles('**/*.{ple,fml,fun,sub,cmp,req,haz,rsk,fsr,itm,sgl,ast,sec,sgo,blk}', '**/node_modules/**');
             
             console.log(`[ValidationEngine] Validating ${sylangFiles.length} Sylang files in workspace`);
             

@@ -154,8 +154,10 @@ export class SubsystemValidator {
                 this.validateEnum(diagnostics, lineIndex, line, keyword, ['A', 'B', 'C', 'D', 'QM']);
                 break;
             case 'enables':
+                this.validateEnablesFeature(diagnostics, lineIndex, line);
+                break;
             case 'implements':
-                this.validateIdentifierList(diagnostics, lineIndex, line, keyword);
+                this.validateImplementsFunction(diagnostics, lineIndex, line);
                 break;
             default:
                 this.addError(diagnostics, lineIndex, `Invalid property "${keyword}" in ${context}`);
@@ -197,6 +199,40 @@ export class SubsystemValidator {
             for (const value of values) {
                 if (!/^[A-Z][A-Za-z0-9_]*$/.test(value)) {
                     this.addError(diagnostics, lineIndex, `Invalid identifier "${value}" in ${keyword} - should use PascalCase`);
+                }
+            }
+        }
+    }
+
+    private validateEnablesFeature(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        const match = line.trim().match(/^enables\s+feature\s+(.+)$/);
+        if (!match) {
+            this.addError(diagnostics, lineIndex, 'Invalid enables syntax. Expected format: enables feature <FeatureList>');
+        } else {
+            const featuresText = match[1];
+            if (featuresText) {
+                const features = featuresText.split(',').map(f => f.trim());
+                for (const feature of features) {
+                    if (!/^[A-Z][A-Za-z0-9_]*$/.test(feature)) {
+                        this.addError(diagnostics, lineIndex, `Invalid feature identifier "${feature}" - should use PascalCase`);
+                    }
+                }
+            }
+        }
+    }
+
+    private validateImplementsFunction(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        const match = line.trim().match(/^implements\s+function\s+(.+)$/);
+        if (!match) {
+            this.addError(diagnostics, lineIndex, 'Invalid implements syntax. Expected format: implements function <FunctionList>');
+        } else {
+            const functionsText = match[1];
+            if (functionsText) {
+                const functions = functionsText.split(',').map(f => f.trim());
+                for (const func of functions) {
+                    if (!/^[A-Z][A-Za-z0-9_]*$/.test(func)) {
+                        this.addError(diagnostics, lineIndex, `Invalid function identifier "${func}" - should use PascalCase`);
+                    }
                 }
             }
         }
