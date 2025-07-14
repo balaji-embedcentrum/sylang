@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-      "version": "1.0.61",
+      "version": "1.0.62",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -390,34 +390,6 @@
     ],
     "commands": [
       {
-        "command": "sylang.validate",
-        "title": "Validate Sylang File",
-        "category": "Sylang"
-      },
-      {
-        "command": "sylang.format",
-        "title": "Format Sylang File",
-        "category": "Sylang"
-      },
-      {
-        "command": "sylang.generateProject",
-        "title": "🚀 Generate Sylang Project",
-        "category": "Sylang",
-        "icon": "$(rocket)"
-      },
-      {
-        "command": "sylang.analyzePleFml",
-        "title": "📊 Analyze .ple/.fml Files",
-        "category": "Sylang",
-        "icon": "$(graph)"
-      },
-      {
-        "command": "sylang.validatePleFml",
-        "title": "✅ Validate All .ple/.fml Files",
-        "category": "Sylang",
-        "icon": "$(check)"
-      },
-      {
         "command": "sylang.validateWorkspace",
         "title": "Validate Workspace",
         "category": "Sylang"
@@ -434,45 +406,7 @@
         "icon": "$(file-code)"
       }
     ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "sylang.generateProject",
-          "title": "Generate Sylang Project"
-        }
-      ],
-      "explorer/context": [
-        {
-          "command": "sylang.validate",
-          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|vml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
-          "group": "sylang@1"
-        }
-      ],
-      "editor/context": [
-        {
-          "submenu": "sylang.core.submenu",
-          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|vml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
-          "group": "sylang@1"
-        }
-      ],
-      "sylang.core.submenu": [
-        {
-          "command": "sylang.validate",
-          "group": "1_validate@1"
-        },
-        {
-          "command": "sylang.format",
-          "group": "1_validate@2"
-        }
-      ]
-    },
-    "submenus": [
-      {
-        "id": "sylang.core.submenu",
-        "label": "🔧 Sylang Tools",
-        "icon": "$(tools)"
-      }
-    ],
+
     "configuration": {
       "title": "Sylang Language Support",
       "properties": {
