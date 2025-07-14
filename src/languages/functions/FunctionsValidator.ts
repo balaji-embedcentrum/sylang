@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import { BaseValidator } from '../base/BaseValidator';
 import { LanguageConfig } from '../../config/LanguageConfigs';
+import { SymbolManager } from '../../core/SymbolManager';
 
 export class FunctionsValidator extends BaseValidator {
-    constructor(languageConfig: LanguageConfig) {
-        super(languageConfig);
+    constructor(languageConfig: LanguageConfig, symbolManager: SymbolManager) {
+        super(languageConfig, symbolManager);
     }
 
     protected getDefinitionKeywords(): string[] {

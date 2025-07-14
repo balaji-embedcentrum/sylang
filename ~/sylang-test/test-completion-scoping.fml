@@ -1,0 +1,15 @@
+// Simple test for completion provider with import scoping
+use systemfeatures CoreFeatures
+
+def systemfeatures CompletionTest
+  def feature LocalFeature mandatory
+    name "Local Feature"
+    description "Locally defined feature"
+    
+  def feature TestConstraints optional  
+    name "Test Constraints"
+    description "Feature to test constraint completion"
+    // When typing "requires " here, completion should show both:
+    // - LocalFeature (local)
+    // - Any symbols from CoreFeatures (imported)
+    requires LocalFeature 

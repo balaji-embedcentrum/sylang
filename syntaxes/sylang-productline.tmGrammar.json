@@ -4,6 +4,7 @@
   "scopeName": "source.sylang.productline",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#imports" },
     { "include": "#keywords" },
     { "include": "#strings" },
     { "include": "#safety-levels" },
@@ -24,11 +25,29 @@
         }
       ]
     },
+    "imports": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.control.import.sylang"
+            },
+            "2": {
+              "name": "storage.type.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.sylang"
+            }
+          }
+        }
+      ]
+    },
     "keywords": {
       "patterns": [
         {
           "name": "keyword.control.definition.sylang",
-          "match": "\\b(def)\\b"
+          "match": "\\b(use|def)\\b"
         },
         {
           "name": "keyword.control.sylang",
