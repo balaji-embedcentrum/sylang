@@ -140,7 +140,7 @@ export class SafetyGoalsValidator {
     private getValidProperties(context: string): string[] {
         switch (context) {
             case 'safetygoals': return ['name', 'description', 'item', 'riskassessment', 'hazardidentification'];
-            case 'goal': return ['name', 'description', 'hazard', 'scenario', 'asil'];
+            case 'goal': return ['name', 'description', 'hazard', 'scenario', 'safetylevel'];
             case 'measure': return ['description', 'enabledby function'];
             default: return [];
         }
@@ -161,8 +161,8 @@ export class SafetyGoalsValidator {
             case 'hazardidentification':
                 this.validateIdentifier(diagnostics, lineIndex, line, keyword);
                 break;
-            case 'asil':
-                this.validateASIL(diagnostics, lineIndex, line, keyword);
+            case 'safetylevel':
+                this.validateSafetyLevel(diagnostics, lineIndex, line, keyword);
                 break;
             case 'hazard':
             case 'scenario':
@@ -191,9 +191,9 @@ export class SafetyGoalsValidator {
         }
     }
 
-    private validateASIL(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string, keyword: string): void {
-        if (!line.match(new RegExp(`^${keyword}\\s+[A-D]$`))) {
-            this.addError(diagnostics, lineIndex, `${keyword} must be a valid ASIL level: ${keyword} A, B, C, or D`);
+    private validateSafetyLevel(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string, keyword: string): void {
+        if (!line.match(new RegExp(`^${keyword}\\s+(ASIL-[A-D]|QM)$`))) {
+            this.addError(diagnostics, lineIndex, `${keyword} must be a valid safety level: ${keyword} ASIL-A, ASIL-B, ASIL-C, ASIL-D, or QM`);
         }
     }
 

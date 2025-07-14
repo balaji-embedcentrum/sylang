@@ -3,6 +3,6 @@ def block subsystem CommunicationSubsystem
   description "Provides external interfaces for control commands and status reporting."
   owner "Communication Team"
   tags "communication", "interface", "protocol", "network"
-  asil B
+  safetylevel ASIL-B
   enables feature CommunicationInterfaces, CANInterface, EthernetInterface
   implements function CommunicationInterface, CANBusController, EthernetProcessor 

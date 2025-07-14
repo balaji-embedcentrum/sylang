@@ -7,7 +7,6 @@ export class FailureModeAnalysisValidator extends BaseValidator {
     private readonly SEVERITY_RANGE = { min: 1, max: 10 };
     private readonly OCCURRENCE_RANGE = { min: 1, max: 10 };
     private readonly DETECTION_RANGE = { min: 1, max: 10 };
-    private readonly ASIL_LEVELS = ['QM', 'A', 'B', 'C', 'D'];
     private readonly ACTION_PRIORITIES = ['high', 'medium', 'low'];
 
     constructor(languageConfig: LanguageConfig, symbolManager: SymbolManager) {
@@ -53,8 +52,6 @@ export class FailureModeAnalysisValidator extends BaseValidator {
             this.validateRpn(lineIndex, trimmedLine);
         } else if (trimmedLine.startsWith('actionpriority ')) {
             this.validateEnumProperty(lineIndex, trimmedLine, 'actionpriority', this.ACTION_PRIORITIES);
-        } else if (trimmedLine.startsWith('asil ')) {
-            this.validateEnumProperty(lineIndex, trimmedLine, 'asil', this.ASIL_LEVELS);
         } else if (trimmedLine.startsWith('causes failuremode ')) {
             this.validateFailureModeReferences(lineIndex, trimmedLine, 'causes');
         } else if (trimmedLine.startsWith('effects failuremode ')) {

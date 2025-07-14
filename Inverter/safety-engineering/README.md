@@ -32,9 +32,9 @@ This directory contains comprehensive safety analysis for the **AutomotiveInvert
 - **Content**: 6 safety goals (SG_INV_001 to SG_INV_006) with safety measures and verification criteria
 - **References**: Hazards from .haz, functions from platform engineering, scenarios from .itm
 
-### 5. Functional Safety Requirements (.fsr)
-- **File**: `InverterFunctionalSafetyRequirements.fsr`
-- **Grammar**: `def functionalsafetyrequirements InverterFunctionalSafetyRequirements`
+### 5. Functional Safety Requirements (.req)
+- **File**: `InverterFunctionalSafetyRequirements.req`
+- **Grammar**: `def reqsection InverterFunctionalSafetyRequirements`
 - **Purpose**: Detailed technical safety requirements with verification methods
 - **Content**: 20 functional requirements (FSR_INV_001 to FSR_INV_020) derived from safety goals
 - **References**: Safety goals from .sgl, functions from platform engineering
@@ -49,7 +49,7 @@ The safety files properly reference platform engineering definitions:
 - **Subsystems**: PowerConversion, MotorControl, ThermalManagement, SafetySystems, etc.
 
 ### Safety Traceability Chain
-**Scenarios** (.itm) → **Hazards** (.haz) → **Risk Assessment** (.rsk) → **Safety Goals** (.sgl) → **Requirements** (.fsr)
+**Scenarios** (.itm) → **Hazards** (.haz) → **Risk Assessment** (.rsk) → **Safety Goals** (.sgl) → **Requirements** (.req)
 
 1. **SCEN_001_NormalDriving** → **H_PWR_001** → **ASIL D** → **SG_INV_001** → **FSR_INV_001**
 2. **SCEN_002_HighPerformance** → **H_THM_003** → **ASIL C** → **SG_INV_003** → **FSR_INV_007**

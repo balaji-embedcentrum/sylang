@@ -69,7 +69,7 @@ export class SystemValidator {
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'system': return ['name', 'description', 'owner', 'tags', 'asil', 'contains'];
+            case 'system': return ['name', 'description', 'owner', 'tags', 'safetylevel', 'contains'];
             default: return [];
         }
     }
@@ -84,8 +84,8 @@ export class SystemValidator {
             case 'tags':
                 this.validateQuotedList(diagnostics, lineIndex, line, keyword);
                 break;
-            case 'asil':
-                this.validateEnum(diagnostics, lineIndex, line, keyword, ['QM', 'A', 'B', 'C', 'D']);
+            case 'safetylevel':
+                this.validateEnum(diagnostics, lineIndex, line, keyword, ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM']);
                 break;
             case 'contains':
                 this.validateTypedIdentifierList(diagnostics, lineIndex, line, keyword);

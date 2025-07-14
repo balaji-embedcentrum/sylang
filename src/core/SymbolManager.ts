@@ -674,8 +674,8 @@ export class SymbolManager {
             'exposure': ['description'],
             'controllability': ['description'],
             'risk': ['severity', 'exposure', 'controllability', 'description'],
-            'asil': ['risk', 'description'],
-            'hazard': ['scenario', 'asil', 'rationale']
+            'safetylevel': ['risk', 'description'],
+            'hazard': ['scenario', 'safetylevel', 'rationale']
         };
         return (propertiesByContext[context] || []).includes(keyword);
     }
@@ -796,7 +796,7 @@ export class SymbolManager {
     private isSafetyGoalsPropertyKeyword(keyword: string, context: string): boolean {
         const propertiesByContext: { [key: string]: string[] } = {
             'safetygoals': ['name', 'description', 'item', 'riskassessment', 'hazardidentification'],
-            'goal': ['name', 'description', 'hazard', 'scenario', 'asil'],
+            'goal': ['name', 'description', 'hazard', 'scenario', 'safetylevel'],
             'measure': ['description'] // Note: 'enabledby function' is handled separately
         };
         return (propertiesByContext[context] || []).includes(keyword);
@@ -897,7 +897,7 @@ export class SymbolManager {
     private isRequirementsPropertyKeyword(keyword: string, context: string): boolean {
         const propertiesByContext: { [key: string]: string[] } = {
             'reqsection': ['name', 'description'],
-            'requirement': ['name', 'description', 'type', 'source', 'derivedfrom', 'asil', 'rationale', 'allocatedto', 'verificationcriteria', 'status']
+            'requirement': ['name', 'description', 'type', 'source', 'derivedfrom', 'safetylevel', 'rationale', 'allocatedto', 'verificationcriteria', 'status']
         };
         return (propertiesByContext[context] || []).includes(keyword);
     }
@@ -996,7 +996,7 @@ export class SymbolManager {
 
     private isSubsystemPropertyKeyword(keyword: string, context: string): boolean {
         const propertiesByContext: { [key: string]: string[] } = {
-            'subsystem': ['name', 'description', 'owner', 'tags', 'safetylevel', 'asil', 'enables', 'implements']
+            'subsystem': ['name', 'description', 'owner', 'tags', 'safetylevel', 'enables', 'implements']
         };
         return (propertiesByContext[context] || []).includes(keyword);
     }
@@ -1091,7 +1091,7 @@ export class SymbolManager {
 
     private isFunctionsPropertyKeyword(keyword: string, context: string): boolean {
         const propertiesByContext: { [key: string]: string[] } = {
-            'function': ['name', 'description', 'category', 'owner', 'tags', 'asil', 'partof', 'enables', 'allocatedto']
+            'function': ['name', 'description', 'category', 'owner', 'tags', 'safetylevel', 'partof', 'enables', 'allocatedto']
         };
         return (propertiesByContext[context] || []).includes(keyword);
     }
@@ -1472,7 +1472,7 @@ export class SymbolManager {
                 const line = originalLine.trim();
                 
                 // Find header definitions (def keyword identifier OR def block type identifier)
-                let headerMatch = line.match(/^def\s+(featureset|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals|functionalsafetyrequirements)\s+([A-Za-z0-9_]+)/);
+                let headerMatch = line.match(/^def\s+(featureset|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals)\s+([A-Za-z0-9_]+)/);
                 let keyword: string = '';
                 let identifier: string = '';
                 

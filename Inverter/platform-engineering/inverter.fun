@@ -6,7 +6,7 @@ def functiongroup InverterFunctions
 		description "Main controller for all power electronics operations and switching control"
 		owner "Power Electronics Team"
 		tags "power-electronics", "controller", "switching"
-		asil D
+		safetylevel ASIL-D
 		enables feature InverterSystem, PowerConversion, DCBusManagement, IGBTDrivers
 
 	def function MotorControlAlgorithmEngine
@@ -14,7 +14,7 @@ def functiongroup InverterFunctions
 		description "Advanced motor control algorithms including field-oriented control"	
 		owner "Controls Team"
 		tags "motor-control", "algorithms", "FOC"
-		asil D		
+		safetylevel ASIL-D		
 		enables feature MotorControl, VectorControl, SpaceVectorPWM
 
 	def function TorqueManagementProcessor
@@ -22,7 +22,7 @@ def functiongroup InverterFunctions
 		description "Precise torque control and torque vectoring processing unit"
 		owner "Controls Team"
 		tags "torque", "management", "vectoring"
-		asil D
+		safetylevel ASIL-D
 		enables feature TorqueControl
 
 	def function SpeedRegulationController
@@ -30,7 +30,7 @@ def functiongroup InverterFunctions
 		description "Motor speed regulation and cruise control support processing"
 		owner "Controls Team"
 		tags "speed", "regulation", "cruise"
-		asil C
+		safetylevel ASIL-C
 		enables feature SpeedControl
 
 	def function ThermalManagementSystem
@@ -38,7 +38,7 @@ def functiongroup InverterFunctions
 		description "Active thermal monitoring and cooling system coordination"
 		owner "Thermal Team"
 		tags "thermal", "cooling", "monitoring"
-		asil C
+		safetylevel ASIL-C
 		enables feature ThermalManagement, CoolingMethod
 
 	def function CoolantFlowController
@@ -46,7 +46,7 @@ def functiongroup InverterFunctions
 		description "Liquid cooling system control and pump management unit"
 		owner "Thermal Team"
 		tags "coolant", "liquid-cooling", "pump"
-		asil B
+		safetylevel ASIL-B
 		enables feature CoolantControl
 
 	def function AirCoolingManager
@@ -54,7 +54,7 @@ def functiongroup InverterFunctions
 		description "Variable speed fan control for air cooling management"
 		owner "Thermal Team"
 		tags "air-cooling", "fan-control", "variable-speed"
-		asil QM
+		safetylevel QM
 		enables feature FanControl
 
 	def function SafetyMonitoringEngine
@@ -62,7 +62,7 @@ def functiongroup InverterFunctions
 		description "Comprehensive safety monitoring and fault management coordinator"
 		owner "Safety Team"
 		tags "safety", "monitoring", "fault-management"
-		asil D
+		safetylevel ASIL-D
 		enables feature SafetySystems
 
 	def function OvervoltageProtectionUnit
@@ -70,7 +70,7 @@ def functiongroup InverterFunctions
 		description "DC bus and AC output overvoltage protection system"
 		owner "Safety Team"
 		tags "overvoltage", "protection", "safety"
-		asil D
+		safetylevel ASIL-D
 		enables feature OvervoltageProtection
 
 	def function OvercurrentProtectionUnit
@@ -78,7 +78,7 @@ def functiongroup InverterFunctions
 		description "Phase current and DC bus overcurrent protection system"
 		owner "Safety Team"
 		tags "overcurrent", "protection", "current-limiting"
-		asil D
+		safetylevel ASIL-D
 		enables feature OvercurrentProtection
 
 	def function ShortCircuitDetector
@@ -86,7 +86,7 @@ def functiongroup InverterFunctions
 		description "Fast short circuit detection and protection system"
 		owner "Safety Team"
 		tags "short-circuit", "detection", "protection"
-		asil D
+		safetylevel ASIL-D
 		enables feature ShortCircuitProtection
 
 	def function ThermalProtectionMonitor
@@ -94,7 +94,7 @@ def functiongroup InverterFunctions
 		description "Junction and coolant temperature monitoring and protection"
 		owner "Safety Team"
 		tags "thermal-protection", "temperature", "monitoring"
-		asil C
+		safetylevel ASIL-C
 		enables feature OvertemperatureProtection
 
 	def function IsolationMonitoringSystem
@@ -102,7 +102,7 @@ def functiongroup InverterFunctions
 		description "High-voltage isolation monitoring and fault detection system"
 		owner "Safety Team"
 		tags "isolation", "HV-monitoring", "insulation"
-		asil D
+		safetylevel ASIL-D
 		enables feature IsolationMonitoring
 
 	def function CommunicationInterface
@@ -110,7 +110,7 @@ def functiongroup InverterFunctions
 		description "Vehicle network communication and data exchange coordinator"
 		owner "Communication Team"
 		tags "communication", "vehicle-network", "interface"
-		asil C
+		safetylevel ASIL-C
 		enables feature CommunicationInterfaces
 
 	def function CANBusController
@@ -118,7 +118,7 @@ def functiongroup InverterFunctions
 		description "Controller Area Network interface for vehicle communication"
 		owner "Communication Team"
 		tags "CAN", "bus-controller", "automotive"
-		asil C
+		safetylevel ASIL-C
 		enables feature CANInterface
 
 	def function EthernetProcessor
@@ -126,7 +126,7 @@ def functiongroup InverterFunctions
 		description "High-speed Ethernet interface for advanced diagnostics"
 		owner "Communication Team"
 		tags "ethernet", "diagnostics", "high-speed"
-		asil QM
+		safetylevel QM
 		enables feature EthernetInterface
 
 	def function DiagnosticCoordinator
@@ -134,7 +134,7 @@ def functiongroup InverterFunctions
 		description "Comprehensive system diagnostics and fault reporting coordinator"
 		owner "Diagnostics Team"
 		tags "diagnostics", "fault-reporting", "coordinator"
-		asil C
+		safetylevel ASIL-C
 		enables feature Diagnostics
 
 	def function OBDComplianceInterface
@@ -142,7 +142,7 @@ def functiongroup InverterFunctions
 		description "On-board diagnostics compliance for regulatory requirements"
 		owner "Diagnostics Team"
 		tags "OBD", "compliance", "regulations"
-		asil C
+		safetylevel ASIL-C
 		enables feature OBDCompliance
 
 	def function FaultMemoryManager
@@ -150,7 +150,7 @@ def functiongroup InverterFunctions
 		description "Non-volatile fault memory storage and retrieval system"
 		owner "Diagnostics Team"
 		tags "fault-memory", "non-volatile", "storage"
-		asil C
+		safetylevel ASIL-C
 		enables feature FaultMemory
 
 	def function SensorInterfaceController
@@ -158,7 +158,7 @@ def functiongroup InverterFunctions
 		description "Interface controller for position, current, and temperature sensors"
 		owner "Sensor Team"
 		tags "sensors", "interface", "measurement"
-		asil D
+		safetylevel ASIL-D
 		enables feature SensorInterfaces
 
 	def function CurrentSensingInterface
@@ -166,7 +166,7 @@ def functiongroup InverterFunctions
 		description "Phase current measurement using hall-effect sensors"
 		owner "Sensor Team"
 		tags "current-sensing", "hall-effect", "measurement"
-		asil D
+		safetylevel ASIL-D
 		enables feature CurrentSensing
 
 	def function PositionSensingInterface
@@ -174,7 +174,7 @@ def functiongroup InverterFunctions
 		description "Rotor position sensing using resolver or encoder interface"
 		owner "Sensor Team"
 		tags "position-sensing", "resolver", "encoder"
-		asil D
+		safetylevel ASIL-D
 		enables feature PositionSensing
 
 	def function TemperatureSensingInterface
@@ -182,7 +182,7 @@ def functiongroup InverterFunctions
 		description "IGBT junction and coolant temperature measurement interface"
 		owner "Sensor Team"
 		tags "temperature-sensing", "thermal-monitoring", "NTC"
-		asil C
+		safetylevel ASIL-C
 		enables feature TemperatureSensing
 
 	def function PowerModeManager
@@ -190,7 +190,7 @@ def functiongroup InverterFunctions
 		description "System power state management and energy optimization coordinator"
 		owner "Power Management Team"
 		tags "power-modes", "energy-optimization", "state-management"
-		asil B
+		safetylevel ASIL-B
 		enables feature PowerModes
 
 	def function SleepModeController
@@ -198,7 +198,7 @@ def functiongroup InverterFunctions
 		description "Low-power sleep mode control for energy conservation"
 		owner "Power Management Team"
 		tags "sleep-mode", "low-power", "energy-saving"
-		asil QM
+		safetylevel QM
 		enables feature SleepMode
 
 	def function RegenerativeBrakingController
@@ -206,7 +206,7 @@ def functiongroup InverterFunctions
 		description "Energy recovery control during braking and deceleration"	
 		owner "Controls Team"
 		tags "regenerative-braking", "energy-recovery", "efficiency"
-		asil C
+		safetylevel ASIL-C
 		enables feature RegenerativeBraking
 
 	def function EMCComplianceManager
@@ -214,7 +214,7 @@ def functiongroup InverterFunctions
 		description "Electromagnetic compatibility and interference management coordinator"
 		owner "EMC Team"
 		tags "EMC", "electromagnetic", "compliance"
-		asil QM
+		safetylevel QM
 		enables feature EMCCompliance
 
 	def function EMIFilteringController
@@ -222,5 +222,5 @@ def functiongroup InverterFunctions
 		description "Electromagnetic interference filtering and suppression controller"
 		owner "EMC Team"
 		tags "EMI", "filtering", "suppression"
-		asil QM
+		safetylevel QM
 		enables feature EMIFiltering

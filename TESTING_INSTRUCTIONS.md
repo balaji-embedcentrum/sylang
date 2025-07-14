@@ -122,7 +122,7 @@ You can test with the example files in the repository:
 - `InverterHazards.haz` - Hazard identification
 - `InverterOperationalScenarios.itm` - Hazard analysis scenarios  
 - `InverterSafetyGoals.sgl` - Safety goals
-- `InverterFunctionalSafetyRequirements.fsr` - Safety requirements
+- `InverterFunctionalSafetyRequirements.req` - Safety requirements
 
 **Platform Engineering Files:**
 - `Inverter/platform-engineering/inverter.ple` - Product line definition

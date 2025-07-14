@@ -8,7 +8,7 @@ def testsuite InverterCommunicationTests
   owner "Systems Test Team"
   tags "inverter", "communication", "integration", "safety"
   testtype integration
-  asil C
+  safetylevel ASIL-C
   coverage mcdc
   method hil
   
@@ -16,7 +16,7 @@ def testsuite InverterCommunicationTests
     name "CAN Bus Communication Test"
     description "Verify CAN bus communication between inverter control unit and vehicle systems"
     priority critical
-    asil C
+    safetylevel ASIL-C
     method hil
     verifies requirement FSR_INV_001, FSR_INV_014
     exercises CANControlFunction, MessageHandlingFunction
@@ -40,7 +40,7 @@ def testsuite InverterCommunicationTests
     name "Fault Injection - CAN Bus Failure"
     description "Test system response to CAN bus communication failures"
     priority high
-    asil C
+    safetylevel ASIL-C
     method hil
     verifies requirement FSR_INV_045, SG_INV_003
     exercises DiagnosticFunction, SafetyMonitoringFunction
@@ -62,7 +62,7 @@ def testsuite InverterCommunicationTests
     name "Ethernet Communication Test"
     description "Verify Ethernet-based diagnostic communication interface"
     priority medium
-    asil A
+    safetylevel ASIL-A
     method automated
     verifies requirement FSR_INV_028
     exercises EthernetInterface, DiagnosticProtocol

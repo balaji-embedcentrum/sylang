@@ -130,7 +130,7 @@ export class RequirementsValidator {
     private getValidProperties(context: string): string[] {
         switch (context) {
             case 'reqsection': return ['name', 'description'];
-            case 'requirement': return ['name', 'description', 'type', 'source', 'derivedfrom', 'asil', 'rationale', 'allocatedto', 'verificationcriteria', 'status'];
+            case 'requirement': return ['name', 'description', 'type', 'source', 'derivedfrom', 'safetylevel', 'rationale', 'allocatedto', 'verificationcriteria', 'status'];
             default: return [];
         }
     }
@@ -153,8 +153,8 @@ export class RequirementsValidator {
             case 'source':
                 this.validateEnum(diagnostics, lineIndex, line, keyword, ['stakeholder', 'internal', 'supplier', 'customer']);
                 break;
-            case 'asil':
-                this.validateEnum(diagnostics, lineIndex, line, keyword, ['QM', 'A', 'B', 'C', 'D']);
+            case 'safetylevel':
+                this.validateEnum(diagnostics, lineIndex, line, keyword, ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM']);
                 break;
             case 'status':
                 this.validateEnum(diagnostics, lineIndex, line, keyword, ['draft', 'review', 'approved']);

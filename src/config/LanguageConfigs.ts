@@ -139,7 +139,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         extensions: ['.itm', '.sgl', '.haz', '.rsk', '.fsr'],
         keywords: [
             'def', 'hazardanalysis', 'hazardidentification', 'riskassessment', 
-            'safetygoals', 'functionalsafetyrequirements', 'goal', 
+            'safetygoals', 'goal', 
             'hazard', 'scenario', 'measure', 'criterion', 'category', 'subsystem', 
             'boundary', 'vehiclestate', 'drivingstate', 'environment', 'assumption', 'principle',
             'itemdef', 'operationalscenarios', 'safetyconcept', 

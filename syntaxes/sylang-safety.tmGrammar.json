@@ -65,7 +65,7 @@
       "patterns": [
         {
           "name": "keyword.control.section.sylang",
-          "match": "^\\s*(operationalscenarios|operationalconditions|vehiclestates|driverstates|environments|safetyconcept|itemdef|hazardanalysis|riskassessment|safetygoals|safetymeasures|functionalsafetyrequirements)\\b"
+          "match": "^\\s*(operationalscenarios|operationalconditions|vehiclestates|driverstates|environments|safetyconcept|itemdef|hazardanalysis|riskassessment|safetygoals|safetymeasures)\\b"
         }
       ]
     },
@@ -105,7 +105,7 @@
         },
         {
           "name": "keyword.other.safety.sylang",
-          "match": "\\b(safetylevel|asil|mandatory|optional|alternative|or)\\b"
+          "match": "\\b(safetylevel|mandatory|optional|alternative|or)\\b"
         }
       ]
     },

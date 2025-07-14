@@ -52,7 +52,7 @@
         },
         {
           "name": "keyword.other.sylang",
-          "match": "\\b(name|description|owner|tags|enables|partof|asil|feature)\\b"
+          "match": "\\b(name|description|owner|tags|enables|partof|feature)\\b"
         }
       ]
     },

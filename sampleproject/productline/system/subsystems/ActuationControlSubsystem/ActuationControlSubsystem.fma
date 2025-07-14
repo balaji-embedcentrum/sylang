@@ -11,7 +11,7 @@ def failuremodeanalysis ActuationControlSubsystem_FailureModeAnalysis
     detection 4
     rpn auto
     actionpriority high
-    asil D
+    safetylevel ASIL-D
     causes MCU_PowerRegulationFailure, PMU_VoltageRegulationFailure, MCU_PWMGenerationFailure, PMU_EfficiencyOptimizationFailure 
     effects EPB_FailsToEngageBrake, EPB_FailsToDisengageBrake, EPB_LossOfBrakingForceControl, EPB_UncontrolledActuatorMovement
     detection ACS_MotorCurrentMonitoring, ACS_PowerSupplyVoltageMonitoring, ACS_MotorPositionFeedbackMonitoring, ACS_ActuatorDiagnosticFeedback

@@ -147,8 +147,8 @@ export class BlockValidator {
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'block': return ['name', 'description', 'owner', 'tags', 'asil', 'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'];
-            case 'port': return ['name', 'description', 'type', 'owner', 'asil', 'tags'];
+            case 'block': return ['name', 'description', 'owner', 'tags', 'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'];
+            case 'port': return ['name', 'description', 'type', 'owner', 'tags'];
             default: return [];
         }
     }
@@ -169,9 +169,6 @@ export class BlockValidator {
                 break;
             case 'tags':
                 this.validateQuotedStringList(diagnostics, lineIndex, line, keyword);
-                break;
-            case 'asil':
-                this.validateAsil(diagnostics, lineIndex, line, blockType);
                 break;
             case 'type':
                 if (context === 'port') {
@@ -214,27 +211,6 @@ export class BlockValidator {
         const pattern = new RegExp(`^\\s*${keyword}\\s+"([^"]*)"`);
         if (!pattern.test(line.trim())) {
             this.addError(diagnostics, lineIndex, `Property "${keyword}" must be quoted strings: ${keyword} "value1", "value2"`);
-        }
-    }
-
-    private validateAsil(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string, blockType: string): void {
-        const match = line.trim().match(/^asil\s+(\w+)$/);
-        if (!match) {
-            this.addError(diagnostics, lineIndex, 'Invalid asil property. Expected format: asil <level>');
-            return;
-        }
-
-        const asilLevel = match[1];
-        const validLevels = ['QM', 'A', 'B', 'C', 'D'];
-        
-        if (!validLevels.includes(asilLevel)) {
-            this.addError(diagnostics, lineIndex, `Invalid asil level "${asilLevel}". Valid levels: ${validLevels.join(', ')}`);
-            return;
-        }
-
-        // Add note about ASIL inheritance for hierarchical blocks
-        if (['component', 'subcomponent', 'module', 'submodule', 'unit', 'subunit', 'assembly', 'subassembly', 'circuit', 'part'].includes(blockType)) {
-            this.addInfo(diagnostics, lineIndex, `💡 ASIL Inheritance: Child blocks cannot have higher ASIL level than their parent. Verify parent block ASIL level.`);
         }
     }
 

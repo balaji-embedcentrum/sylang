@@ -3,6 +3,6 @@ def block subsystem ControlSubsystem
   description "Manages PWM generation, switching timing, and control algorithms."
   owner "Controls Team"
   tags "control", "pwm", "algorithms", "motor-control"
-  asil D
+  safetylevel ASIL-D
   enables feature MotorControl, VectorControl, SpaceVectorPWM, TorqueControl, SpeedControl
   implements function MotorControlAlgorithmEngine, TorqueManagementProcessor, SpeedRegulationController 
