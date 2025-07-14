@@ -87,8 +87,8 @@ export class FaultTreeAnalysisValidator extends BaseValidator {
         else if (trimmedLine.startsWith('category ')) {
             this.validateCategoryProperty(lineIndex, trimmedLine);
         }
-        else if (trimmedLine.startsWith('asil ')) {
-            this.validateAsilProperty(lineIndex, trimmedLine);
+        else if (trimmedLine.startsWith('safetylevel ')) {
+            this.validateSafetyLevelProperty(lineIndex, trimmedLine);
         }
         else if (trimmedLine.startsWith('dormancy ')) {
             this.validateDormancyProperty(lineIndex, trimmedLine);
@@ -329,17 +329,17 @@ export class FaultTreeAnalysisValidator extends BaseValidator {
         }
     }
 
-    private validateAsilProperty(lineIndex: number, trimmedLine: string): void {
-        const match = trimmedLine.match(/^asil\s+(\w+)$/);
+    private validateSafetyLevelProperty(lineIndex: number, trimmedLine: string): void {
+        const match = trimmedLine.match(/^safetylevel\s+(ASIL-[A-D]|QM)$/);
         if (!match) {
-            this.addError(lineIndex, 'Invalid asil syntax. Expected: asil <level>');
+            this.addError(lineIndex, 'Invalid safetylevel syntax. Expected: safetylevel ASIL-A, ASIL-B, ASIL-C, ASIL-D, or QM');
             return;
         }
 
-        const asil = match[1];
-        const validAsils = ['QM', 'A', 'B', 'C', 'D'];
-        if (!validAsils.includes(asil)) {
-            this.addError(lineIndex, `Invalid ASIL level "${asil}". Valid levels: ${validAsils.join(', ')}`);
+        const safetyLevel = match[1];
+        const validLevels = ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'];
+        if (!validLevels.includes(safetyLevel)) {
+            this.addError(lineIndex, `Invalid safety level "${safetyLevel}". Valid levels: ${validLevels.join(', ')}`);
         }
     }
 

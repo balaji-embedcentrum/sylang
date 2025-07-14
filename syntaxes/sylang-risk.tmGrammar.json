@@ -10,6 +10,7 @@
     { "include": "#strings" },
     { "include": "#risk-levels" },
     { "include": "#asil-levels" },
+    { "include": "#safetylevel-levels" },
     { "include": "#numbers" },
     { "include": "#identifiers" }
   ],
@@ -31,7 +32,7 @@
     "def-statements": {
       "patterns": [
         {
-          "match": "\\b(def)\\s+(riskassessment|severity|exposure|controllability|risk|asil)\\s+([A-Z][A-Za-z0-9_]*)",
+          "match": "\\b(def)\\s+(riskassessment|severity|exposure|controllability|risk|safetylevel)\\s+([A-Z][A-Za-z0-9_]*)",
           "captures": {
             "1": { "name": "keyword.control" },
             "2": { "name": "storage.type" },
@@ -56,7 +57,7 @@
       "patterns": [
         {
           "name": "variable.parameter",
-          "match": "\\b(name|description|hazardanalysis|hazardidentification|item|methodology|severity|exposure|controllability|risk|scenario|asil|rationale|subsystem|hazard)\\b"
+          "match": "\\b(name|description|severity|exposure|controllability|risk|scenario|safetylevel|rationale|subsystem|hazard)\\b"
         }
       ]
     },
@@ -88,6 +89,14 @@
         {
           "name": "constant.language",
           "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD]|(?<![A-Z])[ABCD](?![A-Z]))\\b"
+        }
+      ]
+    },
+    "safetylevel-levels": {
+      "patterns": [
+        {
+          "name": "constant.language.safetylevel.sylang",
+          "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD])\\b"
         }
       ]
     },

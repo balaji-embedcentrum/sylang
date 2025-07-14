@@ -141,24 +141,7 @@
     ],
     "description": "Complete safety goals structure for .sgl files"
   },
-  "Functional Safety Requirements (.fsr)": {
-    "prefix": "functionalsafetyrequirements",
-    "body": [
-      "def functionalsafetyrequirements ${1:SystemName}FunctionalSafetyRequirements",
-      "  name \"${2:System Name} - Functional Safety Requirements\"",
-      "  description \"${3:High-level functional safety requirements derived from safety goals per ISO 26262}\"",
-      "  safetygoals ${4:SafetyGoalsName}",
-      "",
-      "  def requirement ${5:FSR_SYS_001}",
-      "    description \"${6:Requirement description}\"",
-      "    derivedfrom ${7:SG_SYS_001}",
-      "    asil ${8|A,B,C,D,QM|}",
-      "    rationale \"${9:Rationale description}\"",
-      "    allocatedto ${10:FunctionName1}, ${11:FunctionName2}",
-      "    verification \"${12:Verification method description}\""
-    ],
-    "description": "Complete functional safety requirements structure for .fsr files"
-  },
+
   "Safety Goal": {
     "prefix": "goal",
     "body": [

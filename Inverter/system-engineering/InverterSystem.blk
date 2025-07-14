@@ -7,7 +7,7 @@ def block system InverterSystem
   description "Complete three-phase power inverter system for electric vehicle motor drive applications"
   owner "System Engineering Team"
   tags "system", "inverter", "power-electronics", "ev"
-  asil D
+  safetylevel ASIL-D
   contains subsystem PowerSubsystem, ControlSubsystem
   enables feature InverterSystem
   implements function PowerElectronicsController, SpeedRegulationController

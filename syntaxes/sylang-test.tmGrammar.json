@@ -95,7 +95,7 @@
         },
         {
           "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|testtype|coverage|method|priority|asil|verifies|requirement|exercises|preconditions|teststeps|expectedresult|actualresult|testresult|executiontime)\\b"
+          "match": "\\b(name|description|owner|tags|testtype|coverage|method|priority|safetylevel|verifies|requirement|exercises|preconditions|teststeps|expectedresult|actualresult|testresult|executiontime)\\b"
         }
       ]
     },
@@ -122,8 +122,8 @@
           "match": "\\b(critical|high|medium|low)\\b"
         },
         {
-          "name": "constant.language.asil-level.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b"
+          "name": "constant.language.safetylevel.sylang",
+          "match": "\\b(ASIL-[ABCD]|QM)\\b"
         }
       ]
     },

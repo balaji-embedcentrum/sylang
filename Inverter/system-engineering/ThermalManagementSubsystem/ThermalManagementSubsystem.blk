@@ -3,6 +3,6 @@ def block subsystem ThermalManagementSubsystem
   description "Provides cooling and temperature regulation for power components."
   owner "Thermal Team"
   tags "cooling", "temperature", "thermal", "management"
-  asil C
+  safetylevel ASIL-C
   enables feature ThermalManagement, CoolingMethod, CoolantControl, FanControl
   implements function ThermalManagementSystem, CoolantFlowController, AirCoolingManager 

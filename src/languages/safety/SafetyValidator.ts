@@ -344,11 +344,11 @@ export class SafetyValidator {
 
             const trimmedLine = line.trim();
 
-            if (trimmedLine.includes('safetylevel') || trimmedLine.includes('asil')) {
-                const safetyLevelMatch = trimmedLine.match(/(?:safetylevel|asil)\s+([A-Z-]+)/);
+            if (trimmedLine.includes('safetylevel')) {
+                const safetyLevelMatch = trimmedLine.match(/safetylevel\s+([A-Z-]+)/);
                 if (safetyLevelMatch && safetyLevelMatch[1]) {
                     const level = safetyLevelMatch[1];
-                    const validLevels = ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM', 'A', 'B', 'C', 'D'];
+                    const validLevels = ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'];
                     if (!validLevels.includes(level)) {
                         this.addError(diagnostics, lineIndex, `Invalid safety level: ${level}. Valid values are: ${validLevels.join(', ')}`);
                     }

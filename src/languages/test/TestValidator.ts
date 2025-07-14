@@ -45,11 +45,6 @@ export class TestValidator extends BaseValidator {
             await this.validatePriorityProperty(lineIndex, trimmedLine);
         }
 
-        // Validate ASIL property (reusing pattern from other validators)
-        if (trimmedLine.startsWith('asil ')) {
-            await this.validateAsilProperty(lineIndex, trimmedLine);
-        }
-
         // Validate cross-file references
         if (trimmedLine.startsWith('verifies requirement')) {
             await this.validateVerifiesRequirementReferences(document, lineIndex, line);
@@ -333,47 +328,6 @@ export class TestValidator extends BaseValidator {
                 vscode.DiagnosticSeverity.Error
             );
             diagnostic.code = 'invalid-priority-value';
-            this.diagnostics.push(diagnostic);
-        }
-    }
-
-    private async validateAsilProperty(lineIndex: number, trimmedLine: string): Promise<void> {
-        const asilMatch = trimmedLine.match(/^asil\s+(.+)$/);
-        if (!asilMatch) {
-            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                'Invalid asil property. Expected format: asil <level>',
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.code = 'invalid-asil-property';
-            this.diagnostics.push(diagnostic);
-            return;
-        }
-
-        const asilValue = asilMatch[1]?.trim();
-        if (!asilValue) {
-            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                'asil value is required',
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.code = 'missing-asil-value';
-            this.diagnostics.push(diagnostic);
-            return;
-        }
-
-        const validAsilValues = ['A', 'B', 'C', 'D', 'QM'];
-        
-        if (!validAsilValues.includes(asilValue)) {
-            const range = new vscode.Range(lineIndex, trimmedLine.indexOf(asilValue), lineIndex, trimmedLine.indexOf(asilValue) + asilValue.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                `Invalid asil value '${asilValue}'. Valid values are: ${validAsilValues.join(', ')}`,
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.code = 'invalid-asil-value';
             this.diagnostics.push(diagnostic);
         }
     }

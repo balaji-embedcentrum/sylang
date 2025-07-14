@@ -135,7 +135,7 @@ export class SubsystemValidator {
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'subsystem': return ['name', 'description', 'owner', 'tags', 'safetylevel', 'asil', 'enables', 'implements'];
+            case 'subsystem': return ['name', 'description', 'owner', 'tags', 'safetylevel', 'enables', 'implements'];
             default: return [];
         }
     }
@@ -152,9 +152,6 @@ export class SubsystemValidator {
                 break;
             case 'safetylevel':
                 this.validateEnum(diagnostics, lineIndex, line, keyword, ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM']);
-                break;
-            case 'asil':
-                this.validateEnum(diagnostics, lineIndex, line, keyword, ['A', 'B', 'C', 'D', 'QM']);
                 break;
             case 'enables':
                 this.validateEnablesFeature(diagnostics, lineIndex, line);

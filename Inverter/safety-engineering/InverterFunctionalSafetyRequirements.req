@@ -12,7 +12,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_001	
-		asil D
+		safetylevel ASIL-D
 		rationale "Early detection of torque control failures to prevent uncontrolled acceleration"
 		allocatedto subsystem PowerElectronicsController, MotorControlAlgorithmEngine
 		verificationcriteria "Torque control monitoring shall detect deviations greater than 10% within 10ms"
@@ -24,7 +24,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_001
-		asil D
+		safetylevel ASIL-D
 		rationale "Prevent excessive torque that could cause loss of vehicle control"
 		allocatedto subsystem TorqueManagementProcessor, SafetyMonitoringEngine
 		verificationcriteria "Torque limiting shall prevent torque output greater than 150% of rated torque"
@@ -36,7 +36,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_001
-		asil D
+		safetylevel ASIL-D
 		rationale "Immediate response to prevent dangerous torque output"
 		allocatedto subsystem SafetyMonitoringEngine, OvercurrentProtectionUnit
 		verificationcriteria "Fail-safe torque shutdown shall occur within 50ms upon detection of critical failure"
@@ -52,7 +52,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		source stakeholder
 		description "Inverter shall continuously monitor high-voltage isolation resistance and detect values below 100 ohms/volt within 1 second"
 		derivedfrom safetygoal SG_INV_002
-		asil D
+		safetylevel ASIL-D
 		rationale "Early detection of isolation degradation to prevent electric shock"
 		allocatedto subsystem IsolationMonitoringSystem, SafetyMonitoringEngine
 		verificationcriteria "High-voltage isolation monitoring shall detect values below 100 ohms/volt within 1 second"
@@ -64,7 +64,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		source stakeholder
 		description "Inverter shall immediately shut down high-voltage systems upon detection of isolation failure"
 		derivedfrom safetygoal SG_INV_002
-		asil D
+		safetylevel ASIL-D
 		rationale "Immediate protection against high voltage exposure"
 		allocatedto subsystem SafetyMonitoringEngine, PowerElectronicsController
 		verificationcriteria "High-voltage isolation failure shall immediately shut down high-voltage systems"
@@ -76,7 +76,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		source stakeholder
 		description "Inverter overvoltage protection shall activate at 110% of nominal DC bus voltage within 1ms"
 		derivedfrom safetygoal SG_INV_002
-		asil D
+		safetylevel ASIL-D
 		rationale "Prevent component damage and insulation breakdown"
 		allocatedto subsystem OvervoltageProtectionUnit, PowerElectronicsController
 		verificationcriteria "Overvoltage protection shall activate at 110% of nominal DC bus voltage within 1ms"
@@ -92,7 +92,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_003
-		asil C
+		safetylevel ASIL-C
 		rationale "Prevent thermal runaway by early temperature detection"
 		allocatedto subsystem ThermalProtectionMonitor, TemperatureSensingInterface
 		verificationcriteria "IGBT junction temperature monitoring shall trigger protection at 125°C with ±5°C accuracy"
@@ -104,7 +104,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal 		SG_INV_003
-		asil C
+		safetylevel ASIL-C
 		rationale "Gradual power reduction to prevent thermal runaway"
 		allocatedto subsystem ThermalManagementSystem, ThermalProtectionMonitor
 		verificationcriteria "Progressive power derating shall start at 110°C junction temperature"
@@ -116,7 +116,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_003
-		asil C
+		safetylevel ASIL-C
 		rationale "Early detection of cooling system degradation"
 		allocatedto subsystem CoolantFlowController, ThermalManagementSystem
 		verificationcriteria "Cooling system flow monitoring shall detect flow rate reduction >20% within 5 seconds"
@@ -132,7 +132,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_004
-		asil B
+		safetylevel ASIL-B
 		rationale "Ensure basic vehicle mobility during system failures"
 		allocatedto subsystem PowerModeManager, PowerElectronicsController
 		verificationcriteria "Degraded mode power capability shall maintain minimum 20% power capability"
@@ -144,7 +144,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_004
-		asil B
+		safetylevel ASIL-B
 		rationale "Maintain accurate current measurement for motor control"
 		allocatedto subsystem CurrentSensingInterface, SensorInterfaceController
 		verificationcriteria "Redundant current sensor monitoring shall detect single sensor failures within one control cycle"
@@ -156,7 +156,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_004
-		asil B
+		safetylevel ASIL-B
 		rationale "Maintain expected braking performance for safety"
 		allocatedto subsystem RegenerativeBrakingController, SafetyMonitoringEngine
 		verificationcriteria "Regenerative braking performance monitoring shall detect performance degradation >20% and warn driver"
@@ -172,7 +172,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_005
-		asil C
+		safetylevel ASIL-C
 		rationale "Prevent vehicle handling issues from motor control instability"
 		allocatedto subsystem MotorControlAlgorithmEngine, TorqueManagementProcessor
 		verificationcriteria "Torque ripple control shall maintain torque ripple <5% under all operating conditions"
@@ -184,7 +184,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_005
-		asil C
+		safetylevel ASIL-C
 		rationale "Accurate rotor position is critical for stable motor control"
 		allocatedto subsystem PositionSensingInterface, SensorInterfaceController
 		verificationcriteria "Rotor position validation shall detect errors within 2ms"
@@ -196,7 +196,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_005
-		asil C
+		safetylevel ASIL-C
 		rationale "Maintain stability across component aging and environmental changes"
 		allocatedto subsystem MotorControlAlgorithmEngine, SpeedRegulationController
 		verificationcriteria "Parameter variation compensation shall maintain stability across component aging and environmental changes"
@@ -212,7 +212,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_006
-		asil B
+		safetylevel ASIL-B
 		rationale "Detect communication failures to maintain system coordination"
 		allocatedto subsystem CANBusController, CommunicationInterface
 		status draft	
@@ -223,7 +223,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_006
-		asil B
+		safetylevel ASIL-B
 		rationale "Prevent incorrect operation from communication errors"
 		allocatedto subsystem CANBusController, SafetyMonitoringEngine
 		verificationcriteria "CAN Watchdog Implementation shall implement watchdogs with 100ms timeout for safety-critical messages"
@@ -235,7 +235,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_006
-		asil B
+		safetylevel ASIL-B
 		rationale "Ensure basic safety even when isolated from vehicle network"
 		allocatedto subsystem PowerElectronicsController, SafetyMonitoringEngine
 		verificationcriteria "Local safety functionality shall maintain local safety functions during communication loss for minimum 10 seconds"
@@ -251,7 +251,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_002
-		asil D
+		safetylevel ASIL-D
 		rationale "Ultra-fast detection to prevent electrical fire ignition"
 		allocatedto subsystem ShortCircuitDetector, OvercurrentProtectionUnit
 		verificationcriteria "Short circuit detection shall activate protection within 2 microseconds"
@@ -263,7 +263,7 @@ def reqsection InverterFunctionalSafetyRequirements
 		type functionalsafety
 		source stakeholder
 		derivedfrom safetygoal SG_INV_002
-		asil D
+		safetylevel ASIL-D
 		rationale "Prevent component damage and fire from excessive current"
 		allocatedto subsystem OvercurrentProtectionUnit, SafetyMonitoringEngine
 		verificationcriteria "Overcurrent protection shall limit current to 150% of rated current for maximum 100ms"

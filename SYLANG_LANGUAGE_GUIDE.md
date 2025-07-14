@@ -1203,7 +1203,8 @@ def productline InsulinPumpSystem
 | `.fun` | Functions | All | ISO 26262 |
 | `.sgl` | Safety Goals | Automotive | ISO 26262 |
 | `.haz` | Hazards | All | ISO 26262, ISO 14971 |
-| `.fsr` | Safety Requirements | Automotive | ISO 26262 |
+| `.rsk` | Risks | All | ISO 26262, ISO 14971 |
+| `.itm` | Safety Items | All | ISO 26262, ISO 14971 |
 | `.cmp` | Components | All | Various |
 | `.sub` | Subsystems | All | Various |
 

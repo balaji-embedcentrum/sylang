@@ -3,6 +3,6 @@ def block subsystem ProtectionSubsystem
   description "Implements overcurrent, overvoltage, and thermal protection mechanisms."
   owner "Safety Team"
   tags "protection", "safety", "fault", "monitoring"
-  asil D
+  safetylevel ASIL-D
   enables feature SafetySystems, OvervoltageProtection, OvercurrentProtection, ShortCircuitProtection, OvertemperatureProtection, IsolationMonitoring
   implements function SafetyMonitoringEngine, OvervoltageProtectionUnit, OvercurrentProtectionUnit, ShortCircuitDetector, ThermalProtectionMonitor, IsolationMonitoringSystem 

@@ -75,7 +75,7 @@
     "properties": {
       "patterns": [
         {
-          "match": "\\b(name|description|type|source|derivedfrom|asil|rationale|allocatedto|verificationcriteria|status|owner|tags|safetylevel|partof|aggregatedby|enables|implements|interfaces|interface|protocol|direction|voltage|width|safety_level|input|output)\\b",
+          "match": "\\b(name|description|type|source|derivedfrom|safetylevel|rationale|allocatedto|verificationcriteria|status|owner|tags|partof|aggregatedby|enables|implements|interfaces|interface|protocol|direction|voltage|width|safety_level|input|output)\\b",
           "name": "keyword.other.property.sylang"
         }
       ]

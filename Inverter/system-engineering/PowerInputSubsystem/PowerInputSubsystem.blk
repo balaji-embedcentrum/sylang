@@ -3,6 +3,6 @@ def block subsystem PowerInputSubsystem
   description "Conditions and filters DC input power from battery or DC source."
   owner "Power Input Team"
   tags "input", "filtering", "conditioning", "power-modes"
-  asil C
+  safetylevel ASIL-C
   enables feature PowerModes, SleepMode
   implements function PowerModeManager, SleepModeController 

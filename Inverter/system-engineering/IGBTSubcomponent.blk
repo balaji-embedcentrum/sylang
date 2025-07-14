@@ -3,7 +3,7 @@ def block subcomponent IGBTSubcomponent
 	description "High-power IGBT switching subcomponent with integrated gate drivers and protection"
 	owner "Power Electronics Subcomponent Team"
 	tags "subcomponent", "igbt", "power-switching", "gate-drivers"
-	asil D
+	safetylevel ASIL-D
 	contains module GateDriverModule, ProtectionModule, SensingModule
 	partof component IGBTComponent
 	enables feature PowerSwitching, FastSwitching

@@ -9,7 +9,7 @@
     { "include": "#block-types" },
     { "include": "#secondary-keywords" },
     { "include": "#properties" },
-    { "include": "#asil-levels" },
+    { "include": "#safetylevel-levels" },
     { "include": "#port-types" },
     { "include": "#strings" },
     { "include": "#identifiers" }
@@ -78,7 +78,7 @@
       "patterns": [
         {
           "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|asil|contains|partof|enables|implements|interfaces|port|type)\\b"
+          "match": "\\b(name|description|owner|tags|contains|partof|enables|implements|interfaces|port|type)\\b"
         },
         {
           "name": "keyword.control.port.sylang", 
@@ -86,11 +86,11 @@
         }
       ]
     },
-    "asil-levels": {
+    "safetylevel-levels": {
       "patterns": [
         {
-          "name": "constant.language.asil-level.sylang",
-          "match": "\\b(QM|A|B|C|D)\\b"
+          "name": "constant.language.safetylevel.sylang",
+          "match": "\\b(ASIL-[ABCD]|QM)\\b"
         }
       ]
     },

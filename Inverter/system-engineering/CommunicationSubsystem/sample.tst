@@ -4,13 +4,13 @@ def testsuite EPB_IntegrationTests
   owner "Systems Test Team"
   tags "EPB", "integration", "safety"
   testtype integration
-  asil C
+  safetylevel ASIL-C
   coverage  
    
   def testcase TC_EPB_001
     name "Normal Activation Test"
     description "Verify EPB activates correctly on driver command"
-    asil C
+    safetylevel ASIL-C
     verifies requirement FSR_EPB_001, FSR_EPB_014    
     precondition "blah blah - multl line string"
       
@@ -28,7 +28,7 @@ def testsuite EPB_IntegrationTests
     name "Fault Injection - Sensor Failure"
     description "Test system response to position sensor failure"
     priority "high"
-    asil ASIL-C
+    safetylevel ASIL-ASIL-C
     verifies SG_EPB_003
     exercises EPBMonitoringFunction, DiagnosticFunction
     

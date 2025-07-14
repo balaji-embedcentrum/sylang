@@ -149,7 +149,7 @@ export class RiskValidator {
         switch (currentContext) {
             case 'riskcriteria': return ['severity', 'exposure', 'controllability'];
             case 'riskdetermination': return ['risk'];
-            case 'asildetermination': return ['asil'];
+            case 'asildetermination': return ['safetylevel'];
             default: return [];
         }
     }
@@ -168,8 +168,8 @@ export class RiskValidator {
             case 'exposure': return ['description'];
             case 'controllability': return ['description'];
             case 'risk': return ['severity', 'exposure', 'controllability', 'description'];
-            case 'asil': return ['risk', 'description'];
-            case 'hazard': return ['scenario', 'asil', 'rationale'];
+            case 'safetylevel': return ['risk', 'description'];
+            case 'hazard': return ['scenario', 'safetylevel', 'rationale'];
             default: return [];
         }
     }
@@ -196,7 +196,7 @@ export class RiskValidator {
             case 'severity':
             case 'exposure':
             case 'controllability':
-            case 'asil':
+            case 'safetylevel':
                 this.validateIdentifier(diagnostics, lineIndex, trimmedLine, keyword);
                 break;
             case 'risk':

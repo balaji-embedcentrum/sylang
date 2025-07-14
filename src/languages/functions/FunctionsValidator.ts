@@ -33,11 +33,6 @@ export class FunctionsValidator extends BaseValidator {
             await this.validatePartofProperty(lineIndex, trimmedLine);
         }
 
-        // Validate asil property
-        if (trimmedLine.startsWith('asil ')) {
-            await this.validateAsilProperty(lineIndex, trimmedLine);
-        }
-
         // Validate enables feature cross-file references
         if (trimmedLine.startsWith('enables feature')) {
             await this.validateEnablesFeatureReferences(document, lineIndex, line);
@@ -178,48 +173,6 @@ export class FunctionsValidator extends BaseValidator {
                 vscode.DiagnosticSeverity.Warning
             );
             diagnostic.code = 'invalid-function-name';
-            this.diagnostics.push(diagnostic);
-        }
-    }
-
-    private async validateAsilProperty(lineIndex: number, trimmedLine: string): Promise<void> {
-        const asilMatch = trimmedLine.match(/^asil\s+(.+)$/);
-        if (!asilMatch) {
-            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                'Invalid asil property. Expected format: asil <level>',
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.code = 'invalid-asil-property';
-            this.diagnostics.push(diagnostic);
-            return;
-        }
-
-        const asilValue = asilMatch[1]?.trim();
-        if (!asilValue) {
-            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                'asil value is required',
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.code = 'missing-asil-value';
-            this.diagnostics.push(diagnostic);
-            return;
-        }
-
-        // Define valid ASIL levels
-        const validAsilValues = ['A', 'B', 'C', 'D', 'QM'];
-        
-        if (!validAsilValues.includes(asilValue)) {
-            const range = new vscode.Range(lineIndex, trimmedLine.indexOf(asilValue), lineIndex, trimmedLine.indexOf(asilValue) + asilValue.length);
-            const diagnostic = new vscode.Diagnostic(
-                range,
-                `Invalid asil value '${asilValue}'. Valid values are: ${validAsilValues.join(', ')}`,
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.code = 'invalid-asil-value';
             this.diagnostics.push(diagnostic);
         }
     }
@@ -412,8 +365,8 @@ export class FunctionsValidator extends BaseValidator {
                 continue;
             }
             
-            // Check property indentation (name, description, owner, tags, partof, asil, enables)
-            const propertyMatch = trimmedLine.match(/^(name|description|owner|tags|partof|asil|enables)\s/);
+            // Check property indentation (name, description, owner, tags, partof, enables)
+            const propertyMatch = trimmedLine.match(/^(name|description|owner|tags|partof|enables)\s/);
             if (propertyMatch && propertyMatch[1]) {
                 if (functionStack.length === 0) {
                     this.addDiagnostic(i, 0, line.length, 'Property found outside of any function definition', 'property-outside-function');

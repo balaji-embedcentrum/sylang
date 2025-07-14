@@ -14,7 +14,6 @@ export class FailureModeControlsValidator extends BaseValidator {
     private readonly COVERAGE_TYPES = ['complete', 'partial'];
     private readonly INDEPENDENCE_LEVELS = ['high', 'medium', 'low'];
     private readonly MATURITY_LEVELS = ['mature', 'developing', 'research'];
-    private readonly ASIL_LEVELS = ['QM', 'A', 'B', 'C', 'D'];
     private readonly DETECTION_RATING_RANGE = { min: 1, max: 10 };
     private readonly PERCENTAGE_RANGE = { min: 0, max: 100 };
 
@@ -79,8 +78,6 @@ export class FailureModeControlsValidator extends BaseValidator {
             this.validateEnumProperty(lineIndex, trimmedLine, 'independence', this.INDEPENDENCE_LEVELS);
         } else if (trimmedLine.startsWith('maturity ')) {
             this.validateEnumProperty(lineIndex, trimmedLine, 'maturity', this.MATURITY_LEVELS);
-        } else if (trimmedLine.startsWith('asil ')) {
-            this.validateEnumProperty(lineIndex, trimmedLine, 'asil', this.ASIL_LEVELS);
         } else if (trimmedLine.startsWith('detectionrating ')) {
             this.validateNumericProperty(lineIndex, trimmedLine, 'detectionrating', this.DETECTION_RATING_RANGE);
         } else if (trimmedLine.startsWith('occurrencereduction ')) {
