@@ -10,6 +10,7 @@
     { "include": "#secondary-keywords" },
     { "include": "#properties" },
     { "include": "#asil-levels" },
+    { "include": "#port-types" },
     { "include": "#strings" },
     { "include": "#identifiers" }
   ],
@@ -77,7 +78,11 @@
       "patterns": [
         {
           "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|asil|contains|partof|enables|implements|interfaces)\\b"
+          "match": "\\b(name|description|owner|tags|asil|contains|partof|enables|implements|interfaces|port|type)\\b"
+        },
+        {
+          "name": "keyword.control.port.sylang", 
+          "match": "\\b(port)\\s+(in|out)\\b"
         }
       ]
     },
@@ -86,6 +91,14 @@
         {
           "name": "constant.language.asil-level.sylang",
           "match": "\\b(QM|A|B|C|D)\\b"
+        }
+      ]
+    },
+    "port-types": {
+      "patterns": [
+        {
+          "name": "constant.language.port-type.sylang",
+          "match": "\\b(electrical|mechanical|data|CAN|Ethernet|hydraulic|pneumatic|optical|thermal|audio|RF|sensor|actuator)\\b"
         }
       ]
     },

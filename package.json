@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.39",
+      "version": "1.0.60",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -227,6 +227,17 @@
           ".blk"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-test",
+        "aliases": [
+          "Sylang Test",
+          "sylang-tst"
+        ],
+        "extensions": [
+          ".tst"
+        ],
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -304,6 +315,11 @@
         "language": "sylang-blocks",
         "scopeName": "source.sylang.blocks",
         "path": "./syntaxes/sylang-blocks.tmGrammar.json"
+      },
+      {
+        "language": "sylang-test",
+        "scopeName": "source.sylang.test",
+        "path": "./syntaxes/sylang-test.tmGrammar.json"
       }
     ],
     "snippets": [
@@ -366,6 +382,10 @@
       {
         "language": "sylang-blocks",
         "path": "./snippets/blocks.json"
+      },
+      {
+        "language": "sylang-test",
+        "path": "./snippets/test.json"
       }
     ],
     "commands": [
@@ -406,6 +426,12 @@
         "command": "sylang.refreshSymbols",
         "title": "Refresh Symbols",
         "category": "Sylang"
+      },
+      {
+        "command": "sylang.createRules",
+        "title": "🤖 Create Sylang Rules",
+        "category": "Sylang",
+        "icon": "$(file-code)"
       }
     ],
     "menus": {

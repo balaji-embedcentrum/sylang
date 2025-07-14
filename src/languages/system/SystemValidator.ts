@@ -27,7 +27,7 @@ export class SystemValidator {
                 continue;
             }
 
-            // Root level: def system
+            // Root level: def system or use statements
             if (level === 0) {
                 if (trimmedLine.startsWith('def system ')) {
                     const parts = trimmedLine.split(/\s+/);
@@ -36,8 +36,11 @@ export class SystemValidator {
                     }
                     contextStack = ['system'];
                     hasSystem = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.sys files must start with "def system <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.sys files must start with "def system <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }

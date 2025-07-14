@@ -38,8 +38,11 @@ export class SubsystemValidator {
                     }
                     contextStack = ['subsystem'];
                     hasSubsystem = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.sub files must start with "def subsystem <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.sub files must start with "def subsystem <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }

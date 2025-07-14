@@ -2,6 +2,115 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.60] - 2025-01-14
+
+### Changed
+- **BREAKING: Language Specification Updates**
+  - **Unified Safety Levels**: Removed `asil` keyword completely, now only use `safetylevel` with values `ASIL-A`, `ASIL-B`, `ASIL-C`, `ASIL-D`, `QM`
+  - **Removed Version Property**: Eliminated `version` keyword from all file types - no longer needed
+  - **Consolidated Requirements**: Removed `.fsr` files and `functionalsafetyrequirements` keyword - all requirements now use `.req` files only
+  - **Unified Block Definitions**: Eliminated separate `.cmp`, `.sub`, `.mod`, `.prt`, `.ckt`, `.asm` files - all now consolidated into `.blk` files
+  - **Removed Interface Keywords**: Eliminated `interface` and `interfaces` keywords - no longer used in any file types
+  - **Updated .sylangrules**: Complete language specification file updated to reflect all changes
+
+### Enhanced
+- **Simplified Syntax**: More consistent and streamlined language syntax across all file types
+- **Future-Ready**: `safetylevel` keyword now supports other safety standards beyond ASIL (e.g., SIL)
+- **Reduced Complexity**: Fewer file types and keywords to learn and maintain
+
+## [1.0.59] - 2025-01-14
+
+### Added
+- **Create Sylang Rules Command**: New VS Code command `🤖 Create Sylang Rules` for AI-assisted code generation
+  - **Comprehensive Language Specification**: Complete .sylangrules file covering all 22+ Sylang file extensions
+  - **AI Context File**: Detailed syntax rules, validation requirements, and examples for every file type
+  - **Use Case**: Provide .sylangrules as context to AI tools for accurate Sylang code generation
+  - **Complete Coverage**: .ple, .fml, .fun, .sgl, .haz, .rsk, .fsr, .itm, .cmp, .sub, .req, .mod, .prt, .ckt, .asm, .blk, .tst, and all other extensions
+  - **Smart Overwrite Protection**: Prompts before overwriting existing .sylangrules files
+  - **Auto-Open**: Automatically opens the generated file for review
+
+### Enhanced
+- **Command Palette Integration**: Accessible via Ctrl+Shift+P → "Create Sylang Rules"
+- **Workspace-Aware**: Creates .sylangrules file in workspace root directory
+- **Comprehensive Documentation**: Includes syntax examples, validation rules, best practices, and cross-file reference patterns
+
+## [1.0.58] - 2025-01-14
+
+### Added
+- **Test Case File Support (.tst)**: Complete implementation of test case files for safety-critical testing
+  - **Test Suite Definitions**: `def testsuite <TestSuiteIdentifier>` with comprehensive test management
+  - **Test Case Definitions**: `def testcase <TestCaseIdentifier>` with detailed test specifications
+  - **Test Properties**: testtype, coverage, method, priority, asil, verifies requirement, exercises
+  - **Test Enums**: Comprehensive enum validation for test types (unit, integration, system), coverage (statement, branch, mcdc), methods (manual, automated, hil, sil), results (pass, fail, pending), priorities (critical, high, medium, low)
+  - **Cross-File Validation**: Validates requirement and function references with proper import checking
+  - **Test Steps**: Structured test steps with `step STEP_ID "description"` format
+  - **Syntax Highlighting**: Complete syntax highlighting for all test keywords and enum values
+  - **Code Snippets**: Comprehensive snippets for test suites, test cases, steps, and properties
+
+### Enhanced
+- **TestValidator**: New validator with full enum validation, cross-file reference checking, and ISO standards compliance
+- **SymbolManager Integration**: Proper import-aware validation for test file dependencies
+- **Language Server**: Added test file support to language server with real-time validation
+
+## [1.0.57] - 2025-01-14
+
+### Added
+- **Port Support in .blk Files**: Complete implementation of port functionality for system/component interfaces
+  - **Port References**: `port in PortA, PortB, PortC` - reference ports from other .blk files (required interfaces)
+  - **Port Definitions**: `def port out PortName` - define ports this block provides (provided interfaces)
+  - **Port Properties**: name, description, type (enum), owner, asil, tags
+  - **Port Types**: electrical, mechanical, data, CAN, Ethernet, hydraulic, pneumatic, optical, thermal, audio, RF, sensor, actuator
+  - **Cross-File Validation**: Validates port references against definitions in other .blk files
+  - **Syntax Highlighting**: Full syntax highlighting for port keywords and types
+
+### Enhanced
+- **Block Validator**: Updated to handle both port references and definitions with proper validation
+- **Language Configuration**: Added all port-related keywords and validation rules
+- **Type Safety**: Port type enum validation ensures consistent interface specifications
+
+## [1.0.56] - 2025-01-14
+
+### Fixed
+- **Functions Validator File Start Logic**: Fixed validation error when `use` statements precede `def functiongroup`
+  - **Issue**: Functions files with valid `use featureset` imports at the top were incorrectly flagged as "must start with def functiongroup"
+  - **Resolution**: Updated `validateFileStartsWithFunctiongroup` to skip over `use` statements before checking for the first definition
+  - **Behavior**: Now properly allows `use` statements, comments, and empty lines before `def functiongroup` declaration
+  - **Consistency**: Matches behavior of other validators (BlockValidator, SystemValidator, etc.)
+
+### Enhanced
+- **Better Error Message**: Updated error message to clarify that imports with "use" keyword are allowed before `def functiongroup`
+
+## [1.0.55] - 2025-01-14
+
+### Fixed
+- **Functions Validator Import Validation**: Fixed missing "use" statement validation in .fun files
+  - **Issue**: Functions could reference features without declaring dependencies via `use featureset` statements
+  - **Resolution**: Updated FunctionsValidator to use import-aware validation like other validators
+  - **Behavior**: Now shows errors like "Undefined feature 'FeatureName' - missing 'use featureset FeatureName' import or definition"
+  - **Compliance**: Ensures proper cross-file dependency management and project structure integrity
+
+### Enhanced
+- **Consistent Validation**: Functions validator now matches validation behavior of BlockValidator and other validators
+- **Better Error Messages**: Clear guidance on required import statements for feature dependencies
+
+## [1.0.54] - 2025-01-14
+
+### Changed
+- **Functions Definition Language Update**: Complete transition from `systemfunctions`/`subsystemfunctions` to `functiongroup`
+  - **Breaking Change**: `def systemfunctions` → `def functiongroup`
+  - **Breaking Change**: `def subsystemfunctions` → `def functiongroup` 
+  - **Generic Approach**: Single `functiongroup` keyword replaces hierarchy-specific containers
+  - **Backward Compatibility**: Old syntax marked as deprecated with clear migration guidance
+  - Updated all validators, providers, and documentation
+  - Updated sample files and test cases
+  - Enhanced completion templates with modern syntax
+
+### Benefits
+- **Simplified Function Organization**: Generic `functiongroup` container works at any hierarchy level
+- **Future-Proof Design**: More flexible approach for organizing functions
+- **Clear Migration Path**: Deprecation warnings guide users to new syntax
+- **Consistent Language**: Aligns with other Sylang container patterns
+
 ## [1.0.20] - 2025-01-08
 
 ### Changed

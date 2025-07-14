@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { SymbolManager } from '../core/SymbolManager';
 
 interface CompletionContext {
-    type: 'top-level' | 'after-systemfeatures' | 'after-productline' | 'inside-feature' | 'inside-itm' | 'inside-def' | 'inside-haz' | 'inside-rsk' | 'inside-sgl' | 'inside-req' | 'inside-sub' | 'inside-sys' | 'inside-fun';
+    type: 'top-level' | 'after-featureset' | 'after-productline' | 'inside-feature' | 'inside-itm' | 'inside-def' | 'inside-haz' | 'inside-rsk' | 'inside-sgl' | 'inside-req' | 'inside-sub' | 'inside-sys' | 'inside-fun';
     parentKeyword: string | null;
     indentLevel: number;
 }
@@ -65,11 +65,11 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                     continue; // Skip empty lines and comments
                 }
                 
-                // Check for systemfeatures context
-                if (prevText.startsWith('systemfeatures') && this.getIndentLevel(line.text) > 0) {
-                    return { 
-                        type: 'after-systemfeatures',
-                        parentKeyword: 'systemfeatures',
+                        // Check for featureset context
+        if (prevText.startsWith('featureset') && this.getIndentLevel(line.text) > 0) {
+            return {
+                type: 'after-featureset',
+                parentKeyword: 'featureset',
                         indentLevel: this.getIndentLevel(line.text)
                     };
                 }
@@ -231,8 +231,8 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         
         // Context-specific completions
         switch (context.type) {
-            case 'after-systemfeatures':
-                // After systemfeatures, suggest feature template and properties
+            case 'after-featureset':
+                // After featureset, suggest feature template and properties
                 if (context.indentLevel === 2) { // Direct children
                     completions.push(this.createFeatureCompletion());
                     snippetKeywords.add('feature'); // Mark feature as having a snippet
@@ -399,7 +399,7 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
 
     private getItmDefPropertyCompletions(defType: string): vscode.CompletionItem[] {
         const propertiesByDef: { [key: string]: string[] } = {
-            'item': ['name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions', 'subsystems', 'systemboundaries'],
+            'item': ['name', 'description', 'owner', 'reviewers', 'productline', 'featureset', 'functiongroup', 'subsystems', 'systemboundaries'],
             'scenario': ['description', 'vehiclestate', 'environment', 'driverstate'],
             'condition': ['range', 'impact', 'standard'],
             'vehiclestate': ['description', 'characteristics'],
@@ -901,9 +901,9 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
     }
 
     private createSystemfunctionsTemplate(): vscode.CompletionItem {
-        const item = new vscode.CompletionItem('def systemfunctions (template)', vscode.CompletionItemKind.Snippet);
+        const item = new vscode.CompletionItem('def functiongroup (template)', vscode.CompletionItemKind.Snippet);
         item.insertText = new vscode.SnippetString([
-            'def systemfunctions ${1:SystemName}',
+            'def functiongroup ${1:GroupName}',
             '  def function ${2:FunctionName}',
             '    name "${3:Function Name}"',
             '    description "${4:Function description}"',
@@ -913,17 +913,17 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
             '    enables feature ${9:FeatureName}',
             '  ${0}'
         ].join('\n'));
-        item.detail = 'System Functions Template';
-        item.documentation = new vscode.MarkdownString('**System Functions**\n\nComplete template for .fun file with systemfunctions container.');
-        item.filterText = 'def systemfunctions';
-        item.sortText = '0_def_systemfunctions';
+        item.detail = 'Function Group Template';
+        item.documentation = new vscode.MarkdownString('**Function Group**\n\nComplete template for .fun file with functiongroup container. Replaces systemfunctions/subsystemfunctions.');
+        item.filterText = 'def functiongroup';
+        item.sortText = '0_def_functiongroup';
         return item;
     }
 
     private createSubsystemfunctionsTemplate(): vscode.CompletionItem {
-        const item = new vscode.CompletionItem('def subsystemfunctions (template)', vscode.CompletionItemKind.Snippet);
+        const item = new vscode.CompletionItem('def subsystemfunctions (deprecated)', vscode.CompletionItemKind.Snippet);
         item.insertText = new vscode.SnippetString([
-            'def subsystemfunctions ${1:SubsystemName}',
+            'def functiongroup ${1:GroupName}',
             '  def function ${2:FunctionName}',
             '    name "${3:Function Name}"',
             '    description "${4:Function description}"',
@@ -933,10 +933,10 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
             '    enables feature ${9:FeatureName}',
             '  ${0}'
         ].join('\n'));
-        item.detail = 'Subsystem Functions Template';
-        item.documentation = new vscode.MarkdownString('**Subsystem Functions**\n\nComplete template for .fun file with subsystemfunctions container.');
+        item.detail = '⚠️ Deprecated - Use functiongroup instead';
+        item.documentation = new vscode.MarkdownString('**⚠️ Deprecated - Function Group**\n\nUse `def functiongroup` instead of `def subsystemfunctions`. This template provides the modern syntax.');
         item.filterText = 'def subsystemfunctions';
-        item.sortText = '0_def_subsystemfunctions';
+        item.sortText = '9_def_subsystemfunctions_deprecated';
         return item;
     }
 
@@ -1148,7 +1148,7 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         const items: vscode.CompletionItem[] = [];
         
         if (this.languageId === 'sylang-features') {
-            items.push(this.createSystemfeaturesCompletion());
+            items.push(this.createFeaturesetCompletion());
         }
         if (this.languageId === 'sylang-safety') {
             items.push(this.createItemTemplate());
@@ -1178,8 +1178,8 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
             '  reviewers "${5:Reviewer1}", "${6:Reviewer2}"',
             '  ',
             '  productline ${7:ProductLineID}',
-            '  systemfeatures ${8:FeaturesID}',
-            '  systemfunctions ${9:FunctionsID}',
+            '  featureset ${8:FeaturesID}',
+            '  functiongroup ${9:FunctionsID}',
             '  subsystems',
             '    ${10:Subsystem1}',
             '    ${11:Subsystem2}',
@@ -1233,16 +1233,16 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         return item;
     }
 
-    private createSystemfeaturesCompletion(): vscode.CompletionItem {
-        const item = new vscode.CompletionItem('systemfeatures (template)', vscode.CompletionItemKind.Snippet);
+    private createFeaturesetCompletion(): vscode.CompletionItem {
+        const item = new vscode.CompletionItem('featureset (template)', vscode.CompletionItemKind.Snippet);
         item.insertText = new vscode.SnippetString([
-            'systemfeatures ${1:ContainerName}',
+            'featureset ${1:ContainerName}',
             '  ${0}'
         ].join('\n'));
         item.detail = 'System Features Container Template';
-        item.documentation = new vscode.MarkdownString('**System Features Template**\n\nCreates a systemfeatures container with tab navigation.');
-        item.filterText = 'systemfeatures'; // Still matches when typing "systemfeatures"
-        item.sortText = '0_systemfeatures';
+        item.documentation = new vscode.MarkdownString('**System Features Template**\n\nCreates a featureset container with tab navigation.');
+        item.filterText = 'featureset'; // Matches when typing "featureset"
+        item.sortText = '0_featureset';
         return item;
     }
 
@@ -1272,7 +1272,7 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
 
     private getRelevantKeywords(context: CompletionContext): string[] {
         switch (context.type) {
-            case 'after-systemfeatures':
+            case 'after-featureset':
                 return ['feature', 'name', 'description', 'owner', 'tags', 'safetylevel'];
             case 'after-productline':
                 return ['name', 'description', 'owner', 'domain', 'compliance', 'firstrelease', 'tags', 'safetylevel', 'region'];
@@ -1280,7 +1280,7 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
                 return ['name', 'description', 'owner', 'tags', 'safetylevel'];
             case 'inside-def':
             case 'inside-itm':
-                return ['def', 'name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions', 'subsystems', 'systemboundaries', 'includes', 'excludes', 'boundary', 'operationalscenarios', 'scenario', 'vehiclestate', 'environment', 'driverstate', 'operationalconditions', 'condition', 'range', 'impact', 'standard', 'vehiclestates', 'drivingstate', 'characteristics', 'environments', 'conditions', 'safetyconcept', 'safetystrategy', 'principle', 'assumptionsofuse', 'assumption', 'foreseeablemisuse', 'misuse'];
+                return ['def', 'name', 'description', 'owner', 'reviewers', 'productline', 'featureset', 'functiongroup', 'subsystems', 'systemboundaries', 'includes', 'excludes', 'boundary', 'operationalscenarios', 'scenario', 'vehiclestate', 'environment', 'driverstate', 'operationalconditions', 'condition', 'range', 'impact', 'standard', 'vehiclestates', 'drivingstate', 'characteristics', 'environments', 'conditions', 'safetyconcept', 'safetystrategy', 'principle', 'assumptionsofuse', 'assumption', 'foreseeablemisuse', 'misuse'];
             case 'inside-haz':
                 return ['def', 'name', 'description', 'hazardanalysis', 'methodology', 'category', 'subsystem', 'hazard', 'cause', 'effect', 'function', 'mitigation', 'severity'];
             case 'inside-rsk':

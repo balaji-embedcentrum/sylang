@@ -1,8 +1,8 @@
 {
-  "SystemFeatures Container": {
-    "prefix": "systemfeatures",
+  "Featureset Container": {
+    "prefix": "featureset",
     "body": [
-      "systemfeatures ${1:ContainerName}",
+      "featureset ${1:ContainerName}",
       "  feature ${2:FeatureName} ${3|mandatory,optional,alternative|}",
       "    name \"${4:Display Name}\"",
       "    description \"${5:Feature description}\"",
@@ -10,7 +10,7 @@
       "    tags \"${7:tag1}\", \"${8:tag2}\"",
       "    safetylevel ${9|ASIL-A,ASIL-B,ASIL-C,ASIL-D,QM|}"
     ],
-    "description": "Complete system features container with feature"
+    "description": "Complete featureset container with feature"
   },
   "Mandatory Feature": {
     "prefix": "mandatory",

@@ -1,8 +1,9 @@
+use featureset InverterFeatures
+
 def functiongroup InverterFunctions
 	def function PowerElectronicsController
 		name "Power Electronics Controller"
 		description "Main controller for all power electronics operations and switching control"
-		partof system PowerElectronicsSystem
 		owner "Power Electronics Team"
 		tags "power-electronics", "controller", "switching"
 		asil D
@@ -10,8 +11,7 @@ def functiongroup InverterFunctions
 
 	def function MotorControlAlgorithmEngine
 		name "Motor Control Algorithm Engine"
-		description "Advanced motor control algorithms including field-oriented control"
-		partof product
+		description "Advanced motor control algorithms including field-oriented control"	
 		owner "Controls Team"
 		tags "motor-control", "algorithms", "FOC"
 		asil D		
@@ -20,7 +20,6 @@ def functiongroup InverterFunctions
 	def function TorqueManagementProcessor
 		name "Torque Management Processor"
 		description "Precise torque control and torque vectoring processing unit"
-		partof product
 		owner "Controls Team"
 		tags "torque", "management", "vectoring"
 		asil D
@@ -29,7 +28,6 @@ def functiongroup InverterFunctions
 	def function SpeedRegulationController
 		name "Speed Regulation Controller"
 		description "Motor speed regulation and cruise control support processing"
-		partof product
 		owner "Controls Team"
 		tags "speed", "regulation", "cruise"
 		asil C
@@ -38,7 +36,6 @@ def functiongroup InverterFunctions
 	def function ThermalManagementSystem
 		name "Thermal Management System"
 		description "Active thermal monitoring and cooling system coordination"
-		partof product
 		owner "Thermal Team"
 		tags "thermal", "cooling", "monitoring"
 		asil C
@@ -47,7 +44,6 @@ def functiongroup InverterFunctions
 	def function CoolantFlowController
 		name "Coolant Flow Controller"
 		description "Liquid cooling system control and pump management unit"
-		partof product
 		owner "Thermal Team"
 		tags "coolant", "liquid-cooling", "pump"
 		asil B
@@ -56,7 +52,6 @@ def functiongroup InverterFunctions
 	def function AirCoolingManager
 		name "Air Cooling Manager"
 		description "Variable speed fan control for air cooling management"
-		partof product
 		owner "Thermal Team"
 		tags "air-cooling", "fan-control", "variable-speed"
 		asil QM
@@ -65,7 +60,6 @@ def functiongroup InverterFunctions
 	def function SafetyMonitoringEngine
 		name "Safety Monitoring Engine"
 		description "Comprehensive safety monitoring and fault management coordinator"
-		partof product
 		owner "Safety Team"
 		tags "safety", "monitoring", "fault-management"
 		asil D
@@ -74,7 +68,6 @@ def functiongroup InverterFunctions
 	def function OvervoltageProtectionUnit
 		name "Overvoltage Protection Unit"
 		description "DC bus and AC output overvoltage protection system"
-		partof product
 		owner "Safety Team"
 		tags "overvoltage", "protection", "safety"
 		asil D
@@ -83,7 +76,6 @@ def functiongroup InverterFunctions
 	def function OvercurrentProtectionUnit
 		name "Overcurrent Protection Unit"
 		description "Phase current and DC bus overcurrent protection system"
-		partof product
 		owner "Safety Team"
 		tags "overcurrent", "protection", "current-limiting"
 		asil D
@@ -92,7 +84,6 @@ def functiongroup InverterFunctions
 	def function ShortCircuitDetector
 		name "Short Circuit Detector"
 		description "Fast short circuit detection and protection system"
-		partof product
 		owner "Safety Team"
 		tags "short-circuit", "detection", "protection"
 		asil D
@@ -101,7 +92,6 @@ def functiongroup InverterFunctions
 	def function ThermalProtectionMonitor
 		name "Thermal Protection Monitor"
 		description "Junction and coolant temperature monitoring and protection"
-		partof product
 		owner "Safety Team"
 		tags "thermal-protection", "temperature", "monitoring"
 		asil C
@@ -110,7 +100,6 @@ def functiongroup InverterFunctions
 	def function IsolationMonitoringSystem
 		name "Isolation Monitoring System"
 		description "High-voltage isolation monitoring and fault detection system"
-		partof product
 		owner "Safety Team"
 		tags "isolation", "HV-monitoring", "insulation"
 		asil D
@@ -119,7 +108,6 @@ def functiongroup InverterFunctions
 	def function CommunicationInterface
 		name "Communication Interface"
 		description "Vehicle network communication and data exchange coordinator"
-		partof product
 		owner "Communication Team"
 		tags "communication", "vehicle-network", "interface"
 		asil C
@@ -128,7 +116,6 @@ def functiongroup InverterFunctions
 	def function CANBusController
 		name "CAN Bus Controller"
 		description "Controller Area Network interface for vehicle communication"
-		partof product
 		owner "Communication Team"
 		tags "CAN", "bus-controller", "automotive"
 		asil C
@@ -145,7 +132,6 @@ def functiongroup InverterFunctions
 	def function DiagnosticCoordinator
 		name "Diagnostic Coordinator"
 		description "Comprehensive system diagnostics and fault reporting coordinator"
-		partof product
 		owner "Diagnostics Team"
 		tags "diagnostics", "fault-reporting", "coordinator"
 		asil C
@@ -154,7 +140,6 @@ def functiongroup InverterFunctions
 	def function OBDComplianceInterface
 		name "OBD Compliance Interface"
 		description "On-board diagnostics compliance for regulatory requirements"
-		partof product
 		owner "Diagnostics Team"
 		tags "OBD", "compliance", "regulations"
 		asil C
@@ -163,7 +148,6 @@ def functiongroup InverterFunctions
 	def function FaultMemoryManager
 		name "Fault Memory Manager"
 		description "Non-volatile fault memory storage and retrieval system"
-		partof product
 		owner "Diagnostics Team"
 		tags "fault-memory", "non-volatile", "storage"
 		asil C
@@ -172,7 +156,6 @@ def functiongroup InverterFunctions
 	def function SensorInterfaceController
 		name "Sensor Interface Controller"
 		description "Interface controller for position, current, and temperature sensors"
-		partof product
 		owner "Sensor Team"
 		tags "sensors", "interface", "measurement"
 		asil D
@@ -181,7 +164,6 @@ def functiongroup InverterFunctions
 	def function CurrentSensingInterface
 		name "Current Sensing Interface"
 		description "Phase current measurement using hall-effect sensors"
-		partof product
 		owner "Sensor Team"
 		tags "current-sensing", "hall-effect", "measurement"
 		asil D
@@ -190,7 +172,6 @@ def functiongroup InverterFunctions
 	def function PositionSensingInterface
 		name "Position Sensing Interface"
 		description "Rotor position sensing using resolver or encoder interface"
-		partof product
 		owner "Sensor Team"
 		tags "position-sensing", "resolver", "encoder"
 		asil D
@@ -199,7 +180,6 @@ def functiongroup InverterFunctions
 	def function TemperatureSensingInterface
 		name "Temperature Sensing Interface"
 		description "IGBT junction and coolant temperature measurement interface"
-		partof product
 		owner "Sensor Team"
 		tags "temperature-sensing", "thermal-monitoring", "NTC"
 		asil C
@@ -208,7 +188,6 @@ def functiongroup InverterFunctions
 	def function PowerModeManager
 		name "Power Mode Manager"
 		description "System power state management and energy optimization coordinator"
-		partof product
 		owner "Power Management Team"
 		tags "power-modes", "energy-optimization", "state-management"
 		asil B
@@ -217,7 +196,6 @@ def functiongroup InverterFunctions
 	def function SleepModeController
 		name "Sleep Mode Controller"
 		description "Low-power sleep mode control for energy conservation"
-		partof product
 		owner "Power Management Team"
 		tags "sleep-mode", "low-power", "energy-saving"
 		asil QM
@@ -225,8 +203,7 @@ def functiongroup InverterFunctions
 
 	def function RegenerativeBrakingController
 		name "Regenerative Braking Controller"
-		description "Energy recovery control during braking and deceleration"
-		partof product
+		description "Energy recovery control during braking and deceleration"	
 		owner "Controls Team"
 		tags "regenerative-braking", "energy-recovery", "efficiency"
 		asil C
@@ -235,7 +212,6 @@ def functiongroup InverterFunctions
 	def function EMCComplianceManager
 		name "EMC Compliance Manager"
 		description "Electromagnetic compatibility and interference management coordinator"
-		partof product
 		owner "EMC Team"
 		tags "EMC", "electromagnetic", "compliance"
 		asil QM
@@ -244,7 +220,6 @@ def functiongroup InverterFunctions
 	def function EMIFilteringController
 		name "EMI Filtering Controller"
 		description "Electromagnetic interference filtering and suppression controller"
-		partof product
 		owner "EMC Team"
 		tags "EMI", "filtering", "suppression"
 		asil QM

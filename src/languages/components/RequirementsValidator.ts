@@ -38,8 +38,11 @@ export class RequirementsValidator {
                     }
                     contextStack = ['reqsection'];
                     hasReqSection = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.req files must start with "def reqsection <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.req files must start with "def reqsection <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }

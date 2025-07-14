@@ -250,17 +250,33 @@ export class FunctionsValidator extends BaseValidator {
         
         const features = featuresText.split(',').map(f => f.trim());
 
-        // Get all defined features from .fml files in workspace
-        const definedFeatures = await this.getAllDefinedFeatures();
-
+        // Validate feature identifiers format
         for (const feature of features) {
-            if (feature && !definedFeatures.includes(feature)) {
+            if (!/^[A-Z][A-Za-z0-9_]*$/.test(feature)) {
                 const featureStart = line.indexOf(feature);
                 if (featureStart !== -1) {
                     const range = new vscode.Range(lineIndex, featureStart, lineIndex, featureStart + feature.length);
                     const diagnostic = new vscode.Diagnostic(
                         range,
-                        `Feature '${feature}' is not defined in any .fml file. Functions can only enable features defined in feature models.`,
+                        `Invalid feature identifier "${feature}" - should use PascalCase`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnostic.code = 'invalid-feature-identifier';
+                    this.diagnostics.push(diagnostic);
+                }
+            }
+        }
+
+        // Use import-aware validation for feature references
+        for (const feature of features) {
+            if (!/^[A-Z][A-Za-z0-9_]*$/.test(feature)) continue; // Skip invalid features (already reported above)
+            if (!this.symbolManager.isSymbolAvailable(feature, document.uri.toString())) {
+                const featureStart = line.indexOf(feature);
+                if (featureStart !== -1) {
+                    const range = new vscode.Range(lineIndex, featureStart, lineIndex, featureStart + feature.length);
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Undefined feature '${feature}' - missing 'use featureset ${feature}' import or definition`,
                         vscode.DiagnosticSeverity.Error
                     );
                     diagnostic.code = 'undefined-feature-reference';
@@ -268,79 +284,13 @@ export class FunctionsValidator extends BaseValidator {
                 }
             }
         }
-    }
-
-    private async validateEnablesReferences(
-        document: vscode.TextDocument,
-        lineIndex: number,
-        line: string
-    ): Promise<void> {
-        const trimmedLine = line.trim();
-        
-        // Extract features from enables line: enables FeatureA, FeatureB, FeatureC
-        const enablesMatch = trimmedLine.match(/^enables\s+(.+)$/);
-        if (!enablesMatch) return;
-
-        const featuresText = enablesMatch[1];
-        if (!featuresText) return;
-        
-        const features = featuresText.split(',').map(f => f.trim());
-
-        // Get all defined features from .fml files in workspace
-        const definedFeatures = await this.getAllDefinedFeatures();
-
-        for (const feature of features) {
-            if (feature && !definedFeatures.includes(feature)) {
-                const featureStart = line.indexOf(feature);
-                if (featureStart !== -1) {
-                    const range = new vscode.Range(lineIndex, featureStart, lineIndex, featureStart + feature.length);
-                    const diagnostic = new vscode.Diagnostic(
-                        range,
-                        `Feature '${feature}' is not defined in any .fml file. Functions can only enable features defined in feature models.`,
-                        vscode.DiagnosticSeverity.Error
-                    );
-                    diagnostic.code = 'undefined-feature-reference';
-                    this.diagnostics.push(diagnostic);
-                }
-            }
-        }
-    }
-
-    private async getAllDefinedFeatures(): Promise<string[]> {
-        const features: string[] = [];
-        
-        try {
-            // Find all .fml files in workspace
-            const fmlFiles = await vscode.workspace.findFiles('**/*.fml', '**/node_modules/**');
-            
-            for (const fileUri of fmlFiles) {
-                const document = await vscode.workspace.openTextDocument(fileUri);
-                const text = document.getText();
-                const lines = text.split('\n');
-                
-                for (const line of lines) {
-                    if (!line) continue;
-                    const trimmed = line.trim();
-                    
-                    // Look for def feature definitions
-                    const featureMatch = trimmed.match(/^def\s+feature\s+(\w+)/);
-                    if (featureMatch && featureMatch[1]) {
-                        features.push(featureMatch[1]);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('[FunctionsValidator] Error reading feature definitions:', error);
-        }
-        
-        return features;
     }
 
     private async validateFileStartsWithFunctiongroup(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
         const lines = text.split('\n');
         
-        // Find the first non-empty, non-comment line
+        // Find the first non-empty, non-comment, non-import line
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (!line) continue;
@@ -348,18 +298,21 @@ export class FunctionsValidator extends BaseValidator {
             const trimmedLine = line.trim();
             if (trimmedLine.length === 0 || trimmedLine.startsWith('//')) continue;
             
-            // This is the first meaningful line
+            // Skip import statements (use keyword)
+            if (trimmedLine.startsWith('use ')) continue;
+            
+            // This is the first meaningful definition line
             if (!trimmedLine.startsWith('def functiongroup')) {
                 const range = new vscode.Range(i, 0, i, line.length);
                 const diagnostic = new vscode.Diagnostic(
                     range,
-                    'Functions file must start with "def functiongroup" declaration',
+                    'Functions file must start with "def functiongroup" declaration (imports with "use" keyword are allowed before)',
                     vscode.DiagnosticSeverity.Error
                 );
                 diagnostic.code = 'file-must-start-with-functiongroup';
                 this.diagnostics.push(diagnostic);
             }
-            return; // We only check the first meaningful line
+            return; // We only check the first meaningful definition line
         }
     }
 
@@ -410,7 +363,7 @@ export class FunctionsValidator extends BaseValidator {
         const text = document.getText();
         const lines = text.split('\n');
         
-        let systemfunctionsIndent = -1;
+        let functiongroupIndent = -1;
         const functionStack: Array<{indentLevel: number, lineIndex: number, name: string}> = [];
         
         for (let i = 0; i < lines.length; i++) {
@@ -425,7 +378,7 @@ export class FunctionsValidator extends BaseValidator {
                 if (indentLevel !== 0) {
                     this.addDiagnostic(i, 0, indentLevel, `functiongroup must start at column 0. Found ${indentLevel} tabs.`, 'invalid-functiongroup-indentation');
                 }
-                systemfunctionsIndent = indentLevel;
+                functiongroupIndent = indentLevel;
                 continue;
             }
             
@@ -435,13 +388,13 @@ export class FunctionsValidator extends BaseValidator {
                 const functionName = functionMatch[1];
                 
                 // Validate function indentation hierarchy
-                if (systemfunctionsIndent === -1) {
+                if (functiongroupIndent === -1) {
                     this.addDiagnostic(i, 0, line.length, 'Function definition found before functiongroup declaration', 'function-before-functiongroup');
                     continue;
                 }
                 
-                // Check if indentation is valid (must be at least 1 tab deeper than systemfunctions)
-                const expectedMinIndent = systemfunctionsIndent + 1; // First level functions
+                // Check if indentation is valid (must be at least 1 tab deeper than functiongroup)
+                const expectedMinIndent = functiongroupIndent + 1; // First level functions
                 if (indentLevel < expectedMinIndent) {
                     this.addDiagnostic(i, 0, indentLevel, `Function '${functionName}' indentation too shallow. Minimum expected: ${expectedMinIndent} tabs, found: ${indentLevel} tabs.`, 'function-indentation-too-shallow');
                     continue;

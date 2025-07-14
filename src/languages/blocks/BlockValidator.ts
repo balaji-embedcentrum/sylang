@@ -1,10 +1,54 @@
 import * as vscode from 'vscode';
+import { SymbolManager } from '../../core/SymbolManager';
+import { getLanguageConfigByExtension } from '../../config/LanguageConfigs';
 
 export class BlockValidator {
+    private symbolManager: SymbolManager;
+    private documentUri: string = '';
+
+    constructor(symbolManager: SymbolManager) {
+        this.symbolManager = symbolManager;
+    }
+
     public async validate(document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
+        this.documentUri = document.uri.toString();
         const diagnostics: vscode.Diagnostic[] = [];
         const text = document.getText();
         const lines = text.split('\n');
+
+        // Parse document with imports and get available symbols
+        const languageConfig = getLanguageConfigByExtension('.blk');
+        if (languageConfig) {
+            await this.symbolManager.parseDocumentWithImports(document, languageConfig);
+        }
+        const documentUri = document.uri.toString();
+        
+        // Validate imports first
+        const importValidation = this.symbolManager.validateImports(documentUri);
+        if (importValidation.errors.length > 0) {
+            // Convert import errors to diagnostics
+            importValidation.errors.forEach(error => {
+                const diagnostic = new vscode.Diagnostic(
+                    error.range,
+                    error.message,
+                    vscode.DiagnosticSeverity.Error
+                );
+                diagnostic.code = 'import-error';
+                diagnostics.push(diagnostic);
+            });
+        }
+        if (importValidation.warnings.length > 0) {
+            // Convert import warnings to diagnostics  
+            importValidation.warnings.forEach(warning => {
+                const diagnostic = new vscode.Diagnostic(
+                    warning.range,
+                    warning.message,
+                    vscode.DiagnosticSeverity.Warning
+                );
+                diagnostic.code = 'import-warning';
+                diagnostics.push(diagnostic);
+            });
+        }
 
         let hasBlock = false;
         let contextStack: string[] = [];
@@ -56,8 +100,11 @@ export class BlockValidator {
                     contextStack = ['block'];
                     currentBlockType = blockType;
                     hasBlock = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.blk files must start with "def block <type> <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.blk files must start with "def block <type> <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }
@@ -65,7 +112,13 @@ export class BlockValidator {
             const currentContext = contextStack[contextStack.length - 1] || '';
 
             if (trimmedLine.startsWith('def ')) {
-                this.addError(diagnostics, lineIndex, 'No nested block definitions allowed in .blk files');
+                // Handle def port out definitions
+                if (trimmedLine.startsWith('def port out ')) {
+                    this.validateDefPortOut(diagnostics, lineIndex, trimmedLine);
+                    contextStack.push('port');
+                } else {
+                    this.addError(diagnostics, lineIndex, 'Only "def port out" definitions are allowed in .blk files. No other nested block definitions allowed.');
+                }
             } else {
                 const keyword = trimmedLine.split(' ')[0];
                 const validProperties = this.getValidProperties(currentContext);
@@ -94,7 +147,8 @@ export class BlockValidator {
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'block': return ['name', 'description', 'owner', 'tags', 'asil', 'contains', 'partof', 'enables', 'implements', 'interfaces'];
+            case 'block': return ['name', 'description', 'owner', 'tags', 'asil', 'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'];
+            case 'port': return ['name', 'description', 'type', 'owner', 'asil', 'tags'];
             default: return [];
         }
     }
@@ -119,6 +173,13 @@ export class BlockValidator {
             case 'asil':
                 this.validateAsil(diagnostics, lineIndex, line, blockType);
                 break;
+            case 'type':
+                if (context === 'port') {
+                    this.validatePortType(diagnostics, lineIndex, line);
+                } else {
+                    this.addError(diagnostics, lineIndex, `Property "type" is only valid in port context`);
+                }
+                break;
             case 'contains':
                 this.validateContains(diagnostics, lineIndex, line, blockType);
                 break;
@@ -133,6 +194,9 @@ export class BlockValidator {
                 break;
             case 'interfaces':
                 this.validateInterfaces(diagnostics, lineIndex, line);
+                break;
+            case 'port':
+                this.validatePort(diagnostics, lineIndex, line);
                 break;
             default:
                 this.addError(diagnostics, lineIndex, `Invalid property "${keyword}" in ${context}`);
@@ -174,6 +238,46 @@ export class BlockValidator {
         }
     }
 
+    private validatePortType(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        const match = line.trim().match(/^type\s+(\w+)$/);
+        if (!match) {
+            this.addError(diagnostics, lineIndex, 'Invalid port type. Expected format: type <Type>');
+            return;
+        }
+
+        const portType = match[1];
+        const validTypes = ['electrical', 'mechanical', 'data', 'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator'];
+
+        if (!validTypes.includes(portType)) {
+            this.addError(diagnostics, lineIndex, `Invalid port type "${portType}". Valid types: ${validTypes.join(', ')}`);
+        }
+    }
+
+    private validatePort(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        // Handle 'port in' references - port in XXXX, YYYY, ZZZZ
+        const portInMatch = line.trim().match(/^port\s+in\s+(.+)$/);
+        if (portInMatch) {
+            const portList = portInMatch[1];
+            const identifiers = portList.split(',').map(id => id.trim());
+            
+            // Validate identifiers format
+            for (const id of identifiers) {
+                if (!/^[A-Z][A-Za-z0-9_]*$/.test(id)) {
+                    this.addError(diagnostics, lineIndex, `Invalid port identifier "${id}" - should use PascalCase`);
+                } else {
+                    // Cross-file validation for port references
+                    if (!this.symbolManager.isSymbolAvailable(id, this.documentUri)) {
+                        this.addError(diagnostics, lineIndex, `Undefined port '${id}' - missing 'use port ${id}' import or definition in another .blk file`);
+                    }
+                }
+            }
+            return;
+        }
+
+        // If not 'port in', it's an invalid port syntax
+        this.addError(diagnostics, lineIndex, 'Invalid port syntax. Expected format: port in <PortList> (port out definitions use "def port out <identifier>")');
+    }
+
     private validateContains(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string, blockType: string): void {
         const match = line.trim().match(/^contains\s+(\w+)\s+(.+)$/);
         if (!match) {
@@ -201,9 +305,13 @@ export class BlockValidator {
             }
         }
 
-        // Add cross-file validation hint for contains
+        // Add cross-file validation for contains
         if (validIdentifiers.length > 0) {
-            this.addInfo(diagnostics, lineIndex, `🔗 Cross-file validation: Verify that ${containsType}s [${validIdentifiers.join(', ')}] exist in other .blk files`);
+            for (const identifier of validIdentifiers) {
+                if (!this.symbolManager.isSymbolAvailable(identifier, this.documentUri)) {
+                    this.addError(diagnostics, lineIndex, `Undefined ${containsType} '${identifier}' - missing 'use subsystem ${identifier}' import or definition`);
+                }
+            }
         }
     }
 
@@ -227,8 +335,10 @@ export class BlockValidator {
         if (!/^[A-Z][A-Za-z0-9_]*$/.test(identifier)) {
             this.addError(diagnostics, lineIndex, `Invalid identifier "${identifier}" in partof - should use PascalCase`);
         } else {
-            // Add cross-file validation hint for partof
-            this.addInfo(diagnostics, lineIndex, `🔗 Cross-file validation: Verify that ${partofType} "${identifier}" exists in another .blk file`);
+            // Add cross-file validation for partof
+            if (!this.symbolManager.isSymbolAvailable(identifier, this.documentUri)) {
+                this.addError(diagnostics, lineIndex, `Undefined ${partofType} '${identifier}' - missing 'use ${partofType} ${identifier}' import or definition`);
+            }
         }
     }
 
@@ -248,9 +358,12 @@ export class BlockValidator {
             }
         }
 
-        // Add cross-file validation hint
-        if (features.length > 0) {
-            this.addInfo(diagnostics, lineIndex, `🔗 Cross-file validation: Verify that features [${features.join(', ')}] are defined in .fml files`);
+        // Add cross-file validation for features
+        for (const feature of features) {
+            if (!/^[A-Z][A-Za-z0-9_]*$/.test(feature)) continue; // Skip invalid features (already reported above)
+            if (!this.symbolManager.isSymbolAvailable(feature, this.documentUri)) {
+                this.addError(diagnostics, lineIndex, `Undefined feature '${feature}' - missing 'use featureset ${feature}' import or definition`);
+            }
         }
     }
 
@@ -270,9 +383,12 @@ export class BlockValidator {
             }
         }
 
-        // Add cross-file validation hint
-        if (functions.length > 0) {
-            this.addInfo(diagnostics, lineIndex, `🔗 Cross-file validation: Verify that functions [${functions.join(', ')}] are defined in .fun files`);
+        // Add cross-file validation for functions
+        for (const func of functions) {
+            if (!/^[A-Z][A-Za-z0-9_]*$/.test(func)) continue; // Skip invalid functions (already reported above)
+            if (!this.symbolManager.isSymbolAvailable(func, this.documentUri)) {
+                this.addError(diagnostics, lineIndex, `Undefined function '${func}' - missing 'use functiongroup ${func}' import or definition`);
+            }
         }
     }
 
@@ -380,5 +496,24 @@ export class BlockValidator {
         const range = new vscode.Range(lineIndex, 0, lineIndex, Number.MAX_VALUE);
         const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Information);
         diagnostics.push(diagnostic);
+    }
+
+    private validateDefPortOut(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        const match = line.trim().match(/^def\s+port\s+out\s+([A-Za-z_][A-Za-z0-9_]*)$/);
+        if (!match) {
+            this.addError(diagnostics, lineIndex, 'Invalid "def port out" syntax. Expected format: def port out <Identifier>');
+            return;
+        }
+
+        const identifier = match[1];
+
+        if (!/^[A-Z][A-Za-z0-9_]*$/.test(identifier)) {
+            this.addError(diagnostics, lineIndex, `Invalid port identifier "${identifier}" - should use PascalCase`);
+        } else {
+            // Add cross-file validation for port definitions
+            if (!this.symbolManager.isSymbolAvailable(identifier, this.documentUri)) {
+                this.addError(diagnostics, lineIndex, `Undefined port '${identifier}' - missing 'use port ${identifier}' import or definition in another .blk file`);
+            }
+        }
     }
 } 

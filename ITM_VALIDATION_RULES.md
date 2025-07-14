@@ -33,7 +33,7 @@ def item <ItemName>
   reviewers "Team1", "Team2"
   productline <ProductLineName>
   systemfeatures <SystemFeaturesName>
-  systemfunctions <SystemFunctionsName>
+  functiongroup <SystemFunctionsName>
   subsystems
     <SubsystemName1>
     <SubsystemName2>
@@ -174,7 +174,7 @@ def item InverterItem
   
     productline AutomotiveInverter
     systemfeatures InverterFeatures
-    systemfunctions InverterFunctions
+    functiongroup InverterFunctions
     subsystems
       PowerConversion
       MotorControl

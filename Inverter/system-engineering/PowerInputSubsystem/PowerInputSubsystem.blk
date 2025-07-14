@@ -1,4 +1,4 @@
-def subsystem PowerInputSubsystem
+def block subsystem PowerInputSubsystem
   name "Power Input Subsystem"
   description "Conditions and filters DC input power from battery or DC source."
   owner "Power Input Team"

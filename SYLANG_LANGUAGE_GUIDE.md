@@ -160,8 +160,8 @@ Sylang Language Family
 |-----------|-------------|---------|-------------------|
 | `.ple` | sylang-productline | Product line definitions | `productline` |
 | `.fml` | sylang-features | Feature models | `systemfeatures` |
-| `.fun` | sylang-functions | System functions | `systemfunctions` |
-| `.fma` | sylang-functions | Function architectures | `systemfunctions` |
+| `.fun` | sylang-functions | System functions | `functiongroup` |
+| `.fma` | sylang-functions | Function architectures | `functiongroup` |
 | `.sgl` | sylang-safety | Safety goals | `safetygoals` |
 | `.haz` | sylang-safety | Hazard analysis | `hazards` |
 | `.rsk` | sylang-safety | Risk assessment | `risks` |
@@ -389,7 +389,7 @@ Function files define the system functions that implement features and provide s
 
 ### Syntax Structure
 ```sylang
-def systemfunctions <UniqueSystemIdentifier>
+def functiongroup <UniqueSystemIdentifier>
   def function <UniqueFunctionIdentifier>
     name "<Display Name>"
     description "<Detailed description>"
@@ -413,7 +413,7 @@ def systemfunctions <UniqueSystemIdentifier>
 
 ### Complete Example
 ```sylang
-def systemfunctions EPBFunctions
+def functiongroup EPBFunctions
   def function CoreSystemOrchestrator
     name "Core System Orchestrator"
     description "Main orchestration engine for the entire EPB system architecture and coordination."
@@ -448,7 +448,7 @@ def function MyFunction
 ```
 
 ### Validation Rules
-1. Only one `systemfunctions` definition per file
+1. Only one `functiongroup` definition per file
 2. All functions must have `enables` property
 3. Referenced features must exist in .fml files
 4. Function identifiers must be unique across project
@@ -949,7 +949,7 @@ def component MyComponent
 - Alternative features need at least 2 sub-features
 
 #### Functions (.fun)
-- Only one `systemfunctions` definition per file
+- Only one `functiongroup` definition per file
 - All functions must have `enables` property
 - Referenced features must exist
 

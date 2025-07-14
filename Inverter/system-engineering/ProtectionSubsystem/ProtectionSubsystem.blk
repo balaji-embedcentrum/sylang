@@ -1,4 +1,4 @@
-def subsystem ProtectionSubsystem
+def block subsystem ProtectionSubsystem
   name "Protection Subsystem"
   description "Implements overcurrent, overvoltage, and thermal protection mechanisms."
   owner "Safety Team"

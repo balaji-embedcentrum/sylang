@@ -61,7 +61,7 @@ This project includes pre-configured AI context for:
 1. **Install Sylang Extension**: Get it from the VS Code Marketplace
 2. **AI Ready**: Your AI assistants are pre-configured with Sylang knowledge
 3. **Start Coding**: Create `.ple`, `.fun`, or `.cmp` files in the `src/` directory
-4. **Use Auto-completion**: Type keywords like `productline`, `component`, `systemfunctions` and let auto-completion guide you
+4. **Use Auto-completion**: Type keywords like `productline`, `component`, `functiongroup` and let auto-completion guide you
 
 ## Example Usage
 
@@ -81,14 +81,13 @@ productline MyAutomotiveSystem
 Create system functions (`.fun` file):
 
 ```sylang
-systemfunctions MySystemFunctions
-    function SafetyController
-        name "Safety Controller"
-        description "Main safety control function"
-        owner "Safety Team"
-        tags "safety", "controller"
-        safetylevel ASIL-C
-        enables SafetyMonitoring
+def functiongroup MySystemFunctions
+  def function SafetyController
+    name "Safety Controller"
+    description "Main safety control function"
+    owner "Safety Team"
+    tags "safety", "controller"
+    safetylevel ASIL-C
 ```
 
 ## Development Tips

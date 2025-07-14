@@ -1,4 +1,4 @@
-def subsystem PowerOutputSubsystem
+def block subsystem PowerOutputSubsystem
   name "Power Output Subsystem"
   description "Filters and conditions AC output power for load connection."
   owner "Power Output Team"

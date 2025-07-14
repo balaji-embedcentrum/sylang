@@ -108,7 +108,7 @@
         },
         {
           "name": "entity.name.tag.property.crossref.faulttreeanalysis",
-          "match": "\\b(item|hazardidentification|riskassessment|safetygoals|productline|systemfeatures|systemfunctions)\\b"
+          "match": "\\b(item|hazardidentification|riskassessment|safetygoals|productline|featureset|functiongroup)\\b"
         }
       ]
     },

@@ -1,11 +1,13 @@
+use subsystem PowerSubsystem, ControlSubsystem
+use featureset InverterFeatures
+use functiongroup InverterFunctions
+
 def block system InverterSystem
-	name "Automotive Electric Vehicle Inverter System"
-	description "Complete three-phase power inverter system for electric vehicle motor drive applications"
-	owner "System Engineering Team"
-	tags "system", "inverter", "power-electronics", "ev"
-	asil D
-	contains subsystem PowerSubsystem, ControlSubsystem, SafetySubsystem, ThermalSubsystem, CommunicationSubsystem
-	partof product ElectricVehiclePowerTrain
-	enables feature InverterSystem
-	implements function PowerConversion, MotorControl
-	interfaces PowerInterface, MotorInterface, VehicleInterface 
+  name "Automotive Electric Vehicle Inverter System"
+  description "Complete three-phase power inverter system for electric vehicle motor drive applications"
+  owner "System Engineering Team"
+  tags "system", "inverter", "power-electronics", "ev"
+  asil D
+  contains subsystem PowerSubsystem, ControlSubsystem
+  enables feature InverterSystem
+  implements function PowerElectronicsController, SpeedRegulationController

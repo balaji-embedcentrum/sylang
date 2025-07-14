@@ -39,8 +39,11 @@ export class SafetyGoalsValidator {
                     }
                     contextStack = ['safetygoals'];
                     hasSafetyGoals = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.sgl files must start with "def safetygoals <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.sgl files must start with "def safetygoals <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }

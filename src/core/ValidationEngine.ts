@@ -16,6 +16,7 @@ import { SubsystemValidator } from '../languages/subsystem/SubsystemValidator'; 
 import { SystemValidator } from '../languages/system/SystemValidator'; // New import
 import { ProductLineValidator } from '../languages/productline/ProductLineValidator';
 import { BlockValidator } from '../languages/blocks/BlockValidator';
+import { TestValidator } from '../languages/test/TestValidator';
 import { getLanguageConfig } from '../config/LanguageConfigs';
 
 export class ValidationEngine {
@@ -67,6 +68,11 @@ export class ValidationEngine {
                 this.validators.set('sylang-faulttreeanalysis', new FaultTreeAnalysisValidator(faultTreeAnalysisConfig, this.symbolManager));
             }
 
+            const testConfig = getLanguageConfig('sylang-test');
+            if (testConfig) {
+                this.validators.set('sylang-test', new TestValidator(testConfig, this.symbolManager));
+            }
+
             // For safety files, we'll handle them separately in validateDocument
             console.log('[ValidationEngine] Initialized validators for:', Array.from(this.validators.keys()));
         } catch (error) {
@@ -86,11 +92,11 @@ export class ValidationEngine {
             // Check if it's a safety or other file (by extension)
             const fileName = document.fileName;
             const extension = fileName.split('.').pop();
-            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys', 'blk', 'fma', 'fmc'];
+            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys', 'blk', 'fma', 'fmc', 'tst'];
             
             if (extensions.includes(extension || '')) {
                 // Use appropriate validator based on extension
-                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator | BlockValidator | FailureModeAnalysisValidator | FailureModeControlsValidator;
+                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator | BlockValidator | FailureModeAnalysisValidator | FailureModeControlsValidator | TestValidator;
                 if (extension === 'haz') {
                     validator = new HazardValidator();
                     console.log(`[ValidationEngine] Running HazardValidator for .${extension} file`);
@@ -110,7 +116,7 @@ export class ValidationEngine {
                     validator = new SystemValidator();
                     console.log(`[ValidationEngine] Running SystemValidator for .${extension} file`);
                 } else if (extension === 'blk') {
-                    validator = new BlockValidator();
+                    validator = new BlockValidator(this.symbolManager);
                     console.log(`[ValidationEngine] Running BlockValidator for .${extension} file`);
                 } else if (extension === 'fma') {
                     const fmaConfig = getLanguageConfig('sylang-failuremodeanalysis');
@@ -120,6 +126,10 @@ export class ValidationEngine {
                     const fmcConfig = getLanguageConfig('sylang-failuremodecontrols');
                     validator = new FailureModeControlsValidator(fmcConfig!, this.symbolManager);
                     console.log(`[ValidationEngine] Running FailureModeControlsValidator for .${extension} file`);
+                } else if (extension === 'tst') {
+                    const testConfig = getLanguageConfig('sylang-test');
+                    validator = new TestValidator(testConfig!, this.symbolManager);
+                    console.log(`[ValidationEngine] Running TestValidator for .${extension} file`);
                 } else {
                     validator = new SafetyValidator();
                     console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);

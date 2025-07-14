@@ -10,7 +10,7 @@
       "",
       "  itemdef",
       "    productline ${7:ProductLineName}",
-      "    systemfeatures ${8:SystemFeatures}",
+      "    featureset ${8:SystemFeatures}",
       "    systemfunctions ${9:SystemFunctions}",
       "    subsystems",
       "      ${10:SubsystemName}",

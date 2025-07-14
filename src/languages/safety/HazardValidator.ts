@@ -41,8 +41,11 @@ export class HazardValidator {
                     }
                     contextStack = ['hazardidentification'];
                     hasHazardIdentification = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.haz files must start with "def hazardidentification <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.haz files must start with "def hazardidentification <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }

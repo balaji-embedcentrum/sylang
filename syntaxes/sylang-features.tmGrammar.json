@@ -53,7 +53,7 @@
         },
         {
           "name": "keyword.control.sylang",
-          "match": "\\b(use|def\\s+systemfeatures|def\\s+feature|def\\s+constraints|systemfeatures|feature|constraints)\\b"
+                      "match": "\\b(use|def\\s+featureset|def\\s+feature|def\\s+constraints|featureset|feature|constraints)\\b"
         },
         {
           "name": "keyword.other.sylang",

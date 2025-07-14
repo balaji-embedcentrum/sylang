@@ -18,7 +18,7 @@
       "\triskassessment ${10:SystemRiskAssessment}",
       "\tsafetygoals ${11:SystemSafetyGoals}",
       "\tproductline ${12:ProductLineName}",
-      "\tsystemfeatures ${13:SystemFeatures}",
+      "\tfeatureset ${13:SystemFeatures}",
       "\tsystemfunctions ${14:SystemFunctions}",
       "\t",
       "\t# Top event definition",
@@ -367,9 +367,9 @@
     "description": "Cross-reference to .ple file"
   },
   "Cross-reference - System Features": {
-    "prefix": "systemfeatures",
+    "prefix": "featureset",
     "body": [
-      "systemfeatures ${1:SystemFeatures}",
+      "featureset ${1:SystemFeatures}",
       "$0"
     ],
     "description": "Cross-reference to .fml file"

@@ -24,16 +24,16 @@ export interface SymbolInfo {
 
 // New interfaces for import system
 export interface ImportStatement {
-    keyword: string;          // 'systemfeatures', 'functiongroup', etc.
+    keyword: string;          // 'featureset', 'functiongroup', etc.
     identifier: string;       // The imported identifier
-    selectiveImports?: string[]; // For selective imports: use systemfeatures CoreFeatures.Engine, CoreFeatures.Safety
+    selectiveImports?: string[]; // For selective imports: use featureset CoreFeatures.Engine, CoreFeatures.Safety
     location: vscode.Location;
     range: vscode.Range;
 }
 
 export interface HeaderDefinition {
     identifier: string;       // The header identifier (e.g., 'CoreFeatures')
-    keyword: string;         // The header type (e.g., 'systemfeatures')
+    keyword: string;         // The header type (e.g., 'featureset')
     fileUri: string;         // File containing this header
     childSymbols: string[];  // All symbols defined under this header
     location: vscode.Location;
@@ -86,6 +86,8 @@ export class SymbolManager {
             ({ definitions: documentSymbols, references: documentReferences } = this.parseProductLineDocument(document));
         } else if (extension === 'sys') {
             ({ definitions: documentSymbols, references: documentReferences } = this.parseSystemDocument(document));
+        } else if (extension === 'blk') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseBlockDocument(document));
         } else if (languageConfig.id === 'sylang-safety') {
             ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyDocument(document));
         } else {
@@ -373,7 +375,7 @@ export class SymbolManager {
 
     private isPropertyKeyword(keyword: string, context: string): boolean {
         const propertiesByContext: { [key: string]: string[] } = {
-            'item': ['name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions'],
+            'item': ['name', 'description', 'owner', 'reviewers', 'productline', 'featureset', 'functiongroup'],
             'scenario': ['description', 'vehiclestate', 'environment', 'driverstate'],
             'condition': ['range', 'impact', 'standard'],
             'vehiclestate': ['description', 'characteristics'],
@@ -1122,10 +1124,10 @@ export class SymbolManager {
             if (line.startsWith('def ')) {
                 const parts = line.split(/\s+/);
                 if (parts.length >= 3) {
-                    const keyword = parts[1]; // systemfeatures, feature
+                    const keyword = parts[1]; // featureset, feature
                     const name = parts[2];
 
-                    if (keyword === 'systemfeatures') {
+                    if (keyword === 'featureset') {
                         contextStack[indentLevel] = keyword;
                         definitions.push({
                             name: name,
@@ -1243,6 +1245,111 @@ export class SymbolManager {
         return { definitions, references };
     }
 
+    /**
+     * Parse block document (.blk files)
+     */
+    private parseBlockDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.trim();
+            if (!line || line.startsWith('//')) continue;
+
+            // Parse block definition: def block <type> <identifier>
+            if (line.startsWith('def block')) {
+                const parts = line.split(/\s+/);
+                if (parts.length >= 4) {
+                    const blockType = parts[2]; // subsystem, component, etc.
+                    const name = parts[3];      // PowerSubsystem, etc.
+                    definitions.push({
+                        name: name,
+                        kind: blockType,
+                        location: new vscode.Location(document.uri, new vscode.Position(lineIndex, 0)),
+                        container: '',
+                        properties: new Map(),
+                        range: new vscode.Range(lineIndex, 0, lineIndex, line.length)
+                    });
+                }
+            }
+            // Parse contains references: contains subsystem PowerSubsystem, ControlSubsystem
+            else if (line.startsWith('contains')) {
+                const containsMatch = line.match(/contains\s+\w+\s+(.+)/);
+                if (containsMatch) {
+                    const identifiers = containsMatch[1].split(',').map(s => s.trim());
+                    for (const identifier of identifiers) {
+                        if (identifier && /^[A-Za-z_][A-Za-z0-9_]*$/.test(identifier)) {
+                            const startPos = line.indexOf(identifier);
+                            references.push({
+                                name: identifier,
+                                location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                                context: 'contains',
+                                range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + identifier.length)
+                            });
+                        }
+                    }
+                }
+            }
+            // Parse partof references: partof product ElectricVehiclePowerTrain
+            else if (line.startsWith('partof')) {
+                const partofMatch = line.match(/partof\s+\w+\s+([A-Za-z_][A-Za-z0-9_]*)/);
+                if (partofMatch) {
+                    const identifier = partofMatch[1];
+                    const startPos = line.indexOf(identifier);
+                    references.push({
+                        name: identifier,
+                        location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                        context: 'partof',
+                        range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + identifier.length)
+                    });
+                }
+            }
+            // Parse enables feature references: enables feature InverterSystem
+            else if (line.startsWith('enables feature')) {
+                const enablesMatch = line.match(/enables\s+feature\s+(.+)/);
+                if (enablesMatch) {
+                    const features = enablesMatch[1].split(',').map(s => s.trim());
+                    for (const feature of features) {
+                        if (feature && /^[A-Za-z_][A-Za-z0-9_]*$/.test(feature)) {
+                            const startPos = line.indexOf(feature);
+                            references.push({
+                                name: feature,
+                                location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                                context: 'enables',
+                                range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + feature.length)
+                            });
+                        }
+                    }
+                }
+            }
+            // Parse implements function references: implements function PowerConversion, MotorControl
+            else if (line.startsWith('implements function')) {
+                const implementsMatch = line.match(/implements\s+function\s+(.+)/);
+                if (implementsMatch) {
+                    const functions = implementsMatch[1].split(',').map(s => s.trim());
+                    for (const func of functions) {
+                        if (func && /^[A-Za-z_][A-Za-z0-9_]*$/.test(func)) {
+                            const startPos = line.indexOf(func);
+                            references.push({
+                                name: func,
+                                location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                                context: 'implements',
+                                range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + func.length)
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        return { definitions, references };
+    }
+
     // ============================================================================
     // NEW IMPORT SYSTEM METHODS - ADDED WITHOUT MODIFYING EXISTING FUNCTIONALITY
     // ============================================================================
@@ -1263,17 +1370,18 @@ export class SymbolManager {
                 continue;
             }
 
-            // Parse use statements: use keyword identifier [.selectiveImports]
-            const useMatch = line.match(/^use\s+(\w+)\s+([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+,?\s*)*)$/);
+            // Parse use statements: use keyword identifier1, identifier2, ... OR use keyword identifier.symbol1, identifier.symbol2
+            const useMatch = line.match(/^use\s+(\w+)\s+(.+)$/);
             if (useMatch) {
                 const keyword = useMatch[1];
-                const identifierPart = useMatch[2];
+                const identifierPart = useMatch[2].trim();
+                console.log(`[DEBUG] Parsing import: use ${keyword} ${identifierPart}`);
                 
                 const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
                 const location = new vscode.Location(document.uri, range);
 
-                // Check for selective imports (identifier.symbol1, identifier.symbol2)
-                if (identifierPart.includes('.')) {
+                // Check for selective imports with dots (identifier.symbol1, identifier.symbol2)
+                if (identifierPart.includes('.') && identifierPart.split('.').length > 1) {
                     const parts = identifierPart.split('.');
                     const identifier = parts[0];
                     const selectiveImports = parts.slice(1).join('.').split(',').map(s => s.trim());
@@ -1286,13 +1394,19 @@ export class SymbolManager {
                         range
                     });
                 } else {
-                    // Simple import
-                    imports.push({
-                        keyword,
-                        identifier: identifierPart,
-                        location,
-                        range
-                    });
+                    // Parse comma-separated identifiers: PowerSubsystem, ControlSubsystem, ...
+                    const identifiers = identifierPart.split(',').map(id => id.trim());
+                    for (const identifier of identifiers) {
+                        if (identifier && /^[A-Za-z_][A-Za-z0-9_]*$/.test(identifier)) {
+                            console.log(`[DEBUG] Adding import: ${keyword} ${identifier}`);
+                            imports.push({
+                                keyword,
+                                identifier,
+                                location,
+                                range
+                            });
+                        }
+                    }
                 }
             }
         }
@@ -1323,7 +1437,7 @@ export class SymbolManager {
                 this.workspaceIndex.fileToHeaders.clear();
 
                 // Find all Sylang files in workspace
-                const sylangFiles = await vscode.workspace.findFiles('**/*.{fml,fun,sys,ple,vml,haz,rsk,sgl,req,sub,blk}');
+                const sylangFiles = await vscode.workspace.findFiles('**/*.{fml,fun,sys,ple,vml,haz,rsk,sgl,req,blk}');
                 
                 for (let i = 0; i < sylangFiles.length; i++) {
                     const fileUri = sylangFiles[i];
@@ -1351,14 +1465,34 @@ export class SymbolManager {
             const fileHeaders: string[] = [];
             const childSymbols: string[] = [];
 
+            console.log(`[DEBUG] Processing file: ${fileUri.fsPath} (${lines.length} lines)`);
+
             for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-                const line = lines[lineIndex].trim();
+                const originalLine = lines[lineIndex];
+                const line = originalLine.trim();
                 
-                // Find header definitions (def keyword identifier)
-                const headerMatch = line.match(/^def\s+(systemfeatures|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals|functionalsafetyrequirements|subsystem|component)\s+([A-Za-z0-9_]+)/);
+                // Find header definitions (def keyword identifier OR def block type identifier)
+                let headerMatch = line.match(/^def\s+(featureset|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals|functionalsafetyrequirements)\s+([A-Za-z0-9_]+)/);
+                let keyword: string = '';
+                let identifier: string = '';
+                
                 if (headerMatch) {
-                    const keyword = headerMatch[1];
-                    const identifier = headerMatch[2];
+                    // Traditional headers: def featureset CoreFeatures
+                    keyword = headerMatch[1];
+                    identifier = headerMatch[2];
+                } else {
+                    // Block headers: def block subsystem PowerSubsystem
+                    const blockMatch = line.match(/^def\s+block\s+(system|subsystem|component|subcomponent|module|submodule|unit|subunit|assembly|subassembly|circuit|part)\s+([A-Za-z0-9_]+)/);
+                    if (blockMatch) {
+                        keyword = blockMatch[1]; // subsystem, component, etc.
+                        identifier = blockMatch[2]; // PowerSubsystem, etc.
+                    }
+                    // NO continue statement - let it fall through to child detection
+                }
+                
+                // Process header if found
+                if (keyword && identifier) {
+                    console.log(`[DEBUG] Found header '${identifier}' (${keyword}) in file ${fileUri.fsPath}`);
                     
                     const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
                     const location = new vscode.Location(fileUri, range);
@@ -1383,12 +1517,30 @@ export class SymbolManager {
                 }
 
                 // Find child definitions under headers
-                const childMatch = line.match(/^\s+def\s+\w+\s+([A-Za-z0-9_]+)/);
-                if (childMatch) {
-                    const childIdentifier = childMatch[1];
-                    childSymbols.push(childIdentifier);
-                    this.workspaceIndex.symbolToFile.set(childIdentifier, fileUri.toString());
+                // For traditional files (non-.blk): look for nested def statements
+                if (!fileUri.fsPath.endsWith('.blk')) {
+                    console.log(`[DEBUG] Checking line ${lineIndex} for child symbols: "${originalLine}"`);
+                    // Check for indented def statements (original line, not trimmed)
+                    const childMatch = originalLine.match(/^\s+def\s+\w+\s+([A-Za-z0-9_]+)/);
+                    if (childMatch) {
+                        const childIdentifier = childMatch[1];
+                        console.log(`[DEBUG] Found child symbol '${childIdentifier}' in file ${fileUri.fsPath}`);
+                        childSymbols.push(childIdentifier);
+                        this.workspaceIndex.symbolToFile.set(childIdentifier, fileUri.toString());
+                    } else if (line.startsWith('def ') && line.includes('function ')) {
+                        // More permissive fallback check for any def function
+                        const fallbackMatch = line.match(/^def\s+function\s+([A-Za-z0-9_]+)/);
+                        if (fallbackMatch) {
+                            const childIdentifier = fallbackMatch[1];
+                            console.log(`[DEBUG] Found child symbol (fallback) '${childIdentifier}' in file ${fileUri.fsPath}`);
+                            childSymbols.push(childIdentifier);
+                            this.workspaceIndex.symbolToFile.set(childIdentifier, fileUri.toString());
+                        }
+                    }
+                } else {
+                    console.log(`[DEBUG] Skipping .blk file line ${lineIndex}: "${originalLine}"`);
                 }
+                // For .blk files: the header identifier IS the symbol (no child symbols)
             }
 
             // Update child symbols for headers in this file
@@ -1396,6 +1548,7 @@ export class SymbolManager {
                 const headerDef = this.workspaceIndex.headerDefinitions.get(headerId);
                 if (headerDef) {
                     headerDef.childSymbols = childSymbols;
+                    console.log(`[DEBUG] Updated header '${headerId}' with child symbols:`, childSymbols);
                 }
             }
 
@@ -1432,29 +1585,38 @@ export class SymbolManager {
      * Check if a symbol is available in the given document (either defined locally or imported)
      */
     public isSymbolAvailable(symbolName: string, documentUri: string): boolean {
-        // Check if symbol is defined locally
-        const localSymbols = this.workspaceSymbols.get(documentUri) || [];
-        if (localSymbols.some(sym => sym.name === symbolName)) {
-            return true;
-        }
-
+        // STRICT IMPORT SYSTEM: Only check imports, no local workspace fallback
+        
         // Check if symbol is imported
         const imports = this.getDocumentImports(documentUri);
+        console.log(`[DEBUG] Checking symbol '${symbolName}' with imports:`, imports.map(i => `${i.keyword} ${i.identifier}`));
+        
         for (const importStmt of imports) {
             const headerDef = this.workspaceIndex.headerDefinitions.get(importStmt.identifier);
             if (headerDef) {
+                console.log(`[DEBUG] Found header '${importStmt.identifier}' with childSymbols:`, headerDef.childSymbols);
                 // Check selective imports
                 if (importStmt.selectiveImports) {
                     if (importStmt.selectiveImports.includes(symbolName)) {
+                        console.log(`[DEBUG] Symbol '${symbolName}' found in selective imports`);
                         return true;
                     }
                 } else {
-                    // Simple import - check all child symbols
-                    if (headerDef.childSymbols.includes(symbolName)) {
+                    // Simple import - check if symbol matches the header identifier OR is in child symbols
+                    if (importStmt.identifier === symbolName || headerDef.childSymbols.includes(symbolName)) {
+                        console.log(`[DEBUG] Symbol '${symbolName}' available via import '${importStmt.identifier}'`);
                         return true;
                     }
                 }
+            } else {
+                console.log(`[DEBUG] Header '${importStmt.identifier}' not found in workspace index`);
             }
+        }
+
+        // Check if symbol is defined locally in THIS document only (for block self-references)
+        const localSymbols = this.workspaceSymbols.get(documentUri) || [];
+        if (localSymbols.some(sym => sym.name === symbolName && sym.location.uri.toString() === documentUri)) {
+            return true;
         }
 
         return false;
@@ -1496,9 +1658,9 @@ export class SymbolManager {
     /**
      * Validate imports in a document
      */
-    public validateImports(documentUri: string): { errors: string[]; warnings: string[] } {
-        const errors: string[] = [];
-        const warnings: string[] = [];
+    public validateImports(documentUri: string): { errors: { message: string; range: vscode.Range }[]; warnings: { message: string; range: vscode.Range }[] } {
+        const errors: { message: string; range: vscode.Range }[] = [];
+        const warnings: { message: string; range: vscode.Range }[] = [];
         const imports = this.getDocumentImports(documentUri);
         const usedSymbols = new Set<string>();
 
@@ -1512,7 +1674,10 @@ export class SymbolManager {
             // Check if imported header exists
             const headerDef = this.workspaceIndex.headerDefinitions.get(importStmt.identifier);
             if (!headerDef) {
-                errors.push(`Import error: '${importStmt.identifier}' not found in workspace`);
+                errors.push({
+                    message: `Import error: '${importStmt.identifier}' not found in workspace`,
+                    range: importStmt.range
+                });
                 continue;
             }
 
@@ -1521,11 +1686,15 @@ export class SymbolManager {
             if (importStmt.selectiveImports) {
                 importUsed = importStmt.selectiveImports.some(sym => usedSymbols.has(sym));
             } else {
-                importUsed = headerDef.childSymbols.some(sym => usedSymbols.has(sym));
+                // Check if header identifier itself is used OR any child symbols are used
+                importUsed = usedSymbols.has(importStmt.identifier) || headerDef.childSymbols.some(sym => usedSymbols.has(sym));
             }
 
             if (!importUsed) {
-                warnings.push(`Unused import: '${importStmt.identifier}'`);
+                warnings.push({
+                    message: `Unused import: '${importStmt.identifier}'`,
+                    range: importStmt.range
+                });
             }
         }
 

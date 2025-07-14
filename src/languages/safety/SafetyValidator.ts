@@ -67,8 +67,11 @@ export class SafetyValidator {
                         if (keyword === 'operationalscenarios') hasOperationalScenarios = true;
                         if (keyword === 'safetyconcept') hasSafetyConcept = true;
                     }
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.itm files must start with "def item <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.itm files must start with "def item <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }
@@ -182,7 +185,7 @@ export class SafetyValidator {
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'item': return ['name', 'description', 'owner', 'reviewers', 'productline', 'systemfeatures', 'systemfunctions'];
+            case 'item': return ['name', 'description', 'owner', 'reviewers', 'productline', 'featureset', 'functiongroup'];
             case 'scenario': return ['description', 'vehiclestate', 'environment', 'driverstate'];
             case 'condition': return ['range', 'impact', 'standard'];
             case 'vehiclestate': return ['description', 'characteristics'];
@@ -192,6 +195,7 @@ export class SafetyValidator {
             case 'assumption':
             case 'misuse': return ['description'];
             case 'boundary': return ['description'];
+            case 'featureset': return ['description'];
             default: return [];
         }
     }
@@ -224,8 +228,7 @@ export class SafetyValidator {
                 this.validateQuotedList(diagnostics, lineIndex, line, keyword);
                 break;
             case 'productline':
-            case 'systemfeatures':
-            case 'systemfunctions':
+            case 'functiongroup':
             case 'vehiclestate':
             case 'environment':
             case 'driverstate':
@@ -235,6 +238,9 @@ export class SafetyValidator {
                 if (!line.match(/^conditions\s+[A-Za-z0-9_]+(,\s*[A-Za-z0-9_]+)*$/)) {
                     this.addError(diagnostics, lineIndex, 'conditions must be a comma-separated list of identifiers: conditions ID1, ID2');
                 }
+                break;
+            case 'featureset':
+                this.validateQuotedString(diagnostics, lineIndex, line, keyword);
                 break;
             default:
                 this.addError(diagnostics, lineIndex, `Invalid property "${keyword}" in ${context}`);

@@ -51,8 +51,11 @@ export class RiskValidator {
                     }
                     contextStack = ['riskassessment'];
                     hasRiskAssessment = true;
+                } else if (trimmedLine.startsWith('use ')) {
+                    // Allow import statements at root level - skip validation for now
+                    continue;
                 } else {
-                    this.addError(diagnostics, lineIndex, '.rsk files must start with "def riskassessment <identifier>"');
+                    this.addError(diagnostics, lineIndex, '.rsk files must start with "def riskassessment <identifier>" (imports with "use" keyword are allowed before)');
                 }
                 continue;
             }

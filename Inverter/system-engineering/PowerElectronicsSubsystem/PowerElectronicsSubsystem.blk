@@ -1,4 +1,4 @@
-def subsystem PowerElectronicsSubsystem
+def block subsystem PowerElectronicsSubsystem
   name "Power Electronics Subsystem"
   description "Handles DC to AC power conversion using IGBTs and switching circuits."
   owner "Power Electronics Team"

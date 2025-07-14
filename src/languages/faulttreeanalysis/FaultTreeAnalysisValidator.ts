@@ -126,11 +126,11 @@ export class FaultTreeAnalysisValidator extends BaseValidator {
         else if (trimmedLine.startsWith('productline ')) {
             this.validateCrossReferenceProperty(lineIndex, trimmedLine, 'productline', '.ple');
         }
-        else if (trimmedLine.startsWith('systemfeatures ')) {
-            this.validateCrossReferenceProperty(lineIndex, trimmedLine, 'systemfeatures', '.fml');
+        else if (trimmedLine.startsWith('featureset ')) {
+            this.validateCrossReferenceProperty(lineIndex, trimmedLine, 'featureset', '.fml');
         }
-        else if (trimmedLine.startsWith('systemfunctions ')) {
-            this.validateCrossReferenceProperty(lineIndex, trimmedLine, 'systemfunctions', '.fun');
+        else if (trimmedLine.startsWith('functiongroup ')) {
+            this.validateCrossReferenceProperty(lineIndex, trimmedLine, 'functiongroup', '.fun');
         }
     }
 
