@@ -2,6 +2,27 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.62] - 2025-01-15
+
+### Changed
+- **Streamlined Commands**: Removed unused/redundant commands for cleaner implementation
+- Kept only 3 essential commands: `🤖 Create Sylang Rules`, `Validate Workspace`, `Refresh Symbols`
+- Removed context menus and obsolete command palette entries
+- Cleaned up file extension detection in isSylangDocument() method
+
+### Removed
+- `Validate Sylang File` (redundant with real-time validation)
+- `Format Sylang File` (redundant with real-time formatting)  
+- `🚀 Generate Sylang Project` (unimplemented)
+- `📊 Analyze .ple/.fml Files` (unimplemented)
+- `✅ Validate All .ple/.fml Files` (unimplemented)
+- All context menu entries and submenus
+
+### Technical Details
+- Simplified package.json commands section
+- Removed obsolete file extensions (.sub, .cmp, .mod, .prt, .ckt, .asm, .fsr)
+- Focused implementation on working core features only
+
 ## [1.0.61] - 2025-01-14
 
 ### Fixed
