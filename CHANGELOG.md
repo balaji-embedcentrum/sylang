@@ -2,6 +2,22 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.61] - 2025-01-14
+
+### Fixed
+- **BREAKING: Complete Language Consistency**
+  - **Replaced 'asil' with 'safetylevel'**: Updated all validators, syntax highlighting, and sample files to use unified `safetylevel` keyword
+  - **Removed 'functionalsafetyrequirements'**: Completely eliminated this keyword from all validators, configs, syntax files, and snippets
+  - **Updated Sample Files**: All Inverter example files now use correct `safetylevel ASIL-A/B/C/D/QM` syntax
+  - **Fixed Syntax Highlighting**: Updated all .tmGrammar.json files to highlight `safetylevel` instead of `asil`
+  - **Validator Updates**: 15+ validator files updated to properly validate `safetylevel` with ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM values
+  - **Documentation Updates**: Removed .fsr references and functionalsafetyrequirements from guides
+
+### Enhanced
+- **Consistent Safety Level Validation**: All safety levels now use unified ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM format
+- **Future-Ready Architecture**: `safetylevel` keyword supports additional safety standards beyond ASIL
+- **Cleaner Codebase**: Removed inconsistent keywords and unified language specification
+
 ## [1.0.60] - 2025-01-14
 
 ### Changed
