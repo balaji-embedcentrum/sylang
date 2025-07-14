@@ -7,6 +7,7 @@
     { "include": "#keywords" },
     { "include": "#strings" },
     { "include": "#safety-levels" },
+    { "include": "#partof-values" },
     { "include": "#attributes" }
   ],
   "repository": {
@@ -28,11 +29,11 @@
       "patterns": [
         {
           "name": "keyword.control.sylang",
-          "match": "\\b(systemfunctions|function)\\b"
+          "match": "\\b(def|functiongroup|function)\\b"
         },
         {
           "name": "keyword.other.sylang",
-          "match": "\\b(name|description|owner|tags|enables)\\b"
+          "match": "\\b(name|description|owner|tags|enables|partof|asil|feature)\\b"
         }
       ]
     },
@@ -40,11 +41,15 @@
       "patterns": [
         {
           "name": "constant.language.safety-level.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM)\\b"
-        },
+          "match": "\\b([ABCD]|QM)\\b"
+        }
+      ]
+    },
+    "partof-values": {
+      "patterns": [
         {
-          "name": "keyword.other.safety.sylang",
-          "match": "\\b(safetylevel)\\b"
+          "name": "constant.language.partof-value.sylang",
+          "match": "\\b(system|subsystem|component|module|unit|assembly|circuit|part)\\b"
         }
       ]
     },

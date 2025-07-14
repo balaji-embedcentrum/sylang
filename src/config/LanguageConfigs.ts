@@ -24,7 +24,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
     'sylang-functions': {
         id: 'sylang-functions',
         aliases: ['Sylang Functions', 'sylang-fun'],
-        extensions: ['.fun', '.fma'],
+        extensions: ['.fun'],
         keywords: [
             'def', 'functiongroup', 'function', 'name', 'description', 'category', 'owner', 
             'tags', 'asil', 'partof', 'enables', 'allocatedto', 'feature'
@@ -33,6 +33,51 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         validationRules: ['required-fields', 'safety-levels', 'function-structure', 'def-keyword'],
         validPropertyValues: {
             'partof': ['product', 'system', 'subsystem', 'component', 'module', 'unit', 'assembly', 'circuit', 'part'],
+            'asil': ['QM', 'A', 'B', 'C', 'D']
+        }
+    },
+    'sylang-failuremodeanalysis': {
+        id: 'sylang-failuremodeanalysis',
+        aliases: ['Sylang Failure Mode Analysis', 'sylang-fma'],
+        extensions: ['.fma'],
+        keywords: [
+            'def', 'failuremodeanalysis', 'failuremode', 'name', 'description', 'in', 'function',
+            'severity', 'occurrence', 'detection', 'rpn', 'auto', 'actionpriority', 'asil',
+            'causes', 'effects', 'mitigation', 'high', 'medium', 'low'
+        ],
+        snippetFile: 'failuremodeanalysis.json',
+        validationRules: ['required-fields', 'safety-levels', 'failure-mode-structure', 'def-keyword'],
+        validPropertyValues: {
+            'actionpriority': ['high', 'medium', 'low'],
+            'asil': ['QM', 'A', 'B', 'C', 'D']
+        }
+    },
+    'sylang-failuremodecontrols': {
+        id: 'sylang-failuremodecontrols',
+        aliases: ['Sylang Failure Mode Controls', 'sylang-fmc'],
+        extensions: ['.fmc'],
+        keywords: [
+            'def', 'controlmeasures', 'prevention', 'detection', 'mitigation', 'name', 'description',
+            'implementation', 'verification', 'responsibility', 'scope', 'effectiveness', 'cost',
+            'complexity', 'frequency', 'detecttime', 'responsetime', 'coverage', 'independence',
+            'maturity', 'asil', 'detectionrating', 'occurrencereduction', 'severityreduction',
+            'diagnosticcoverage', 'depends', 'measure', 'internal', 'external', 'high', 'medium',
+            'low', 'simple', 'moderate', 'complex', 'continuous', 'periodic', 'monthly', 'quarterly',
+            'immediate', 'delayed', 'complete', 'partial', 'mature', 'developing', 'research'
+        ],
+        snippetFile: 'failuremodecontrols.json',
+        validationRules: ['required-fields', 'safety-levels', 'control-measures-structure', 'def-keyword'],
+        validPropertyValues: {
+            'scope': ['internal', 'external'],
+            'effectiveness': ['high', 'medium', 'low'],
+            'cost': ['low', 'medium', 'high'],
+            'complexity': ['simple', 'moderate', 'complex'],
+            'frequency': ['continuous', 'periodic', 'monthly', 'quarterly'],
+            'detecttime': ['immediate', 'delayed'],
+            'responsetime': ['immediate', 'delayed'],
+            'coverage': ['complete', 'partial'],
+            'independence': ['high', 'medium', 'low'],
+            'maturity': ['mature', 'developing', 'research'],
             'asil': ['QM', 'A', 'B', 'C', 'D']
         }
     },

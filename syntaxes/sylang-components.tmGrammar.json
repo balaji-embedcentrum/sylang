@@ -40,7 +40,7 @@
     "definition-keywords": {
       "patterns": [
         {
-          "match": "\\b(reqsection|requirement|component|subsystem|assembly|circuit|module)\\b",
+          "match": "\\b(reqsection|requirement|component|subsystem|assembly|circuit|module|unit|part)\\b",
           "name": "entity.name.type.definition.sylang"
         }
       ]
@@ -48,7 +48,7 @@
     "reference-keywords": {
       "patterns": [
         {
-          "match": "\\b(safetygoal|subsystem|feature|function)\\b",
+          "match": "\\b(safetygoal|system|subsystem|component|module|unit|assembly|circuit|part|feature|function)\\b",
           "name": "variable.other.reference.sylang"
         }
       ]

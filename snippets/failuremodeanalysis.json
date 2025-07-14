@@ -1,0 +1,315 @@
+{
+  "Failure Mode Analysis": {
+    "prefix": "failuremodeanalysis",
+    "body": [
+      "def failuremodeanalysis ${1:AnalysisName}",
+      "  ",
+      "  // ========== ${2:FAILURE CATEGORY} ==========",
+      "  ",
+      "  def failuremode ${3:FailureModeIdentifier}",
+      "    name \"${4:Failure Mode Name}\"",
+      "    description \"${5:Detailed description of the failure mode}\"",
+      "    in function ${6:FunctionName}",
+      "    severity ${7:8}",
+      "    occurrence ${8:3}",
+      "    detection ${9:4}",
+      "    rpn ${10:auto}",
+      "    actionpriority ${11:high}",
+      "    asil ${12:D}",
+      "    causes failuremode ${13:CauseFailureMode1}, ${14:CauseFailureMode2}",
+      "    effects failuremode ${15:EffectFailureMode1}, ${16:EffectFailureMode2}",
+      "    detection ${17:DetectionControl1}, ${18:DetectionControl2}",
+      "    mitigation ${19:MitigationControl1}, ${20:MitigationControl2}",
+      "  ",
+      "  $0"
+    ],
+    "description": "Complete failure mode analysis template"
+  },
+  "Failure Mode": {
+    "prefix": "failuremode",
+    "body": [
+      "def failuremode ${1:FailureModeIdentifier}",
+      "  name \"${2:Failure Mode Name}\"",
+      "  description \"${3:Detailed description of the failure mode}\"",
+      "  in function ${4:FunctionName}",
+      "  severity ${5:8}",
+      "  occurrence ${6:3}",
+      "  detection ${7:4}",
+      "  rpn ${8:auto}",
+      "  actionpriority ${9:high}",
+      "  asil ${10:D}",
+      "  causes failuremode ${11:CauseFailureMode1}, ${12:CauseFailureMode2}",
+      "  effects failuremode ${13:EffectFailureMode1}, ${14:EffectFailureMode2}",
+      "  detection ${15:DetectionControl1}, ${16:DetectionControl2}",
+      "  mitigation ${17:MitigationControl1}, ${18:MitigationControl2}",
+      "  $0"
+    ],
+    "description": "Failure mode definition template"
+  },
+  "High Severity Failure Mode": {
+    "prefix": "failuremode-high",
+    "body": [
+      "def failuremode ${1:HighSeverityFailure}",
+      "  name \"${2:High Severity Failure Mode}\"",
+      "  description \"${3:Critical failure mode with high severity impact}\"",
+      "  in function ${4:CriticalFunction}",
+      "  severity 9",
+      "  occurrence ${5:2}",
+      "  detection ${6:3}",
+      "  rpn auto",
+      "  actionpriority high",
+      "  asil D",
+      "  causes failuremode ${7:RootCause1}, ${8:RootCause2}",
+      "  effects failuremode ${9:SystemFailure1}, ${10:SafetyHazard1}",
+      "  detection ${11:SafetyMonitor1}, ${12:DiagnosticCheck1}",
+      "  mitigation ${13:SafetyMechanism1}, ${14:EmergencyShutdown1}",
+      "  $0"
+    ],
+    "description": "High severity failure mode template"
+  },
+  "Medium Severity Failure Mode": {
+    "prefix": "failuremode-medium",
+    "body": [
+      "def failuremode ${1:MediumSeverityFailure}",
+      "  name \"${2:Medium Severity Failure Mode}\"",
+      "  description \"${3:Moderate failure mode with medium severity impact}\"",
+      "  in function ${4:StandardFunction}",
+      "  severity 6",
+      "  occurrence ${5:4}",
+      "  detection ${6:5}",
+      "  rpn auto",
+      "  actionpriority medium",
+      "  asil B",
+      "  causes failuremode ${7:ComponentFailure1}, ${8:InterfaceFailure1}",
+      "  effects failuremode ${9:DegradedPerformance1}, ${10:FunctionalLoss1}",
+      "  detection ${11:PerformanceMonitor1}, ${12:StatusCheck1}",
+      "  mitigation ${13:BackupSystem1}, ${14:GracefulDegradation1}",
+      "  $0"
+    ],
+    "description": "Medium severity failure mode template"
+  },
+  "Low Severity Failure Mode": {
+    "prefix": "failuremode-low",
+    "body": [
+      "def failuremode ${1:LowSeverityFailure}",
+      "  name \"${2:Low Severity Failure Mode}\"",
+      "  description \"${3:Minor failure mode with low severity impact}\"",
+      "  in function ${4:AuxiliaryFunction}",
+      "  severity 3",
+      "  occurrence ${5:6}",
+      "  detection ${6:7}",
+      "  rpn auto",
+      "  actionpriority low",
+      "  asil QM",
+      "  causes failuremode ${7:MinorComponentFailure1}, ${8:WearOut1}",
+      "  effects failuremode ${9:MinorDegradation1}, ${10:UserInconvenience1}",
+      "  detection ${11:BasicMonitoring1}, ${12:UserFeedback1}",
+      "  mitigation ${13:Maintenance1}, ${14:UserNotification1}",
+      "  $0"
+    ],
+    "description": "Low severity failure mode template"
+  },
+  "Name Property": {
+    "prefix": "name",
+    "body": [
+      "name \"${1:Failure Mode Name}\"$0"
+    ],
+    "description": "Name property for failure mode"
+  },
+  "Description Property": {
+    "prefix": "description",
+    "body": [
+      "description \"${1:Detailed description of the failure mode and its impact}\"$0"
+    ],
+    "description": "Description property for failure mode"
+  },
+  "In Function Property": {
+    "prefix": "in-function",
+    "body": [
+      "in function ${1:FunctionName}$0"
+    ],
+    "description": "Function reference property"
+  },
+  "Severity Property": {
+    "prefix": "severity",
+    "body": [
+      "severity ${1:8}$0"
+    ],
+    "description": "Severity rating (1-10)"
+  },
+  "Occurrence Property": {
+    "prefix": "occurrence",
+    "body": [
+      "occurrence ${1:3}$0"
+    ],
+    "description": "Occurrence rating (1-10)"
+  },
+  "Detection Property (Numeric)": {
+    "prefix": "detection-numeric",
+    "body": [
+      "detection ${1:4}$0"
+    ],
+    "description": "Detection rating (1-10)"
+  },
+  "Detection Property (Controls)": {
+    "prefix": "detection-controls",
+    "body": [
+      "detection ${1:DetectionControl1}, ${2:DetectionControl2}$0"
+    ],
+    "description": "Detection controls list"
+  },
+  "RPN Auto": {
+    "prefix": "rpn-auto",
+    "body": [
+      "rpn auto$0"
+    ],
+    "description": "Auto-calculated RPN"
+  },
+  "RPN Manual": {
+    "prefix": "rpn-manual",
+    "body": [
+      "rpn ${1:96}$0"
+    ],
+    "description": "Manual RPN value"
+  },
+  "Action Priority High": {
+    "prefix": "actionpriority-high",
+    "body": [
+      "actionpriority high$0"
+    ],
+    "description": "High action priority"
+  },
+  "Action Priority Medium": {
+    "prefix": "actionpriority-medium",
+    "body": [
+      "actionpriority medium$0"
+    ],
+    "description": "Medium action priority"
+  },
+  "Action Priority Low": {
+    "prefix": "actionpriority-low",
+    "body": [
+      "actionpriority low$0"
+    ],
+    "description": "Low action priority"
+  },
+  "ASIL D": {
+    "prefix": "asil-d",
+    "body": [
+      "asil D$0"
+    ],
+    "description": "ASIL D (highest safety level)"
+  },
+  "ASIL C": {
+    "prefix": "asil-c",
+    "body": [
+      "asil C$0"
+    ],
+    "description": "ASIL C safety level"
+  },
+  "ASIL B": {
+    "prefix": "asil-b",
+    "body": [
+      "asil B$0"
+    ],
+    "description": "ASIL B safety level"
+  },
+  "ASIL A": {
+    "prefix": "asil-a",
+    "body": [
+      "asil A$0"
+    ],
+    "description": "ASIL A safety level"
+  },
+  "ASIL QM": {
+    "prefix": "asil-qm",
+    "body": [
+      "asil QM$0"
+    ],
+    "description": "ASIL QM (quality management)"
+  },
+  "Causes Property": {
+    "prefix": "causes",
+    "body": [
+      "causes failuremode ${1:CauseFailureMode1}, ${2:CauseFailureMode2}$0"
+    ],
+    "description": "Causes (underlying failure modes)"
+  },
+  "Effects Property": {
+    "prefix": "effects",
+    "body": [
+      "effects failuremode ${1:EffectFailureMode1}, ${2:EffectFailureMode2}$0"
+    ],
+    "description": "Effects (overlying failure modes)"
+  },
+  "Mitigation Property": {
+    "prefix": "mitigation",
+    "body": [
+      "mitigation ${1:MitigationControl1}, ${2:MitigationControl2}$0"
+    ],
+    "description": "Mitigation controls"
+  },
+  "Complete Motor Control Failure": {
+    "prefix": "motor-control-failure",
+    "body": [
+      "def failuremode ${1:MotorControlFailure}",
+      "  name \"Motor Control System Failure\"",
+      "  description \"Motor control system fails to provide proper control signals\"",
+      "  in function ${2:MotorControlFunction}",
+      "  severity 9",
+      "  occurrence 3",
+      "  detection 4",
+      "  rpn auto",
+      "  actionpriority high",
+      "  asil D",
+      "  causes failuremode ${3:PowerSupplyFailure}, ${4:ControllerFailure}, ${5:SensorFailure}",
+      "  effects failuremode ${6:ActuatorFailure}, ${7:SystemShutdown}, ${8:SafetyHazard}",
+      "  detection ${9:CurrentMonitoring}, ${10:PositionFeedback}, ${11:VoltageMonitoring}",
+      "  mitigation ${12:BackupController}, ${13:EmergencyStop}, ${14:SafeMode}",
+      "  $0"
+    ],
+    "description": "Complete motor control failure template"
+  },
+  "Communication Failure": {
+    "prefix": "communication-failure",
+    "body": [
+      "def failuremode ${1:CommunicationFailure}",
+      "  name \"Communication Interface Failure\"",
+      "  description \"Communication interface fails to transmit or receive data\"",
+      "  in function ${2:CommunicationFunction}",
+      "  severity 7",
+      "  occurrence 4",
+      "  detection 5",
+      "  rpn auto",
+      "  actionpriority medium",
+      "  asil B",
+      "  causes failuremode ${3:NetworkFailure}, ${4:ProtocolError}, ${5:HardwareFailure}",
+      "  effects failuremode ${6:DataLoss}, ${7:CommandTimeout}, ${8:SystemIsolation}",
+      "  detection ${9:HeartbeatMonitoring}, ${10:ChecksumValidation}, ${11:TimeoutDetection}",
+      "  mitigation ${12:RetryMechanism}, ${13:AlternativeChannel}, ${14:SafeDefault}",
+      "  $0"
+    ],
+    "description": "Communication failure template"
+  },
+  "Sensor Failure": {
+    "prefix": "sensor-failure",
+    "body": [
+      "def failuremode ${1:SensorFailure}",
+      "  name \"Sensor Reading Failure\"",
+      "  description \"Sensor fails to provide accurate measurements\"",
+      "  in function ${2:SensingFunction}",
+      "  severity 6",
+      "  occurrence 5",
+      "  detection 3",
+      "  rpn auto",
+      "  actionpriority medium",
+      "  asil C",
+      "  causes failuremode ${3:SensorDrift}, ${4:WiringFailure}, ${5:EnvironmentalDamage}",
+      "  effects failuremode ${6:IncorrectControl}, ${7:SystemInstability}, ${8:SafetyTrigger}",
+      "  detection ${9:PlausibilityCheck}, ${10:CrossValidation}, ${11:SelfDiagnostic}",
+      "  mitigation ${12:BackupSensor}, ${13:DefaultValue}, ${14:SafetyShutdown}",
+      "  $0"
+    ],
+    "description": "Sensor failure template"
+  }
+} 

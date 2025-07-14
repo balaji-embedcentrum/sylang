@@ -113,15 +113,26 @@ export class SystemValidator {
 
     private validateTypedIdentifierList(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string, keyword: string): void {
         const value = line.substring(keyword.length).trim();
-        if (!value.startsWith('subsystem ')) {
-            this.addError(diagnostics, lineIndex, `${keyword} must start with 'subsystem ' followed by comma-separated identifiers`);
+        const validSecondaryKeywords = ['subsystem', 'component', 'module', 'unit', 'assembly', 'circuit', 'part'];
+        
+        // Check if it starts with a valid secondary keyword
+        const foundKeyword = validSecondaryKeywords.find(sk => value.startsWith(sk + ' '));
+        if (!foundKeyword) {
+            this.addError(diagnostics, lineIndex, `${keyword} must start with one of: ${validSecondaryKeywords.join(', ')} followed by comma-separated identifiers`);
             return;
         }
-        const listPart = value.split(' ').slice(1).join(' ');
+        
+        // Extract the identifier list after the secondary keyword
+        const listPart = value.substring(foundKeyword.length).trim();
+        if (!listPart) {
+            this.addError(diagnostics, lineIndex, `${keyword} ${foundKeyword} must be followed by comma-separated identifiers`);
+            return;
+        }
+        
         const identifiers = listPart.split(',').map(id => id.trim());
         for (const id of identifiers) {
             if (!/^[A-Z][A-Za-z0-9_]*$/.test(id)) {
-                this.addError(diagnostics, lineIndex, `Invalid identifier in ${keyword} list: "${id}". Use PascalCase`);
+                this.addError(diagnostics, lineIndex, `Invalid identifier in ${keyword} ${foundKeyword} list: "${id}". Use PascalCase`);
             }
         }
     }

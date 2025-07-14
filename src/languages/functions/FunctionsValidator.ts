@@ -22,9 +22,8 @@ export class FunctionsValidator extends BaseValidator {
         if (trimmedLine.startsWith('def functiongroup')) {
             await this.validateFunctiongroupDefinition(lineIndex, trimmedLine);
         }
-
-        // Validate def function syntax
-        if (trimmedLine.startsWith('def function')) {
+        // Validate def function syntax (but exclude functiongroup lines)
+        else if (trimmedLine.match(/^def\s+function\s+\w+/)) {
             await this.validateFunctionDefinition(lineIndex, trimmedLine);
         }
 
@@ -33,18 +32,23 @@ export class FunctionsValidator extends BaseValidator {
             await this.validatePartofProperty(lineIndex, trimmedLine);
         }
 
-        // Validate enables cross-file references to features
-        if (trimmedLine.includes('enables')) {
-            await this.validateEnablesReferences(document, lineIndex, line);
+        // Validate asil property
+        if (trimmedLine.startsWith('asil ')) {
+            await this.validateAsilProperty(lineIndex, trimmedLine);
+        }
+
+        // Validate enables feature cross-file references
+        if (trimmedLine.startsWith('enables feature')) {
+            await this.validateEnablesFeatureReferences(document, lineIndex, line);
         }
     }
 
     protected async validateDocumentLevelRules(document: vscode.TextDocument): Promise<void> {
+        // Check that file starts with def functiongroup
+        await this.validateFileStartsWithFunctiongroup(document);
+
         // Check for single functiongroup keyword in file
         await this.validateSingleFunctiongroupKeyword(document);
-
-        // Check for single .fun file in workspace
-        await this.validateSingleFunFileInWorkspace(document);
 
         // Validate functions-specific hierarchical indentation
         await this.validateFunctionsHierarchicalIndentation(document);
@@ -84,7 +88,7 @@ export class FunctionsValidator extends BaseValidator {
             const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'Invalid partof property. Expected format: partof <value>',
+                'Invalid partof property. Expected format: partof <type> <identifier>',
                 vscode.DiagnosticSeverity.Error
             );
             diagnostic.code = 'invalid-partof-property';
@@ -92,8 +96,8 @@ export class FunctionsValidator extends BaseValidator {
             return;
         }
 
-        const partofValue = partofMatch[1]?.trim();
-        if (!partofValue) {
+        const value = partofMatch[1]?.trim();
+        if (!value) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
@@ -105,17 +109,46 @@ export class FunctionsValidator extends BaseValidator {
             return;
         }
 
-        // Get valid partof enum values from language config
-        const validPartofValues = this.languageConfig.validPropertyValues?.['partof'] || [];
+        const validSecondaryKeywords = ['system', 'subsystem', 'component', 'module', 'unit', 'assembly', 'circuit', 'part'];
         
-        if (validPartofValues.length > 0 && !validPartofValues.includes(partofValue)) {
-            const range = new vscode.Range(lineIndex, trimmedLine.indexOf(partofValue), lineIndex, trimmedLine.indexOf(partofValue) + partofValue.length);
+        // Check if it starts with a valid secondary keyword
+        const foundKeyword = validSecondaryKeywords.find(sk => value.startsWith(sk + ' '));
+        if (!foundKeyword) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                `Invalid partof value '${partofValue}'. Valid values are: ${validPartofValues.join(', ')}`,
+                `partof must start with one of: ${validSecondaryKeywords.join(', ')} followed by identifier`,
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'invalid-partof-value';
+            diagnostic.code = 'invalid-partof-secondary-keyword';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+        
+        // Extract the identifier after the secondary keyword
+        const identifier = value.substring(foundKeyword.length).trim();
+        if (!identifier) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                `partof ${foundKeyword} must be followed by identifier`,
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'missing-partof-identifier';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+        
+        // Validate the identifier is PascalCase
+        if (!/^[A-Z][A-Za-z0-9_]*$/.test(identifier)) {
+            const identifierStart = trimmedLine.indexOf(identifier);
+            const range = new vscode.Range(lineIndex, identifierStart, lineIndex, identifierStart + identifier.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                `Invalid identifier "${identifier}" in partof ${foundKeyword} - should use PascalCase`,
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'invalid-partof-identifier';
             this.diagnostics.push(diagnostic);
         }
     }
@@ -145,6 +178,94 @@ export class FunctionsValidator extends BaseValidator {
             );
             diagnostic.code = 'invalid-function-name';
             this.diagnostics.push(diagnostic);
+        }
+    }
+
+    private async validateAsilProperty(lineIndex: number, trimmedLine: string): Promise<void> {
+        const asilMatch = trimmedLine.match(/^asil\s+(.+)$/);
+        if (!asilMatch) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                'Invalid asil property. Expected format: asil <level>',
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'invalid-asil-property';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+
+        const asilValue = asilMatch[1]?.trim();
+        if (!asilValue) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                'asil value is required',
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'missing-asil-value';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+
+        // Define valid ASIL levels
+        const validAsilValues = ['A', 'B', 'C', 'D', 'QM'];
+        
+        if (!validAsilValues.includes(asilValue)) {
+            const range = new vscode.Range(lineIndex, trimmedLine.indexOf(asilValue), lineIndex, trimmedLine.indexOf(asilValue) + asilValue.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                `Invalid asil value '${asilValue}'. Valid values are: ${validAsilValues.join(', ')}`,
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'invalid-asil-value';
+            this.diagnostics.push(diagnostic);
+        }
+    }
+
+    private async validateEnablesFeatureReferences(
+        document: vscode.TextDocument,
+        lineIndex: number,
+        line: string
+    ): Promise<void> {
+        const trimmedLine = line.trim();
+        
+        // Extract features from enables feature line: enables feature FeatureA, FeatureB, FeatureC
+        const enablesMatch = trimmedLine.match(/^enables\s+feature\s+(.+)$/);
+        if (!enablesMatch) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
+            const diagnostic = new vscode.Diagnostic(
+                range,
+                'Invalid enables syntax. Expected format: enables feature <FeatureList>',
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.code = 'invalid-enables-syntax';
+            this.diagnostics.push(diagnostic);
+            return;
+        }
+
+        const featuresText = enablesMatch[1];
+        if (!featuresText) return;
+        
+        const features = featuresText.split(',').map(f => f.trim());
+
+        // Get all defined features from .fml files in workspace
+        const definedFeatures = await this.getAllDefinedFeatures();
+
+        for (const feature of features) {
+            if (feature && !definedFeatures.includes(feature)) {
+                const featureStart = line.indexOf(feature);
+                if (featureStart !== -1) {
+                    const range = new vscode.Range(lineIndex, featureStart, lineIndex, featureStart + feature.length);
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Feature '${feature}' is not defined in any .fml file. Functions can only enable features defined in feature models.`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnostic.code = 'undefined-feature-reference';
+                    this.diagnostics.push(diagnostic);
+                }
+            }
         }
     }
 
@@ -214,6 +335,33 @@ export class FunctionsValidator extends BaseValidator {
         return features;
     }
 
+    private async validateFileStartsWithFunctiongroup(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        const lines = text.split('\n');
+        
+        // Find the first non-empty, non-comment line
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line) continue;
+            
+            const trimmedLine = line.trim();
+            if (trimmedLine.length === 0 || trimmedLine.startsWith('//')) continue;
+            
+            // This is the first meaningful line
+            if (!trimmedLine.startsWith('def functiongroup')) {
+                const range = new vscode.Range(i, 0, i, line.length);
+                const diagnostic = new vscode.Diagnostic(
+                    range,
+                    'Functions file must start with "def functiongroup" declaration',
+                    vscode.DiagnosticSeverity.Error
+                );
+                diagnostic.code = 'file-must-start-with-functiongroup';
+                this.diagnostics.push(diagnostic);
+            }
+            return; // We only check the first meaningful line
+        }
+    }
+
     private async validateSingleFunctiongroupKeyword(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
         const lines = text.split('\n');
@@ -255,28 +403,7 @@ export class FunctionsValidator extends BaseValidator {
         }
     }
 
-    private async validateSingleFunFileInWorkspace(document: vscode.TextDocument): Promise<void> {
-        try {
-            const files = await vscode.workspace.findFiles('**/*.fun', '**/node_modules/**');
-            const currentFile = document.uri.fsPath;
-            
-            if (files.length > 1) {
-                const otherFiles = files.filter(uri => uri.fsPath !== currentFile);
-                if (otherFiles.length > 0) {
-                    const range = new vscode.Range(0, 0, 0, 0);
-                    const diagnostic = new vscode.Diagnostic(
-                        range,
-                        `Multiple .fun files found in workspace. Only one .fun file is recommended per project. Found: ${files.map(f => vscode.workspace.asRelativePath(f)).join(', ')}`,
-                        vscode.DiagnosticSeverity.Warning
-                    );
-                    diagnostic.code = 'multiple-fun-files';
-                    this.diagnostics.push(diagnostic);
-                }
-            }
-        } catch (error) {
-            console.error('[FunctionsValidator] Error checking for multiple .fun files:', error);
-        }
-    }
+
 
     private async validateFunctionsHierarchicalIndentation(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
@@ -331,8 +458,8 @@ export class FunctionsValidator extends BaseValidator {
                 continue;
             }
             
-            // Check property indentation (name, description, owner, tags, safetylevel, enables)
-            const propertyMatch = trimmedLine.match(/^(name|description|owner|tags|safetylevel|enables)\s/);
+            // Check property indentation (name, description, owner, tags, partof, asil, enables)
+            const propertyMatch = trimmedLine.match(/^(name|description|owner|tags|partof|asil|enables)\s/);
             if (propertyMatch && propertyMatch[1]) {
                 if (functionStack.length === 0) {
                     this.addDiagnostic(i, 0, line.length, 'Property found outside of any function definition', 'property-outside-function');

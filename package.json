@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.33",
+  "version": "1.0.35",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -69,8 +69,29 @@
           "sylang-fun"
         ],
         "extensions": [
-          ".fun",
+          ".fun"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-failuremodeanalysis",
+        "aliases": [
+          "Sylang Failure Mode Analysis",
+          "sylang-fma"
+        ],
+        "extensions": [
           ".fma"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-failuremodecontrols",
+        "aliases": [
+          "Sylang Failure Mode Controls",
+          "sylang-fmc"
+        ],
+        "extensions": [
+          ".fmc"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -173,6 +194,17 @@
           ".asm"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-blocks",
+        "aliases": [
+          "Sylang Blocks",
+          "sylang-blk"
+        ],
+        "extensions": [
+          ".blk"
+        ],
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -185,6 +217,16 @@
         "language": "sylang-functions",
         "scopeName": "source.sylang.functions",
         "path": "./syntaxes/sylang-functions.tmGrammar.json"
+      },
+      {
+        "language": "sylang-failuremodeanalysis",
+        "scopeName": "source.sylang.failuremodeanalysis",
+        "path": "./syntaxes/sylang-failuremodeanalysis.tmGrammar.json"
+      },
+      {
+        "language": "sylang-failuremodecontrols",
+        "scopeName": "source.sylang.failuremodecontrols",
+        "path": "./syntaxes/sylang-failuremodecontrols.tmGrammar.json"
       },
       {
         "language": "sylang-features",
@@ -225,6 +267,11 @@
         "language": "sylang-mechanics",
         "scopeName": "source.sylang.mechanics",
         "path": "./syntaxes/sylang-mechanics.tmGrammar.json"
+      },
+      {
+        "language": "sylang-blocks",
+        "scopeName": "source.sylang.blocks",
+        "path": "./syntaxes/sylang-blocks.tmGrammar.json"
       }
     ],
     "snippets": [
@@ -235,6 +282,14 @@
       {
         "language": "sylang-functions",
         "path": "./snippets/functions.json"
+      },
+      {
+        "language": "sylang-failuremodeanalysis",
+        "path": "./snippets/failuremodeanalysis.json"
+      },
+      {
+        "language": "sylang-failuremodecontrols",
+        "path": "./snippets/failuremodecontrols.json"
       },
       {
         "language": "sylang-features",
@@ -267,6 +322,10 @@
       {
         "language": "sylang-mechanics",
         "path": "./snippets/mechanics.json"
+      },
+      {
+        "language": "sylang-blocks",
+        "path": "./snippets/blocks.json"
       }
     ],
     "commands": [

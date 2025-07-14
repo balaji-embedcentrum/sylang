@@ -178,7 +178,7 @@ class SylangExtension {
         
         const sylangExtensions = ['.ple', '.fml', '.fun', '.sub', '.cmp', '.req', 
                                  '.haz', '.rsk', '.fsr', '.itm', '.sgl', '.tra', '.thr', '.sgo', 
-                                 '.sre', '.ast', '.sec', '.mod', '.prt', '.ckt', '.asm'];
+                                 '.sre', '.ast', '.sec', '.mod', '.prt', '.ckt', '.asm', '.blk'];
         const hasSylangExtension = sylangExtensions.some(ext => document.fileName.endsWith(ext));
         console.log(`[Sylang] - Has Sylang extension: ${hasSylangExtension}`);
         
