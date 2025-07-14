@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -92,6 +92,17 @@
         ],
         "extensions": [
           ".fmc"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-faulttreeanalysis",
+        "aliases": [
+          "Sylang Fault Tree Analysis",
+          "sylang-fta"
+        ],
+        "extensions": [
+          ".fta"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -229,6 +240,11 @@
         "path": "./syntaxes/sylang-failuremodecontrols.tmGrammar.json"
       },
       {
+        "language": "sylang-faulttreeanalysis",
+        "scopeName": "source.faulttreeanalysis",
+        "path": "./syntaxes/sylang-faulttreeanalysis.tmGrammar.json"
+      },
+      {
         "language": "sylang-features",
         "scopeName": "source.sylang.features",
         "path": "./syntaxes/sylang-features.tmGrammar.json"
@@ -290,6 +306,10 @@
       {
         "language": "sylang-failuremodecontrols",
         "path": "./snippets/failuremodecontrols.json"
+      },
+      {
+        "language": "sylang-faulttreeanalysis",
+        "path": "./snippets/faulttreeanalysis.json"
       },
       {
         "language": "sylang-features",
@@ -378,14 +398,14 @@
       "explorer/context": [
         {
           "command": "sylang.validate",
-          "when": "resourceExtname =~ /\\.(ple|fun|fma|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
+          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
           "group": "sylang@1"
         }
       ],
       "editor/context": [
         {
           "submenu": "sylang.core.submenu",
-          "when": "resourceExtname =~ /\\.(ple|fun|fma|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
+          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
           "group": "sylang@1"
         }
       ],

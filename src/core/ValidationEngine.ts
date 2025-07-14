@@ -4,6 +4,7 @@ import { FeaturesValidator } from '../languages/features/FeaturesValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
 import { FailureModeAnalysisValidator } from '../languages/failuremodeanalysis/FailureModeAnalysisValidator';
 import { FailureModeControlsValidator } from '../languages/failuremodecontrols/FailureModeControlsValidator';
+import { FaultTreeAnalysisValidator } from '../languages/faulttreeanalysis/FaultTreeAnalysisValidator';
 import { SafetyValidator } from '../languages/safety/SafetyValidator';
 import { HazardValidator } from '../languages/safety/HazardValidator';
 import { RiskValidator } from '../languages/safety/RiskValidator';
@@ -50,6 +51,11 @@ export class ValidationEngine {
             const failureModeControlsConfig = getLanguageConfig('sylang-failuremodecontrols');
             if (failureModeControlsConfig) {
                 this.validators.set('sylang-failuremodecontrols', new FailureModeControlsValidator(failureModeControlsConfig));
+            }
+
+            const faultTreeAnalysisConfig = getLanguageConfig('sylang-faulttreeanalysis');
+            if (faultTreeAnalysisConfig) {
+                this.validators.set('sylang-faulttreeanalysis', new FaultTreeAnalysisValidator(faultTreeAnalysisConfig));
             }
 
             // For safety files, we'll handle them separately in validateDocument

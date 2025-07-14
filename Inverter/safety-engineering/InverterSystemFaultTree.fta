@@ -1,0 +1,131 @@
+def faulttree InverterSystemFaultTree
+	name "Automotive Inverter System - Fault Tree Analysis"
+	description "Top-level fault tree analysis for inverter system safety-critical functions per ISO 26262 and IEC 61025"
+	owner "Functional Safety Team"
+	reviewers "Systems Engineering", "Verification Team"
+	
+	# Standards compliance
+	standards "ISO 26262", "IEC 61025"
+	analysismethod "Deductive fault tree analysis"
+	
+	# Cross-references to existing safety files
+	item InverterItem
+	hazardidentification InverterHazards
+	riskassessment InverterRiskAssessment
+	safetygoals InverterSafetyGoals
+	productline AutomotiveInverter
+	systemfeatures InverterFeatures
+	systemfunctions InverterFunctions
+	
+	# Top event definition
+	topevent
+		def topevent InverterHazardousEvent
+			name "Inverter Hazardous Event"
+			description "Loss of inverter control leading to unintended torque delivery"
+			severity S3
+			asil D
+			probability 1.0e-6
+	
+	# Intermediate events
+	intermediateevents
+		def intermediateevent PowerElectronicsFailure
+			name "Power Electronics Failure"
+			description "Failure in power switching or control circuits"
+			category systematic
+			probability 1.0e-5
+		
+		def intermediateevent ControlSystemFailure
+			name "Control System Failure"
+			description "Failure in control algorithms or sensors"
+			category systematic
+			probability 1.0e-5
+		
+		def intermediateevent CommunicationFailure
+			name "Communication Failure"
+			description "Loss of communication with vehicle control systems"
+			category systematic
+			probability 1.0e-5
+	
+	# Basic events
+	basicevents
+		def basicevent IGBTFailure
+			name "IGBT Failure"
+			description "Insulated Gate Bipolar Transistor failure"
+			category random
+			probability 1.0e-4
+			dormancy low
+			exposuretime 1.0
+			repairtime 0.5
+		
+		def basicevent SensorFailure
+			name "Sensor Failure"
+			description "Position or current sensor failure"
+			category random
+			probability 1.0e-4
+			dormancy medium
+			exposuretime 1.0
+			repairtime 0.3
+		
+		def basicevent ProcessorFailure
+			name "Processor Failure"
+			description "Control processor hardware failure"
+			category random
+			probability 1.0e-5
+			dormancy none
+			exposuretime 1.0
+			repairtime 2.0
+		
+		def basicevent CANFailure
+			name "CAN Bus Failure"
+			description "CAN communication bus failure"
+			category random
+			probability 1.0e-4
+			dormancy high
+			exposuretime 1.0
+			repairtime 0.1
+	
+	# Logic gates
+	gates
+		def gate SystemLogicGate
+			name "System Logic Gate"
+			description "Top-level OR gate for system failure modes"
+			gatetype OR
+			inputs PowerElectronicsFailure, ControlSystemFailure, CommunicationFailure
+			outputs InverterHazardousEvent
+		
+		def gate PowerElectronicsGate
+			name "Power Electronics Gate"
+			description "AND gate for power electronics failure"
+			gatetype AND
+			inputs IGBTFailure, SensorFailure
+			outputs PowerElectronicsFailure
+		
+		def gate ControlSystemGate
+			name "Control System Gate"
+			description "OR gate for control system failure"
+			gatetype OR
+			inputs ProcessorFailure, SensorFailure
+			outputs ControlSystemFailure
+		
+		def gate CommunicationGate
+			name "Communication Gate"
+			description "Basic gate for communication failure"
+			gatetype NOT
+			inputs CANFailure
+			outputs CommunicationFailure
+	
+	# Transfer gates
+	transfers
+		def transfer PowerSubsystemTransfer
+			name "Transfer to Power Subsystem Fault Tree"
+			description "Transfer to detailed power subsystem fault tree analysis"
+			from PowerElectronicsFailure
+			to PowerSubsystemEvent
+			targetfta PowerSubsystemFaultTree
+		
+		def transfer ControlSubsystemTransfer
+			name "Transfer to Control Subsystem Fault Tree"
+			description "Transfer to detailed control subsystem fault tree analysis"
+			from ControlSystemFailure
+			to ControlSubsystemEvent
+			targetfta ControlSubsystemFaultTree 
