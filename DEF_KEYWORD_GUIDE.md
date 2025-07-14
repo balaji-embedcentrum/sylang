@@ -46,15 +46,8 @@ def systemfeatures EPBFeatures
 
 ### def function Files (.fun, .fma)
 ```sylang
-def systemfunctions EPB_Functions
+def functiongroup EPB_Functions
   description "Electronic Parking Brake System Functions"
-  partof ElectricParkingBrakeSystem  # Reference (no def)
-
-def def function ApplyParkingBrake
-  description "Apply parking brake when requested"
-  safetylevel ASIL-D
-  allocatedto EPB_Controller  # Reference (no def)
-  enables VehicleStability   # Reference (no def)
 ```
 
 ## Migration Guide
@@ -65,7 +58,7 @@ The extension will automatically detect and suggest adding `def` keywords to exi
 ### Manual Migration Steps
 1. **Product Line Files**: Add `def` before `productline`
 2. **Feature Files**: Add `def` before `systemfeatures` and each `feature`
-3. **def function Files**: Add `def` before `systemfunctions` and each `function`
+3. **def function Files**: Add `def` before `functiongroup` and each `function`
 
 ### Example Migration
 **Before:**

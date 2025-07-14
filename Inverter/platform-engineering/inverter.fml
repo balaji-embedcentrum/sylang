@@ -1,4 +1,4 @@
-def systemfeatures InverterFeatures
+def featureset InverterFeatures
 	def feature InverterSystem mandatory
 		name "Inverter System"
 		description "Root feature for automotive electric vehicle inverter system"

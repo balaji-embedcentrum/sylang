@@ -1,4 +1,4 @@
-def subsystem ThermalManagementSubsystem
+def block subsystem ThermalManagementSubsystem
   name "Thermal Management Subsystem"
   description "Provides cooling and temperature regulation for power components."
   owner "Thermal Team"

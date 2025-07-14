@@ -33,12 +33,12 @@ export abstract class BaseValidator {
         // Validate imports first
         const importValidation = this.symbolManager.validateImports(documentUri);
         if (importValidation.errors.length > 0) {
-            console.log(`[${this.languageConfig.id}] Import errors:`, importValidation.errors);
+            console.log(`[${this.languageConfig.id}] Import errors:`, importValidation.errors.map(e => e.message));
             // Convert import errors to diagnostics
             importValidation.errors.forEach(error => {
                 const diagnostic = new vscode.Diagnostic(
-                    new vscode.Range(0, 0, 0, 100),
-                    error,
+                    error.range,
+                    error.message,
                     vscode.DiagnosticSeverity.Error
                 );
                 diagnostic.code = 'import-error';
@@ -46,12 +46,12 @@ export abstract class BaseValidator {
             });
         }
         if (importValidation.warnings.length > 0) {
-            console.log(`[${this.languageConfig.id}] Import warnings:`, importValidation.warnings);
+            console.log(`[${this.languageConfig.id}] Import warnings:`, importValidation.warnings.map(w => w.message));
             // Convert import warnings to diagnostics  
             importValidation.warnings.forEach(warning => {
                 const diagnostic = new vscode.Diagnostic(
-                    new vscode.Range(0, 0, 0, 100),
-                    warning,
+                    warning.range,
+                    warning.message,
                     vscode.DiagnosticSeverity.Warning
                 );
                 diagnostic.code = 'import-warning';

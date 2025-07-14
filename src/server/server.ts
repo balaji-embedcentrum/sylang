@@ -20,12 +20,17 @@ import {
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { SafetyValidator } from '../languages/safety/SafetyValidator';
+import { TestValidator } from '../languages/test/TestValidator';
+import { SymbolManager } from '../core/SymbolManager';
+import { getLanguageConfigByExtension } from '../config/LanguageConfigs';
 
 // Create a connection for the server
 const connection = createConnection(ProposedFeatures.all);
 
-// Initialize safety validator
+// Initialize validators
+const symbolManager = new SymbolManager();
 const safetyValidator = new SafetyValidator();
+const testValidator = new TestValidator(getLanguageConfigByExtension('.tst')!, symbolManager);
 
 // Create a simple text document manager
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -50,12 +55,12 @@ const languageConfigs: Record<string, LanguageConfig> = {
     },
     'sylang-functions': {
         fileExtensions: ['.fun', '.fma'],
-        keywords: ['systemfunctions', 'function', 'name', 'description', 'owner', 'tags', 'safetylevel', 'enables'],
+        keywords: ['functiongroup', 'function', 'name', 'description', 'owner', 'tags', 'safetylevel', 'enables'],
         validators: [validateFunctions]
     },
     'sylang-features': {
         fileExtensions: ['.fml'],
-        keywords: ['systemfeatures', 'feature', 'mandatory', 'optional', 'alternative', 'or', 'name', 'description', 'owner', 'tags', 'safetylevel'],
+        keywords: ['featureset', 'feature', 'mandatory', 'optional', 'alternative', 'or', 'name', 'description', 'owner', 'tags', 'safetylevel'],
         validators: [validateFeatures]
     },
     'sylang-safety': {
@@ -87,6 +92,11 @@ const languageConfigs: Record<string, LanguageConfig> = {
         fileExtensions: ['.asm'],
         keywords: ['assembly', 'part', 'component', 'mechanism', 'actuator', 'sensor', 'bracket', 'housing', 'mounting', 'fastener', 'gear', 'spring', 'bearing', 'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 'material', 'dimensions', 'weight', 'tolerance', 'finish', 'coating', 'hardness', 'strength', 'temperature_range', 'pressure_rating', 'lifecycle', 'maintenance', 'steel', 'aluminum', 'plastic', 'rubber', 'titanium', 'carbon_fiber', 'stainless', 'anodized', 'painted', 'galvanized', 'static', 'dynamic', 'rotating', 'linear', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM'],
         validators: [validateMechanics]
+    },
+    'sylang-test': {
+        fileExtensions: ['.tst'],
+        keywords: ['def', 'testsuite', 'testcase', 'name', 'description', 'owner', 'tags', 'testtype', 'coverage', 'method', 'priority', 'asil', 'verifies', 'requirement', 'exercises', 'preconditions', 'teststeps', 'step', 'expectedresult', 'testresult', 'actualresult', 'executiontime', 'use', 'unit', 'integration', 'system', 'acceptance', 'regression', 'smoke', 'statement', 'branch', 'mcdc', 'function', 'manual', 'automated', 'hil', 'sil', 'mil', 'pil', 'pass', 'fail', 'pending', 'inconclusive', 'critical', 'high', 'medium', 'low', 'QM', 'A', 'B', 'C', 'D'],
+        validators: [validateTest]
     }
 };
 
@@ -317,11 +327,11 @@ function validateFunctions(document: TextDocument): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
     const text = document.getText();
     
-    if (!text.includes('systemfunctions')) {
+    if (!text.includes('functiongroup')) {
         diagnostics.push({
             severity: DiagnosticSeverity.Warning,
             range: { start: { line: 0, character: 0 }, end: { line: 0, character: 10 } },
-            message: 'Functions file should contain a systemfunctions declaration',
+            message: 'Functions file should contain a functiongroup declaration',
             source: 'Sylang'
         });
     }
@@ -498,7 +508,7 @@ function validateMechanics(document: TextDocument): Diagnostic[] {
 
     lines.forEach((line, lineNumber) => {
         // Validate assembly declarations
-        const assemblyMatch = line.match(/^\s*(assembly|part|component)\s+([A-Z][a-zA-Z0-9_]*)/);
+        const assemblyMatch = line.match(/^\s*(assembly|part)\s+([A-Z][a-zA-Z0-9_]*)/);
         if (assemblyMatch && assemblyMatch[2]) {
             const assemblyName = assemblyMatch[2];
             if (!/^[A-Z][a-zA-Z0-9_]*$/.test(assemblyName)) {
@@ -516,6 +526,42 @@ function validateMechanics(document: TextDocument): Diagnostic[] {
     });
 
     return diagnostics;
+}
+
+async function validateTest(document: TextDocument): Promise<Diagnostic[]> {
+    try {
+        // Convert TextDocument to vscode.TextDocument format
+        const vscodeDocument = {
+            uri: { fsPath: document.uri, path: document.uri, toString: () => document.uri },
+            getText: () => document.getText(),
+            lineAt: (line: number) => ({ text: document.getText().split('\n')[line] || '' }),
+            lineCount: document.getText().split('\n').length,
+            fileName: document.uri,
+            languageId: 'sylang-test'
+        } as any;
+        
+        const vscDiagnostics = await testValidator.validate(vscodeDocument);
+        
+        // Convert vscode diagnostics to language server protocol diagnostics
+        return vscDiagnostics.map(diag => ({
+            severity: diag.severity as DiagnosticSeverity,
+            range: {
+                start: { line: diag.range.start.line, character: diag.range.start.character },
+                end: { line: diag.range.end.line, character: diag.range.end.character }
+            },
+            message: diag.message,
+            source: diag.source || 'Sylang Test Validator',
+            code: diag.code as string
+        }));
+    } catch (error) {
+        console.error('[validateTest] Error:', error);
+        return [{
+            severity: DiagnosticSeverity.Error,
+            range: Range.create(0, 0, 0, 0),
+            message: `Test validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            source: 'Sylang Test Validator'
+        }];
+    }
 }
 
 // Helper functions
@@ -626,8 +672,9 @@ function getWordRangeAtPosition(line: string, character: number): { start: numbe
 function getKeywordDocumentation(word: string): string | null {
     const docs: Record<string, string> = {
         'productline': '**Product Line Definition**\n\nDefines a family of related products with shared and variable features.',
-        'systemfunctions': '**System Functions Container**\n\nContainer for defining system-level functions and their relationships.',
-        'systemfeatures': '**System Features Container**\n\nContainer for defining feature models with variability.',
+        'functiongroup': '**Function Group Container**\n\nContainer for defining functions regardless of hierarchy level. Replaces systemfunctions/subsystemfunctions.',
+        'systemfunctions': '**⚠️ Deprecated - System Functions Container**\n\n*This keyword is deprecated. Use `functiongroup` instead.*\n\nContainer for defining system-level functions and their relationships.',
+        'featureset': '**Featureset Container**\n\nContainer for defining feature models with variability.',
         'function': '**Function Definition**\n\nDefines a system function with properties and relationships.',
         'feature': '**Feature Definition**\n\nDefines a feature in the product line with variability type.',
         'safetylevel': '**Safety Level**\n\nISO 26262 Automotive Safety Integrity Level.\n\nValid values: ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM',

@@ -1,4 +1,4 @@
-def subsystem CommunicationSubsystem
+def block subsystem CommunicationSubsystem
   name "Communication Subsystem"
   description "Provides external interfaces for control commands and status reporting."
   owner "Communication Team"

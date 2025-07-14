@@ -62,14 +62,15 @@ export class SylangFormattingProvider implements vscode.DocumentFormattingEditPr
     private shouldIncreaseIndent(line: string): boolean {
         const increaseKeywords = [
             'productline',
-            'systemfunctions',
-            'systemfeatures',
+            'functiongroup',
+            'featureset',
             'function',
             'feature'
         ];
         
         return increaseKeywords.some(keyword => 
-            line.startsWith(keyword + ' ') || line === keyword
+            line.trim().startsWith(`def ${keyword}`) || 
+            line.trim().startsWith(keyword)
         );
     }
     
@@ -81,8 +82,8 @@ export class SylangFormattingProvider implements vscode.DocumentFormattingEditPr
         
         const containerKeywords = [
             'productline',
-            'systemfunctions', 
-            'systemfeatures',
+            'functiongroup', 
+            'featureset',
             'function',
             'feature'
         ];

@@ -90,8 +90,8 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'name', 'description', 'owner', 'reviewers', 'standards', 'analysismethod', 'condition',
             'from', 'to', 'targetfta', 'gatetype', 'severity', 'category', 'asil', 'dormancy',
             'probability', 'exposuretime', 'repairtime', 'inputs', 'outputs', 'item',
-            'hazardidentification', 'riskassessment', 'safetygoals', 'productline', 'systemfeatures',
-            'systemfunctions', 'AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT', 'INHIBIT', 'PRIORITY_AND',
+            'hazardidentification', 'riskassessment', 'safetygoals', 'productline', 'featureset',
+            'functiongroup', 'AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT', 'INHIBIT', 'PRIORITY_AND',
             'VOTING', 'S0', 'S1', 'S2', 'S3', 'systematic', 'random', 'external', 'common_cause',
             'human_error', 'QM', 'A', 'B', 'C', 'D', 'none', 'low', 'medium', 'high'
         ],
@@ -110,13 +110,13 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Features', 'sylang-fml'],
         extensions: ['.fml'],
         keywords: [
-            'def', 'systemfeatures', 'feature', 'mandatory', 'optional', 'alternative', 
+            'def', 'featureset', 'feature', 'mandatory', 'optional', 'alternative', 
             'or', 'name', 'description', 'owner', 'tags', 'safetylevel', 
             'enables', 'constraints', 'requires', 'excludes'
         ],
         snippetFile: 'features.json',
         validationRules: [
-            'single-systemfeatures', 'feature-variability', 'constraint-rules',
+            'single-featureset', 'feature-variability', 'constraint-rules',
             'duplicate-features', 'structural-order', 'def-keyword'
         ]
     },
@@ -150,7 +150,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'context', 'conditions', 'consequences', 'enabledby', 'enabledby function', 'functions_affected',
             'assessment', 'riskcriteria', 'exposure', 'asilmatrix', 'determination',
             'derivedfrom', 'allocatedto', 'safetylevel', 'asil', 'productline', 
-            'systemfeatures', 'systemfunctions', 'subsystems',
+            'featureset', 'functiongroup', 'subsystems',
             'includes', 'excludes', 'operationalconditions', 'condition', 
             'vehiclestates', 'driverstates', 'environments', 'overallsafetystrategy', 
             'assumptionsofuse', 'UnintendedActivation', 'FailureToActivate', 
@@ -238,6 +238,52 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         ],
         snippetFile: 'mechanics.json',
         validationRules: ['required-fields', 'safety-levels', 'mechanics-structure']
+    },
+    'sylang-blocks': {
+        id: 'sylang-blocks',
+        aliases: ['Sylang Blocks', 'sylang-blk'],
+        extensions: ['.blk'],
+        keywords: [
+            'def', 'block', 'system', 'subsystem', 'component', 'subcomponent', 'module', 'submodule',
+            'unit', 'subunit', 'assembly', 'subassembly', 'circuit', 'part', 'name', 'description',
+            'owner', 'tags', 'asil', 'contains', 'partof', 'enables', 'implements', 'interfaces',
+            'feature', 'function', 'use', 'port', 'type', 'electrical', 'mechanical', 'data',
+            'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator'
+        ],
+        snippetFile: 'blocks.json',
+        validationRules: ['required-fields', 'block-structure', 'def-keyword'],
+        validPropertyValues: {
+            'asil': ['QM', 'A', 'B', 'C', 'D'],
+            'type': ['electrical', 'mechanical', 'data', 'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator']
+        }
+    },
+    'sylang-test': {
+        id: 'sylang-test',
+        aliases: ['Sylang Test', 'sylang-tst'],
+        extensions: ['.tst'],
+        keywords: [
+            'def', 'testsuite', 'testcase', 'name', 'description', 'owner', 'tags', 
+            'testtype', 'coverage', 'method', 'priority', 'asil', 'verifies', 'requirement',
+            'exercises', 'preconditions', 'teststeps', 'step', 'expectedresult', 
+            'testresult', 'actualresult', 'executiontime', 'use',
+            // Enum values
+            'unit', 'integration', 'system', 'acceptance', 'regression', 'smoke',
+            'statement', 'branch', 'mcdc', 'function',
+            'manual', 'automated', 'hil', 'sil', 'mil', 'pil',
+            'pass', 'fail', 'pending', 'inconclusive',
+            'critical', 'high', 'medium', 'low',
+            'QM', 'A', 'B', 'C', 'D'
+        ],
+        snippetFile: 'test.json',
+        validationRules: ['required-fields', 'test-structure', 'def-keyword'],
+        validPropertyValues: {
+            'testtype': ['unit', 'integration', 'system', 'acceptance', 'regression', 'smoke'],
+            'coverage': ['statement', 'branch', 'mcdc', 'requirement', 'function'],
+            'method': ['manual', 'automated', 'hil', 'sil', 'mil', 'pil'],
+            'testresult': ['pass', 'fail', 'pending', 'inconclusive'],
+            'priority': ['critical', 'high', 'medium', 'low'],
+            'asil': ['QM', 'A', 'B', 'C', 'D']
+        }
     }
 };
 

@@ -77,7 +77,7 @@
         },
         {
           "name": "keyword.other.safety-reference.sylang",
-          "match": "\\b(productline|systemfeatures|systemfunctions|vehiclestate|environment|driverstate|conditions)\\b"
+          "match": "\\b(productline|featureset|functiongroup|vehiclestate|environment|driverstate|conditions)\\b"
         },
         {
           "name": "keyword.other.methodology.sylang",

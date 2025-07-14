@@ -14,8 +14,8 @@ def faulttree InverterSystemFaultTree
 	riskassessment InverterRiskAssessment
 	safetygoals InverterSafetyGoals
 	productline AutomotiveInverter
-	systemfeatures InverterFeatures
-	systemfunctions InverterFunctions
+	featureset InverterFeatures
+	functiongroup InverterFunctions
 	
 	# Top event definition
 	topevent

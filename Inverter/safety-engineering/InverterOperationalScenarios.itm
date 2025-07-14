@@ -6,7 +6,7 @@ def item InverterItem
   
   productline AutomotiveInverter
   systemfeatures InverterFeatures
-  systemfunctions InverterFunctions
+  functiongroup InverterFunctions
   subsystems
     PowerConversion
     MotorControl

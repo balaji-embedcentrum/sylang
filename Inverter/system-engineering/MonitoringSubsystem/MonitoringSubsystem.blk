@@ -1,4 +1,4 @@
-def subsystem MonitoringSubsystem
+def block subsystem MonitoringSubsystem
   name "Monitoring Subsystem"
   description "Monitors system health, diagnostics, and performance parameters."
   owner "Diagnostics Team"

@@ -3,6 +3,8 @@
 ## Overview
 This version adds comprehensive support for `.fun` (Functions Definition) files with enhanced validation, auto-completion, and hover documentation.
 
+> **⚠️ Important Change**: As of this version, `systemfunctions` and `subsystemfunctions` have been replaced with the generic `functiongroup` keyword. While legacy syntax may still be supported with deprecation warnings, all new code should use `def functiongroup`.
+
 ## Installation
 1. Install the VSIX package: `code --install-extension sylang-1.0.32-fun-support.vsix`
 2. Reload VS Code
@@ -10,9 +12,9 @@ This version adds comprehensive support for `.fun` (Functions Definition) files 
 
 ## Test Files
 
-### 1. Basic Subsystem Functions (`test-fun-validation.fun`)
+### 1. Basic Function Group (`test-fun-validation.fun`)
 ```sylang
-def subsystemfunctions ActuationControlSubsystemFunctions
+def functiongroup ActuationControlFunctions
   def function MotorDriveController
     name "Motor Drive Controller"
     description "Controls motor drive circuits and power management for actuator systems."
@@ -30,9 +32,9 @@ def subsystemfunctions ActuationControlSubsystemFunctions
     enables feature ActuatorTypeSelector
 ```
 
-### 2. System Functions Example (`system-functions-test.fun`)
+### 2. System Functions Example (`function-group-test.fun`)
 ```sylang
-def systemfunctions InverterSystemFunctions
+def functiongroup InverterSystemFunctions
   def function PowerElectronicsController
     name "Power Electronics Controller"
     description "Main controller for all power electronics operations and switching control"

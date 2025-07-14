@@ -17,7 +17,7 @@ export class FeaturesValidator extends BaseValidator {
     }
 
     protected getDefinitionKeywords(): string[] {
-        return ['systemfeatures', 'feature'];
+        return ['featureset', 'feature'];
     }
 
     protected async validateLanguageSpecificRules(
@@ -27,9 +27,9 @@ export class FeaturesValidator extends BaseValidator {
     ): Promise<void> {
         const trimmedLine = line.trim();
 
-        // Validate def systemfeatures syntax
-        if (trimmedLine.startsWith('def systemfeatures')) {
-            await this.validateSystemfeaturesDefinition(lineIndex, trimmedLine);
+        // Validate def featureset syntax
+        if (trimmedLine.startsWith('def featureset')) {
+            await this.validateFeaturesetDefinition(lineIndex, trimmedLine);
         }
 
         // Validate def feature syntax
@@ -37,56 +37,53 @@ export class FeaturesValidator extends BaseValidator {
             await this.validateFeatureDefinition(lineIndex, trimmedLine);
         }
 
-        // Note: Constraints section indentation is now handled by validateHierarchicalIndentation()
-        // in document-level validation for comprehensive tab-based hierarchy validation
-
-        // Validate constraint rules (requires/excludes)
-        if (trimmedLine.startsWith('requires') || trimmedLine.startsWith('excludes')) {
+        // Validate constraint rules
+        if (trimmedLine.startsWith('requires ') || trimmedLine.startsWith('excludes ')) {
             await this.validateConstraintRule(document, lineIndex, line);
         }
     }
 
     protected async validateDocumentLevelRules(document: vscode.TextDocument): Promise<void> {
-        // Check for single systemfeatures keyword in file
-        await this.validateSingleSystemfeaturesKeyword(document);
-
-        // Check for single .fml file in workspace
-        await this.validateSingleFmlFileInWorkspace(document);
+        // Check for single featureset keyword in file
+        await this.validateSingleFeaturesetKeyword(document);
 
         // Validate constraint references
         await this.validateConstraintReferences(document);
 
-        // Validate ISO 26580 sibling variability consistency
+        // Validate features hierarchical indentation
+        await this.validateFeaturesHierarchicalIndentation(document);
+
+        // Validate sibling variability consistency
         await this.validateSiblingVariabilityConsistency(document);
 
-        // Validate features-specific hierarchical indentation
-        await this.validateFeaturesHierarchicalIndentation(document);
+        // Validate single .fml file in workspace
+        await this.validateSingleFmlFileInWorkspace(document);
     }
 
-    private async validateSystemfeaturesDefinition(lineIndex: number, trimmedLine: string): Promise<void> {
-        const systemfeaturesMatch = trimmedLine.match(/^def\s+systemfeatures\s+(\w+)/);
-        if (!systemfeaturesMatch) {
+    private async validateFeaturesetDefinition(lineIndex: number, trimmedLine: string): Promise<void> {
+        const featuresetMatch = trimmedLine.match(/^def\s+featureset\s+(\w+)/);
+        if (!featuresetMatch) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'Invalid systemfeatures syntax. Expected: def systemfeatures <name>',
+                'Invalid featureset syntax. Expected: def featureset <identifier>',
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'invalid-systemfeatures-syntax';
+            diagnostic.code = 'invalid-featureset-syntax';
             this.diagnostics.push(diagnostic);
             return;
         }
 
-        const systemfeaturesName = systemfeaturesMatch[1] || '';
+        const featuresetName = featuresetMatch[1] || '';
         
-        if (!/^[A-Z][a-zA-Z0-9]*$/.test(systemfeaturesName)) {
+        if (!/^[A-Z][a-zA-Z0-9]*$/.test(featuresetName)) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, trimmedLine.length);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'System features name should start with uppercase letter and contain only letters and numbers',
+                'Featureset name should start with uppercase letter and contain only letters and numbers',
                 vscode.DiagnosticSeverity.Warning
             );
-            diagnostic.code = 'invalid-systemfeatures-name';
+            diagnostic.code = 'invalid-featureset-name';
             this.diagnostics.push(diagnostic);
         }
     }
@@ -154,43 +151,41 @@ export class FeaturesValidator extends BaseValidator {
         }
     }
 
-    private async validateSingleSystemfeaturesKeyword(document: vscode.TextDocument): Promise<void> {
+    private async validateSingleFeaturesetKeyword(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
         const lines = text.split('\n');
-        let systemfeaturesCount = 0;
-        let firstSystemfeaturesLine = -1;
+        let featuresetCount = 0;
+        let firstFeaturesetLine = -1;
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            if (!line) continue;
-            
             const trimmedLine = line.trim();
-            if (trimmedLine.startsWith('def systemfeatures')) {
-                systemfeaturesCount++;
-                if (firstSystemfeaturesLine === -1) {
-                    firstSystemfeaturesLine = i;
+            if (trimmedLine.startsWith('def featureset')) {
+                featuresetCount++;
+                if (firstFeaturesetLine === -1) {
+                    firstFeaturesetLine = i;
                 }
             }
         }
 
-        if (systemfeaturesCount === 0) {
+        if (featuresetCount === 0) {
             const range = new vscode.Range(0, 0, 0, 0);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                'Features file must contain exactly one "def systemfeatures" declaration',
+                'Features file must contain exactly one "def featureset" declaration',
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'missing-systemfeatures-keyword';
+            diagnostic.code = 'missing-featureset-keyword';
             this.diagnostics.push(diagnostic);
-        } else if (systemfeaturesCount > 1) {
-            const firstLine = lines[firstSystemfeaturesLine];
-            const range = new vscode.Range(firstSystemfeaturesLine, 0, firstSystemfeaturesLine, firstLine ? firstLine.length : 0);
+        } else if (featuresetCount > 1) {
+            const firstLine = lines[firstFeaturesetLine];
+            const range = new vscode.Range(firstFeaturesetLine, 0, firstFeaturesetLine, firstLine ? firstLine.length : 0);
             const diagnostic = new vscode.Diagnostic(
                 range,
-                `Multiple "def systemfeatures" declarations found (${systemfeaturesCount}). Only one is allowed per file.`,
+                `Multiple "def featureset" declarations found (${featuresetCount}). Only one is allowed per file.`,
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'multiple-systemfeatures-keywords';
+            diagnostic.code = 'multiple-featureset-keywords';
             this.diagnostics.push(diagnostic);
         }
     }
@@ -397,99 +392,61 @@ export class FeaturesValidator extends BaseValidator {
     private async validateFeaturesHierarchicalIndentation(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
         const lines = text.split('\n');
-        
-        let systemfeaturesIndent = -1;
-        const featureStack: Array<{indentLevel: number, lineIndex: number, name: string}> = [];
-        
+        let featuresetIndent = -1;
+
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            if (!line || line.trim().length === 0 || line.trim().startsWith('//')) continue;
-            
+            if (!line) continue;
             const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+
             const indentLevel = this.getIndentLevel(line);
-            
-            // Check systemfeatures indentation
-            if (trimmedLine.startsWith('def systemfeatures')) {
+
+            // Check featureset indentation
+            if (trimmedLine.startsWith('def featureset')) {
                 if (indentLevel !== 0) {
-                    this.addDiagnostic(i, 0, indentLevel, `systemfeatures must start at column 0. Found ${indentLevel} tabs.`, 'invalid-systemfeatures-indentation');
+                    this.addDiagnostic(i, 0, indentLevel, `featureset must start at column 0. Found ${indentLevel} tabs.`, 'invalid-featureset-indentation');
                 }
-                systemfeaturesIndent = indentLevel;
-                continue;
+                featuresetIndent = indentLevel;
             }
-            
+
             // Check feature definitions
-            const featureMatch = trimmedLine.match(/^def\s+feature\s+(\w+)\s+(mandatory|optional|alternative|or)/);
-            if (featureMatch && featureMatch[1]) {
-                const featureName = featureMatch[1];
-                
-                // Validate feature indentation hierarchy
-                if (systemfeaturesIndent === -1) {
-                    this.addDiagnostic(i, 0, line.length, 'Feature definition found before systemfeatures declaration', 'feature-before-systemfeatures');
+            if (trimmedLine.startsWith('def feature')) {
+                // Must be after featureset declaration
+                if (featuresetIndent === -1) {
+                    this.addDiagnostic(i, 0, line.length, 'Feature definition found before featureset declaration', 'feature-before-featureset');
                     continue;
                 }
-                
-                // Check if indentation is valid (must be at least 1 tab deeper than systemfeatures)
-                const expectedMinIndent = systemfeaturesIndent + 1; // First level features
+
+                // Check if indentation is valid (must be at least 1 tab deeper than featureset)
+                const expectedMinIndent = featuresetIndent + 1; // First level features
+
                 if (indentLevel < expectedMinIndent) {
-                    this.addDiagnostic(i, 0, indentLevel, `Feature '${featureName}' indentation too shallow. Minimum expected: ${expectedMinIndent} tabs, found: ${indentLevel} tabs.`, 'feature-indentation-too-shallow');
-                    continue;
+                    this.addDiagnostic(i, 0, indentLevel, `Feature must be indented at least ${expectedMinIndent} tabs from featureset. Found: ${indentLevel} tabs.`, 'feature-incorrect-indentation');
                 }
-                
-                // Update feature stack (remove features at same or deeper level)
-                while (featureStack.length > 0) {
-                    const lastFeature = featureStack[featureStack.length - 1];
-                    if (!lastFeature || lastFeature.indentLevel < indentLevel) break;
-                    featureStack.pop();
-                }
-                
-                // Add current feature to stack
-                featureStack.push({indentLevel, lineIndex: i, name: featureName});
-                continue;
             }
-            
-            // Check property indentation (name, description, owner, tags, safetylevel)
-            const propertyMatch = trimmedLine.match(/^(name|description|owner|tags|safetylevel)\s/);
-            if (propertyMatch && propertyMatch[1]) {
-                if (featureStack.length === 0) {
-                    this.addDiagnostic(i, 0, line.length, 'Property found outside of any feature definition', 'property-outside-feature');
-                    continue;
-                }
-                
-                const parentFeature = featureStack[featureStack.length - 1];
-                if (!parentFeature) continue;
-                
-                const expectedPropertyIndent = parentFeature.indentLevel + 1;
-                
-                if (indentLevel !== expectedPropertyIndent) {
-                    this.addDiagnostic(i, 0, indentLevel, `Property '${propertyMatch[1]}' must be indented 1 tab deeper than its parent feature '${parentFeature.name}'. Expected: ${expectedPropertyIndent} tabs, found: ${indentLevel} tabs.`, 'property-incorrect-indentation');
-                }
-                continue;
-            }
-            
-            // Check constraints section indentation (FEATURES-SPECIFIC)
+
+            // Check constraint section
             if (trimmedLine === 'constraints') {
-                if (systemfeaturesIndent === -1) {
-                    this.addDiagnostic(i, 0, line.length, 'Constraints section found before systemfeatures declaration', 'constraints-before-systemfeatures');
+                if (featuresetIndent === -1) {
+                    this.addDiagnostic(i, 0, line.length, 'Constraints section found before featureset declaration', 'constraints-before-featureset');
                     continue;
                 }
-                
-                const expectedConstraintsIndent = systemfeaturesIndent + 1;
+
+                const expectedConstraintsIndent = featuresetIndent + 1;
                 if (indentLevel !== expectedConstraintsIndent) {
-                    this.addDiagnostic(i, 0, indentLevel, `Constraints section must be indented 1 tab from systemfeatures. Expected: ${expectedConstraintsIndent} tabs, found: ${indentLevel} tabs.`, 'constraints-incorrect-indentation');
+                    this.addDiagnostic(i, 0, indentLevel, `Constraints section must be indented 1 tab from featureset. Expected: ${expectedConstraintsIndent} tabs, found: ${indentLevel} tabs.`, 'constraints-incorrect-indentation');
                 }
-                continue;
             }
-            
-            // Check constraint rule indentation (FEATURES-SPECIFIC: requires/excludes lines)
-            const constraintRuleMatch = trimmedLine.match(/^(\w+)\s+(requires|excludes)\s+(\w+)/);
-            if (constraintRuleMatch) {
-                if (systemfeaturesIndent === -1) continue;
-                
-                const expectedConstraintRuleIndent = systemfeaturesIndent + 2; // 1 more than constraints
+
+            // Check constraint rules
+            if ((trimmedLine.startsWith('requires') || trimmedLine.startsWith('excludes')) && !trimmedLine.includes(':')) {
+                if (featuresetIndent === -1) continue;
+
+                const expectedConstraintRuleIndent = featuresetIndent + 2; // 1 more than constraints
                 if (indentLevel !== expectedConstraintRuleIndent) {
-                    this.addDiagnostic(i, 0, indentLevel, `Constraint rules must be indented 1 tab deeper than constraints section. Expected: ${expectedConstraintRuleIndent} tabs, found: ${indentLevel} tabs.`, 'constraint-rule-incorrect-indentation');
+                    this.addDiagnostic(i, 0, indentLevel, `Constraint rules must be indented 2 tabs from featureset. Expected: ${expectedConstraintRuleIndent} tabs, found: ${indentLevel} tabs.`, 'constraint-rule-incorrect-indentation');
                 }
-                continue;
             }
         }
     }

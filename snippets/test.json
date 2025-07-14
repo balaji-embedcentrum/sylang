@@ -1,0 +1,199 @@
+{
+  "Complete Test Suite": {
+    "prefix": "testsuite",
+    "body": [
+      "def testsuite ${1:TestSuiteName}",
+      "  name \"${2:Test Suite Display Name}\"",
+      "  description \"${3:Test suite description}\"",
+      "  owner \"${4:Test Team}\"",
+      "  tags \"${5:tag1}\", \"${6:tag2}\"",
+      "  testtype ${7|unit,integration,system,acceptance,regression,smoke|}",
+      "  asil ${8|A,B,C,D,QM|}",
+      "  coverage ${9|statement,branch,mcdc,requirement,function|}",
+      "  method ${10|manual,automated,hil,sil,mil,pil|}",
+      "  ",
+      "  def testcase ${11:TC_001}",
+      "    name \"${12:Test Case Name}\"",
+      "    description \"${13:Test case description}\"",
+      "    priority ${14|critical,high,medium,low|}",
+      "    asil ${15|A,B,C,D,QM|}",
+      "    method ${16|manual,automated,hil,sil,mil,pil|}",
+      "    verifies requirement ${17:RequirementList}",
+      "    exercises ${18:FunctionList}",
+      "    ",
+      "    preconditions",
+      "      \"${19:Precondition 1}\"",
+      "      \"${20:Precondition 2}\"",
+      "      ",
+      "    teststeps",
+      "      step ${21:STEP_001} \"${22:Step description}\"",
+      "      step ${23:STEP_002} \"${24:Step description}\"",
+      "      ",
+      "    expectedresult \"${25:Expected result description}\"",
+      "    testresult ${26|pass,fail,pending,inconclusive|}"
+    ],
+    "description": "Complete test suite with test case"
+  },
+  "Test Case Definition": {
+    "prefix": "testcase",
+    "body": [
+      "def testcase ${1:TC_001}",
+      "  name \"${2:Test Case Name}\"",
+      "  description \"${3:Test case description}\"",
+      "  priority ${4|critical,high,medium,low|}",
+      "  asil ${5|A,B,C,D,QM|}",
+      "  method ${6|manual,automated,hil,sil,mil,pil|}",
+      "  verifies requirement ${7:RequirementList}",
+      "  exercises ${8:FunctionList}",
+      "  ",
+      "  preconditions",
+      "    \"${9:Precondition 1}\"",
+      "    \"${10:Precondition 2}\"",
+      "    ",
+      "  teststeps",
+      "    step ${11:STEP_001} \"${12:Step description}\"",
+      "    step ${13:STEP_002} \"${14:Step description}\"",
+      "    ",
+      "  expectedresult \"${15:Expected result description}\"",
+      "  testresult ${16|pass,fail,pending,inconclusive|}"
+    ],
+    "description": "Complete test case definition"
+  },
+  "Basic Test Case": {
+    "prefix": "tc",
+    "body": [
+      "def testcase ${1:TC_001}",
+      "  name \"${2:Test Case Name}\"",
+      "  description \"${3:Description}\"",
+      "  priority ${4|critical,high,medium,low|}",
+      "  verifies requirement ${5:RequirementList}",
+      "  expectedresult \"${6:Expected result}\""
+    ],
+    "description": "Basic test case structure"
+  },
+  "Test Steps Section": {
+    "prefix": "teststeps",
+    "body": [
+      "teststeps",
+      "  step ${1:STEP_001} \"${2:Step description}\"",
+      "  step ${3:STEP_002} \"${4:Step description}\"",
+      "  step ${5:STEP_003} \"${6:Step description}\""
+    ],
+    "description": "Test steps section with multiple steps"
+  },
+  "Single Test Step": {
+    "prefix": "step",
+    "body": [
+      "step ${1:STEP_001} \"${2:Step description}\""
+    ],
+    "description": "Single test step"
+  },
+  "Preconditions Section": {
+    "prefix": "preconditions",
+    "body": [
+      "preconditions",
+      "  \"${1:Precondition 1}\"",
+      "  \"${2:Precondition 2}\"",
+      "  \"${3:Precondition 3}\""
+    ],
+    "description": "Preconditions section"
+  },
+  "Test Name": {
+    "prefix": "name",
+    "body": [
+      "name \"${1:Display Name}\""
+    ],
+    "description": "Test name property"
+  },
+  "Test Description": {
+    "prefix": "desc",
+    "body": [
+      "description \"${1:Test description}\""
+    ],
+    "description": "Test description property"
+  },
+  "Test Owner": {
+    "prefix": "owner",
+    "body": [
+      "owner \"${1:Team Name}\""
+    ],
+    "description": "Test owner property"
+  },
+  "Test Tags": {
+    "prefix": "tags",
+    "body": [
+      "tags \"${1:tag1}\", \"${2:tag2}\", \"${3:tag3}\""
+    ],
+    "description": "Test tags property"
+  },
+  "Test Type": {
+    "prefix": "testtype",
+    "body": [
+      "testtype ${1|unit,integration,system,acceptance,regression,smoke|}"
+    ],
+    "description": "Test type property"
+  },
+  "Coverage Type": {
+    "prefix": "coverage",
+    "body": [
+      "coverage ${1|statement,branch,mcdc,requirement,function|}"
+    ],
+    "description": "Coverage type property"
+  },
+  "Test Method": {
+    "prefix": "method",
+    "body": [
+      "method ${1|manual,automated,hil,sil,mil,pil|}"
+    ],
+    "description": "Test method property"
+  },
+  "Test Priority": {
+    "prefix": "priority",
+    "body": [
+      "priority ${1|critical,high,medium,low|}"
+    ],
+    "description": "Test priority property"
+  },
+  "ASIL Level": {
+    "prefix": "asil",
+    "body": [
+      "asil ${1|A,B,C,D,QM|}"
+    ],
+    "description": "ASIL level property"
+  },
+  "Verifies Requirement": {
+    "prefix": "verifies",
+    "body": [
+      "verifies requirement ${1:FSR_001}, ${2:FSR_002}"
+    ],
+    "description": "Verifies requirement property"
+  },
+  "Exercises Functions": {
+    "prefix": "exercises",
+    "body": [
+      "exercises ${1:FunctionA}, ${2:FunctionB}"
+    ],
+    "description": "Exercises functions property"
+  },
+  "Expected Result": {
+    "prefix": "expected",
+    "body": [
+      "expectedresult \"${1:Expected result description}\""
+    ],
+    "description": "Expected result property"
+  },
+  "Test Result": {
+    "prefix": "testresult",
+    "body": [
+      "testresult ${1|pass,fail,pending,inconclusive|}"
+    ],
+    "description": "Test result property"
+  },
+  "Use Import": {
+    "prefix": "use",
+    "body": [
+      "use ${1|functiongroup,requirements,safetygoals,featureset|} ${2:IdentifierName}"
+    ],
+    "description": "Import statement for cross-file references"
+  }
+} 
