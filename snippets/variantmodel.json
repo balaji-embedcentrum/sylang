@@ -1,0 +1,197 @@
+{
+  "Feature Selected": {
+    "prefix": "feature-selected",
+    "body": [
+      "feature ${1:FeatureName} ${2|mandatory,optional,alternative|} selected"
+    ],
+    "description": "Feature with selected status"
+  },
+  "Feature Unselected": {
+    "prefix": "feature-unselected",
+    "body": [
+      "feature ${1:FeatureName} ${2|mandatory,optional,alternative|}"
+    ],
+    "description": "Feature without selected status"
+  },
+  "Mandatory Feature Selected": {
+    "prefix": "mandatory-selected",
+    "body": [
+      "feature ${1:FeatureName} mandatory selected"
+    ],
+    "description": "Mandatory feature (must be selected)"
+  },
+  "Optional Feature Selected": {
+    "prefix": "optional-selected",
+    "body": [
+      "feature ${1:FeatureName} optional selected"
+    ],
+    "description": "Optional feature that is selected"
+  },
+  "Optional Feature Unselected": {
+    "prefix": "optional-unselected",
+    "body": [
+      "feature ${1:FeatureName} optional"
+    ],
+    "description": "Optional feature that is not selected"
+  },
+  "Alternative Feature Selected": {
+    "prefix": "alternative-selected",
+    "body": [
+      "feature ${1:FeatureName} alternative selected"
+    ],
+    "description": "Alternative feature that is selected"
+  },
+  "Alternative Feature Unselected": {
+    "prefix": "alternative-unselected",
+    "body": [
+      "feature ${1:FeatureName} alternative"
+    ],
+    "description": "Alternative feature that is not selected"
+  },
+  "Feature Group": {
+    "prefix": "feature-group",
+    "body": [
+      "feature ${1:ParentFeature} ${2|mandatory,optional|} ${3|selected,|}",
+      "    feature ${4:ChildFeature1} ${5|mandatory,optional,alternative|} ${6|selected,|}",
+      "    feature ${7:ChildFeature2} ${8|mandatory,optional,alternative|} ${9|selected,|}"
+    ],
+    "description": "Feature group with child features"
+  },
+  "Alternative Group": {
+    "prefix": "alternative-group",
+    "body": [
+      "feature ${1:ParentFeature} mandatory selected",
+      "    feature ${2:Option1} alternative selected",
+      "    feature ${3:Option2} alternative",
+      "    feature ${4:Option3} alternative"
+    ],
+    "description": "Alternative group (exactly one must be selected)"
+  },
+  "Product Variant Basic": {
+    "prefix": "product-basic",
+    "body": [
+      "# ${1:ProductName} Variant Model",
+      "",
+      "# Core Features",
+      "feature ${2:CoreFeature} mandatory selected",
+      "    feature ${3:SubFeature1} mandatory selected",
+      "    feature ${4:SubFeature2} optional selected",
+      "",
+      "# Optional Features",
+      "feature ${5:OptionalFeature} optional"
+    ],
+    "description": "Basic product variant template"
+  },
+  "Automotive Variant": {
+    "prefix": "automotive-variant",
+    "body": [
+      "# ${1:VehicleModel} Variant Configuration",
+      "",
+      "# Engine Options",
+      "feature Engine mandatory selected",
+      "    feature Gasoline alternative selected",
+      "    feature Diesel alternative",
+      "    feature Electric alternative",
+      "",
+      "# Transmission",
+      "feature Transmission mandatory selected",
+      "    feature Manual alternative",
+      "    feature Automatic alternative selected",
+      "",
+      "# Safety Features",
+      "feature Safety mandatory selected",
+      "    feature ABS mandatory selected",
+      "    feature ESP mandatory selected",
+      "    feature LaneKeeping optional selected",
+      "",
+      "# Comfort Features",
+      "feature Comfort optional selected",
+      "    feature AirConditioning optional selected",
+      "    feature HeatedSeats optional",
+      "    feature SunRoof optional"
+    ],
+    "description": "Automotive product variant example"
+  },
+  "Electronics Variant": {
+    "prefix": "electronics-variant",
+    "body": [
+      "# ${1:DeviceName} Variant Configuration",
+      "",
+      "# Processing Unit",
+      "feature ProcessingUnit mandatory selected",
+      "    feature ARM alternative selected",
+      "    feature x86 alternative",
+      "",
+      "# Memory",
+      "feature Memory mandatory selected",
+      "    feature 8GB alternative",
+      "    feature 16GB alternative selected",
+      "    feature 32GB alternative",
+      "",
+      "# Connectivity",
+      "feature Connectivity mandatory selected",
+      "    feature WiFi mandatory selected",
+      "    feature Bluetooth mandatory selected",
+      "    feature 5G optional selected",
+      "",
+      "# Display",
+      "feature Display optional selected",
+      "    feature TouchScreen optional selected",
+      "    feature HighResolution optional"
+    ],
+    "description": "Electronics product variant example"
+  },
+  "Software Variant": {
+    "prefix": "software-variant",
+    "body": [
+      "# ${1:SoftwareName} Variant Configuration",
+      "",
+      "# Core Modules",
+      "feature CoreModule mandatory selected",
+      "    feature Authentication mandatory selected",
+      "    feature Database mandatory selected",
+      "    feature API mandatory selected",
+      "",
+      "# Optional Modules",
+      "feature Analytics optional selected",
+      "feature Reporting optional",
+      "feature Integration optional selected",
+      "",
+      "# Deployment Options",
+      "feature Deployment mandatory selected",
+      "    feature Cloud alternative selected",
+      "    feature OnPremise alternative",
+      "    feature Hybrid alternative"
+    ],
+    "description": "Software product variant example"
+  },
+  "Hierarchical Features": {
+    "prefix": "hierarchical-features",
+    "body": [
+      "feature ${1:Level1Feature} mandatory selected",
+      "    feature ${2:Level2Feature1} mandatory selected",
+      "        feature ${3:Level3Feature1} optional selected",
+      "        feature ${4:Level3Feature2} optional",
+      "    feature ${5:Level2Feature2} optional",
+      "        feature ${6:Level3Feature3} alternative selected",
+      "        feature ${7:Level3Feature4} alternative"
+    ],
+    "description": "Multi-level hierarchical feature structure"
+  },
+  "Comment Block": {
+    "prefix": "comment",
+    "body": [
+      "# ${1:Comment text}"
+    ],
+    "description": "Add comment line"
+  },
+  "Section Header": {
+    "prefix": "section",
+    "body": [
+      "# ========================================",
+      "# ${1:Section Name}",
+      "# ========================================"
+    ],
+    "description": "Section header with decorative borders"
+  }
+} 

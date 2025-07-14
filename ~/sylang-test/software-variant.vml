@@ -1,0 +1,32 @@
+# Software Product Variant Model
+# Example: Enterprise Software Suite Configuration
+
+# Core Platform (must be selected)
+feature CorePlatform mandatory selected
+    feature Authentication mandatory selected
+    feature Database mandatory selected
+    feature UserManagement mandatory selected
+
+# Deployment Options (exactly one must be selected)
+feature Deployment mandatory selected
+    feature Cloud alternative selected
+    feature OnPremise alternative
+    feature Hybrid alternative
+
+# Analytics Module (optional)
+feature Analytics optional selected
+    feature BasicReporting mandatory selected
+    feature AdvancedDashboards optional selected
+    feature RealTimeMonitoring optional
+
+# Integration Module (optional)
+feature Integration optional
+    feature RestAPI mandatory
+    feature GraphQL optional
+    feature Webhooks optional
+
+# Security Features (optional but recommended)
+feature Security optional selected
+    feature TwoFactorAuth mandatory selected
+    feature SingleSignOn optional selected
+    feature AuditLogging mandatory selected 
