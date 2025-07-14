@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { SymbolManager } from '../core/SymbolManager';
 
 interface CompletionContext {
     type: 'top-level' | 'after-systemfeatures' | 'after-productline' | 'inside-feature' | 'inside-itm' | 'inside-def' | 'inside-haz' | 'inside-rsk' | 'inside-sgl' | 'inside-req' | 'inside-sub' | 'inside-sys' | 'inside-fun';
@@ -10,10 +11,12 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
     private templates: Map<string, vscode.CompletionItem> = new Map();
     private keywords: string[];
     private languageId: string;
+    private symbolManager: SymbolManager;
 
-    constructor(languageId: string, keywords: string[]) {
+    constructor(languageId: string, keywords: string[], symbolManager: SymbolManager) {
         this.languageId = languageId;
         this.keywords = keywords;
+        this.symbolManager = symbolManager;
         this.createTemplates();
     }
 
@@ -32,7 +35,7 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         const currentContext = this.getCompletionContext(document, position);
         
         // Get Sylang-specific completions based on context
-        const completions = this.getSylangCompletions(trimmedPrefix, currentContext);
+        const completions = this.getSylangCompletions(document, trimmedPrefix, currentContext);
         
         // Prioritize snippet completions for tab navigation
         completions.forEach(item => {
@@ -222,7 +225,7 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         return { type: 'top-level', parentKeyword: null, indentLevel: 0 };
     }
 
-    private getSylangCompletions(linePrefix: string, context: CompletionContext): vscode.CompletionItem[] {
+    private getSylangCompletions(document: vscode.TextDocument, linePrefix: string, context: CompletionContext): vscode.CompletionItem[] {
         const completions: vscode.CompletionItem[] = [];
         const snippetKeywords = new Set<string>(); // Track which keywords have snippet versions
         
@@ -340,6 +343,10 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         // Add keyword completions ONLY for keywords that don't have snippet versions
         const keywordCompletions = this.getFilteredKeywordCompletions(linePrefix, context, snippetKeywords);
         completions.push(...keywordCompletions);
+
+        // Add import-aware symbol completions for reference contexts
+        const symbolCompletions = this.getImportAwareSymbolCompletions(document, linePrefix, context);
+        completions.push(...symbolCompletions);
         
         return completions;
     }
@@ -1478,5 +1485,51 @@ export class SylangCompletionProvider implements vscode.CompletionItemProvider {
         _token: vscode.CancellationToken
     ): vscode.ProviderResult<vscode.CompletionItem> {
         return item;
+    }
+
+    /**
+     * Get import-aware symbol completions for constraint references and other cross-file symbol usage
+     */
+    private getImportAwareSymbolCompletions(document: vscode.TextDocument, linePrefix: string, context: CompletionContext): vscode.CompletionItem[] {
+        const completions: vscode.CompletionItem[] = [];
+        
+        // Only provide symbol completions in contexts where symbols are referenced
+        if (!this.isSymbolReferenceContext(linePrefix, context)) {
+            return completions;
+        }
+
+        const documentUri = document.uri.toString();
+        const availableSymbols = this.symbolManager.getAvailableSymbols(documentUri);
+        
+        // Create completion items for available symbols
+        for (const symbol of availableSymbols) {
+            const item = new vscode.CompletionItem(symbol.name, vscode.CompletionItemKind.Reference);
+            item.detail = `${symbol.kind} (${symbol.container || 'local'})`;
+            item.documentation = new vscode.MarkdownString(`**${symbol.kind}** ${symbol.name}\n\nDefined in: ${symbol.container || 'this file'}`);
+            item.sortText = `3_${symbol.name}`; // Sort after snippets and keywords
+            completions.push(item);
+        }
+
+        return completions;
+    }
+
+    /**
+     * Check if the current context and line prefix suggest a symbol reference
+     */
+    private isSymbolReferenceContext(linePrefix: string, context: CompletionContext): boolean {
+        // Check for constraint patterns like "requires " or "excludes "
+        if (linePrefix.trim().endsWith('requires ') || linePrefix.trim().endsWith('excludes ')) {
+            return true;
+        }
+
+        // Check for reference properties like "derivedfrom ", "allocatedto ", etc.
+        const referencePatterns = ['derivedfrom ', 'allocatedto ', 'enables feature ', 'partof '];
+        for (const pattern of referencePatterns) {
+            if (linePrefix.trim().endsWith(pattern)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

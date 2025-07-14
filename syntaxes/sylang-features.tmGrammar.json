@@ -4,6 +4,7 @@
   "scopeName": "source.sylang.features",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#imports" },
     { "include": "#keywords" },
     { "include": "#variability" },
     { "include": "#constraints" },
@@ -26,6 +27,24 @@
         }
       ]
     },
+    "imports": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.control.import.sylang"
+            },
+            "2": {
+              "name": "storage.type.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.sylang"
+            }
+          }
+        }
+      ]
+    },
     "keywords": {
       "patterns": [
         {
@@ -34,7 +53,7 @@
         },
         {
           "name": "keyword.control.sylang",
-          "match": "\\b(def\\s+systemfeatures|def\\s+feature|def\\s+constraints|systemfeatures|feature|constraints)\\b"
+          "match": "\\b(use|def\\s+systemfeatures|def\\s+feature|def\\s+constraints|systemfeatures|feature|constraints)\\b"
         },
         {
           "name": "keyword.other.sylang",

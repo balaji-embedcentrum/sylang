@@ -1,12 +1,15 @@
 import * as vscode from 'vscode';
 import { LanguageConfig } from '../../config/LanguageConfigs';
+import { SymbolManager } from '../../core/SymbolManager';
 
 export abstract class BaseValidator {
     protected languageConfig: LanguageConfig;
     protected diagnostics: vscode.Diagnostic[] = [];
+    protected symbolManager: SymbolManager;
 
-    constructor(languageConfig: LanguageConfig) {
+    constructor(languageConfig: LanguageConfig, symbolManager: SymbolManager) {
         this.languageConfig = languageConfig;
+        this.symbolManager = symbolManager;
     }
 
     // Main validation entry point
@@ -19,9 +22,42 @@ export abstract class BaseValidator {
         const text = document.getText();
         const lines = text.split('\n');
 
-        // Collect all definitions in this document (only lines starting with 'def')
-        const definitions = this.collectDefinitions(lines);
-        console.log(`[${this.languageConfig.id}] Found definitions:`, Array.from(definitions));
+        // Parse document with imports and get available symbols
+        await this.symbolManager.parseDocumentWithImports(document, this.languageConfig);
+        const documentUri = document.uri.toString();
+        const availableSymbols = this.symbolManager.getAvailableSymbols(documentUri);
+        const documentImports = this.symbolManager.getDocumentImports(documentUri);
+        console.log(`[${this.languageConfig.id}] Imports:`, documentImports.map(i => `${i.keyword} ${i.identifier}`));
+        console.log(`[${this.languageConfig.id}] Total available symbols:`, availableSymbols.length);
+
+        // Validate imports first
+        const importValidation = this.symbolManager.validateImports(documentUri);
+        if (importValidation.errors.length > 0) {
+            console.log(`[${this.languageConfig.id}] Import errors:`, importValidation.errors);
+            // Convert import errors to diagnostics
+            importValidation.errors.forEach(error => {
+                const diagnostic = new vscode.Diagnostic(
+                    new vscode.Range(0, 0, 0, 100),
+                    error,
+                    vscode.DiagnosticSeverity.Error
+                );
+                diagnostic.code = 'import-error';
+                this.diagnostics.push(diagnostic);
+            });
+        }
+        if (importValidation.warnings.length > 0) {
+            console.log(`[${this.languageConfig.id}] Import warnings:`, importValidation.warnings);
+            // Convert import warnings to diagnostics  
+            importValidation.warnings.forEach(warning => {
+                const diagnostic = new vscode.Diagnostic(
+                    new vscode.Range(0, 0, 0, 100),
+                    warning,
+                    vscode.DiagnosticSeverity.Warning
+                );
+                diagnostic.code = 'import-warning';
+                this.diagnostics.push(diagnostic);
+            });
+        }
 
         // Validate each line
         for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -31,11 +67,14 @@ export abstract class BaseValidator {
             const trimmedLine = line.trim();
             if (trimmedLine.length === 0 || trimmedLine.startsWith('//')) continue;
 
+            // Skip import lines (already validated above)
+            if (trimmedLine.startsWith('use ')) continue;
+
             // Validate def keyword requirement
             await this.validateDefKeywordRequirement(lineIndex, trimmedLine);
 
-            // Validate references to definitions
-            await this.validateReferences(lineIndex, trimmedLine, definitions);
+            // Validate references to definitions (now import-aware)
+            await this.validateImportAwareReferences(lineIndex, trimmedLine, document.uri.toString());
 
             // Common validations
             await this.validateCommonRules(document, lineIndex, line);
@@ -126,6 +165,67 @@ export abstract class BaseValidator {
                     const diagnostic = new vscode.Diagnostic(
                         range,
                         `Reference to undefined symbol: ${target}`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnostic.code = 'undefined-symbol-reference';
+                    this.diagnostics.push(diagnostic);
+                }
+            } else {
+                // Check if it's a typo of a constraint keyword
+                const possibleTypos = ['requires', 'excludes'];
+                const suggestion = possibleTypos.find(keyword => 
+                    this.isLikelyTypo(constraintKeyword, keyword)
+                );
+                
+                if (suggestion) {
+                    const start = trimmedLine.indexOf(constraintKeyword);
+                    const range = new vscode.Range(lineIndex, start, lineIndex, start + constraintKeyword.length);
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Unknown constraint keyword '${constraintKeyword}'. Did you mean '${suggestion}'?`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnostic.code = 'unknown-constraint-keyword';
+                    this.diagnostics.push(diagnostic);
+                }
+            }
+        }
+    }
+
+    // Import-aware validation of symbol references
+    private async validateImportAwareReferences(lineIndex: number, trimmedLine: string, documentUri: string): Promise<void> {
+        // Check for potential constraint patterns (including typos)
+        const constraintMatch = trimmedLine.match(/^(\w+)\s+(\w+)\s+(\w+)/);
+        if (constraintMatch) {
+            const source = constraintMatch[1];
+            const constraintKeyword = constraintMatch[2];
+            const target = constraintMatch[3];
+            
+            // Ensure all parts are defined
+            if (!source || !constraintKeyword || !target) {
+                return;
+            }
+            
+            // Check if it's a valid constraint keyword
+            if (['requires', 'excludes'].includes(constraintKeyword)) {
+                // Valid constraint - check symbol references using import-aware symbol availability
+                if (!this.symbolManager.isSymbolAvailable(source, documentUri)) {
+                    const range = new vscode.Range(lineIndex, 0, lineIndex, source.length);
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Reference to undefined symbol: ${source}. Make sure it's defined locally or imported.`,
+                        vscode.DiagnosticSeverity.Error
+                    );
+                    diagnostic.code = 'undefined-symbol-reference';
+                    this.diagnostics.push(diagnostic);
+                }
+                
+                if (!this.symbolManager.isSymbolAvailable(target, documentUri)) {
+                    const start = trimmedLine.indexOf(target);
+                    const range = new vscode.Range(lineIndex, start, lineIndex, start + target.length);
+                    const diagnostic = new vscode.Diagnostic(
+                        range,
+                        `Reference to undefined symbol: ${target}. Make sure it's defined locally or imported.`,
                         vscode.DiagnosticSeverity.Error
                     );
                     diagnostic.code = 'undefined-symbol-reference';

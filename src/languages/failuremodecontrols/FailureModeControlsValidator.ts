@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { BaseValidator } from '../base/BaseValidator';
 import { LanguageConfig } from '../../config/LanguageConfigs';
+import { SymbolManager } from '../../core/SymbolManager';
 
 export class FailureModeControlsValidator extends BaseValidator {
     private readonly EFFECTIVENESS_LEVELS = ['high', 'medium', 'low'];
@@ -17,8 +18,8 @@ export class FailureModeControlsValidator extends BaseValidator {
     private readonly DETECTION_RATING_RANGE = { min: 1, max: 10 };
     private readonly PERCENTAGE_RANGE = { min: 0, max: 100 };
 
-    constructor(languageConfig: LanguageConfig) {
-        super(languageConfig);
+    constructor(languageConfig: LanguageConfig, symbolManager: SymbolManager) {
+        super(languageConfig, symbolManager);
     }
 
     protected getDefinitionKeywords(): string[] {

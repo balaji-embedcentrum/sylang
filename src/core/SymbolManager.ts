@@ -22,9 +22,41 @@ export interface SymbolInfo {
     references: SymbolReference[];
 }
 
+// New interfaces for import system
+export interface ImportStatement {
+    keyword: string;          // 'systemfeatures', 'functiongroup', etc.
+    identifier: string;       // The imported identifier
+    selectiveImports?: string[]; // For selective imports: use systemfeatures CoreFeatures.Engine, CoreFeatures.Safety
+    location: vscode.Location;
+    range: vscode.Range;
+}
+
+export interface HeaderDefinition {
+    identifier: string;       // The header identifier (e.g., 'CoreFeatures')
+    keyword: string;         // The header type (e.g., 'systemfeatures')
+    fileUri: string;         // File containing this header
+    childSymbols: string[];  // All symbols defined under this header
+    location: vscode.Location;
+}
+
+export interface WorkspaceIndex {
+    headerDefinitions: Map<string, HeaderDefinition>;  // identifier -> HeaderDefinition
+    symbolToFile: Map<string, string>;                 // Quick lookup: symbol -> fileUri
+    fileToHeaders: Map<string, string[]>;              // fileUri -> header identifiers
+}
+
 export class SymbolManager {
     private symbols: Map<string, SymbolInfo> = new Map();
     private workspaceSymbols: Map<string, SymbolDefinition[]> = new Map();
+    
+    // New properties for import system
+    private imports: Map<string, ImportStatement[]> = new Map(); // fileUri -> imports
+    private workspaceIndex: WorkspaceIndex = {
+        headerDefinitions: new Map(),
+        symbolToFile: new Map(),
+        fileToHeaders: new Map()
+    };
+    private indexingInProgress: boolean = false;
 
     /**
      * Parse a document and extract all symbol definitions and references
@@ -1209,5 +1241,316 @@ export class SymbolManager {
         }
 
         return { definitions, references };
+    }
+
+    // ============================================================================
+    // NEW IMPORT SYSTEM METHODS - ADDED WITHOUT MODIFYING EXISTING FUNCTIONALITY
+    // ============================================================================
+
+    /**
+     * Parse import statements from a document
+     */
+    private parseImportStatements(document: vscode.TextDocument): ImportStatement[] {
+        const imports: ImportStatement[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const line = lines[lineIndex].trim();
+            
+            // Skip empty lines and comments
+            if (!line || line.startsWith('#') || line.startsWith('//')) {
+                continue;
+            }
+
+            // Parse use statements: use keyword identifier [.selectiveImports]
+            const useMatch = line.match(/^use\s+(\w+)\s+([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+,?\s*)*)$/);
+            if (useMatch) {
+                const keyword = useMatch[1];
+                const identifierPart = useMatch[2];
+                
+                const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                const location = new vscode.Location(document.uri, range);
+
+                // Check for selective imports (identifier.symbol1, identifier.symbol2)
+                if (identifierPart.includes('.')) {
+                    const parts = identifierPart.split('.');
+                    const identifier = parts[0];
+                    const selectiveImports = parts.slice(1).join('.').split(',').map(s => s.trim());
+                    
+                    imports.push({
+                        keyword,
+                        identifier,
+                        selectiveImports,
+                        location,
+                        range
+                    });
+                } else {
+                    // Simple import
+                    imports.push({
+                        keyword,
+                        identifier: identifierPart,
+                        location,
+                        range
+                    });
+                }
+            }
+        }
+
+        return imports;
+    }
+
+    /**
+     * Build workspace-wide symbol index
+     */
+    public async buildWorkspaceIndex(): Promise<void> {
+        if (this.indexingInProgress) {
+            return;
+        }
+
+        this.indexingInProgress = true;
+        
+        try {
+            // Show progress for large workspaces
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: "Building Sylang symbol index...",
+                cancellable: false
+            }, async (progress) => {
+                // Clear existing index
+                this.workspaceIndex.headerDefinitions.clear();
+                this.workspaceIndex.symbolToFile.clear();
+                this.workspaceIndex.fileToHeaders.clear();
+
+                // Find all Sylang files in workspace
+                const sylangFiles = await vscode.workspace.findFiles('**/*.{fml,fun,sys,ple,vml,haz,rsk,sgl,req,sub,blk}');
+                
+                for (let i = 0; i < sylangFiles.length; i++) {
+                    const fileUri = sylangFiles[i];
+                    progress.report({ 
+                        increment: (i / sylangFiles.length) * 100,
+                        message: `Processing ${fileUri.fsPath}...`
+                    });
+
+                    await this.indexFileHeaders(fileUri);
+                }
+            });
+        } finally {
+            this.indexingInProgress = false;
+        }
+    }
+
+    /**
+     * Index header definitions from a specific file
+     */
+    private async indexFileHeaders(fileUri: vscode.Uri): Promise<void> {
+        try {
+            const document = await vscode.workspace.openTextDocument(fileUri);
+            const text = document.getText();
+            const lines = text.split('\n');
+            const fileHeaders: string[] = [];
+            const childSymbols: string[] = [];
+
+            for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                const line = lines[lineIndex].trim();
+                
+                // Find header definitions (def keyword identifier)
+                const headerMatch = line.match(/^def\s+(systemfeatures|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals|functionalsafetyrequirements|subsystem|component)\s+([A-Za-z0-9_]+)/);
+                if (headerMatch) {
+                    const keyword = headerMatch[1];
+                    const identifier = headerMatch[2];
+                    
+                    const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                    const location = new vscode.Location(fileUri, range);
+
+                    // Check for duplicate identifiers
+                    if (this.workspaceIndex.headerDefinitions.has(identifier)) {
+                        const existing = this.workspaceIndex.headerDefinitions.get(identifier)!;
+                        console.warn(`Duplicate identifier '${identifier}' found in ${fileUri.fsPath} and ${existing.fileUri}`);
+                    }
+
+                    const headerDef: HeaderDefinition = {
+                        identifier,
+                        keyword,
+                        fileUri: fileUri.toString(),
+                        childSymbols: [], // Will be populated below
+                        location
+                    };
+
+                    this.workspaceIndex.headerDefinitions.set(identifier, headerDef);
+                    this.workspaceIndex.symbolToFile.set(identifier, fileUri.toString());
+                    fileHeaders.push(identifier);
+                }
+
+                // Find child definitions under headers
+                const childMatch = line.match(/^\s+def\s+\w+\s+([A-Za-z0-9_]+)/);
+                if (childMatch) {
+                    const childIdentifier = childMatch[1];
+                    childSymbols.push(childIdentifier);
+                    this.workspaceIndex.symbolToFile.set(childIdentifier, fileUri.toString());
+                }
+            }
+
+            // Update child symbols for headers in this file
+            for (const headerId of fileHeaders) {
+                const headerDef = this.workspaceIndex.headerDefinitions.get(headerId);
+                if (headerDef) {
+                    headerDef.childSymbols = childSymbols;
+                }
+            }
+
+            this.workspaceIndex.fileToHeaders.set(fileUri.toString(), fileHeaders);
+
+        } catch (error) {
+            console.error(`Error indexing file ${fileUri.fsPath}:`, error);
+        }
+    }
+
+    /**
+     * Update document parsing to include import tracking
+     */
+    public async parseDocumentWithImports(document: vscode.TextDocument, languageConfig: LanguageConfig): Promise<void> {
+        // Parse imports first
+        const importStatements = this.parseImportStatements(document);
+        this.imports.set(document.uri.toString(), importStatements);
+
+        // Call existing parseDocument method (unchanged)
+        await this.parseDocument(document, languageConfig);
+
+        // Update workspace index for this file
+        await this.indexFileHeaders(document.uri);
+    }
+
+    /**
+     * Get imports for a specific document
+     */
+    public getDocumentImports(documentUri: string): ImportStatement[] {
+        return this.imports.get(documentUri) || [];
+    }
+
+    /**
+     * Check if a symbol is available in the given document (either defined locally or imported)
+     */
+    public isSymbolAvailable(symbolName: string, documentUri: string): boolean {
+        // Check if symbol is defined locally
+        const localSymbols = this.workspaceSymbols.get(documentUri) || [];
+        if (localSymbols.some(sym => sym.name === symbolName)) {
+            return true;
+        }
+
+        // Check if symbol is imported
+        const imports = this.getDocumentImports(documentUri);
+        for (const importStmt of imports) {
+            const headerDef = this.workspaceIndex.headerDefinitions.get(importStmt.identifier);
+            if (headerDef) {
+                // Check selective imports
+                if (importStmt.selectiveImports) {
+                    if (importStmt.selectiveImports.includes(symbolName)) {
+                        return true;
+                    }
+                } else {
+                    // Simple import - check all child symbols
+                    if (headerDef.childSymbols.includes(symbolName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get available symbols for a document (local + imported)
+     */
+    public getAvailableSymbols(documentUri: string): SymbolDefinition[] {
+        const availableSymbols: SymbolDefinition[] = [];
+
+        // Add local symbols
+        const localSymbols = this.workspaceSymbols.get(documentUri) || [];
+        availableSymbols.push(...localSymbols);
+
+        // Add imported symbols
+        const imports = this.getDocumentImports(documentUri);
+        for (const importStmt of imports) {
+            const headerDef = this.workspaceIndex.headerDefinitions.get(importStmt.identifier);
+            if (headerDef && headerDef.fileUri !== documentUri) {
+                const importedFileSymbols = this.workspaceSymbols.get(headerDef.fileUri) || [];
+                
+                if (importStmt.selectiveImports) {
+                    // Add only selective imports
+                    const selectiveSymbols = importedFileSymbols.filter(sym => 
+                        importStmt.selectiveImports!.includes(sym.name)
+                    );
+                    availableSymbols.push(...selectiveSymbols);
+                } else {
+                    // Add all symbols from imported header
+                    availableSymbols.push(...importedFileSymbols);
+                }
+            }
+        }
+
+        return availableSymbols;
+    }
+
+    /**
+     * Validate imports in a document
+     */
+    public validateImports(documentUri: string): { errors: string[]; warnings: string[] } {
+        const errors: string[] = [];
+        const warnings: string[] = [];
+        const imports = this.getDocumentImports(documentUri);
+        const usedSymbols = new Set<string>();
+
+        // Collect used symbols in document
+        const documentSymbols = this.symbols.get(documentUri);
+        if (documentSymbols) {
+            documentSymbols.references.forEach(ref => usedSymbols.add(ref.name));
+        }
+
+        for (const importStmt of imports) {
+            // Check if imported header exists
+            const headerDef = this.workspaceIndex.headerDefinitions.get(importStmt.identifier);
+            if (!headerDef) {
+                errors.push(`Import error: '${importStmt.identifier}' not found in workspace`);
+                continue;
+            }
+
+            // Check if import is used
+            let importUsed = false;
+            if (importStmt.selectiveImports) {
+                importUsed = importStmt.selectiveImports.some(sym => usedSymbols.has(sym));
+            } else {
+                importUsed = headerDef.childSymbols.some(sym => usedSymbols.has(sym));
+            }
+
+            if (!importUsed) {
+                warnings.push(`Unused import: '${importStmt.identifier}'`);
+            }
+        }
+
+        return { errors, warnings };
+    }
+
+    /**
+     * Clear import data for a document
+     */
+    public clearDocumentImports(documentUri: string): void {
+        this.imports.delete(documentUri);
+        
+        // Also clear from workspace index
+        const headers = this.workspaceIndex.fileToHeaders.get(documentUri) || [];
+        for (const header of headers) {
+            this.workspaceIndex.headerDefinitions.delete(header);
+            this.workspaceIndex.symbolToFile.delete(header);
+        }
+        this.workspaceIndex.fileToHeaders.delete(documentUri);
+    }
+
+    /**
+     * Get workspace index (for debugging/testing)
+     */
+    public getWorkspaceIndex(): WorkspaceIndex {
+        return this.workspaceIndex;
     }
 }

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { BaseValidator } from '../base/BaseValidator';
 import { LanguageConfig } from '../../config/LanguageConfigs';
+import { SymbolManager } from '../../core/SymbolManager';
 
 export class FailureModeAnalysisValidator extends BaseValidator {
     private readonly SEVERITY_RANGE = { min: 1, max: 10 };
@@ -9,8 +10,8 @@ export class FailureModeAnalysisValidator extends BaseValidator {
     private readonly ASIL_LEVELS = ['QM', 'A', 'B', 'C', 'D'];
     private readonly ACTION_PRIORITIES = ['high', 'medium', 'low'];
 
-    constructor(languageConfig: LanguageConfig) {
-        super(languageConfig);
+    constructor(languageConfig: LanguageConfig, symbolManager: SymbolManager) {
+        super(languageConfig, symbolManager);
     }
 
     protected getDefinitionKeywords(): string[] {

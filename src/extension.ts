@@ -19,8 +19,13 @@ class SylangExtension {
 
         try {
             // Initialize core services
-            this.validationEngine = new ValidationEngine();
             this.symbolManager = new SymbolManager();
+            this.validationEngine = new ValidationEngine(this.symbolManager);
+
+            // Build workspace index for import resolution
+            console.log('[Sylang] Building workspace index for import resolution...');
+            await this.symbolManager.buildWorkspaceIndex();
+            console.log('[Sylang] Workspace index building completed');
 
             // Parse symbols for all currently open Sylang documents
             for (const document of vscode.workspace.textDocuments) {
@@ -45,7 +50,7 @@ class SylangExtension {
                 context.subscriptions.push(
                     vscode.languages.registerCompletionItemProvider(
                         { language: languageId },
-                        new SylangCompletionProvider(languageId, keywords),
+                        new SylangCompletionProvider(languageId, keywords, this.symbolManager),
                         ' ', ':', '"'
                     )
                 );

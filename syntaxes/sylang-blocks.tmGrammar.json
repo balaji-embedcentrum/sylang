@@ -4,6 +4,7 @@
   "scopeName": "source.sylang.blocks",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#imports" },
     { "include": "#def-keyword" },
     { "include": "#block-types" },
     { "include": "#secondary-keywords" },
@@ -26,11 +27,29 @@
         }
       ]
     },
+    "imports": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.control.import.sylang"
+            },
+            "2": {
+              "name": "storage.type.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.sylang"
+            }
+          }
+        }
+      ]
+    },
     "def-keyword": {
       "patterns": [
         {
           "name": "keyword.control.def.sylang",
-          "match": "\\bdef\\b"
+          "match": "\\b(use|def)\\b"
         }
       ]
     },

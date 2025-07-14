@@ -1,0 +1,53 @@
+// Test file for comprehensive Phase 2 import system functionality
+// This file demonstrates:
+// 1. Simple imports
+// 2. Selective imports
+// 3. Import validation
+// 4. Symbol availability checking
+// 5. Cross-file constraint validation
+
+// Import entire feature model
+use systemfeatures CoreFeatures
+use systemfeatures SafetyFeatures
+use systemfeatures InverterFeatures
+
+// Selective imports (if CoreFeatures has multiple subcomponents)
+use functiongroup Core.Engine, Core.Safety
+
+def systemfeatures TestFeatures
+  name "Test Features with Import Support"
+  description "Comprehensive test of Phase 2 import functionality"
+  owner "Sylang Development Team"
+  tags "test", "import", "phase2"
+
+  // Features that reference imported symbols
+  def feature TestEngineFeature mandatory
+    name "Test Engine Feature"
+    description "Feature that requires imported engine components"
+    // This constraint references an imported symbol
+    requires EngineControl  // Should be available through CoreFeatures import
+    
+  def feature TestSafetyFeature optional
+    name "Test Safety Feature"
+    description "Feature that requires imported safety components"
+    // This constraint references a selectively imported symbol
+    requires SafetyMonitor  // Should be available through Core.Safety selective import
+    
+  def feature LocalFeature mandatory
+    name "Local Feature"
+    description "Feature defined locally"
+    
+  def feature IntegratedFeature optional
+    name "Integrated Feature" 
+    description "Feature that uses both local and imported symbols"
+    requires LocalFeature    // Local reference
+    requires PowerOutput     // Should be available through InverterFeatures import
+    excludes EmergencyStop   // Should be available through selective import
+
+  // Constraint section testing import validation
+  def feature InvalidReference optional
+    name "Invalid Reference Feature"
+    description "This feature references non-imported symbols to test validation"
+    // This should generate import validation errors:
+    requires NonExistentFeature  // Should show error: not imported or defined locally
+    requires AnotherMissingFeature 

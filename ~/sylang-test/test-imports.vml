@@ -1,0 +1,19 @@
+use systemfeatures CoreAutomotiveFeatures
+use functiongroup PowerElectronicsControls
+
+def variantmodel PremiumVariantWithImports
+
+    # Using imported features from CoreAutomotiveFeatures
+    feature Engine mandatory selected
+        feature Gasoline alternative selected
+        feature Diesel alternative
+        feature Electric alternative
+
+    feature Safety mandatory selected
+        feature ABS mandatory selected
+        feature ESP mandatory selected
+
+    # Additional features defined locally
+    feature PremiumPackage optional selected
+        feature LeatherSeats optional selected
+        feature SunRoof optional 

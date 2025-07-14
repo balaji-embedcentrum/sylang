@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseValidator } from '../languages/base/BaseValidator';
+import { SymbolManager } from './SymbolManager';
 import { FeaturesValidator } from '../languages/features/FeaturesValidator';
 import { VariantModelValidator } from '../languages/variantmodel/VariantModelValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
@@ -20,9 +21,11 @@ import { getLanguageConfig } from '../config/LanguageConfigs';
 export class ValidationEngine {
     private diagnosticCollection: vscode.DiagnosticCollection;
     private validators: Map<string, BaseValidator> = new Map();
+    private symbolManager: SymbolManager;
 
-    constructor() {
+    constructor(symbolManager: SymbolManager) {
         this.diagnosticCollection = vscode.languages.createDiagnosticCollection('sylang');
+        this.symbolManager = symbolManager;
         this.initializeValidators();
     }
 
@@ -31,37 +34,37 @@ export class ValidationEngine {
         try {
             const featuresConfig = getLanguageConfig('sylang-features');
             if (featuresConfig) {
-                this.validators.set('sylang-features', new FeaturesValidator(featuresConfig));
+                this.validators.set('sylang-features', new FeaturesValidator(featuresConfig, this.symbolManager));
             }
 
             const variantModelConfig = getLanguageConfig('sylang-variantmodel');
             if (variantModelConfig) {
-                this.validators.set('sylang-variantmodel', new VariantModelValidator(variantModelConfig));
+                this.validators.set('sylang-variantmodel', new VariantModelValidator(variantModelConfig, this.symbolManager));
             }
 
             const productLineConfig = getLanguageConfig('sylang-productline');
             if (productLineConfig) {
-                this.validators.set('sylang-productline', new ProductLineValidator(productLineConfig));
+                this.validators.set('sylang-productline', new ProductLineValidator(productLineConfig, this.symbolManager));
             }
 
             const functionsConfig = getLanguageConfig('sylang-functions');
             if (functionsConfig) {
-                this.validators.set('sylang-functions', new FunctionsValidator(functionsConfig));
+                this.validators.set('sylang-functions', new FunctionsValidator(functionsConfig, this.symbolManager));
             }
 
             const failureModeAnalysisConfig = getLanguageConfig('sylang-failuremodeanalysis');
             if (failureModeAnalysisConfig) {
-                this.validators.set('sylang-failuremodeanalysis', new FailureModeAnalysisValidator(failureModeAnalysisConfig));
+                this.validators.set('sylang-failuremodeanalysis', new FailureModeAnalysisValidator(failureModeAnalysisConfig, this.symbolManager));
             }
 
             const failureModeControlsConfig = getLanguageConfig('sylang-failuremodecontrols');
             if (failureModeControlsConfig) {
-                this.validators.set('sylang-failuremodecontrols', new FailureModeControlsValidator(failureModeControlsConfig));
+                this.validators.set('sylang-failuremodecontrols', new FailureModeControlsValidator(failureModeControlsConfig, this.symbolManager));
             }
 
             const faultTreeAnalysisConfig = getLanguageConfig('sylang-faulttreeanalysis');
             if (faultTreeAnalysisConfig) {
-                this.validators.set('sylang-faulttreeanalysis', new FaultTreeAnalysisValidator(faultTreeAnalysisConfig));
+                this.validators.set('sylang-faulttreeanalysis', new FaultTreeAnalysisValidator(faultTreeAnalysisConfig, this.symbolManager));
             }
 
             // For safety files, we'll handle them separately in validateDocument
@@ -111,11 +114,11 @@ export class ValidationEngine {
                     console.log(`[ValidationEngine] Running BlockValidator for .${extension} file`);
                 } else if (extension === 'fma') {
                     const fmaConfig = getLanguageConfig('sylang-failuremodeanalysis');
-                    validator = new FailureModeAnalysisValidator(fmaConfig!);
+                    validator = new FailureModeAnalysisValidator(fmaConfig!, this.symbolManager);
                     console.log(`[ValidationEngine] Running FailureModeAnalysisValidator for .${extension} file`);
                 } else if (extension === 'fmc') {
                     const fmcConfig = getLanguageConfig('sylang-failuremodecontrols');
-                    validator = new FailureModeControlsValidator(fmcConfig!);
+                    validator = new FailureModeControlsValidator(fmcConfig!, this.symbolManager);
                     console.log(`[ValidationEngine] Running FailureModeControlsValidator for .${extension} file`);
                 } else {
                     validator = new SafetyValidator();
