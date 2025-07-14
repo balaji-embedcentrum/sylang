@@ -81,6 +81,30 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'asil': ['QM', 'A', 'B', 'C', 'D']
         }
     },
+    'sylang-faulttreeanalysis': {
+        id: 'sylang-faulttreeanalysis',
+        aliases: ['Sylang Fault Tree Analysis', 'sylang-fta'],
+        extensions: ['.fta'],
+        keywords: [
+            'def', 'faulttree', 'topevent', 'intermediateevent', 'basicevent', 'gate', 'transfer',
+            'name', 'description', 'owner', 'reviewers', 'standards', 'analysismethod', 'condition',
+            'from', 'to', 'targetfta', 'gatetype', 'severity', 'category', 'asil', 'dormancy',
+            'probability', 'exposuretime', 'repairtime', 'inputs', 'outputs', 'item',
+            'hazardidentification', 'riskassessment', 'safetygoals', 'productline', 'systemfeatures',
+            'systemfunctions', 'AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT', 'INHIBIT', 'PRIORITY_AND',
+            'VOTING', 'S0', 'S1', 'S2', 'S3', 'systematic', 'random', 'external', 'common_cause',
+            'human_error', 'QM', 'A', 'B', 'C', 'D', 'none', 'low', 'medium', 'high'
+        ],
+        snippetFile: 'faulttreeanalysis.json',
+        validationRules: ['required-fields', 'safety-levels', 'fault-tree-structure', 'def-keyword'],
+        validPropertyValues: {
+            'gatetype': ['AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT', 'INHIBIT', 'PRIORITY_AND', 'VOTING'],
+            'severity': ['S0', 'S1', 'S2', 'S3'],
+            'category': ['systematic', 'random', 'external', 'common_cause', 'human_error'],
+            'asil': ['QM', 'A', 'B', 'C', 'D'],
+            'dormancy': ['none', 'low', 'medium', 'high']
+        }
+    },
     'sylang-features': {
         id: 'sylang-features',
         aliases: ['Sylang Features', 'sylang-fml'],
