@@ -1,0 +1,84 @@
+{
+  "name": "Sylang Variant Model",
+  "scopeName": "source.sylang.variantmodel",
+  "fileTypes": ["vml"],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#feature-definition"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "match": "#.*$",
+          "name": "comment.line.hash.sylang"
+        }
+      ]
+    },
+    "feature-definition": {
+      "patterns": [
+        {
+          "match": "\\b(feature)\\s+(\\w+)\\s+(mandatory|optional|alternative)\\s*(selected)?\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.other.sylang"
+            },
+            "2": {
+              "name": "entity.name.function.sylang"
+            },
+            "3": {
+              "name": "storage.type.sylang"
+            },
+            "4": {
+              "name": "keyword.other.selected.sylang"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "\\b(feature|mandatory|optional|alternative|selected)\\b",
+          "name": "keyword.control.sylang"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.sylang",
+          "patterns": [
+            {
+              "match": "\\\\.",
+              "name": "constant.character.escape.sylang"
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    }
+  }
+} 

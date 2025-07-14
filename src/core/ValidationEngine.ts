@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { BaseValidator } from '../languages/base/BaseValidator';
 import { FeaturesValidator } from '../languages/features/FeaturesValidator';
+import { VariantModelValidator } from '../languages/variantmodel/VariantModelValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
 import { FailureModeAnalysisValidator } from '../languages/failuremodeanalysis/FailureModeAnalysisValidator';
 import { FailureModeControlsValidator } from '../languages/failuremodecontrols/FailureModeControlsValidator';
@@ -31,6 +32,11 @@ export class ValidationEngine {
             const featuresConfig = getLanguageConfig('sylang-features');
             if (featuresConfig) {
                 this.validators.set('sylang-features', new FeaturesValidator(featuresConfig));
+            }
+
+            const variantModelConfig = getLanguageConfig('sylang-variantmodel');
+            if (variantModelConfig) {
+                this.validators.set('sylang-variantmodel', new VariantModelValidator(variantModelConfig));
             }
 
             const productLineConfig = getLanguageConfig('sylang-productline');

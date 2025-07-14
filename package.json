@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -114,6 +114,17 @@
         ],
         "extensions": [
           ".fml"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-variantmodel",
+        "aliases": [
+          "Sylang Variant Model",
+          "sylang-vml"
+        ],
+        "extensions": [
+          ".vml"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -250,6 +261,11 @@
         "path": "./syntaxes/sylang-features.tmGrammar.json"
       },
       {
+        "language": "sylang-variantmodel",
+        "scopeName": "source.sylang.variantmodel",
+        "path": "./syntaxes/sylang-variantmodel.tmGrammar.json"
+      },
+      {
         "language": "sylang-safety",
         "scopeName": "source.sylang.safety",
         "path": "./syntaxes/sylang-safety.tmGrammar.json"
@@ -314,6 +330,10 @@
       {
         "language": "sylang-features",
         "path": "./snippets/features.json"
+      },
+      {
+        "language": "sylang-variantmodel",
+        "path": "./snippets/variantmodel.json"
       },
       {
         "language": "sylang-safety",
@@ -398,14 +418,14 @@
       "explorer/context": [
         {
           "command": "sylang.validate",
-          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
+          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|vml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
           "group": "sylang@1"
         }
       ],
       "editor/context": [
         {
           "submenu": "sylang.core.submenu",
-          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
+          "when": "resourceExtname =~ /\\.(ple|fun|fma|fmc|fta|fml|vml|itm|sgl|haz|rsk|fsr|tra|thr|sgo|sre|ast|sec|cmp|sub|req|mod|prt|ckt|asm)$/",
           "group": "sylang@1"
         }
       ],
@@ -452,6 +472,7 @@
     "onLanguage:sylang-productline",
     "onLanguage:sylang-functions",
     "onLanguage:sylang-features",
+    "onLanguage:sylang-variantmodel",
     "onLanguage:sylang-safety",
     "onLanguage:sylang-security",
     "onLanguage:sylang-components"

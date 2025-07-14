@@ -120,6 +120,19 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'duplicate-features', 'structural-order', 'def-keyword'
         ]
     },
+    'sylang-variantmodel': {
+        id: 'sylang-variantmodel',
+        aliases: ['Sylang Variant Model', 'sylang-vml'],
+        extensions: ['.vml'],
+        keywords: [
+            'feature', 'mandatory', 'optional', 'alternative', 'selected'
+        ],
+        snippetFile: 'variantmodel.json',
+        validationRules: [
+            'feature-selection-consistency', 'mandatory-selection-validation', 
+            'alternative-selection-validation', 'indentation-validation'
+        ]
+    },
     'sylang-safety': {
         id: 'sylang-safety',
         aliases: ['Sylang Safety', 'sylang-safety'],
