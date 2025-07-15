@@ -124,9 +124,8 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Variant Model', 'sylang-vml'],
         extensions: ['.vml'],
         keywords: [
-            'def', 'variantmodel', 'variant', 'name', 'description', 'owner', 
-            'tags', 'safetylevel', 'configuration', 'feature', 'variation', 
-            'enables', 'constraints', 'requires', 'excludes'
+            'def', 'variantmodel', 'feature', 'mandatory', 'optional', 'alternative', 
+            'selected', 'use', 'featureset', 'name', 'description', 'owner', 'tags'
         ],
         snippetFile: 'variantmodel.json',
         validationRules: [

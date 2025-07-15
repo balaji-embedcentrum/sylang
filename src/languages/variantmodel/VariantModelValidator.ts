@@ -33,19 +33,35 @@ export class VariantModelValidator extends BaseValidator {
             return;
         }
 
+        // Validate import statements
+        if (trimmedLine.startsWith('use ')) {
+            await this.validateImportSyntax(lineIndex, trimmedLine);
+        }
         // Validate def variantmodel syntax
-        if (trimmedLine.startsWith('def variantmodel')) {
+        else if (trimmedLine.startsWith('def variantmodel')) {
             await this.validateVariantModelDefinition(lineIndex, trimmedLine);
         }
         // Validate feature line syntax (must be indented)
         else if (trimmedLine.startsWith('feature ')) {
             await this.validateFeatureDefinition(document, lineIndex, line, trimmedLine);
-        } else {
+        }
+        // Validate standard properties (name, description, owner, tags, etc.)
+        else if (this.isPropertyLine(trimmedLine)) {
+            await this.validatePropertySyntax(lineIndex, line, trimmedLine);
+        }
+        // Validate constraints section
+        else if (trimmedLine === 'constraints') {
+            // Valid constraints header
+        }
+        else if (this.isConstraintLine(trimmedLine)) {
+            await this.validateConstraintSyntax(lineIndex, trimmedLine);
+        }
+        else {
             this.addDiagnostic(
                 lineIndex,
                 0,
                 trimmedLine.length,
-                'Invalid line. Expected "def variantmodel", indented feature definition, or comment.',
+                'Invalid line. Expected import, variantmodel definition, feature, property, constraint, or comment.',
                 'invalid-line'
             );
         }
@@ -324,5 +340,97 @@ export class VariantModelValidator extends BaseValidator {
     protected override getIndentLevel(line: string): number {
         const match = line.match(/^(\s*)/);
         return match ? match[1].length : 0;
+    }
+
+    private async validateImportSyntax(lineIndex: number, trimmedLine: string): Promise<void> {
+        // Validate import syntax: use <keyword> <identifier>
+        const importMatch = trimmedLine.match(/^use\s+(featureset|functiongroup|requirements|safetygoals)\s+([A-Z][A-Za-z0-9_]*)$/);
+        
+        if (!importMatch) {
+            this.addDiagnostic(
+                lineIndex,
+                0,
+                trimmedLine.length,
+                'Invalid import syntax. Expected: use <keyword> <PascalCaseIdentifier>',
+                'invalid-import-syntax'
+            );
+        }
+    }
+
+    protected override isPropertyLine(trimmedLine: string): boolean {
+        const validProperties = ['name', 'description', 'owner', 'tags', 'safetylevel'];
+        return validProperties.some(prop => trimmedLine.startsWith(`${prop} `));
+    }
+
+    private async validatePropertySyntax(lineIndex: number, line: string, trimmedLine: string): Promise<void> {
+        const indent = this.getIndentLevel(line);
+        
+        // Properties must be indented
+        if (indent === 0) {
+            this.addDiagnostic(
+                lineIndex,
+                0,
+                trimmedLine.length,
+                'Properties must be indented under a definition',
+                'property-not-indented'
+            );
+            return;
+        }
+
+        // Validate property syntax
+        if (trimmedLine.startsWith('name ') || trimmedLine.startsWith('description ') || trimmedLine.startsWith('owner ')) {
+            const stringMatch = trimmedLine.match(/^(name|description|owner)\s+"([^"]+)"$/);
+            if (!stringMatch) {
+                this.addDiagnostic(
+                    lineIndex,
+                    indent,
+                    trimmedLine.length,
+                    'Property value must be a quoted string',
+                    'invalid-property-value'
+                );
+            }
+        } else if (trimmedLine.startsWith('tags ')) {
+            const tagsMatch = trimmedLine.match(/^tags\s+"([^"]+)"(?:\s*,\s*"([^"]+)")*$/);
+            if (!tagsMatch) {
+                this.addDiagnostic(
+                    lineIndex,
+                    indent,
+                    trimmedLine.length,
+                    'Tags must be comma-separated quoted strings',
+                    'invalid-tags-format'
+                );
+            }
+        } else if (trimmedLine.startsWith('safetylevel ')) {
+            const safetyLevelMatch = trimmedLine.match(/^safetylevel\s+(ASIL-[ABCD]|[ABCD]|QM)$/);
+            if (!safetyLevelMatch) {
+                this.addDiagnostic(
+                    lineIndex,
+                    indent,
+                    trimmedLine.length,
+                    'Safety level must be one of: ASIL-A, ASIL-B, ASIL-C, ASIL-D, A, B, C, D, QM',
+                    'invalid-safety-level'
+                );
+            }
+        }
+    }
+
+    private isConstraintLine(trimmedLine: string): boolean {
+        const constraintKeywords = ['requires', 'excludes', 'implies', 'conflicts'];
+        return constraintKeywords.some(keyword => trimmedLine.startsWith(`${keyword} `));
+    }
+
+    private async validateConstraintSyntax(lineIndex: number, trimmedLine: string): Promise<void> {
+        // Basic constraint syntax validation
+        const constraintMatch = trimmedLine.match(/^(requires|excludes|implies|conflicts)\s+(.+)$/);
+        
+        if (!constraintMatch) {
+            this.addDiagnostic(
+                lineIndex,
+                0,
+                trimmedLine.length,
+                'Invalid constraint syntax',
+                'invalid-constraint-syntax'
+            );
+        }
     }
 } 

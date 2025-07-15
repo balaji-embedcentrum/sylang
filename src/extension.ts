@@ -375,7 +375,42 @@ featureset FeatureSetName
 - \`alternative\`: Exactly one from group must be selected
 - \`or\`: One or more from group can be selected
 
-### 3. FUNCTION DEFINITIONS (.fun)
+### 3. VARIANT MODELING (.vml)
+
+**Purpose**: Define variant configurations and feature selections
+**Top-level keyword**: \`variantmodel\`
+**File limit**: ONE per workspace
+
+**Complete Syntax**:
+\`\`\`sylang
+def variantmodel VariantName
+
+    # Core features (mandatory)
+    feature CoreFeature mandatory selected
+        feature SubFeature1 mandatory selected
+        feature SubFeature2 optional selected
+        
+    # Alternative features (exactly one selected)
+    feature FeatureGroup mandatory selected
+        feature OptionA alternative selected
+        feature OptionB alternative
+        feature OptionC alternative
+        
+    # Optional features
+    feature OptionalFeature optional
+        feature SubOptional optional selected
+\`\`\`
+
+**Variability Types**:
+- \`mandatory\`: Required feature (must be included)
+- \`optional\`: Optional feature (may be included)  
+- \`alternative\`: Exactly one from group must be selected
+
+**Selection**: \`selected\` keyword indicates chosen features
+**Indentation**: Exactly 4 spaces per level for .vml files
+**Validation**: Alternative groups must have exactly one feature selected
+
+### 4. FUNCTION DEFINITIONS (.fun)
 
 **Purpose**: Define system functions and their relationships
 **Top-level keyword**: \`functiongroup\`

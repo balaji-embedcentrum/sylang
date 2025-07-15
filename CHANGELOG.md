@@ -2,6 +2,20 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.65] - 2025-01-18
+
+### Enhanced
+- **Enhanced .vml Support**: Improved variant model (.vml) file validation and syntax highlighting
+  - Added comprehensive property validation (name, description, owner, tags, safetylevel)
+  - Enhanced import statement validation for `use featureset` declarations
+  - Added constraint syntax validation (requires, excludes, implies, conflicts)
+  - Updated sylangrules specification with complete .vml grammar and examples
+  - Created sample `inverter.vml` file demonstrating proper variant model syntax
+
+### Fixed
+- **VariantModelValidator**: Enhanced validation to support all standard Sylang properties
+- **Syntax Highlighting**: Improved keyword recognition for .vml files with proper feature selection syntax
+
 ## [1.0.64] - 2025-01-15
 
 ### Fixed
