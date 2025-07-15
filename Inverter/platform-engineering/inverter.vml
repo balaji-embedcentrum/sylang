@@ -1,0 +1,62 @@
+use featureset InverterFeatures
+
+def variantmodel InverterVariant
+    name "Inverter Product Variant"
+    description "Configuration variants for automotive electric vehicle inverter system"
+    owner "Product Engineering Team"
+    tags "inverter", "variant", "configuration"
+    safetylevel ASIL-D
+
+    # Core System Features (mandatory and selected)
+    feature InverterSystem mandatory selected
+
+        feature PowerConversion mandatory selected
+            feature DCBusManagement alternative selected
+            feature IGBTDrivers alternative
+
+        feature MotorControl mandatory selected
+            feature VectorControl mandatory selected
+            feature SpaceVectorPWM mandatory selected
+            feature TorqueControl mandatory selected
+            feature SpeedControl optional
+
+        feature SafetySystems mandatory selected
+            feature OvervoltageProtection mandatory selected
+            feature OvercurrentProtection mandatory selected
+            feature ShortCircuitProtection mandatory selected
+            feature IsolationMonitoring mandatory selected
+
+        feature SensorInterfaces mandatory selected
+            feature CurrentSensing mandatory selected
+            feature PositionSensing mandatory selected
+            feature TemperatureSensing optional selected
+
+    # Thermal Management (mandatory with alternatives)
+    feature ThermalManagement mandatory selected
+        feature OvertemperatureProtection mandatory selected
+        
+        # Cooling method - exactly one must be selected
+        feature CoolingMethod mandatory selected
+            feature CoolantControl alternative selected
+            feature FanControl alternative
+
+    # Communication Features (mandatory)
+    feature CommunicationInterfaces mandatory selected
+        feature CANInterface mandatory selected
+        feature EthernetInterface optional
+
+    # Diagnostic Features (mandatory)
+    feature Diagnostics mandatory selected
+        feature OBDCompliance mandatory selected
+        feature FaultMemory mandatory selected
+
+    # Advanced Features (optional)
+    feature RegenerativeBraking optional selected
+
+    # Power Management (optional)
+    feature PowerModes optional
+        feature SleepMode optional
+
+    # Compliance Features (mandatory)
+    feature EMCCompliance mandatory selected
+        feature EMIFiltering mandatory selected 
