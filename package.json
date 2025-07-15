@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-      "version": "1.0.63",
+  "version": "1.0.64",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -132,23 +132,12 @@
         "id": "sylang-safety",
         "aliases": [
           "Sylang Safety",
-          "sylang-safety"
+          "sylang-haz"
         ],
         "extensions": [
           ".itm",
           ".sgl",
           ".haz",
-          ".fsr"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-risk",
-        "aliases": [
-          "Sylang Risk Assessment",
-          "sylang-risk"
-        ],
-        "extensions": [
           ".rsk"
         ],
         "configuration": "./language-configuration.json"
@@ -157,7 +146,7 @@
         "id": "sylang-security",
         "aliases": [
           "Sylang Security",
-          "sylang-security"
+          "sylang-sec"
         ],
         "extensions": [
           ".tra",
@@ -173,13 +162,10 @@
         "id": "sylang-components",
         "aliases": [
           "Sylang Components",
-          "sylang-cmp"
+          "sylang-req"
         ],
         "extensions": [
-          ".cmp",
-          ".sub",
-          ".req",
-          ".sys"
+          ".req"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -187,11 +173,10 @@
         "id": "sylang-software",
         "aliases": [
           "Sylang Software",
-          "sylang-mod"
+          "sylang-sof"
         ],
         "extensions": [
-          ".mod",
-          ".prt"
+          ".sof"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -199,10 +184,10 @@
         "id": "sylang-electronics",
         "aliases": [
           "Sylang Electronics",
-          "sylang-ckt"
+          "sylang-elc"
         ],
         "extensions": [
-          ".ckt"
+          ".elc"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -210,10 +195,10 @@
         "id": "sylang-mechanics",
         "aliases": [
           "Sylang Mechanics",
-          "sylang-asm"
+          "sylang-mec"
         ],
         "extensions": [
-          ".asm"
+          ".mec"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -282,11 +267,6 @@
         "path": "./syntaxes/sylang-safety.tmGrammar.json"
       },
       {
-        "language": "sylang-risk",
-        "scopeName": "source.sylang.risk",
-        "path": "./syntaxes/sylang-risk.tmGrammar.json"
-      },
-      {
         "language": "sylang-security",
         "scopeName": "source.sylang.security",
         "path": "./syntaxes/sylang-security.tmGrammar.json"
@@ -332,31 +312,11 @@
         "path": "./snippets/functions.json"
       },
       {
-        "language": "sylang-failuremodeanalysis",
-        "path": "./snippets/failuremodeanalysis.json"
-      },
-      {
-        "language": "sylang-failuremodecontrols",
-        "path": "./snippets/failuremodecontrols.json"
-      },
-      {
-        "language": "sylang-faulttreeanalysis",
-        "path": "./snippets/faulttreeanalysis.json"
-      },
-      {
         "language": "sylang-features",
         "path": "./snippets/features.json"
       },
       {
-        "language": "sylang-variantmodel",
-        "path": "./snippets/variantmodel.json"
-      },
-      {
         "language": "sylang-safety",
-        "path": "./snippets/safety.json"
-      },
-      {
-        "language": "sylang-risk",
         "path": "./snippets/safety.json"
       },
       {
@@ -406,7 +366,6 @@
         "icon": "$(file-code)"
       }
     ],
-
     "configuration": {
       "title": "Sylang Language Support",
       "properties": {
@@ -440,18 +399,17 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/node": "16.x",
     "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
     "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "tree-sitter": "^0.20.4",
-    "vscode-languageclient": "^8.1.0",
-    "vscode-languageserver": "^8.1.0",
-    "vscode-languageserver-textdocument": "^1.0.8",
-    "web-tree-sitter": "^0.20.8"
   }
 }

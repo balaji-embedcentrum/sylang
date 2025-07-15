@@ -58,7 +58,7 @@
           "match": "\\b(systematic|random|external|common_cause|human_error)\\b"
         },
         {
-          "name": "keyword.other.asil.faulttreeanalysis",
+          "name": "keyword.other.safetylevel.faulttreeanalysis",
           "match": "\\b(QM|A|B|C|D)\\b"
         },
         {
@@ -100,7 +100,7 @@
         },
         {
           "name": "entity.name.tag.property.enum.faulttreeanalysis",
-          "match": "\\b(gatetype|severity|category|asil|dormancy)\\b"
+          "match": "\\b(gatetype|severity|category|safetylevel|dormancy)\\b"
         },
         {
           "name": "entity.name.tag.property.numeric.faulttreeanalysis",

@@ -27,13 +27,13 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         extensions: ['.fun'],
         keywords: [
             'def', 'functiongroup', 'function', 'name', 'description', 'category', 'owner', 
-            'tags', 'asil', 'partof', 'enables', 'allocatedto', 'feature'
+            'tags', 'safetylevel', 'partof', 'enables', 'allocatedto', 'feature'
         ],
         snippetFile: 'functions.json',
         validationRules: ['required-fields', 'safety-levels', 'function-structure', 'def-keyword'],
         validPropertyValues: {
             'partof': ['product', 'system', 'subsystem', 'component', 'module', 'unit', 'assembly', 'circuit', 'part'],
-            'asil': ['QM', 'A', 'B', 'C', 'D']
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D']
         }
     },
     'sylang-failuremodeanalysis': {
@@ -42,14 +42,14 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         extensions: ['.fma'],
         keywords: [
             'def', 'failuremodeanalysis', 'failuremode', 'name', 'description', 'in', 'function',
-            'severity', 'occurrence', 'detection', 'rpn', 'auto', 'actionpriority', 'asil',
+            'severity', 'occurrence', 'detection', 'rpn', 'auto', 'actionpriority', 'safetylevel',
             'causes', 'effects', 'mitigation', 'high', 'medium', 'low'
         ],
         snippetFile: 'failuremodeanalysis.json',
         validationRules: ['required-fields', 'safety-levels', 'failure-mode-structure', 'def-keyword'],
         validPropertyValues: {
             'actionpriority': ['high', 'medium', 'low'],
-            'asil': ['QM', 'A', 'B', 'C', 'D']
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D']
         }
     },
     'sylang-failuremodecontrols': {
@@ -60,7 +60,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'def', 'controlmeasures', 'prevention', 'detection', 'mitigation', 'name', 'description',
             'implementation', 'verification', 'responsibility', 'scope', 'effectiveness', 'cost',
             'complexity', 'frequency', 'detecttime', 'responsetime', 'coverage', 'independence',
-            'maturity', 'asil', 'detectionrating', 'occurrencereduction', 'severityreduction',
+            'maturity', 'safetylevel', 'detectionrating', 'occurrencereduction', 'severityreduction',
             'diagnosticcoverage', 'depends', 'measure', 'internal', 'external', 'high', 'medium',
             'low', 'simple', 'moderate', 'complex', 'continuous', 'periodic', 'monthly', 'quarterly',
             'immediate', 'delayed', 'complete', 'partial', 'mature', 'developing', 'research'
@@ -78,7 +78,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'coverage': ['complete', 'partial'],
             'independence': ['high', 'medium', 'low'],
             'maturity': ['mature', 'developing', 'research'],
-            'asil': ['QM', 'A', 'B', 'C', 'D']
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D']
         }
     },
     'sylang-faulttreeanalysis': {
@@ -86,23 +86,22 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Fault Tree Analysis', 'sylang-fta'],
         extensions: ['.fta'],
         keywords: [
-            'def', 'faulttree', 'topevent', 'intermediateevent', 'basicevent', 'gate', 'transfer',
-            'name', 'description', 'owner', 'reviewers', 'standards', 'analysismethod', 'condition',
-            'from', 'to', 'targetfta', 'gatetype', 'severity', 'category', 'asil', 'dormancy',
-            'probability', 'exposuretime', 'repairtime', 'inputs', 'outputs', 'item',
-            'hazardidentification', 'riskassessment', 'safetygoals', 'productline', 'featureset',
-            'functiongroup', 'AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT', 'INHIBIT', 'PRIORITY_AND',
-            'VOTING', 'S0', 'S1', 'S2', 'S3', 'systematic', 'random', 'external', 'common_cause',
-            'human_error', 'QM', 'A', 'B', 'C', 'D', 'none', 'low', 'medium', 'high'
+            'def', 'faulttreeanalysis', 'faulttree', 'node', 'name', 'description', 'functiongroup',
+            'from', 'to', 'targetfta', 'gatetype', 'severity', 'category', 'safetylevel', 'dormancy',
+            'OR', 'AND', 'XOR', 'NOT', 'INHIBIT', 'TRANSFER', 'UNDEVELOPED', 'BASIC', 'INTERMEDIATE',
+            'owner', 'tags', 'type', 'function', 'interface', 'lambda', 'probability', 'condition',
+            'high', 'medium', 'low'
         ],
         snippetFile: 'faulttreeanalysis.json',
         validationRules: ['required-fields', 'safety-levels', 'fault-tree-structure', 'def-keyword'],
         validPropertyValues: {
-            'gatetype': ['AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT', 'INHIBIT', 'PRIORITY_AND', 'VOTING'],
-            'severity': ['S0', 'S1', 'S2', 'S3'],
-            'category': ['systematic', 'random', 'external', 'common_cause', 'human_error'],
-            'asil': ['QM', 'A', 'B', 'C', 'D'],
-            'dormancy': ['none', 'low', 'medium', 'high']
+            'gatetype': ['OR', 'AND', 'XOR', 'NOT', 'INHIBIT', 'TRANSFER', 'UNDEVELOPED', 'BASIC', 'INTERMEDIATE'],
+            'severity': ['high', 'medium', 'low'],
+            'category': ['high', 'medium', 'low'],
+            'dormancy': ['high', 'medium', 'low'],
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D'],
+            'lambda': ['high', 'medium', 'low'],
+            'probability': ['high', 'medium', 'low']
         }
     },
     'sylang-features': {
@@ -125,75 +124,88 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         aliases: ['Sylang Variant Model', 'sylang-vml'],
         extensions: ['.vml'],
         keywords: [
-            'def', 'variantmodel', 'feature', 'mandatory', 'optional', 'alternative', 'selected'
+            'def', 'variantmodel', 'variant', 'name', 'description', 'owner', 
+            'tags', 'safetylevel', 'configuration', 'feature', 'variation', 
+            'enables', 'constraints', 'requires', 'excludes'
         ],
         snippetFile: 'variantmodel.json',
         validationRules: [
-            'single-variantmodel', 'feature-selection-consistency', 'mandatory-selection-validation', 
-            'alternative-selection-validation', 'indentation-validation', 'def-keyword'
+            'single-variantmodel', 'variant-configuration', 'constraint-rules',
+            'duplicate-variants', 'structural-order', 'def-keyword'
         ]
     },
     'sylang-safety': {
         id: 'sylang-safety',
         aliases: ['Sylang Safety', 'sylang-safety'],
-        extensions: ['.itm', '.sgl', '.haz', '.rsk', '.fsr'],
+        extensions: ['.itm', '.sgl', '.haz', '.rsk'],
         keywords: [
-            'def', 'hazardanalysis', 'hazardidentification', 'riskassessment', 
-            'safetygoals', 'goal', 
-            'hazard', 'scenario', 'measure', 'criterion', 'category', 'subsystem', 
-            'boundary', 'vehiclestate', 'drivingstate', 'environment', 'assumption', 'principle',
-            'itemdef', 'operationalscenarios', 'safetyconcept', 
-            'hazardcategories', 'subsystemhazards', 'scenarios', 
-            'safetygoalsdef', 'safetymeasures', 'verificationcriteria',
-            'name', 'description', 'owner', 'tags', 'severity', 'probability', 
-            'controllability', 'verification', 'rationale', 'methodology', 
-            'context', 'conditions', 'consequences', 'enabledby', 'enabledby function', 'functions_affected',
-            'assessment', 'riskcriteria', 'exposure', 'asilmatrix', 'determination',
-            'derivedfrom', 'allocatedto', 'safetylevel', 'asil', 'productline', 
-            'featureset', 'functiongroup', 'subsystems',
-            'includes', 'excludes', 'operationalconditions', 'condition', 
-            'vehiclestates', 'driverstates', 'environments', 'overallsafetystrategy', 
-            'assumptionsofuse', 'UnintendedActivation', 'FailureToActivate', 
-            'FailureToRelease', 'PartialFailure', 'DelayedResponse', 'MisleadingIndication',
-            'FMEA', 'HAZOP', 'STPA', 'FTA', 'ETA', 'S1', 'S2', 'S3', 
-            'E1', 'E2', 'E3', 'E4', 'C1', 'C2', 'C3', 'ASIL-A', 'ASIL-B', 
+            'def', 'hazardidentification', 'hazard', 'safetygoal', 'goal', 'safetylevel', 
+            'riskassessment', 'riskcriteria', 'riskdetermination', 'asildetermination', 
+            'asilassessment', 'exposure', 'asilmatrix', 'determination',
+            'derivedfrom', 'allocatedto', 'safetylevel', 'productline',
+            'functiongroup', 'category', 'consequences', 'controllability', 'severity',
+            'cause', 'effect', 'context', 'conditions', 'functions_affected',
+            'name', 'description', 'owner', 'tags', 'S1', 'S2', 'S3', 'S4',
+            'E1', 'E2', 'E3', 'E4', 'C1', 'C2', 'C3', 'ASIL-A', 'ASIL-B',
             'ASIL-C', 'ASIL-D', 'QM', 'A', 'B', 'C', 'D'
         ],
         snippetFile: 'safety.json',
-        validationRules: ['required-fields', 'safety-levels', 'safety-structure', 'def-keyword', 'iso26262-compliance']
+        validationRules: ['required-fields', 'safety-levels', 'safety-structure', 'def-keyword'],
+        validPropertyValues: {
+            'severity': ['S1', 'S2', 'S3', 'S4'],
+            'exposure': ['E1', 'E2', 'E3', 'E4'],
+            'controllability': ['C1', 'C2', 'C3'],
+            'safetylevel': ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM', 'A', 'B', 'C', 'D'],
+            'category': ['systematic', 'random', 'software', 'hardware', 'human-factor', 'operational', 'environmental']
+        }
     },
     'sylang-security': {
         id: 'sylang-security',
-        aliases: ['Sylang Security', 'sylang-security'],
+        aliases: ['Sylang Security', 'sylang-sec'],
         extensions: ['.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'],
         keywords: [
-            'security', 'threat', 'asset', 'tara', 'cybersecurity', 'name', 
-            'description', 'owner', 'tags', 'safetylevel', 'allocatedto', 
-            'derivedfrom', 'satisfies', 'implements'
+            'def', 'securityanalysis', 'threat', 'asset', 'vulnerability', 'attack', 
+            'threatsource', 'impact', 'likelihood', 'risk', 'securitygoal', 'securityrequirement',
+            'safetylevel', 'name', 'description', 'owner', 'tags', 'category', 'tara',
+            'cybersecurity', 'confidentiality', 'integrity', 'availability', 'authentication',
+            'authorization', 'non-repudiation', 'accountability', 'high', 'medium', 'low',
+            'critical', 'major', 'minor', 'negligible', 'certain', 'likely', 'possible',
+            'unlikely', 'rare', 'derivedfrom', 'allocatedto', 'functiongroup', 'productline'
         ],
         snippetFile: 'security.json',
-        validationRules: ['required-fields', 'safety-levels', 'security-structure']
+        validationRules: ['required-fields', 'security-structure', 'def-keyword'],
+        validPropertyValues: {
+            'impact': ['critical', 'major', 'minor', 'negligible'],
+            'likelihood': ['certain', 'likely', 'possible', 'unlikely', 'rare'],
+            'category': ['confidentiality', 'integrity', 'availability', 'authentication', 'authorization', 'non-repudiation', 'accountability']
+        }
     },
     'sylang-components': {
         id: 'sylang-components',
-        aliases: ['Sylang Components', 'sylang-cmp'],
-        extensions: ['.cmp', '.sub', '.req'],
+        aliases: ['Sylang Components', 'sylang-req'],
+        extensions: ['.req'],
         keywords: [
-            'def', 'component', 'subsystem', 'interface', 'protocol', 'direction', 
-            'voltage', 'name', 'description', 'owner', 'tags', 'safetylevel', 
-            'partof', 'implements', 'allocatedto', 'type', 'width', 'range', 
-            'frequency', 'baudrate', 'resolution',
-            // .req file keywords
-            'reqsection', 'requirement', 'source', 'derivedfrom', 'asil', 
-            'rationale', 'verificationcriteria', 'status', 'safetygoal',
-            // .req enum values
-            'functionalsafety', 'functional', 'non-functional', 'performance', 
-            'standards', 'legal', 'system', 'software', 'electronics', 'mechanics', 
-            'test', 'stakeholder', 'internal', 'supplier', 'customer', 
-            'QM', 'A', 'B', 'C', 'D', 'draft', 'review', 'approved'
+            'def', 'requirementspecification', 'reqsection', 'requirement', 'name', 'description',
+            'reqsection', 'requirement', 'source', 'derivedfrom', 'safetylevel',
+            'allocatedto', 'functiongroup', 'productline', 'owner', 'tags',
+            'priority', 'type', 'status', 'rationale', 'acceptance', 'verification',
+            'high', 'medium', 'low', 'functional', 'performance', 'interface', 'design',
+            'implementation', 'safety', 'security', 'reliability', 'usability', 'maintainability',
+            'portability', 'draft', 'review', 'approved', 'implemented', 'tested', 'customer',
+            'user', 'system', 'software', 'hardware', 'derived', 'allocated', 'shall',
+            'should', 'may', 'will', 'must', 'can', 'cannot', 'A', 'B', 'C', 'D', 'QM',
+            'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'Bidirectional', 'Input', 'Output',
+            'Communication', 'Digital', 'Analog', 'SPI', 'I2C', 'CAN', 'LIN', 'CMOS'
         ],
         snippetFile: 'components.json',
-        validationRules: ['required-fields', 'safety-levels', 'component-structure', 'req-structure']
+        validationRules: ['required-fields', 'safety-levels', 'requirements-structure', 'def-keyword'],
+        validPropertyValues: {
+            'priority': ['high', 'medium', 'low'],
+            'type': ['functional', 'performance', 'interface', 'design', 'implementation', 'safety', 'security', 'reliability', 'usability', 'maintainability', 'portability'],
+            'status': ['draft', 'review', 'approved', 'implemented', 'tested'],
+            'source': ['customer', 'user', 'system', 'software', 'hardware', 'derived', 'allocated'],
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D']
+        }
     },
     'sylang-software': {
         id: 'sylang-software',
@@ -246,15 +258,16 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         keywords: [
             'def', 'block', 'system', 'subsystem', 'component', 'subcomponent', 'module', 'submodule',
             'unit', 'subunit', 'assembly', 'subassembly', 'circuit', 'part', 'name', 'description',
-            'owner', 'tags', 'asil', 'contains', 'partof', 'enables', 'implements', 'interfaces',
+            'owner', 'tags', 'safetylevel', 'contains', 'partof', 'enables', 'implements', 'interfaces',
             'feature', 'function', 'use', 'port', 'type', 'electrical', 'mechanical', 'data',
             'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator'
         ],
         snippetFile: 'blocks.json',
-        validationRules: ['required-fields', 'block-structure', 'def-keyword'],
+        validationRules: ['required-fields', 'safety-levels', 'block-structure', 'def-keyword'],
         validPropertyValues: {
-            'asil': ['QM', 'A', 'B', 'C', 'D'],
-            'type': ['electrical', 'mechanical', 'data', 'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator']
+            'type': ['electrical', 'mechanical', 'data', 'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator'],
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D'],
+            'interfaces': ['electrical', 'mechanical', 'data', 'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator']
         }
     },
     'sylang-test': {
@@ -263,26 +276,24 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         extensions: ['.tst'],
         keywords: [
             'def', 'testsuite', 'testcase', 'name', 'description', 'owner', 'tags', 
-            'testtype', 'coverage', 'method', 'priority', 'asil', 'verifies', 'requirement',
+            'testtype', 'coverage', 'method', 'priority', 'safetylevel', 'verifies', 'requirement',
             'exercises', 'preconditions', 'teststeps', 'step', 'expectedresult', 
             'testresult', 'actualresult', 'executiontime', 'use',
-            // Enum values
-            'unit', 'integration', 'system', 'acceptance', 'regression', 'smoke',
-            'statement', 'branch', 'mcdc', 'function',
-            'manual', 'automated', 'hil', 'sil', 'mil', 'pil',
-            'pass', 'fail', 'pending', 'inconclusive',
-            'critical', 'high', 'medium', 'low',
-            'QM', 'A', 'B', 'C', 'D'
+            'integration', 'unit', 'system', 'acceptance', 'regression', 'performance',
+            'security', 'safety', 'usability', 'compatibility', 'scalability', 'reliability',
+            'statement', 'branch', 'condition', 'mcdc', 'path', 'hil', 'sil', 'mil',
+            'manual', 'automated', 'critical', 'high', 'medium', 'low', 'pass', 'fail',
+            'blocked', 'skipped', 'pending', 'in-progress', 'A', 'B', 'C', 'D', 'QM', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D'
         ],
         snippetFile: 'test.json',
-        validationRules: ['required-fields', 'test-structure', 'def-keyword'],
+        validationRules: ['required-fields', 'safety-levels', 'test-structure', 'def-keyword'],
         validPropertyValues: {
-            'testtype': ['unit', 'integration', 'system', 'acceptance', 'regression', 'smoke'],
-            'coverage': ['statement', 'branch', 'mcdc', 'requirement', 'function'],
-            'method': ['manual', 'automated', 'hil', 'sil', 'mil', 'pil'],
-            'testresult': ['pass', 'fail', 'pending', 'inconclusive'],
+            'testtype': ['integration', 'unit', 'system', 'acceptance', 'regression', 'performance', 'security', 'safety', 'usability', 'compatibility', 'scalability', 'reliability'],
+            'coverage': ['statement', 'branch', 'condition', 'mcdc', 'path'],
+            'method': ['hil', 'sil', 'mil', 'manual', 'automated'],
             'priority': ['critical', 'high', 'medium', 'low'],
-            'asil': ['QM', 'A', 'B', 'C', 'D']
+            'testresult': ['pass', 'fail', 'blocked', 'skipped', 'pending', 'in-progress'],
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D']
         }
     }
 };
