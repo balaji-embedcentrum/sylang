@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.67",
+  "version": "2.0.0",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -148,24 +148,18 @@
         "extensions": [
           ".itm",
           ".sgl",
-          ".haz",
-          ".rsk"
+          ".haz"
         ],
         "configuration": "./language-configuration.json"
       },
       {
-        "id": "sylang-security",
+        "id": "sylang-risk",
         "aliases": [
-          "Sylang Security",
-          "sylang-sec"
+          "Sylang Risk Assessment",
+          "sylang-rsk"
         ],
         "extensions": [
-          ".tra",
-          ".thr",
-          ".sgo",
-          ".sre",
-          ".ast",
-          ".sec"
+          ".rsk"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -177,39 +171,6 @@
         ],
         "extensions": [
           ".req"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-software",
-        "aliases": [
-          "Sylang Software",
-          "sylang-sof"
-        ],
-        "extensions": [
-          ".sof"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-electronics",
-        "aliases": [
-          "Sylang Electronics",
-          "sylang-elc"
-        ],
-        "extensions": [
-          ".elc"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-mechanics",
-        "aliases": [
-          "Sylang Mechanics",
-          "sylang-mec"
-        ],
-        "extensions": [
-          ".mec"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -283,29 +244,14 @@
         "path": "./syntaxes/sylang-safety.tmGrammar.json"
       },
       {
-        "language": "sylang-security",
-        "scopeName": "source.sylang.security",
-        "path": "./syntaxes/sylang-security.tmGrammar.json"
+        "language": "sylang-risk",
+        "scopeName": "source.sylang.risk",
+        "path": "./syntaxes/sylang-risk.tmGrammar.json"
       },
       {
         "language": "sylang-components",
         "scopeName": "source.sylang.components",
         "path": "./syntaxes/sylang-components.tmGrammar.json"
-      },
-      {
-        "language": "sylang-software",
-        "scopeName": "source.sylang.software",
-        "path": "./syntaxes/sylang-software.tmGrammar.json"
-      },
-      {
-        "language": "sylang-electronics",
-        "scopeName": "source.sylang.electronics",
-        "path": "./syntaxes/sylang-electronics.tmGrammar.json"
-      },
-      {
-        "language": "sylang-mechanics",
-        "scopeName": "source.sylang.mechanics",
-        "path": "./syntaxes/sylang-mechanics.tmGrammar.json"
       },
       {
         "language": "sylang-blocks",
@@ -328,32 +274,40 @@
         "path": "./snippets/functions.json"
       },
       {
+        "language": "sylang-failuremodeanalysis",
+        "path": "./snippets/failuremodeanalysis.json"
+      },
+      {
+        "language": "sylang-failuremodecontrols",
+        "path": "./snippets/failuremodecontrols.json"
+      },
+      {
+        "language": "sylang-faulttreeanalysis",
+        "path": "./snippets/faulttreeanalysis.json"
+      },
+      {
         "language": "sylang-features",
         "path": "./snippets/features.json"
+      },
+      {
+        "language": "sylang-variantmodel",
+        "path": "./snippets/variantmodel.json"
+      },
+      {
+        "language": "sylang-variantconfig",
+        "path": "./snippets/variantconfig.json"
+      },
+      {
+        "language": "sylang-risk",
+        "path": "./snippets/safety.json"
       },
       {
         "language": "sylang-safety",
         "path": "./snippets/safety.json"
       },
       {
-        "language": "sylang-security",
-        "path": "./snippets/security.json"
-      },
-      {
         "language": "sylang-components",
         "path": "./snippets/components.json"
-      },
-      {
-        "language": "sylang-software",
-        "path": "./snippets/software.json"
-      },
-      {
-        "language": "sylang-electronics",
-        "path": "./snippets/electronics.json"
-      },
-      {
-        "language": "sylang-mechanics",
-        "path": "./snippets/mechanics.json"
       },
       {
         "language": "sylang-blocks",

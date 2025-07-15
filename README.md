@@ -4,15 +4,17 @@
 [![Downloads](https://img.shields.io/vscode-marketplace/d/balaji-embedcentrum.sylang.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang)
 [![Rating](https://img.shields.io/vscode-marketplace/r/balaji-embedcentrum.sylang.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang)
 
-**IDE Support for Sylang** - Systems and Safety Engineering Language for **Model Based Systems Engineering (MBSE)** in complex systems development across Automotive, Aerospace, and Medical industries.
+**IDE Support for Sylang** - Complete **Model Based Systems Engineering (MBSE)** toolkit with **Agentic AI Instructions** for automatic project generation in Automotive, Aerospace, and Medical industries.
 
 ## 🚀 **Features**
 
-### **Complete MBSE Toolkit**
-- **22 Sylang file extensions** with professional IDE features
+### **🤖 Agentic AI & Complete MBSE Toolkit**
+- **🤖 Agentic AI Instructions**: Generate complete projects from simple requests using `.sylangrules`
+- **15 Sylang file extensions** with professional IDE features and correct syntax
 - **Systems Engineering domains**: Safety, Security, Components, Software, Electronics, Mechanics
-- **Safety standards compliance**: ISO 26262, DO-178C, IEC 62304
+- **Safety standards compliance**: ISO 26262, DO-178C, IEC 62304, ASPICE
 - **Real-time validation** with domain-specific engineering rules
+- **🎯 User Intent Recognition**: Advanced pattern recognition for project creation and modification
 
 ### **Cross-File Navigation**
 - **Go to Definition (F12)** - Navigate to system component definitions across files
@@ -20,12 +22,20 @@
 - **Workspace-wide symbol indexing** with progress feedback
 - **Smart identifier recognition** for components, requirements, hazards, safety goals
 
+### **🏗️ Automotive System Templates**
+- **EPB Systems**: Electric Parking Brake with ASIL-D safety requirements
+- **Inverter Systems**: EV powertrain with motor control and thermal management
+- **EPS Systems**: Electric Power Steering with torque assist and manual reversion
+- **BBW Systems**: Brake-by-Wire with hydraulic backup and pedal feel simulation
+- **HVAC Systems**: Climate control with air quality monitoring and energy management
+- **ADAS Systems**: Advanced Driver Assistance with sensor fusion and path planning
+
 ### **Industry Focus**
 - **Automotive Safety**: ASIL levels, functional safety requirements, hazard analysis, ISO 26262
 - **Aerospace Systems**: DO-178C compliance, safety-critical software development
 - **Medical Devices**: IEC 62304, risk management, device safety requirements
 - **Systems Architecture**: Component hierarchies, interfaces, traceability
-- **Requirements Engineering**: Traceability, verification, validation
+- **Requirements Engineering**: EARS format, traceability, verification, validation
 
 ## 📋 **Supported Engineering Domains**
 
@@ -41,6 +51,21 @@
 | **Electronics Design** | `.ckt` | Circuit design, signal integrity |
 | **Mechanical Design** | `.asm` | Mechanical assemblies, actuators |
 
+## 🤖 **Agentic AI Features**
+
+### **Create Sylang Rules (Cmd+Shift+P)**
+1. **Press Cmd+Shift+P** and type "Create Sylang Rules"
+2. **Generate comprehensive `.sylangrules`** file with agentic AI instructions
+3. **Use as AI context** for automatic project generation
+4. **Customize for your project** needs and share with team
+
+### **AI-Powered Project Generation**
+- **Simple requests** → Complete automotive MBSE projects
+- **User intent recognition** for project creation, feature addition, compliance enhancement
+- **Intelligent folder structures** with proper MBSE hierarchies
+- **Cross-file intelligence** and full traceability
+- **Standards compliance** built-in (ISO 26262, ASPICE, DO-178C)
+
 ## 🎯 **Quick Start**
 
 ### **Installation**
@@ -55,6 +80,7 @@
 3. **Use F12** - Navigate to component definitions across system architecture
 4. **Press Shift+F12** - Trace requirements and dependencies
 5. **Check Problems panel** - Real-time validation with safety standards compliance
+6. **Create Sylang Rules** - Generate AI context for project generation
 
 ## 🔧 **Configuration**
 
