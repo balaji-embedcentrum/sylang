@@ -2,6 +2,38 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.66] - 2025-01-18
+
+### Added
+- **🚀 NEW: Variant Config Generation (.vcf)**: Revolutionary feature for product line engineering
+  - **Right-click .vml → Generate Variant Config**: Auto-generate configuration files from variant models
+  - **Hierarchical Config Names**: `c_System_Subsystem_Feature` naming for clear traceability
+  - **Single .vcf Constraint**: Only one active variant config per workspace with smart replacement
+  - **Complete Language Support**: Full syntax highlighting, validation, and IntelliSense for .vcf files
+  - **Auto-generated Metadata**: Timestamps, source references, and ownership tracking
+
+### Enhanced
+- **VariantConfigValidator**: Comprehensive validation for .vcf files
+  - Config naming convention validation (c_ prefix required)
+  - Single configset per file validation
+  - Import syntax validation for `use variantmodel`
+  - Binary value validation (0/1 only)
+  - Workspace-level .vcf uniqueness checking
+
+### Language Support
+- **New File Extension**: `.vcf` (Variant Config Files) with complete IDE support
+- **Syntax Highlighting**: Keywords, config definitions, properties, and values
+- **Code Snippets**: Quick templates for configset, config definitions, and properties
+- **Validation Rules**: Real-time error detection and warnings
+
+### Technical Implementation
+- **Smart Parsing**: Intelligent .vml feature hierarchy analysis
+- **Config Generation**: Automatic hierarchical config name creation from feature paths
+- **File Management**: Workspace-aware .vcf file creation and replacement logic
+- **Integration**: Seamless integration with existing Sylang ecosystem
+
+This feature enables true product line engineering by linking variant selections directly to system configurations, revolutionizing how engineers manage complex product families in automotive, aerospace, and medical industries.
+
 ## [1.0.65] - 2025-01-18
 
 ### Enhanced

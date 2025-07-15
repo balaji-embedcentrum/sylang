@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "1.0.65",
+  "version": "1.0.66",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -125,6 +125,17 @@
         ],
         "extensions": [
           ".vml"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-variantconfig",
+        "aliases": [
+          "Sylang Variant Config",
+          "sylang-vcf"
+        ],
+        "extensions": [
+          ".vcf"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -262,6 +273,11 @@
         "path": "./syntaxes/sylang-variantmodel.tmGrammar.json"
       },
       {
+        "language": "sylang-variantconfig",
+        "scopeName": "source.sylang.variantconfig", 
+        "path": "./syntaxes/sylang-variantconfig.tmGrammar.json"
+      },
+      {
         "language": "sylang-safety",
         "scopeName": "source.sylang.safety",
         "path": "./syntaxes/sylang-safety.tmGrammar.json"
@@ -360,12 +376,26 @@
         "category": "Sylang"
       },
       {
+        "command": "sylang.generateVariantConfig",
+        "title": "🔧 Generate Variant Config (.vcf)",
+        "category": "Sylang"
+      },
+      {
         "command": "sylang.createRules",
         "title": "🤖 Create Sylang Rules",
         "category": "Sylang",
         "icon": "$(file-code)"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "sylang.generateVariantConfig",
+          "when": "resourceExtname == .vml",
+          "group": "sylang@1"
+        }
+      ]
+    },
     "configuration": {
       "title": "Sylang Language Support",
       "properties": {
@@ -394,7 +424,8 @@
     "onLanguage:sylang-variantmodel",
     "onLanguage:sylang-safety",
     "onLanguage:sylang-security",
-    "onLanguage:sylang-components"
+    "onLanguage:sylang-components",
+    "onLanguage:sylang-variantconfig"
   ],
   "scripts": {
     "vscode:prepublish": "npm run compile",

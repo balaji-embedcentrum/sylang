@@ -8,6 +8,20 @@ import { ValidationEngine } from './core/ValidationEngine';
 import { SymbolManager } from './core/SymbolManager';
 import { getLanguageConfig, getAllLanguageIds } from './config/LanguageConfigs';
 
+interface ConfigEntry {
+    name: string;
+    value: number;
+    featurePath: string;
+    variabilityType: string;
+    indentLevel: number;
+}
+
+interface FeatureInfo {
+    name: string;
+    indentLevel: number;
+    selected: boolean;
+}
+
 class SylangExtension {
     private validationEngine: ValidationEngine | undefined;
     private symbolManager: SymbolManager | undefined;
@@ -205,6 +219,10 @@ class SylangExtension {
                 })
             );
 
+            context.subscriptions.push(
+                vscode.commands.registerCommand('sylang.generateVariantConfig', (uri) => this.generateVariantConfig(uri))
+            );
+
             // Clean up on deactivation
             context.subscriptions.push({
                 dispose: () => {
@@ -229,7 +247,7 @@ class SylangExtension {
         
         const sylangExtensions = ['.ple', '.fml', '.fun', '.req', 
                                  '.haz', '.rsk', '.itm', '.sgl', '.tra', '.thr', '.sgo', 
-                                 '.sre', '.ast', '.sec', '.blk', '.tst', '.fma', '.fmc', '.fta', '.vml'];
+                                 '.sre', '.ast', '.sec', '.blk', '.tst', '.fma', '.fmc', '.fta', '.vml', '.vcf'];
         const hasSylangExtension = sylangExtensions.some(ext => document.fileName.endsWith(ext));
         console.log(`[Sylang] - Has Sylang extension: ${hasSylangExtension}`);
         
@@ -661,6 +679,172 @@ This specification enables AI to generate complete, validated, and standards-com
         if (this.validationEngine) {
             this.validationEngine.dispose();
         }
+    }
+
+    private async generateVariantConfig(uri?: vscode.Uri): Promise<void> {
+        try {
+            // Get the .vml file URI
+            let vmlUri = uri;
+            if (!vmlUri) {
+                const activeEditor = vscode.window.activeTextEditor;
+                if (activeEditor && activeEditor.document.fileName.endsWith('.vml')) {
+                    vmlUri = activeEditor.document.uri;
+                } else {
+                    vscode.window.showErrorMessage('Please right-click on a .vml file to generate variant config.');
+                    return;
+                }
+            }
+
+            if (!vmlUri.fsPath.endsWith('.vml')) {
+                vscode.window.showErrorMessage('Selected file is not a .vml variant model file.');
+                return;
+            }
+
+            // Check for existing .vcf files in workspace
+            const existingVcf = await this.findExistingVcfFile();
+            if (existingVcf) {
+                const existingFileName = existingVcf.fsPath.split('/').pop();
+                const choice = await vscode.window.showWarningMessage(
+                    `Variant config file "${existingFileName}" already exists. Only one .vcf file is allowed per workspace. Replace it?`,
+                    'Replace', 'Cancel'
+                );
+                if (choice !== 'Replace') {
+                    return;
+                }
+                await vscode.workspace.fs.delete(existingVcf);
+            }
+
+            // Parse .vml file and generate .vcf
+            const vmlDocument = await vscode.workspace.openTextDocument(vmlUri);
+            const configs = await this.parseVmlAndGenerateConfigs(vmlDocument);
+            
+            // Create .vcf file
+            const vcfUri = await this.createVcfFile(vmlUri, configs);
+            
+            // Open the generated file
+            const vcfDocument = await vscode.workspace.openTextDocument(vcfUri);
+            await vscode.window.showTextDocument(vcfDocument);
+            
+            vscode.window.showInformationMessage(
+                `✅ Generated variant config: ${vcfUri.fsPath.split('/').pop()}`
+            );
+            
+        } catch (error) {
+            console.error('[Sylang] Error generating variant config:', error);
+            vscode.window.showErrorMessage(`Failed to generate variant config: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
+    private async findExistingVcfFile(): Promise<vscode.Uri | null> {
+        if (!vscode.workspace.workspaceFolders) return null;
+        
+        const vcfFiles = await vscode.workspace.findFiles('**/*.vcf');
+        return vcfFiles.length > 0 ? vcfFiles[0] : null;
+    }
+
+    private async parseVmlAndGenerateConfigs(vmlDocument: vscode.TextDocument): Promise<ConfigEntry[]> {
+        const text = vmlDocument.getText();
+        const lines = text.split('\n');
+        const configs: ConfigEntry[] = [];
+        const featureStack: FeatureInfo[] = [];
+        
+        let variantModelName = '';
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmedLine = line.trim();
+            
+            if (!trimmedLine || trimmedLine.startsWith('#')) continue;
+            
+            // Extract variant model name
+            const variantModelMatch = trimmedLine.match(/^def\s+variantmodel\s+(\w+)/);
+            if (variantModelMatch) {
+                variantModelName = variantModelMatch[1];
+                continue;
+            }
+            
+            // Parse feature definitions
+            const featureMatch = trimmedLine.match(/^feature\s+(\w+)\s+(mandatory|optional|alternative)\s*(selected)?/);
+            if (featureMatch) {
+                const [, featureName, variabilityType, selectedKeyword] = featureMatch;
+                const indentLevel = this.getIndentLevel(line);
+                const isSelected = selectedKeyword === 'selected';
+                
+                // Pop features that are at the same or higher level
+                while (featureStack.length > 0 && featureStack[featureStack.length - 1].indentLevel >= indentLevel) {
+                    featureStack.pop();
+                }
+                
+                // Build feature path
+                const featurePath = [...featureStack.map(f => f.name), featureName];
+                const configName = 'c_' + featurePath.join('_');
+                
+                configs.push({
+                    name: configName,
+                    value: isSelected ? 1 : 0,
+                    featurePath: featurePath.join(' → '),
+                    variabilityType,
+                    indentLevel
+                });
+                
+                // Push current feature to stack
+                featureStack.push({
+                    name: featureName,
+                    indentLevel,
+                    selected: isSelected
+                });
+            }
+        }
+        
+        return configs.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    private async createVcfFile(vmlUri: vscode.Uri, configs: ConfigEntry[]): Promise<vscode.Uri> {
+        const vmlFileName = vmlUri.fsPath.split('/').pop()?.replace('.vml', '') || 'variant';
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(vmlUri);
+        const vcfFileName = `${vmlFileName}-config.vcf`;
+        
+        let vcfUri: vscode.Uri;
+        if (workspaceFolder) {
+            vcfUri = vscode.Uri.joinPath(workspaceFolder.uri, vcfFileName);
+        } else {
+            const vmlDir = vmlUri.with({ path: vmlUri.path.split('/').slice(0, -1).join('/') });
+            vcfUri = vscode.Uri.joinPath(vmlDir, vcfFileName);
+        }
+        
+        // Extract variant model name from .vml file
+        const vmlDocument = await vscode.workspace.openTextDocument(vmlUri);
+        const vmlText = vmlDocument.getText();
+        const variantModelMatch = vmlText.match(/def\s+variantmodel\s+(\w+)/);
+        const variantModelName = variantModelMatch ? variantModelMatch[1] : 'UnknownVariant';
+        
+        // Generate .vcf content
+        const timestamp = new Date().toISOString();
+        const configsetName = `${variantModelName}Configs`;
+        
+        let vcfContent = `use variantmodel ${variantModelName}\n\n`;
+        vcfContent += `def configset ${configsetName}\n`;
+        vcfContent += `    name "${variantModelName} Configuration Set"\n`;
+        vcfContent += `    description "Auto-generated configuration from ${vmlFileName}.vml variant model selections"\n`;
+        vcfContent += `    owner "Product Engineering"\n`;
+        vcfContent += `    source "${vmlFileName}.vml"\n`;
+        vcfContent += `    generated "${timestamp}"\n`;
+        vcfContent += `    tags "variant", "config", "auto-generated"\n\n`;
+        
+        // Add config definitions
+        configs.forEach(config => {
+            vcfContent += `    def config ${config.name} ${config.value}\n`;
+        });
+        
+        // Write file
+        await vscode.workspace.fs.writeFile(vcfUri, Buffer.from(vcfContent, 'utf8'));
+        
+        return vcfUri;
+    }
+
+    private getIndentLevel(line: string): number {
+        const match = line.match(/^(\s*)/);
+        return match ? match[1].length : 0;
     }
 }
 
