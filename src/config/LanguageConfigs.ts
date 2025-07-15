@@ -133,6 +133,20 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'duplicate-variants', 'structural-order', 'def-keyword'
         ]
     },
+    'sylang-variantconfig': {
+        id: 'sylang-variantconfig',
+        aliases: ['Sylang Variant Config', 'sylang-vcf'],
+        extensions: ['.vcf'],
+        keywords: [
+            'def', 'configset', 'config', 'use', 'variantmodel', 'name', 'description', 
+            'owner', 'tags', 'source', 'generated'
+        ],
+        snippetFile: 'variantconfig.json',
+        validationRules: [
+            'single-configset', 'config-naming', 'config-values', 'source-reference',
+            'def-keyword'
+        ]
+    },
     'sylang-safety': {
         id: 'sylang-safety',
         aliases: ['Sylang Safety', 'sylang-safety'],

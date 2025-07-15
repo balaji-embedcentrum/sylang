@@ -3,6 +3,7 @@ import { BaseValidator } from '../languages/base/BaseValidator';
 import { SymbolManager } from './SymbolManager';
 import { FeaturesValidator } from '../languages/features/FeaturesValidator';
 import { VariantModelValidator } from '../languages/variantmodel/VariantModelValidator';
+import { VariantConfigValidator } from '../languages/variantconfig/VariantConfigValidator';
 import { FunctionsValidator } from '../languages/functions/FunctionsValidator';
 import { FailureModeAnalysisValidator } from '../languages/failuremodeanalysis/FailureModeAnalysisValidator';
 import { FailureModeControlsValidator } from '../languages/failuremodecontrols/FailureModeControlsValidator';
@@ -41,6 +42,11 @@ export class ValidationEngine {
             const variantModelConfig = getLanguageConfig('sylang-variantmodel');
             if (variantModelConfig) {
                 this.validators.set('sylang-variantmodel', new VariantModelValidator(variantModelConfig, this.symbolManager));
+            }
+
+            const variantConfigConfig = getLanguageConfig('sylang-variantconfig');
+            if (variantConfigConfig) {
+                this.validators.set('sylang-variantconfig', new VariantConfigValidator(variantConfigConfig, this.symbolManager));
             }
 
             const productLineConfig = getLanguageConfig('sylang-productline');

@@ -1,0 +1,67 @@
+{
+  "Variant Configset Container": {
+    "prefix": "configset",
+    "body": [
+      "use variantmodel ${1:VariantName}",
+      "",
+      "def configset ${2:ConfigSetName}",
+      "    name \"${3:Configuration Set Name}\"",
+      "    description \"${4:Auto-generated configuration from variant model}\"",
+      "    owner \"${5:Product Engineering}\"",
+      "    source \"${6:${1}.vml}\"",
+      "    generated \"${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}Z\"",
+      "    tags \"variant\", \"config\", \"auto-generated\"",
+      "",
+      "    def config c_${7:FeatureName} ${8|1,0|}",
+      "$0"
+    ],
+    "description": "Complete variant configset container"
+  },
+  "Config Definition Enabled": {
+    "prefix": "config-on",
+    "body": [
+      "    def config c_${1:FeatureName} 1"
+    ],
+    "description": "Config definition (enabled)"
+  },
+  "Config Definition Disabled": {
+    "prefix": "config-off",
+    "body": [
+      "    def config c_${1:FeatureName} 0"
+    ],
+    "description": "Config definition (disabled)"
+  },
+  "Hierarchical Config Enabled": {
+    "prefix": "config-hier-on",
+    "body": [
+      "    def config c_${1:System}_${2:Subsystem}_${3:Feature} 1"
+    ],
+    "description": "Hierarchical config definition (enabled)"
+  },
+  "Hierarchical Config Disabled": {
+    "prefix": "config-hier-off",
+    "body": [
+      "    def config c_${1:System}_${2:Subsystem}_${3:Feature} 0"
+    ],
+    "description": "Hierarchical config definition (disabled)"
+  },
+  "Config Import": {
+    "prefix": "use-variant",
+    "body": [
+      "use variantmodel ${1:VariantModelName}"
+    ],
+    "description": "Import variant model"
+  },
+  "Config Properties": {
+    "prefix": "config-props",
+    "body": [
+      "    name \"${1:Configuration Set Name}\"",
+      "    description \"${2:Configuration description}\"",
+      "    owner \"${3:Product Engineering}\"",
+      "    source \"${4:source.vml}\"",
+      "    generated \"${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}Z\"",
+      "    tags \"${5:variant}\", \"${6:config}\""
+    ],
+    "description": "Standard configset properties"
+  }
+} 
