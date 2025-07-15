@@ -150,49 +150,42 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
     'sylang-safety': {
         id: 'sylang-safety',
         aliases: ['Sylang Safety', 'sylang-safety'],
-        extensions: ['.itm', '.sgl', '.haz', '.rsk'],
+        extensions: ['.itm', '.sgl', '.haz'],
         keywords: [
             'def', 'hazardidentification', 'hazard', 'safetygoal', 'goal', 'safetylevel', 
-            'riskassessment', 'riskcriteria', 'riskdetermination', 'asildetermination', 
-            'asilassessment', 'exposure', 'asilmatrix', 'determination',
-            'derivedfrom', 'allocatedto', 'safetylevel', 'productline',
-            'functiongroup', 'category', 'consequences', 'controllability', 'severity',
-            'cause', 'effect', 'context', 'conditions', 'functions_affected',
-            'name', 'description', 'owner', 'tags', 'S1', 'S2', 'S3', 'S4',
-            'E1', 'E2', 'E3', 'E4', 'C1', 'C2', 'C3', 'ASIL-A', 'ASIL-B',
-            'ASIL-C', 'ASIL-D', 'QM', 'A', 'B', 'C', 'D'
+            'asilmatrix', 'determination', 'derivedfrom', 'allocatedto', 'productline',
+            'functiongroup', 'category', 'consequences', 'cause', 'effect', 'context', 
+            'conditions', 'functions_affected', 'name', 'description', 'owner', 'tags'
         ],
         snippetFile: 'safety.json',
         validationRules: ['required-fields', 'safety-levels', 'safety-structure', 'def-keyword'],
         validPropertyValues: {
-            'severity': ['S1', 'S2', 'S3', 'S4'],
-            'exposure': ['E1', 'E2', 'E3', 'E4'],
-            'controllability': ['C1', 'C2', 'C3'],
             'safetylevel': ['ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D', 'QM', 'A', 'B', 'C', 'D'],
             'category': ['systematic', 'random', 'software', 'hardware', 'human-factor', 'operational', 'environmental']
         }
     },
-    'sylang-security': {
-        id: 'sylang-security',
-        aliases: ['Sylang Security', 'sylang-sec'],
-        extensions: ['.tra', '.thr', '.sgo', '.sre', '.ast', '.sec'],
+    'sylang-risk': {
+        id: 'sylang-risk',
+        aliases: ['Sylang Risk Assessment', 'sylang-rsk'],
+        extensions: ['.rsk'],
         keywords: [
-            'def', 'securityanalysis', 'threat', 'asset', 'vulnerability', 'attack', 
-            'threatsource', 'impact', 'likelihood', 'risk', 'securitygoal', 'securityrequirement',
-            'safetylevel', 'name', 'description', 'owner', 'tags', 'category', 'tara',
-            'cybersecurity', 'confidentiality', 'integrity', 'availability', 'authentication',
-            'authorization', 'non-repudiation', 'accountability', 'high', 'medium', 'low',
-            'critical', 'major', 'minor', 'negligible', 'certain', 'likely', 'possible',
-            'unlikely', 'rare', 'derivedfrom', 'allocatedto', 'functiongroup', 'productline'
+            'def', 'riskassessment', 'severity', 'exposure', 'controllability', 'risk', 'asil',
+            'safetylevel', 'name', 'description', 'hazardanalysis', 'hazardidentification',
+            'item', 'methodology', 'rationale', 'scenario', 'subsystem', 'hazard',
+            'riskcriteria', 'riskdetermination', 'asildetermination', 'asilassessment',
+            'S0', 'S1', 'S2', 'S3', 'E0', 'E1', 'E2', 'E3', 'E4', 'C0', 'C1', 'C2', 'C3',
+            'QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D'
         ],
-        snippetFile: 'security.json',
-        validationRules: ['required-fields', 'security-structure', 'def-keyword'],
+        snippetFile: 'safety.json',
+        validationRules: ['required-fields', 'safety-levels', 'risk-structure', 'def-keyword'],
         validPropertyValues: {
-            'impact': ['critical', 'major', 'minor', 'negligible'],
-            'likelihood': ['certain', 'likely', 'possible', 'unlikely', 'rare'],
-            'category': ['confidentiality', 'integrity', 'availability', 'authentication', 'authorization', 'non-repudiation', 'accountability']
+            'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D'],
+            'severity': ['S0', 'S1', 'S2', 'S3'],
+            'exposure': ['E0', 'E1', 'E2', 'E3', 'E4'],
+            'controllability': ['C0', 'C1', 'C2', 'C3']
         }
     },
+
     'sylang-components': {
         id: 'sylang-components',
         aliases: ['Sylang Components', 'sylang-req'],
@@ -220,50 +213,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
             'safetylevel': ['QM', 'A', 'B', 'C', 'D', 'ASIL-A', 'ASIL-B', 'ASIL-C', 'ASIL-D']
         }
     },
-    'sylang-software': {
-        id: 'sylang-software',
-        aliases: ['Sylang Software', 'sylang-mod'],
-        extensions: ['.mod', '.prt'],
-        keywords: [
-            'module', 'algorithm', 'service', 'execution', 'timing', 'priority', 
-            'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 
-            'implements', 'allocatedto', 'runtime', 'memory', 'cpu', 'schedule', 
-            'interrupt', 'task', 'thread', 'process'
-        ],
-        snippetFile: 'software.json',
-        validationRules: ['required-fields', 'safety-levels', 'software-structure']
-    },
-    'sylang-electronics': {
-        id: 'sylang-electronics',
-        aliases: ['Sylang Electronics', 'sylang-ckt'],
-        extensions: ['.ckt'],
-        keywords: [
-            'circuit', 'voltage', 'current', 'power', 'frequency', 'package', 
-            'name', 'description', 'owner', 'tags', 'safetylevel', 'partof', 
-            'implements', 'pin', 'signal', 'analog', 'digital', 'ground', 
-            'supply', 'reference', 'differential', 'singleended', 'impedance', 
-            'capacitance', 'inductance', 'resistance'
-        ],
-        snippetFile: 'electronics.json',
-        validationRules: ['required-fields', 'safety-levels', 'electronics-structure']
-    },
-    'sylang-mechanics': {
-        id: 'sylang-mechanics',
-        aliases: ['Sylang Mechanics', 'sylang-asm'],
-        extensions: ['.asm'],
-        keywords: [
-            'assembly', 'part', 'component', 'mechanism', 'actuator', 'sensor', 
-            'bracket', 'housing', 'mounting', 'fastener', 'gear', 'spring', 
-            'bearing', 'name', 'description', 'owner', 'tags', 'safetylevel', 
-            'partof', 'material', 'dimensions', 'weight', 'tolerance', 'finish', 
-            'coating', 'hardness', 'strength', 'temperature_range', 'pressure_rating', 
-            'lifecycle', 'maintenance', 'steel', 'aluminum', 'plastic', 'rubber', 
-            'titanium', 'carbon_fiber', 'stainless', 'anodized', 'painted', 
-            'galvanized', 'static', 'dynamic', 'rotating', 'linear'
-        ],
-        snippetFile: 'mechanics.json',
-        validationRules: ['required-fields', 'safety-levels', 'mechanics-structure']
-    },
+
     'sylang-blocks': {
         id: 'sylang-blocks',
         aliases: ['Sylang Blocks', 'sylang-blk'],

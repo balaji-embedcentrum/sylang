@@ -1546,7 +1546,7 @@ export class SymbolManager {
                 this.workspaceIndex.fileToHeaders.clear();
 
                 // Find all Sylang files in workspace
-                const sylangFiles = await vscode.workspace.findFiles('**/*.{fml,fun,sys,ple,vml,haz,rsk,sgl,req,blk,vcf}');
+                const sylangFiles = await vscode.workspace.findFiles('**/*.{itm,haz,rsk,sgl,req,blk,fma,fmc,tst,vcf,ple,fml,vml,fun,fta}');
                 
                 for (let i = 0; i < sylangFiles.length; i++) {
                     const fileUri = sylangFiles[i];

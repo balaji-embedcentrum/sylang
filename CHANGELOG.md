@@ -2,6 +2,56 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [2.0.0] - 2025-01-15 - 🚀 MAJOR RELEASE: AGENTIC AI & COMPREHENSIVE MBSE
+
+### 🎯 MAJOR FEATURES
+- **🤖 Agentic AI Instructions**: Complete `.sylangrules` file with comprehensive agentic AI instructions for automatic project generation
+- **🎯 User Intent Recognition**: Advanced pattern recognition for project creation, feature addition, compliance enhancement, and requirements generation
+- **🏗️ Automotive System Templates**: Pre-built templates for EPB, Inverter, EPS, BBW, HVAC, and ADAS systems
+- **📋 EARS Requirements Format**: Context-aware requirements generation using EARS (Easy Approach to Requirements Syntax)
+- **🔗 Full Traceability**: Complete cross-file intelligence and traceability across all 15 file extensions
+- **📊 Standards Compliance**: ISO 26262, ASPICE, DO-178C, and IEC 62304 compliance built-in
+
+### 🔧 TECHNICAL IMPROVEMENTS
+- **📁 Intelligent Folder Structures**: Automatic generation of proper MBSE folder hierarchies
+- **🔄 Incremental Updates**: Smart propagation of changes across dependent files
+- **🎨 Template System**: Comprehensive template system for rapid project generation
+- **✅ Enhanced Validation**: Improved validation for all 15 file extensions with correct syntax
+- **🔍 Cross-File Intelligence**: Advanced symbol resolution and dependency tracking
+
+### 📝 LANGUAGE UPDATES
+- **✅ Corrected .fma Syntax**: Fixed Failure Mode Analysis syntax to match actual implementation
+- **✅ Corrected .fmc Syntax**: Fixed Control Measures syntax with proper prevention/detection/mitigation structure
+- **✅ Updated .vml/.vcf**: Corrected variant model and config syntax with proper feature definitions
+- **✅ Enhanced .fml**: Complete feature modeling syntax with all variability keywords
+- **✅ Safety Workflow Order**: Reordered safety extensions to follow proper engineering workflow (.itm → .haz → .rsk → .sgl → .req → .fta)
+
+### 🚀 COMMAND PALETTE INTEGRATION
+- **🤖 Create Sylang Rules**: Cmd+Shift+P command to generate comprehensive `.sylangrules` file
+- **📋 Smart Overwrite Protection**: Prompts before overwriting existing files
+- **🔍 Auto-Open**: Automatically opens generated file for review
+- **✅ Success Feedback**: Clear confirmation messages and error handling
+
+### 📚 DOCUMENTATION
+- **📖 Complete Language Guide**: Comprehensive syntax examples for all 15 extensions
+- **🎯 Scaling Guidance**: Clear guidance for small (10-50 elements) to complex (200-500+ elements) projects
+- **🔧 Implementation Examples**: Real-world examples from Inverter project
+- **📋 Best Practices**: Industry-standard MBSE practices and patterns
+
+### 🎯 USE CASES
+- **🚗 Automotive Systems**: Complete EPB, Inverter, EPS, BBW, HVAC, ADAS project generation
+- **✈️ Aerospace Systems**: Safety-critical avionics and control systems
+- **🏥 Medical Devices**: FDA-compliant medical device development
+- **🏭 Industrial Systems**: Complex industrial automation and control
+
+### 🔄 MIGRATION NOTES
+- **✅ Backward Compatible**: All existing projects continue to work
+- **🆕 New Features**: Agentic AI instructions and enhanced templates available
+- **📋 Updated Syntax**: Corrected .fma/.fmc syntax for better validation
+- **🎯 Improved Workflow**: Better safety engineering workflow order
+
+**🎯 STATUS: MAJOR RELEASE - Complete agentic AI system for automotive MBSE project generation!**
+
 ## [1.0.67] - 2025-01-15 - 🔧 CONFIGSET FIXES
 
 ### Fixed
