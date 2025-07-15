@@ -2,6 +2,36 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.64] - 2025-01-15
+
+### Fixed
+- **CRITICAL: Complete asil → safetylevel Migration**
+  - **Functions Language**: Fixed `sylang-functions` to use `safetylevel` instead of `asil` in keywords and validation
+  - **All Language Configs**: Updated all language configurations to use `safetylevel` throughout
+  - **Syntax Highlighting**: Fixed syntax highlighting files to recognize `safetylevel` instead of `asil`
+  - **Validators**: Ensured all validators properly validate `safetylevel` values (ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM)
+  - **Enum Support**: Added full support for both short (`A`, `B`, `C`, `D`, `QM`) and long (`ASIL-A`, `ASIL-B`, `ASIL-C`, `ASIL-D`) formats
+
+### Updated Language Configurations
+- `sylang-functions`: Fixed to use `safetylevel` instead of `asil`
+- `sylang-failuremodeanalysis`: Updated to use `safetylevel`
+- `sylang-failuremodecontrols`: Updated to use `safetylevel`  
+- `sylang-faulttreeanalysis`: Updated to use `safetylevel`
+- `sylang-components`: Updated to use `safetylevel`
+- `sylang-blocks`: Updated to use `safetylevel`
+- `sylang-test`: Updated to use `safetylevel`
+
+### Fixed Syntax Highlighting
+- Updated `.tmGrammar.json` files to highlight `safetylevel` instead of `asil`
+- Fixed property patterns in syntax files to match `safetylevel` keyword
+- Ensured consistent highlighting across all file types
+
+### Technical Details
+- All `validPropertyValues` now include both short and long safety level formats
+- Comprehensive update across 15+ language configurations
+- Fixed syntax highlighting in 10+ grammar files
+- Ensured backward compatibility with existing safety level values
+
 ## [1.0.63] - 2025-01-15
 
 ### Fixed

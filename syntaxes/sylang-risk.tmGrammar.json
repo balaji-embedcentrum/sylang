@@ -9,7 +9,7 @@
     { "include": "#properties" },
     { "include": "#strings" },
     { "include": "#risk-levels" },
-    { "include": "#asil-levels" },
+            { "include": "#safetylevel-values" },
     { "include": "#safetylevel-levels" },
     { "include": "#numbers" },
     { "include": "#identifiers" }
@@ -84,10 +84,10 @@
         }
       ]
     },
-    "asil-levels": {
+    "safetylevel-values": {
       "patterns": [
         {
-          "name": "constant.language",
+          "name": "constant.language.safetylevel.risk",
           "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD]|(?<![A-Z])[ABCD](?![A-Z]))\\b"
         }
       ]
