@@ -5,7 +5,7 @@ def configset InverterVariantConfigs
     description "Auto-generated configuration from inverter.vml variant model selections"
     owner "Product Engineering"
     source "inverter.vml"
-    generated "2025-01-18T16:45:00Z"
+    generated "2025-07-15T03:59:51.990Z"
     tags "variant", "config", "auto-generated"
 
     def config c_CommunicationInterfaces 1
@@ -41,4 +41,4 @@ def configset InverterVariantConfigs
     def config c_ThermalManagement_CoolingMethod 1
     def config c_ThermalManagement_CoolingMethod_CoolantControl 1
     def config c_ThermalManagement_CoolingMethod_FanControl 0
-    def config c_ThermalManagement_OvertemperatureProtection 1 
+    def config c_ThermalManagement_OvertemperatureProtection 1

@@ -237,4 +237,12 @@ export class RequirementsValidator {
         
         return distance;
     }
+
+    protected isPropertyLine(trimmedLine: string): boolean {
+        const validProperties = [
+            'name', 'description', 'owner', 'tags', 'safetylevel', 'priority', 
+            'type', 'rationale', 'acceptance', 'verification', 'config'
+        ];
+        return validProperties.some(prop => trimmedLine.startsWith(`${prop} `));
+    }
 } 

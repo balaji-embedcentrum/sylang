@@ -150,5 +150,13 @@ export class SystemValidator {
         diagnostics.push(new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Error));
     }
 
+    protected isPropertyLine(trimmedLine: string): boolean {
+        const validProperties = [
+            'name', 'description', 'owner', 'tags', 'safetylevel', 'contains', 
+            'partof', 'interfaces', 'config'
+        ];
+        return validProperties.some(prop => trimmedLine.startsWith(`${prop} `));
+    }
+
 
 } 

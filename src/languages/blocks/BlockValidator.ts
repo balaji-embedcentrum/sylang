@@ -147,7 +147,7 @@ export class BlockValidator {
 
     private getValidProperties(context: string): string[] {
         switch (context) {
-            case 'block': return ['name', 'description', 'owner', 'tags', 'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'];
+            case 'block': return ['name', 'description', 'owner', 'tags', 'safetylevel', 'config', 'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'];
             case 'port': return ['name', 'description', 'type', 'owner', 'tags'];
             default: return [];
         }
@@ -169,6 +169,12 @@ export class BlockValidator {
                 break;
             case 'tags':
                 this.validateQuotedStringList(diagnostics, lineIndex, line, keyword);
+                break;
+            case 'safetylevel':
+                this.validateSafetyLevel(diagnostics, lineIndex, line);
+                break;
+            case 'config':
+                this.validateConfigProperty(diagnostics, lineIndex, line);
                 break;
             case 'type':
                 if (context === 'port') {
@@ -472,6 +478,26 @@ export class BlockValidator {
         const range = new vscode.Range(lineIndex, 0, lineIndex, Number.MAX_VALUE);
         const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Information);
         diagnostics.push(diagnostic);
+    }
+
+    private validateSafetyLevel(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        const match = line.trim().match(/^safetylevel\s+(ASIL-[ABCD]|[ABCD]|QM)$/);
+        if (!match) {
+            this.addError(diagnostics, lineIndex, 'Invalid safety level. Expected format: safetylevel <ASIL-A|ASIL-B|ASIL-C|ASIL-D|A|B|C|D|QM>');
+        }
+    }
+
+    private validateConfigProperty(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {
+        const match = line.trim().match(/^config\s+(c_[A-Za-z0-9_]+)$/);
+        if (!match) {
+            this.addError(diagnostics, lineIndex, 'Invalid config property. Expected format: config c_ConfigName');
+            return;
+        }
+
+        const configName = match[1];
+        if (!configName.startsWith('c_')) {
+            this.addError(diagnostics, lineIndex, 'Config names must start with "c_" prefix');
+        }
     }
 
     private validateDefPortOut(diagnostics: vscode.Diagnostic[], lineIndex: number, line: string): void {

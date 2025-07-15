@@ -2,7 +2,38 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
-## [1.0.66] - 2025-01-18
+## [1.0.67] - 2025-01-15 - 🔧 CONFIGSET FIXES
+
+### Fixed
+- **🚀 CRITICAL: Configset Import Resolution**: Fixed "configset not found in workspace" errors
+  - **SymbolManager Indexing**: Added `configset` to header recognition pattern
+  - **Workspace Indexing**: Added `.vcf` files to workspace symbol indexing
+  - **Child Symbol Detection**: Fixed detection of indented `def config` statements under configsets
+  - **ValidationEngine Routing**: Added proper `.vcf` file routing to VariantConfigValidator
+
+- **🎯 Import Validation**: Fixed false "unused import" warnings for configsets
+  - **Config Property References**: Added parsing for `config c_ConfigName` references in .blk files
+  - **Usage Detection**: Import validation now properly recognizes config property usage
+  - **Child Symbol Tracking**: Improved tracking of configset child symbols in import validation
+
+- **✅ Validation Improvements**: Fixed various validation edge cases
+  - **First-level Config Names**: No more false warnings for top-level configs like `c_CommunicationInterfaces`
+  - **ISO Timestamp Format**: Fixed validation to accept milliseconds (e.g., `2025-01-15T03:59:51.990Z`)
+  - **Hierarchical Naming**: Smart validation that only applies underscore rules to truly hierarchical configs
+
+### Technical Improvements
+- **Enhanced SymbolManager**: Better .vcf file parsing and indexing
+- **Improved ValidationEngine**: Proper extension-based routing for all file types
+- **Robust Import System**: More accurate symbol resolution and usage tracking
+- **Better Error Handling**: Clearer error messages and improved edge case handling
+
+### Testing Status
+- ✅ Configset imports now resolve correctly
+- ✅ Visual graying system works with proper configset imports
+- ✅ No more false "unused import" warnings
+- ✅ All validation rules working as expected
+
+## [1.0.66] - 2025-01-18 - �� READY FOR TESTING
 
 ### Added
 - **🚀 NEW: Variant Config Generation (.vcf)**: Revolutionary feature for product line engineering
@@ -13,26 +44,28 @@ All notable changes to the "Sylang" extension will be documented in this file.
   - **Auto-generated Metadata**: Timestamps, source references, and ownership tracking
 
 ### Enhanced
-- **VariantConfigValidator**: Comprehensive validation for .vcf files
-  - Config naming convention validation (c_ prefix required)
-  - Single configset per file validation
-  - Import syntax validation for `use variantmodel`
-  - Binary value validation (0/1 only)
-  - Workspace-level .vcf uniqueness checking
-
-### Language Support
-- **New File Extension**: `.vcf` (Variant Config Files) with complete IDE support
-- **Syntax Highlighting**: Keywords, config definitions, properties, and values
-- **Code Snippets**: Quick templates for configset, config definitions, and properties
-- **Validation Rules**: Real-time error detection and warnings
+- **🎨 REVOLUTIONARY: Visual Graying**: Real-time visual feedback for disabled configurations
+  - **Config-aware Decorations**: Functions/requirements with disabled configs automatically grayed out
+  - **Real-time Updates**: Visual feedback updates when .vcf files change
+  - **Performance Optimized**: Intelligent caching and event-driven updates
+  - **Multi-file Support**: Works across .fun, .req, .sys, .blk, and .tst files
 
 ### Technical Implementation
+- **VariantConfigValidator**: Comprehensive validation for .vcf files
+- **SylangConfigDecorationProvider**: Visual graying system with real-time updates
+- **Enhanced Property Validation**: Config property support in all language validators
 - **Smart Parsing**: Intelligent .vml feature hierarchy analysis
 - **Config Generation**: Automatic hierarchical config name creation from feature paths
 - **File Management**: Workspace-aware .vcf file creation and replacement logic
-- **Integration**: Seamless integration with existing Sylang ecosystem
 
-This feature enables true product line engineering by linking variant selections directly to system configurations, revolutionizing how engineers manage complex product families in automotive, aerospace, and medical industries.
+### Testing Ready
+- **Complete Test Suite**: test-variant.vml and test-functions.fun for comprehensive testing
+- **TESTING_VARIANT_CONFIG.md**: Detailed testing guide with expected behaviors
+- **All Features Implemented**: Generation, validation, visual graying, and performance optimization
+
+**🎯 STATUS: COMPLETE - Ready for real-world product line engineering testing!**
+
+This is the **first-ever real-time variant-driven visual feedback system** for MBSE tools, revolutionizing how engineers work with product configurations in automotive, aerospace, and medical industries.
 
 ## [1.0.65] - 2025-01-18
 

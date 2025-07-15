@@ -88,6 +88,8 @@ export class SymbolManager {
             ({ definitions: documentSymbols, references: documentReferences } = this.parseSystemDocument(document));
         } else if (extension === 'blk') {
             ({ definitions: documentSymbols, references: documentReferences } = this.parseBlockDocument(document));
+        } else if (extension === 'vcf') {
+            ({ definitions: documentSymbols, references: documentReferences } = this.parseVariantConfigDocument(document));
         } else if (languageConfig.id === 'sylang-safety') {
             ({ definitions: documentSymbols, references: documentReferences } = this.parseSafetyDocument(document));
         } else {
@@ -1345,9 +1347,116 @@ export class SymbolManager {
                     }
                 }
             }
+            // Parse config property references: config c_ConfigName
+            else if (line.startsWith('config ')) {
+                const configMatch = line.match(/config\s+(c_[A-Za-z0-9_]+)/);
+                if (configMatch) {
+                    const configName = configMatch[1];
+                    const startPos = line.indexOf(configName);
+                    references.push({
+                        name: configName,
+                        location: new vscode.Location(document.uri, new vscode.Position(lineIndex, startPos)),
+                        context: 'config',
+                        range: new vscode.Range(lineIndex, startPos, lineIndex, startPos + configName.length)
+                    });
+                }
+            }
         }
 
         return { definitions, references };
+    }
+
+    /**
+     * Specialized parsing for variant config documents (.vcf files)
+     */
+    private parseVariantConfigDocument(document: vscode.TextDocument): { definitions: SymbolDefinition[], references: SymbolReference[] } {
+        const definitions: SymbolDefinition[] = [];
+        const references: SymbolReference[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const currentLine = lines[lineIndex];
+            if (!currentLine) continue;
+            
+            const line = currentLine.replace(/\r$/, '');
+            const trimmedLine = line.trim();
+            if (!trimmedLine || trimmedLine.startsWith('#')) continue;
+
+            // Parse imports (use variantmodel)
+            if (trimmedLine.startsWith('use ')) {
+                const importMatch = trimmedLine.match(/^use\s+(\w+)\s+([A-Za-z0-9_]+)/);
+                if (importMatch) {
+                    const [, importType, identifier] = importMatch;
+                    const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                    const location = new vscode.Location(document.uri, range);
+                    
+                    references.push({
+                        name: identifier,
+                        location: location,
+                        context: `use ${importType}`,
+                        range: range
+                    });
+                }
+                continue;
+            }
+
+            // Parse configset definition
+            if (trimmedLine.startsWith('def configset')) {
+                const configsetMatch = trimmedLine.match(/^def\s+configset\s+([A-Za-z0-9_]+)/);
+                if (configsetMatch) {
+                    const [, identifier] = configsetMatch;
+                    const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                    const location = new vscode.Location(document.uri, range);
+                    const properties = new Map<string, string>();
+                    
+                    definitions.push({
+                        name: identifier,
+                        kind: 'configset',
+                        location: location,
+                        properties: properties,
+                        range: range
+                    });
+                }
+                continue;
+            }
+
+            // Parse config definitions
+            if (trimmedLine.startsWith('def config')) {
+                const configMatch = trimmedLine.match(/^def\s+config\s+([A-Za-z0-9_]+)\s+([01])/);
+                if (configMatch) {
+                    const [, configName, configValue] = configMatch;
+                    const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+                    const location = new vscode.Location(document.uri, range);
+                    const properties = new Map<string, string>();
+                    properties.set('value', configValue);
+                    
+                    definitions.push({
+                        name: configName,
+                        kind: 'config',
+                        location: location,
+                        properties: properties,
+                        range: range
+                    });
+                }
+                continue;
+            }
+        }
+
+        return { definitions, references };
+    }
+
+    private isVariantConfigContainerKeyword(keyword: string): boolean {
+        const containers = ['variantconfig', 'variant'];
+        return containers.includes(keyword);
+    }
+
+    private isVariantConfigPropertyKeyword(keyword: string, context: string): boolean {
+        const propertiesByContext: { [key: string]: string[] } = {
+            'variantconfig': ['name', 'description', 'variant'],
+            'variant': ['name', 'description', 'system', 'productline']
+        };
+        return (propertiesByContext[context] || []).includes(keyword);
     }
 
     // ============================================================================
@@ -1437,7 +1546,7 @@ export class SymbolManager {
                 this.workspaceIndex.fileToHeaders.clear();
 
                 // Find all Sylang files in workspace
-                const sylangFiles = await vscode.workspace.findFiles('**/*.{fml,fun,sys,ple,vml,haz,rsk,sgl,req,blk}');
+                const sylangFiles = await vscode.workspace.findFiles('**/*.{fml,fun,sys,ple,vml,haz,rsk,sgl,req,blk,vcf}');
                 
                 for (let i = 0; i < sylangFiles.length; i++) {
                     const fileUri = sylangFiles[i];
@@ -1472,7 +1581,7 @@ export class SymbolManager {
                 const line = originalLine.trim();
                 
                 // Find header definitions (def keyword identifier OR def block type identifier)
-                let headerMatch = line.match(/^def\s+(featureset|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals)\s+([A-Za-z0-9_]+)/);
+                let headerMatch = line.match(/^def\s+(featureset|functiongroup|system|variantmodel|productline|hazardanalysis|riskassessment|safetygoals|configset)\s+([A-Za-z0-9_]+)/);
                 let keyword: string = '';
                 let identifier: string = '';
                 
@@ -1517,8 +1626,18 @@ export class SymbolManager {
                 }
 
                 // Find child definitions under headers
-                // For traditional files (non-.blk): look for nested def statements
-                if (!fileUri.fsPath.endsWith('.blk')) {
+                if (fileUri.fsPath.endsWith('.vcf')) {
+                    // For .vcf files: look for indented def config statements
+                    console.log(`[DEBUG] Checking .vcf line ${lineIndex} for config symbols: "${originalLine}"`);
+                    const configMatch = originalLine.match(/^\s+def\s+config\s+([A-Za-z0-9_]+)\s+[01]/);
+                    if (configMatch) {
+                        const configIdentifier = configMatch[1];
+                        console.log(`[DEBUG] Found config symbol '${configIdentifier}' in file ${fileUri.fsPath}`);
+                        childSymbols.push(configIdentifier);
+                        this.workspaceIndex.symbolToFile.set(configIdentifier, fileUri.toString());
+                    }
+                } else if (!fileUri.fsPath.endsWith('.blk')) {
+                    // For traditional files (non-.blk): look for nested def statements
                     console.log(`[DEBUG] Checking line ${lineIndex} for child symbols: "${originalLine}"`);
                     // Check for indented def statements (original line, not trimmed)
                     const childMatch = originalLine.match(/^\s+def\s+\w+\s+([A-Za-z0-9_]+)/);

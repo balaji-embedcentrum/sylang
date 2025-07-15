@@ -271,7 +271,7 @@ export const LANGUAGE_CONFIGS: Record<string, LanguageConfig> = {
         keywords: [
             'def', 'block', 'system', 'subsystem', 'component', 'subcomponent', 'module', 'submodule',
             'unit', 'subunit', 'assembly', 'subassembly', 'circuit', 'part', 'name', 'description',
-            'owner', 'tags', 'safetylevel', 'contains', 'partof', 'enables', 'implements', 'interfaces',
+            'owner', 'tags', 'safetylevel', 'config', 'contains', 'partof', 'enables', 'implements', 'interfaces',
             'feature', 'function', 'use', 'port', 'type', 'electrical', 'mechanical', 'data',
             'CAN', 'Ethernet', 'hydraulic', 'pneumatic', 'optical', 'thermal', 'audio', 'RF', 'sensor', 'actuator'
         ],
