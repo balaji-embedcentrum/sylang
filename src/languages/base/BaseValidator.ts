@@ -317,6 +317,32 @@ export abstract class BaseValidator {
 
         // Validate keyword spelling
         this.validateKeywordSpelling(document, lineIndex, line);
+
+        // Validate config property syntax
+        const indent = this.getIndentLevel(line);
+        if (trimmedLine.startsWith('config ')) {
+            const configMatch = trimmedLine.match(/^config\s+(c_[A-Za-z0-9_]+)$/);
+            if (!configMatch) {
+                this.addDiagnostic(
+                    lineIndex,
+                    indent,
+                    trimmedLine.length,
+                    'Config property must reference a valid config name (c_FeatureName)',
+                    'invalid-config-reference'
+                );
+            } else {
+                const configName = configMatch[1];
+                if (!configName.startsWith('c_')) {
+                    this.addDiagnostic(
+                        lineIndex,
+                        indent,
+                        configName.length,
+                        'Config names must start with "c_" prefix',
+                        'invalid-config-name'
+                    );
+                }
+            }
+        }
     }
 
     // Abstract methods that subclasses must implement

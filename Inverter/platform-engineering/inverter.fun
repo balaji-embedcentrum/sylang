@@ -224,3 +224,27 @@ def functiongroup InverterFunctions
 		tags "EMI", "filtering", "suppression"
 		safetylevel QM
 		enables feature EMIFiltering
+
+    def function DCBusControl
+        name "DC Bus Voltage Control"
+        description "Control and regulation of DC bus voltage levels"
+        owner "Power Electronics Team"
+        tags "DC-bus", "voltage-control", "power"
+        safetylevel ASIL-D
+        category "control"
+        config c_InverterSystem_PowerConversion_DCBusManagement
+        enables feature DCBusManagement
+        partof PowerConversionSubsystem
+        allocatedto DCBusController
+
+    def function IGBTSwitchingControl
+        name "IGBT Switching Control"
+        description "Control of IGBT switching sequences and timing"
+        owner "Power Electronics Team"
+        tags "IGBT", "switching", "control"
+        safetylevel ASIL-D
+        category "control"
+        config c_InverterSystem_PowerConversion_IGBTDrivers
+        enables feature IGBTDrivers
+        partof PowerConversionSubsystem
+        allocatedto IGBTController

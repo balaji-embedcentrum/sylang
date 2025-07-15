@@ -12,6 +12,14 @@ export class FunctionsValidator extends BaseValidator {
         return ['functiongroup', 'function'];
     }
 
+    protected override isPropertyLine(trimmedLine: string): boolean {
+        const validProperties = [
+            'name', 'description', 'owner', 'tags', 'safetylevel', 'category', 
+            'enables', 'partof', 'allocatedto', 'config'
+        ];
+        return validProperties.some(prop => trimmedLine.startsWith(`${prop} `));
+    }
+
     protected async validateLanguageSpecificRules(
         document: vscode.TextDocument,
         lineIndex: number,

@@ -1,5 +1,8 @@
+use configset InverterVariantConfigs 
+
 def block subsystem ProtectionSubsystem
   name "Protection Subsystem"
+  config c_InverterSystem_MotorControl_SpeedControl
   description "Implements overcurrent, overvoltage, and thermal protection mechanisms."
   owner "Safety Team"
   tags "protection", "safety", "fault", "monitoring"

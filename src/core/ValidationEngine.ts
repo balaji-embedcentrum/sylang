@@ -98,11 +98,11 @@ export class ValidationEngine {
             // Check if it's a safety or other file (by extension)
             const fileName = document.fileName;
             const extension = fileName.split('.').pop();
-            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys', 'blk', 'fma', 'fmc', 'tst'];
+            const extensions = ['itm', 'haz', 'rsk', 'sgl', 'fsr', 'ast', 'sec', 'sgo', 'req', 'sub', 'sys', 'blk', 'fma', 'fmc', 'tst', 'vcf'];
             
             if (extensions.includes(extension || '')) {
                 // Use appropriate validator based on extension
-                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator | BlockValidator | FailureModeAnalysisValidator | FailureModeControlsValidator | TestValidator;
+                let validator: SafetyValidator | HazardValidator | RiskValidator | SafetyGoalsValidator | RequirementsValidator | SubsystemValidator | SystemValidator | BlockValidator | FailureModeAnalysisValidator | FailureModeControlsValidator | TestValidator | VariantConfigValidator;
                 if (extension === 'haz') {
                     validator = new HazardValidator();
                     console.log(`[ValidationEngine] Running HazardValidator for .${extension} file`);
@@ -136,6 +136,10 @@ export class ValidationEngine {
                     const testConfig = getLanguageConfig('sylang-test');
                     validator = new TestValidator(testConfig!, this.symbolManager);
                     console.log(`[ValidationEngine] Running TestValidator for .${extension} file`);
+                } else if (extension === 'vcf') {
+                    const vcfConfig = getLanguageConfig('sylang-variantconfig');
+                    validator = new VariantConfigValidator(vcfConfig!, this.symbolManager);
+                    console.log(`[ValidationEngine] Running VariantConfigValidator for .${extension} file`);
                 } else {
                     validator = new SafetyValidator();
                     console.log(`[ValidationEngine] Running SafetyValidator for .${extension} file`);
@@ -172,7 +176,7 @@ export class ValidationEngine {
 
     public async validateWorkspace(): Promise<void> {
         try {
-            const sylangFiles = await vscode.workspace.findFiles('**/*.{ple,fml,fun,sub,cmp,req,haz,rsk,fsr,itm,sgl,ast,sec,sgo,blk}', '**/node_modules/**');
+            const sylangFiles = await vscode.workspace.findFiles('**/*.{ple,fml,fun,sub,cmp,req,haz,rsk,fsr,itm,sgl,ast,sec,sgo,blk,vcf}', '**/node_modules/**');
             
             console.log(`[ValidationEngine] Validating ${sylangFiles.length} Sylang files in workspace`);
             

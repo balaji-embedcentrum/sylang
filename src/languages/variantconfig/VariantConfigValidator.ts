@@ -211,17 +211,22 @@ export class VariantConfigValidator extends BaseValidator {
             if (configMatch) {
                 const configName = configMatch[1];
                 
-                // Check for proper hierarchical naming (contains underscores)
-                if (!configName.includes('_', 2)) { // Skip the c_ prefix
-                    this.addDiagnostic(
-                        lineIndex,
-                        trimmedLine.indexOf(configName),
-                        configName.length,
-                        'Config names should use hierarchical naming with underscores (e.g., c_System_Subsystem_Feature)',
-                        'config-naming-convention',
-                        vscode.DiagnosticSeverity.Information
-                    );
+                // Check for proper hierarchical naming (contains underscores beyond c_ prefix)
+                // Only apply this rule to configs that appear to be hierarchical (more than 2 parts)
+                const parts = configName.split('_');
+                if (parts.length > 2) { // c_ + at least 2 parts = hierarchical
+                    if (!configName.includes('_', 2)) { // Skip the c_ prefix
+                        this.addDiagnostic(
+                            lineIndex,
+                            trimmedLine.indexOf(configName),
+                            configName.length,
+                            'Config names should use hierarchical naming with underscores (e.g., c_System_Subsystem_Feature)',
+                            'config-naming-convention',
+                            vscode.DiagnosticSeverity.Information
+                        );
+                    }
                 }
+                // Skip validation for top-level configs like c_CommunicationInterfaces
             }
         }
     }
@@ -295,13 +300,13 @@ export class VariantConfigValidator extends BaseValidator {
                 );
             }
         } else if (trimmedLine.startsWith('generated ')) {
-            const dateMatch = trimmedLine.match(/^generated\s+"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)"$/);
+            const dateMatch = trimmedLine.match(/^generated\s+"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z)"$/);
             if (!dateMatch) {
                 this.addDiagnostic(
                     lineIndex,
                     indent,
                     trimmedLine.length,
-                    'Generated timestamp must be in ISO format: "YYYY-MM-DDTHH:mm:ssZ"',
+                    'Generated timestamp must be in ISO format: "YYYY-MM-DDTHH:mm:ss.sssZ" or "YYYY-MM-DDTHH:mm:ssZ"',
                     'invalid-generated-format'
                 );
             }

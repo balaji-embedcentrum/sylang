@@ -7,6 +7,7 @@ import { SylangRenameProvider } from './providers/SylangRenameProvider';
 import { ValidationEngine } from './core/ValidationEngine';
 import { SymbolManager } from './core/SymbolManager';
 import { getLanguageConfig, getAllLanguageIds } from './config/LanguageConfigs';
+import { SylangConfigDecorationProvider } from './providers/SylangConfigDecorationProvider';
 
 interface ConfigEntry {
     name: string;
@@ -25,6 +26,7 @@ interface FeatureInfo {
 class SylangExtension {
     private validationEngine: ValidationEngine | undefined;
     private symbolManager: SymbolManager | undefined;
+    private configDecorationProvider: SylangConfigDecorationProvider | undefined;
 
     public async activate(context: vscode.ExtensionContext): Promise<void> {
         const packageJson = require('../package.json');
@@ -35,6 +37,7 @@ class SylangExtension {
             // Initialize core services
             this.symbolManager = new SymbolManager();
             this.validationEngine = new ValidationEngine(this.symbolManager);
+            this.configDecorationProvider = new SylangConfigDecorationProvider(this.symbolManager);
 
             // Build workspace index for import resolution
             console.log('[Sylang] Building workspace index for import resolution...');
@@ -223,11 +226,23 @@ class SylangExtension {
                 vscode.commands.registerCommand('sylang.generateVariantConfig', (uri) => this.generateVariantConfig(uri))
             );
 
+            // Register config decoration provider
+            context.subscriptions.push(this.configDecorationProvider);
+
+            // Update decorations for active editor
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor) {
+                this.configDecorationProvider.updateDecorations(activeEditor);
+            }
+
             // Clean up on deactivation
             context.subscriptions.push({
                 dispose: () => {
                     if (this.validationEngine) {
                         this.validationEngine.dispose();
+                    }
+                    if (this.configDecorationProvider) {
+                        this.configDecorationProvider.dispose();
                     }
                 }
             });
@@ -455,13 +470,61 @@ functiongroup FunctionGroupName
     enables feature FeatureA, FeatureB
     partof subsystem
     allocatedto ComponentName
+    config c_SystemName_FeatureName
 \`\`\`
 
-**Required Properties**: name, description, owner, enables feature
-**Cross-references**: Must reference valid features (requires use featureset)
-**Categories**: control, safety, diagnostic, communication, user-interface
+### 5. VARIANT CONFIG (.vcf)
 
-### 4. TEST CASE FILES (.tst)
+**Purpose**: Define active configuration based on variant model selections
+**Top-level keyword**: \`configset\`
+**File limit**: ONE per workspace (enforced)
+
+**Complete Syntax**:
+\`\`\`sylang
+use variantmodel VariantModelName
+
+def configset ConfigSetName
+  name "Configuration Set Display Name"
+  description "Auto-generated configuration from variant model"
+  owner "Product Engineering"
+  source "variant.vml"
+  generated "2025-01-18T16:45:00Z"
+  tags "variant", "config", "auto-generated"
+  
+  def config c_SystemName 1
+  def config c_SystemName_SubsystemName 1
+  def config c_SystemName_SubsystemName_FeatureName 1
+  def config c_SystemName_SubsystemName_DisabledFeature 0
+\`\`\`
+
+**Config Properties**:
+- **name**: Human-readable configuration set name
+- **description**: Purpose and generation details
+- **owner**: Responsible team or person
+- **source**: Source .vml file reference
+- **generated**: ISO timestamp of generation
+- **tags**: Comma-separated tag list
+
+**Config Definitions**:
+- **Syntax**: \`def config c_HierarchicalName <0|1>\`
+- **Naming**: \`c_\` prefix + underscore-separated hierarchy
+- **Values**: \`1\` (enabled/selected) or \`0\` (disabled/unselected)
+- **Hierarchy**: Reflects feature structure from .vml file
+
+**Usage in Other Files**:
+\`\`\`sylang
+# In .fun files
+def function MyFunction
+  name "Conditional Function"
+  config c_SystemName_FeatureName  # Only included if config = 1
+  
+# In .req files  
+def requirement REQ_001
+  name "Conditional Requirement"
+  config c_SystemName_FeatureName  # Only active if config = 1
+\`\`\`
+
+### 6. TEST CASE FILES (.tst)
 
 **Purpose**: Test case specifications and execution
 **Top-level keyword**: \`testsuite\`
@@ -678,6 +741,9 @@ This specification enables AI to generate complete, validated, and standards-com
         console.log('Sylang Language Support is deactivating...');
         if (this.validationEngine) {
             this.validationEngine.dispose();
+        }
+        if (this.configDecorationProvider) {
+            this.configDecorationProvider.dispose();
         }
     }
 
