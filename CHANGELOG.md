@@ -2,6 +2,20 @@
 
 All notable changes to the "Sylang" extension will be documented in this file.
 
+## [1.0.63] - 2025-01-15
+
+### Fixed
+- **Featureset Recognition**: Fixed indentation validation issues that were preventing `featureset` keyword recognition
+- **Workspace Validation**: Resolved "multiple .fml files" error by moving test files to .backup extension
+- **Indentation Consistency**: Fixed tab vs space indentation issues in sample .fml files
+- **Language Support**: Confirmed `featureset` keyword is properly supported throughout the extension (NOT systemfeatures)
+
+### Technical Details
+- Fixed mixed tab/space indentation in Inverter/platform-engineering/inverter.fml
+- Moved conflicting test .fml files to .backup extension to avoid workspace validation errors
+- Verified FeaturesValidator properly handles "def featureset" syntax
+- All language configurations correctly use "featureset" keyword
+
 ## [1.0.62] - 2025-01-15
 
 ### Changed
