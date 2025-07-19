@@ -3,6 +3,9 @@ import * as vscode from 'vscode';
 // Import cache settings from ICacheManager
 import type { ICacheSettings } from './ICacheManager';
 
+// Re-export ICacheSettings so it can be used by other modules
+export type { ICacheSettings } from './ICacheManager';
+
 // =============================================================================
 // CONFIGURATION MANAGEMENT INTERFACES
 // =============================================================================

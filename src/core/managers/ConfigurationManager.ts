@@ -314,8 +314,103 @@ export class ConfigurationManager implements IConfigurationManager {
 
     private createDefaultGlobalConfiguration(): IGlobalConfiguration {
         return {
-            debugMode: false,
-            performanceMode: 'balanced'
-        } as IGlobalConfiguration;
+            enableValidation: true,
+            enableCompletion: true,
+            enableIncrementalParsing: true,
+            enableBackgroundValidation: true,
+            cacheSettings: {
+                maxMemoryMB: 100,
+                maxAge: 3600000,
+                enablePersistentCache: false,
+                cleanupInterval: 300000,
+                compressionEnabled: true,
+                compressionLevel: 6,
+                parsing: {
+                    enabled: true,
+                    maxEntries: 100,
+                    maxSize: 1024,
+                    ttl: 3600000,
+                    priority: 5,
+                    evictionPolicy: 'lru' as const
+                },
+                validation: {
+                    enabled: true,
+                    maxEntries: 100,
+                    maxSize: 1024,
+                    ttl: 3600000,
+                    priority: 5,
+                    evictionPolicy: 'lru' as const
+                },
+                symbols: {
+                    enabled: true,
+                    maxEntries: 1000,
+                    maxSize: 2048,
+                    ttl: 7200000,
+                    priority: 8,
+                    evictionPolicy: 'lru' as const
+                },
+                completion: {
+                    enabled: true,
+                    maxEntries: 50,
+                    maxSize: 512,
+                    ttl: 1800000,
+                    priority: 3,
+                    evictionPolicy: 'lru' as const
+                },
+                imports: {
+                    enabled: true,
+                    maxEntries: 200,
+                    maxSize: 1024,
+                    ttl: 3600000,
+                    priority: 6,
+                    evictionPolicy: 'lru' as const
+                },
+                configuration: {
+                    enabled: true,
+                    maxEntries: 50,
+                    maxSize: 256,
+                    ttl: 7200000,
+                    priority: 9,
+                    evictionPolicy: 'lru' as const
+                },
+                dependencies: {
+                    enabled: true,
+                    maxEntries: 100,
+                    maxSize: 512,
+                    ttl: 3600000,
+                    priority: 7,
+                    evictionPolicy: 'lru' as const
+                },
+                maxConcurrentOperations: 4,
+                batchSize: 10,
+                enablePreloading: true,
+                enableOptimization: true
+            },
+            performanceSettings: {
+                maxConcurrentValidations: 4,
+                validationTimeout: 5000,
+                parsingTimeout: 2000,
+                debounceMs: 500,
+                batchSize: 10,
+                enableProfiling: false,
+                profileThreshold: 100
+            },
+            debugSettings: {
+                enableLogging: false,
+                logLevel: 'info' as const,
+                logToFile: false,
+                enableTracing: false,
+                traceValidation: false,
+                traceParsing: false,
+                traceCompletion: false
+            },
+            experimentalFeatures: {
+                enableAICompletion: false,
+                enableSmartRefactoring: false,
+                enableCrossFileAnalysis: false,
+                enableConfigurationUI: false,
+                enablePerformanceMonitoring: false
+            }
+        };
     }
 } 

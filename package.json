@@ -2,7 +2,7 @@
   "name": "sylang",
   "displayName": "Sylang",
   "description": "IDE Support for Sylang - Systems and Safety Engineering Language. Complete MBSE (Model Based Systems Engineering) toolkit for complex systems in Automotive, Aerospace, and Medical industries with syntax highlighting, validation, cross-file navigation, and safety standards compliance.",
-  "version": "3.0.1",
+  "version": "4.0.1",
   "publisher": "balaji-embedcentrum",
   "repository": {
     "type": "git",
@@ -48,152 +48,97 @@
     "theme": "dark"
   },
   "icon": "icon.png",
-  "main": "./out/extension-minimal.js",
+  "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "sylang-productline",
-        "aliases": [
-          "Sylang ProductLine",
-          "sylang-ple"
-        ],
-        "extensions": [
-          ".ple"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-functions",
-        "aliases": [
-          "Sylang Functions",
-          "sylang-fun"
-        ],
-        "extensions": [
-          ".fun"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-failuremodeanalysis",
-        "aliases": [
-          "Sylang Failure Mode Analysis",
-          "sylang-fma"
-        ],
-        "extensions": [
-          ".fma"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-failuremodecontrols",
-        "aliases": [
-          "Sylang Failure Mode Controls",
-          "sylang-fmc"
-        ],
-        "extensions": [
-          ".fmc"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-faulttreeanalysis",
-        "aliases": [
-          "Sylang Fault Tree Analysis",
-          "sylang-fta"
-        ],
-        "extensions": [
-          ".fta"
-        ],
+        "aliases": ["Sylang ProductLine", "sylang-ple"],
+        "extensions": [".ple"],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-features",
-        "aliases": [
-          "Sylang Features",
-          "sylang-fml"
-        ],
-        "extensions": [
-          ".fml"
-        ],
+        "aliases": ["Sylang Features", "sylang-fml"],
+        "extensions": [".fml"],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-variantmodel",
-        "aliases": [
-          "Sylang Variant Model",
-          "sylang-vml"
-        ],
-        "extensions": [
-          ".vml"
-        ],
+        "aliases": ["Sylang Variant Model", "sylang-vml"],
+        "extensions": [".vml"],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-variantconfig",
-        "aliases": [
-          "Sylang Variant Config",
-          "sylang-vcf"
-        ],
-        "extensions": [
-          ".vcf"
-        ],
+        "aliases": ["Sylang Variant Config", "sylang-vcf"],
+        "extensions": [".vcf"],
         "configuration": "./language-configuration.json"
       },
       {
-        "id": "sylang-safety",
-        "aliases": [
-          "Sylang Safety",
-          "sylang-haz"
-        ],
-        "extensions": [
-          ".itm",
-          ".sgl",
-          ".haz"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-risk",
-        "aliases": [
-          "Sylang Risk Assessment",
-          "sylang-rsk"
-        ],
-        "extensions": [
-          ".rsk"
-        ],
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "id": "sylang-components",
-        "aliases": [
-          "Sylang Components",
-          "sylang-req"
-        ],
-        "extensions": [
-          ".req"
-        ],
+        "id": "sylang-functions",
+        "aliases": ["Sylang Functions", "sylang-fun"],
+        "extensions": [".fun"],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-blocks",
-        "aliases": [
-          "Sylang Blocks",
-          "sylang-blk"
-        ],
-        "extensions": [
-          ".blk"
-        ],
+        "aliases": ["Sylang Blocks", "sylang-blk"],
+        "extensions": [".blk"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-requirements",
+        "aliases": ["Sylang Requirements", "sylang-req"],
+        "extensions": [".req"],
         "configuration": "./language-configuration.json"
       },
       {
         "id": "sylang-test",
-        "aliases": [
-          "Sylang Test",
-          "sylang-tst"
-        ],
-        "extensions": [
-          ".tst"
-        ],
+        "aliases": ["Sylang Test", "sylang-tst"],
+        "extensions": [".tst"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-failuremodeanalysis",
+        "aliases": ["Sylang Failure Mode Analysis", "sylang-fma"],
+        "extensions": [".fma"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-failuremodecontrols",
+        "aliases": ["Sylang Failure Mode Controls", "sylang-fmc"],
+        "extensions": [".fmc"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-faulttreeanalysis",
+        "aliases": ["Sylang Fault Tree Analysis", "sylang-fta"],
+        "extensions": [".fta"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-items",
+        "aliases": ["Sylang Items", "sylang-itm"],
+        "extensions": [".itm"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-hazards",
+        "aliases": ["Sylang Hazards", "sylang-haz"],
+        "extensions": [".haz"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-risk",
+        "aliases": ["Sylang Risk Assessment", "sylang-rsk"],
+        "extensions": [".rsk"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sylang-safetygoals",
+        "aliases": ["Sylang Safety Goals", "sylang-sgl"],
+        "extensions": [".sgl"],
         "configuration": "./language-configuration.json"
       }
     ],

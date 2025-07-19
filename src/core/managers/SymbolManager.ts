@@ -12,7 +12,8 @@ import {
     IImportInfo,
     IParsingResult,
     SymbolType,
-    ReferenceType
+    ReferenceType,
+    IParsingError
 } from '../interfaces';
 
 // =============================================================================
@@ -302,7 +303,7 @@ export class SymbolManager implements ISymbolManager {
                         const document = await vscode.workspace.openTextDocument(file);
                         // Note: In real implementation, would parse document here
                         // For now, just index the document structure
-                        await this.indexDocumentStructure(document);
+                        await this.indexDocumentStructure(document.uri.toString(), document.getText());
                     } catch (error) {
                         console.error(`Failed to index ${file.toString()}:`, error);
                     }
@@ -334,9 +335,15 @@ export class SymbolManager implements ISymbolManager {
         try {
             const document = await vscode.workspace.openTextDocument(vscode.Uri.parse(symbol.fileUri));
             // Note: In real implementation, would re-parse just this symbol
-            await this.indexDocumentStructure(document);
+            await this.indexDocumentStructure(document.uri.toString(), document.getText());
         } catch (error) {
             console.error(`Failed to refresh symbol ${symbolId}:`, error);
+        }
+    }
+
+    async refreshDocument(document: vscode.TextDocument): Promise<void> {
+        if (this.isSylangDocument(document)) {
+            this.indexDocumentStructure(document.uri.toString(), document.getText());
         }
     }
 
@@ -582,118 +589,189 @@ export class SymbolManager implements ISymbolManager {
         }
     }
 
-    private async indexDocumentStructure(document: vscode.TextDocument): Promise<void> {
-        // Simplified document indexing for initial structure
-        // In real implementation, this would use the appropriate language parser
+    /**
+     * Enhanced document parsing with validation error detection
+     */
+    indexDocumentStructure(documentUri: string, content: string): IParsingResult {
+        console.log(`🔍 Parsing document: ${documentUri}`);
         
-        const documentUri = document.uri.toString();
-        const content = document.getText();
+        const errors: IParsingError[] = [];
+        const warnings: IParsingError[] = [];
+        const symbols: ISymbolDefinition[] = [];
+        const references: ISymbolReference[] = [];
+        const imports: IImportInfo[] = [];
+        
         const lines = content.split('\n');
         
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
+            const line = lines[i];
+            const trimmedLine = line.trim();
             
-            // Look for definition lines (simplified pattern matching)
-            if (line.startsWith('def ')) {
-                // 🎯 HANDLE COMPOUND DEFS: def block subsystem MeasurementSubsystem
-                const compoundDefMatch = line.match(/def\s+(\w+)\s+(\w+)\s+(\w+)/);
-                if (compoundDefMatch) {
-                    const [, defCategory, defType, defName] = compoundDefMatch;
-                    console.log(`🎯 Found compound def: def ${defCategory} ${defType} ${defName} at line ${i + 1}`);
+            // Skip empty lines and comments
+            if (!trimmedLine || trimmedLine.startsWith('//') || trimmedLine.startsWith('/*')) {
+                continue;
+            }
+            
+            try {
+                // Parse import statements
+                const importMatch = line.match(/^\s*use\s+(\w+)(?:\s+(\w+))?\s+(.+)$/);
+                if (importMatch) {
+                    const [, keyword, subkeyword, identifierList] = importMatch;
+                    const identifiers = identifierList.split(',').map(id => id.trim());
                     
-                    const symbolType = this.mapCompoundDefTypeToSymbolType(defCategory, defType);
-                    if (symbolType) {
-                        const symbol: ISymbolDefinition = {
-                            id: this.generateSymbolId(documentUri, defName),
-                            name: defName, // ✅ Use the actual symbol name, not the type
-                            type: symbolType,
-                            fileUri: documentUri,
-                            location: new vscode.Location(document.uri, new vscode.Position(i, 0)),
-                            range: new vscode.Range(i, 0, i, line.length),
-                            parentSymbol: undefined,
-                            childSymbols: [],
-                            isExported: true,
-                            isVisible: true,
-                            isEnabled: true,
-                            properties: new Map(),
-                            metadata: {
-                                pluginId: 'sylang-core',
-                                documentUri,
-                                version: 1,
-                                lastModified: new Date(),
-                                checksum: this.generateChecksum(line),
-                                dependencies: [],
-                                dependents: []
-                            }
-                        };
-                        
-                        this.addSymbol(symbol);
-                        continue;
-                    }
+                    imports.push({
+                        keyword,
+                        subkeyword,
+                        identifiers,
+                        range: new vscode.Range(i, 0, i, line.length),
+                        location: new vscode.Location(vscode.Uri.parse(documentUri), new vscode.Range(i, 0, i, line.length)),
+                        resolvedSymbols: [],
+                        unresolvedIdentifiers: identifiers,
+                        documentUri,
+                        isResolved: false,
+                        errors: []
+                    });
+                    continue;
                 }
                 
-                // 🎯 SIMPLE DEFS: def featureset BloodPressureFeatures
-                const simpleDefMatch = line.match(/def\s+(\w+)\s+(\w+)/);
-                if (simpleDefMatch) {
-                    const [, defType, defName] = simpleDefMatch;
+                // Parse def statements (including compound defs)
+                const defMatch = line.match(/^\s*def\s+(?:(\w+)\s+)?(\w+)\s+([a-zA-Z_][a-zA-Z0-9_]*)/);
+                if (defMatch) {
+                    const [, compound, type, name] = defMatch;
+                    const fullType = compound ? `${compound} ${type}` : type;
                     
-                    const symbolType = this.mapDefTypeToSymbolType(defType);
-                    if (symbolType) {
-                        const symbol: ISymbolDefinition = {
-                            id: this.generateSymbolId(documentUri, defName),
-                            name: defName,
-                            type: symbolType,
-                            fileUri: documentUri,
-                            location: new vscode.Location(document.uri, new vscode.Position(i, 0)),
-                            range: new vscode.Range(i, 0, i, line.length),
-                            parentSymbol: undefined,
-                            childSymbols: [],
-                            isExported: true,
-                            isVisible: true,
-                            isEnabled: true,
-                            properties: new Map(),
-                            metadata: {
-                                pluginId: 'sylang-core',
-                                documentUri,
-                                version: 1,
-                                lastModified: new Date(),
-                                checksum: this.generateChecksum(line),
-                                dependencies: [],
-                                dependents: []
-                            }
-                        };
-                        
-                        this.addSymbol(symbol);
+                    // Map to proper SymbolType
+                    const symbolType = this.mapTypeToSymbolType(fullType);
+                    
+                    // Check for config key in subsequent lines
+                    let configKey: string | undefined;
+                    for (let j = i + 1; j < Math.min(i + 10, lines.length); j++) {
+                        const configMatch = lines[j].match(/^\s*config\s+(.+)/);
+                        if (configMatch) {
+                            configKey = configMatch[1].trim();
+                            break;
+                        }
+                        // Stop if we hit another def or empty line
+                        if (lines[j].trim().startsWith('def') || !lines[j].trim()) {
+                            break;
+                        }
                     }
+                    
+                    const symbol: ISymbolDefinition = {
+                        id: `${documentUri}#${name}`,
+                        name,
+                        type: symbolType,
+                        range: new vscode.Range(i, 0, i, line.length),
+                        fileUri: documentUri,
+                        location: new vscode.Location(vscode.Uri.parse(documentUri), new vscode.Range(i, 0, i, line.length)),
+                        isExported: true,
+                        childSymbols: [],
+                        isVisible: true,
+                        isEnabled: true,
+                        properties: new Map(),
+                        metadata: {
+                            pluginId: 'sylang-core',
+                            documentUri,
+                            version: 1,
+                            lastModified: new Date(),
+                            checksum: this.generateChecksum(line),
+                            dependencies: [],
+                            dependents: []
+                        }
+                    };
+                    
+                    symbols.push(symbol);
+                    console.log(`✅ Found symbol: ${name} (${symbolType}) ${configKey ? `with config: ${configKey}` : ''}`);
+                    continue;
                 }
+                
+                // Validate syntax - check for common errors
+                if (trimmedLine.includes('def') && !defMatch) {
+                    errors.push({
+                        id: `error-${documentUri}-${i}`,
+                        code: 'INVALID_DEF_SYNTAX',
+                        message: `Invalid def statement syntax: ${trimmedLine}`,
+                        range: new vscode.Range(i, 0, i, line.length),
+                        severity: 'error',
+                        type: 'syntax'
+                    });
+                }
+                
+                // Check for missing quotes in string properties
+                const propertyMatch = line.match(/^\s*(name|description|owner)\s+([^"'].*)$/);
+                if (propertyMatch) {
+                    warnings.push({
+                        id: `warning-${documentUri}-${i}`,
+                        code: 'MISSING_QUOTES',
+                        message: `Property '${propertyMatch[1]}' should use quoted strings`,
+                        range: new vscode.Range(i, 0, i, line.length),
+                        severity: 'warning',
+                        type: 'syntax'
+                    });
+                }
+                
+            } catch (error) {
+                errors.push({
+                    id: `error-${documentUri}-${i}`,
+                    code: 'PARSE_ERROR',
+                    message: `Parse error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    range: new vscode.Range(i, 0, i, line.length),
+                    severity: 'error',
+                    type: 'syntax'
+                });
             }
         }
-    }
-
-    private mapDefTypeToSymbolType(defType: string): SymbolType | undefined {
-        switch (defType) {
-            case 'productline': return SymbolType.PRODUCT_LINE;
-            case 'featureset': return SymbolType.FEATURE_SET;
-            case 'variantmodel': return SymbolType.VARIANT_MODEL;
-            case 'functiongroup': return SymbolType.FUNCTION_GROUP;
-            case 'block': return SymbolType.BLOCK_SYSTEM;
-            case 'reqsection': return SymbolType.REQ_SECTION;
-            case 'testsuite': return SymbolType.TEST_SUITE;
-            default: return undefined;
-        }
-    }
-
-    private mapCompoundDefTypeToSymbolType(defCategory: string, defType: string): SymbolType | undefined {
-        if (defCategory === 'block') {
-            switch (defType) {
-                case 'system': return SymbolType.BLOCK_SYSTEM;
-                case 'subsystem': return SymbolType.BLOCK_SUBSYSTEM;
-                case 'component': return SymbolType.BLOCK_COMPONENT;
-                default: return undefined;
+        
+        console.log(`📊 Parsing complete: ${symbols.length} symbols, ${imports.length} imports, ${errors.length} errors`);
+        
+        return {
+            documentUri,
+            symbols,
+            references,
+            imports,
+            syntax: {
+                root: { id: 'root', type: 'document', range: new vscode.Range(0, 0, lines.length, 0), text: content, children: [], properties: {}, metadata: {} },
+                nodes: [],
+                version: 1,
+                documentUri
+            },
+            errors,
+            metadata: {
+                parserId: 'sylang-core',
+                version: '1.0',
+                parseTime: Date.now(),
+                symbolCount: symbols.length,
+                referenceCount: references.length,
+                importCount: imports.length,
+                errorCount: errors.length,
+                warningCount: warnings.length
             }
-        }
-        // Add other compound categories as needed
-        return undefined;
+        };
+    }
+
+    /**
+     * Map type string to SymbolType enum
+     */
+    private mapTypeToSymbolType(typeString: string): SymbolType {
+        const typeMappings: Record<string, SymbolType> = {
+            'productline': SymbolType.PRODUCT_LINE,
+            'featureset': SymbolType.FEATURE_SET,
+            'feature': SymbolType.FEATURE,
+            'variantmodel': SymbolType.VARIANT_MODEL,
+            'configset': SymbolType.CONFIG_SET,
+            'functiongroup': SymbolType.FUNCTION_GROUP,
+            'function': SymbolType.FUNCTION,
+            'system': SymbolType.BLOCK_SYSTEM,
+            'subsystem': SymbolType.BLOCK_SUBSYSTEM,
+            'component': SymbolType.BLOCK_COMPONENT,
+            'requirement': SymbolType.REQUIREMENT,
+            'testcase': SymbolType.TEST_CASE,
+            'hazard': SymbolType.HAZARD,
+            'risk': SymbolType.RISK,
+            'safetygoal': SymbolType.SAFETY_GOAL
+        };
+        
+        return typeMappings[typeString.toLowerCase()] || SymbolType.PRODUCT_LINE;
     }
 
     private generateSymbolId(documentUri: string, name: string): string {
@@ -702,5 +780,11 @@ export class SymbolManager implements ISymbolManager {
 
     private generateChecksum(content: string): string {
         return crypto.createHash('md5').update(content).digest('hex');
+    }
+
+    private isSylangDocument(document: vscode.TextDocument): boolean {
+        const allowedExtensions = ['.ple', '.fml', '.vml', '.vcf', '.fun', '.blk', '.req', '.tst', '.fma', '.fmc', '.fta', '.itm', '.haz', '.rsk', '.sgl'];
+        const fileExtension = '.' + document.uri.path.split('.').pop();
+        return allowedExtensions.includes(fileExtension);
     }
 } 

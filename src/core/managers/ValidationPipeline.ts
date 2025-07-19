@@ -67,8 +67,10 @@ export class ValidationPipeline implements IValidationPipeline {
         private readonly importManager: any,
         private readonly cacheManager?: any
     ) {
-        this.initializeDefaultConfiguration();
-        this.initializePerformanceMetrics();
+        // Initialize required properties
+        this.configuration = this.createDefaultConfiguration();
+        this.performanceMetrics = this.createDefaultPerformanceMetrics();
+        
         this.initializeBuiltinRules();
     }
 
@@ -456,24 +458,24 @@ export class ValidationPipeline implements IValidationPipeline {
         const importResult = await this.importManager.resolveAllImports(document);
         const importChain = this.buildImportChainNodes(importResult);
         const unresolvedImports = importResult.errors
-            .filter(e => e.type === 'unresolved')
-            .map(e => e.identifier || '');
+            .filter((e: any) => e.type === 'unresolved')
+            .map((e: any) => e.identifier || '');
         const invalidImports = importResult.errors
-            .filter(e => e.type === 'invalid')
-            .map(e => e.identifier || '');
+            .filter((e: any) => e.type === 'invalid')
+            .map((e: any) => e.identifier || '');
         const deprecatedImports = importResult.warnings
-            .filter(w => w.type === 'deprecated_symbol')
-            .map(w => w.importStatement.identifiers)
+            .filter((w: any) => w.type === 'deprecated_symbol')
+            .map((w: any) => w.importStatement.identifiers)
             .flat();
         
         const diagnostics = [
-            ...importResult.errors.map(error => ({
+            ...importResult.errors.map((error: any) => ({
                 range: error.range,
                 message: error.message,
                 severity: vscode.DiagnosticSeverity.Error,
                 source: 'import-validation'
             })),
-            ...importResult.warnings.map(warning => ({
+            ...importResult.warnings.map((warning: any) => ({
                 range: warning.range,
                 message: warning.message,
                 severity: vscode.DiagnosticSeverity.Warning,
@@ -902,7 +904,7 @@ export class ValidationPipeline implements IValidationPipeline {
                 }
                 
                 // Add resolved symbols
-                symbols.push(...importResult.resolutionResults.flatMap(r => r.resolvedSymbols));
+                symbols.push(...importResult.resolutionResults.flatMap((r: any) => r.resolvedSymbols));
                 
             } catch (error) {
                 errors.push({
@@ -1571,5 +1573,80 @@ export class ValidationPipeline implements IValidationPipeline {
             skippedRules: [],
             ruleExecutionTimes: new Map()
         };
+    }
+
+    private createDefaultConfiguration(): IPipelineConfiguration {
+        return {
+            enabledStages: VALIDATION_STAGES_ORDER,
+            stageTimeouts: new Map([
+                [ValidationStage.PARSING, 3000],
+                [ValidationStage.IMPORT_RESOLUTION, 2000],
+                [ValidationStage.SYNTAX_VALIDATION, 2000],
+                [ValidationStage.REFERENCE_VALIDATION, 3000],
+                [ValidationStage.CONFIGURATION_VALIDATION, 1000],
+                [ValidationStage.SEMANTIC_VALIDATION, 4000]
+            ]),
+            enabledRules: [],
+            disabledRules: [],
+            maxConcurrency: 4,
+            cacheEnabled: true,
+            incrementalValidation: true,
+            crossFileValidation: true
+        };
+    }
+
+    private createDefaultPerformanceMetrics(): IValidationPerformanceMetrics {
+        return {
+            totalValidations: 0,
+            averageValidationTime: 0,
+            fastestValidation: Number.MAX_VALUE,
+            slowestValidation: 0,
+            cacheHitRate: 0,
+            stageMetrics: new Map()
+        };
+    }
+
+    /**
+     * Enhanced validation result processing with proper diagnostics
+     */
+    private processValidationResults(
+        result: IPipelineResult,
+        documentUri: string
+    ): { errors: string[], warnings: string[], diagnostics: vscode.Diagnostic[] } {
+        const errors: string[] = [];
+        const warnings: string[] = [];
+        const diagnostics: vscode.Diagnostic[] = result.finalDiagnostics || [];
+        
+        // Separate errors and warnings from diagnostics
+        diagnostics.forEach(diagnostic => {
+            if (diagnostic.severity === vscode.DiagnosticSeverity.Error) {
+                errors.push(diagnostic.message);
+            } else if (diagnostic.severity === vscode.DiagnosticSeverity.Warning) {
+                warnings.push(diagnostic.message);
+            }
+        });
+        
+        console.log(`📊 Validation results processed: ${errors.length} errors, ${warnings.length} warnings, ${diagnostics.length} diagnostics`);
+        
+        return { errors, warnings, diagnostics };
+    }
+
+    /**
+     * Create validation error with proper range detection
+     */
+    private createValidationError(
+        message: string,
+        line: number = 0,
+        column: number = 0,
+        severity: vscode.DiagnosticSeverity = vscode.DiagnosticSeverity.Error
+    ): vscode.Diagnostic {
+        const range = new vscode.Range(
+            new vscode.Position(line, column),
+            new vscode.Position(line, column + 10) // Approximate end position
+        );
+        
+        const diagnostic = new vscode.Diagnostic(range, message, severity);
+        diagnostic.source = 'sylang-validation';
+        return diagnostic;
     }
 } 

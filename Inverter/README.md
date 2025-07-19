@@ -50,7 +50,6 @@ This project includes pre-configured AI context for:
 | .itm | Safety | Items |
 | .sec/.thr/.ast | Security | Security analysis, threats, assets |
 | .cmp | Components | Component definitions |
-| .sub | Components | Subsystems |
 | .req | Requirements | Requirements specifications |
 | .mod/.prt | Software | Modules and partitions |
 | .ckt | Electronics | Circuits |

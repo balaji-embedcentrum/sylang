@@ -5,6 +5,9 @@ import { IValidationResult, IValidationContext } from './ILanguagePlugin';
 // Import validation rule interfaces from IConfigurationManager
 import type { IValidationRuleConfig, IRuleCondition } from './IConfigurationManager';
 
+// Re-export IValidationRuleConfig for use by ValidationPipeline  
+export type { IValidationRuleConfig } from './IConfigurationManager';
+
 // Import dependency and conflict interfaces from IImportManager
 import type { ICircularDependency, ISymbolConflict } from './IImportManager';
 

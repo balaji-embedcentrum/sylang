@@ -78,7 +78,7 @@ def configset TestVariantConfigs
 ### Config Property Validation
 - ✅ Config references in .fun files
 - ✅ Config references in .req files
-- ✅ Config references in .sys files
+- ✅ Config references in .blk files
 - ✅ Config naming validation
 
 ## Performance Features

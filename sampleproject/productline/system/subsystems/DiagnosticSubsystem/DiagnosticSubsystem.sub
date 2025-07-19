@@ -1,8 +1,0 @@
-Subsystem DiagnosticSubsystem
-  name "Diagnostic Subsystem"
-  description "Provides fault detection, health monitoring, and diagnostic reporting."
-  owner "Diagnostics Team"
-  tags "diagnostics", "fault", "health"
-  safetylevel ASIL-D
-  enables Diagnostics, FaultDetection, DiagnosticReporting
-  implements SystemHealthSupervisor, FaultDetectionAlgorithm, DiagnosticReportingGateway 
