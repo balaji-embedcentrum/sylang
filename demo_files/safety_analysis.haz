@@ -1,0 +1,30 @@
+// Safety Hazard Analysis for ADAS
+def hazard unintended_acceleration
+    name "Unintended Acceleration"
+    description "Vehicle accelerates without driver input"
+    severity high
+    probability occasional
+    safetylevel ASIL-D
+    category systematic
+    
+    causes "Sensor malfunction"
+    causes "Software error"
+    causes "Hardware failure"
+    
+    mitigates control emergency_braking
+    mitigates control fail_safe_mode
+    
+def item cruise_control_unit
+    name "Cruise Control ECU"
+    description "Electronic control unit for cruise control"
+    safetylevel ASIL-C
+    partof component
+    
+def safetygoal prevent_unintended_acceleration
+    name "Prevent Unintended Acceleration"
+    description "System shall prevent unintended acceleration events"
+    safetylevel ASIL-D
+    allocatedto item cruise_control_unit
+    verified_by test acceleration_safety_test
+
+use controls emergency_braking, fail_safe_mode 

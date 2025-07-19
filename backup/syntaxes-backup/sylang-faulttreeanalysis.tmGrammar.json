@@ -1,0 +1,152 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Fault Tree Analysis",
+  "scopeName": "source.sylang.faulttreeanalysis",
+  "fileTypes": ["fta"],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#definitions"
+    },
+    {
+      "include": "#properties"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#identifiers"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.faulttreeanalysis",
+          "begin": "//",
+          "end": "$"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.def.faulttreeanalysis",
+          "match": "\\bdef\\b"
+        },
+        {
+          "name": "keyword.other.definition.faulttreeanalysis",
+          "match": "\\b(faulttree|topevent|intermediateevent|basicevent|gate|transfer)\\b"
+        },
+        {
+          "name": "keyword.other.gatetype.faulttreeanalysis",
+          "match": "\\b(AND|OR|XOR|NAND|NOR|NOT|INHIBIT|PRIORITY_AND|VOTING)\\b"
+        },
+        {
+          "name": "keyword.other.severity.faulttreeanalysis",
+          "match": "\\b(S0|S1|S2|S3)\\b"
+        },
+        {
+          "name": "keyword.other.category.faulttreeanalysis",
+          "match": "\\b(systematic|random|external|common_cause|human_error)\\b"
+        },
+        {
+          "name": "keyword.other.safetylevel.faulttreeanalysis",
+          "match": "\\b(QM|A|B|C|D)\\b"
+        },
+        {
+          "name": "keyword.other.dormancy.faulttreeanalysis",
+          "match": "\\b(none|low|medium|high)\\b"
+        },
+        {
+          "name": "keyword.other.standards.faulttreeanalysis",
+          "match": "\\b(ISO\\s+26262|IEC\\s+61025|IEC\\s+61508|ARP4761|MIL-STD-1629|NUREG-0492)\\b"
+        }
+      ]
+    },
+    "definitions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.definition.faulttreeanalysis",
+          "match": "\\b(def)\\s+(faulttree|topevent|intermediateevent|basicevent|gate|transfer)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {"name": "keyword.control.def.faulttreeanalysis"},
+            "2": {"name": "keyword.other.definition.faulttreeanalysis"},
+            "3": {"name": "entity.name.function.faulttreeanalysis"}
+          }
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.property.string.faulttreeanalysis",
+          "match": "\\b(name|description|owner|analysismethod|condition)\\b"
+        },
+        {
+          "name": "entity.name.tag.property.list.faulttreeanalysis",
+          "match": "\\b(reviewers|standards|inputs|outputs)\\b"
+        },
+        {
+          "name": "entity.name.tag.property.identifier.faulttreeanalysis",
+          "match": "\\b(from|to|targetfta)\\b"
+        },
+        {
+          "name": "entity.name.tag.property.enum.faulttreeanalysis",
+          "match": "\\b(gatetype|severity|category|safetylevel|dormancy)\\b"
+        },
+        {
+          "name": "entity.name.tag.property.numeric.faulttreeanalysis",
+          "match": "\\b(probability|exposuretime|repairtime)\\b"
+        },
+        {
+          "name": "entity.name.tag.property.crossref.faulttreeanalysis",
+          "match": "\\b(item|hazardidentification|riskassessment|safetygoals|productline|featureset|functiongroup)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.faulttreeanalysis",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.faulttreeanalysis",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.scientific.faulttreeanalysis",
+          "match": "\\b[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.faulttreeanalysis",
+          "match": "\\b[0-9]*\\.?[0-9]+\\b"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other.identifier.faulttreeanalysis",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    }
+  }
+} 

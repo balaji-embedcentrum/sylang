@@ -2,16 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Test",
   "scopeName": "source.sylang.test",
+  "fileTypes": ["tst"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#imports" },
-    { "include": "#def-statements" },
-    { "include": "#section-headers" },
-    { "include": "#test-keywords" },
-    { "include": "#property-keywords" },
-    { "include": "#test-enums" },
-    { "include": "#cross-references" },
+    { "include": "#use-statements" },
+    { "include": "#def-test" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
+    { "include": "#safety-levels" },
+    { "include": "#categories" },
     { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
     { "include": "#identifiers" }
   ],
   "repository": {
@@ -29,117 +34,100 @@
         }
       ]
     },
-    "imports": {
+    "def-test": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
-          "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
-          }
-        }
-      ]
-    },
-    "def-statements": {
-      "patterns": [
-        {
-          "match": "\\b(def)\\s+(testsuite|testcase)\\s+([A-Za-z_][A-Za-z0-9_]*)\\b",
+          "match": "\\b(def)\\s+(test|testcase)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
             "1": { "name": "keyword.control.def.sylang" },
-            "2": { "name": "entity.name.type.sylang" },
-            "3": { "name": "entity.name.function.sylang" }
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.test.sylang" }
+          }
+        }
+      ]
+    },
+    "def-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(test|testcase)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|owner|tags|safetylevel|precondition|postcondition|steps|expected|actual|config)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(tests)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
           }
         },
         {
-          "name": "keyword.control.def.sylang",
-          "match": "\\bdef\\b"
+          "match": "\\b(verifies)\\s+(requirement|feature|function|component)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(validates)\\s+(requirement|feature|function|component)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(partof|allocatedto|dependson|requires|covers)\\b",
+          "name": "keyword.other.special.sylang"
         }
       ]
     },
-    "section-headers": {
+    "safety-levels": {
       "patterns": [
         {
-          "name": "keyword.control.section.sylang",
-          "match": "^\\s*(preconditions|teststeps|expectedresult|actualresult)\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
+        },
+        {
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
         }
       ]
     },
-    "test-keywords": {
+    "categories": {
       "patterns": [
         {
-          "name": "keyword.other.test-structure.sylang",
-          "match": "\\b(testsuite|testcase|step)\\b"
-        },
-        {
-          "name": "keyword.other.test-action.sylang",
-          "match": "\\b(verifies\\s+requirement|exercises)\\b"
-        },
-        {
-          "name": "keyword.other.test-verification.sylang",
-          "match": "\\b(verifies|exercises)\\b"
-        }
-      ]
-    },
-    "property-keywords": {
-      "patterns": [
-        {
-          "name": "keyword.other.property.multi-word.sylang",
-          "match": "\\b(verifies\\s+requirement)\\b"
-        },
-        {
-          "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|testtype|coverage|method|priority|safetylevel|verifies|requirement|exercises|preconditions|teststeps|expectedresult|actualresult|testresult|executiontime)\\b"
-        }
-      ]
-    },
-    "test-enums": {
-      "patterns": [
-        {
-          "name": "constant.language.test-type.sylang",
-          "match": "\\b(unit|integration|system|acceptance|regression|smoke)\\b"
-        },
-        {
-          "name": "constant.language.coverage-type.sylang",
-          "match": "\\b(statement|branch|mcdc|requirement|function)\\b"
-        },
-        {
-          "name": "constant.language.test-method.sylang",
-          "match": "\\b(manual|automated|hil|sil|mil|pil)\\b"
-        },
-        {
-          "name": "constant.language.test-result.sylang",
-          "match": "\\b(pass|fail|pending|inconclusive)\\b"
-        },
-        {
-          "name": "constant.language.priority.sylang",
-          "match": "\\b(critical|high|medium|low)\\b"
-        },
-        {
-          "name": "constant.language.safetylevel.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM)\\b"
-        }
-      ]
-    },
-    "cross-references": {
-      "patterns": [
-        {
-          "name": "variable.other.reference.requirement.sylang",
-          "match": "\\b(FSR_[A-Z0-9_]+|REQ_[A-Z0-9_]+|SG_[A-Z0-9_]+)\\b"
-        },
-        {
-          "name": "variable.other.reference.function.sylang",
-          "match": "\\b([A-Z][A-Za-z0-9_]*Function)\\b"
-        },
-        {
-          "name": "variable.other.reference.step.sylang",
-          "match": "\\b(STEP_[A-Z0-9_]+)\\b"
+          "match": "\\b(unit|integration|system|acceptance|regression|performance|stress|security)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
@@ -158,15 +146,35 @@
         }
       ]
     },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
+        }
+      ]
+    },
     "identifiers": {
       "patterns": [
         {
-          "name": "entity.name.function.sylang",
-          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
-        },
-        {
-          "name": "variable.other.sylang",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

@@ -1,0 +1,20 @@
+def block subsystem ConnectivitySubsystem
+  name "WiFi Connectivity Subsystem"
+  description "Wireless communication for remote monitoring and data synchronization"
+  owner "Communication Engineering Team"
+  tags "WiFi", "wireless", "communication", "connectivity"
+  safetylevel ASIL-B
+  contains module WiFiModule, AntennaModule, NetworkStackModule, CloudInterfaceModule
+  
+  port in DataToTransmit, NetworkCredentials, SystemCommands
+  def port out NetworkStatus 
+    name "Network Connection Status"
+    description "Current status of the WiFi network connection"
+    type status
+    owner "Connectivity Team"
+    safetylevel ASIL-B
+    tags "network", "status", "connectivity"
+    characteristics "Connected, Disconnected, Error states"
+  def port out TransmissionStatus, ReceivedCommands
+
+

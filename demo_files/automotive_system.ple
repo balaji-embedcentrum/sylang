@@ -1,0 +1,29 @@
+// Automotive System Product Line
+def productline automotive_system
+    name "Advanced Driver Assistance System"
+    description "Complete ADAS product line for automotive applications"
+    owner "Systems Engineering Team"
+    safetylevel ASIL-D
+    category automotive
+    
+    def featureset core_features
+        name "Core ADAS Features"
+        enables function emergency_braking
+        partof system
+        
+        def feature adaptive_cruise_control
+            name "Adaptive Cruise Control"
+            description "Maintains safe following distance"
+            safetylevel ASIL-B
+            enables function speed_control
+            requires feature forward_radar
+            
+        def feature lane_keep_assist
+            name "Lane Keep Assist"
+            description "Keeps vehicle within lane boundaries"
+            safetylevel ASIL-B
+            enables function steering_correction
+            requires feature camera_system
+
+use features adaptive_cruise_control, lane_keep_assist
+use functions emergency_braking, speed_control 

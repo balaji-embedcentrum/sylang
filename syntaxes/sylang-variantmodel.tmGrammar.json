@@ -1,114 +1,153 @@
 {
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Variant Model",
   "scopeName": "source.sylang.variantmodel",
   "fileTypes": ["vml"],
   "patterns": [
-    {
-      "include": "#comments"
-    },
-    {
-      "include": "#imports"
-    },
-    {
-      "include": "#variantmodel-definition"
-    },
-    {
-      "include": "#feature-definition"
-    },
-    {
-      "include": "#keywords"
-    },
-    {
-      "include": "#strings"
-    },
-    {
-      "include": "#numbers"
-    }
+    { "include": "#comments" },
+    { "include": "#use-statements" },
+    { "include": "#def-variant" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
+    { "include": "#safety-levels" },
+    { "include": "#categories" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
+    { "include": "#identifiers" }
   ],
   "repository": {
     "comments": {
       "patterns": [
         {
-          "match": "#.*$",
-          "name": "comment.line.hash.sylang"
+          "name": "comment.line.double-slash.sylang",
+          "begin": "//",
+          "end": "$"
+        },
+        {
+          "name": "comment.block.sylang",
+          "begin": "/\\*",
+          "end": "\\*/"
         }
       ]
     },
-    "imports": {
+    "def-variant": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "match": "\\b(def)\\s+(variantmodel)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.variant.sylang" }
           }
         }
       ]
     },
-    "variantmodel-definition": {
+    "def-keywords": {
       "patterns": [
         {
-          "match": "\\b(def)\\s+(variantmodel)\\s+(\\w+)\\b",
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(variantmodel)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
           "captures": {
-            "1": {
-              "name": "keyword.control.definition.sylang"
-            },
-            "2": {
-              "name": "keyword.control.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
           }
         }
       ]
     },
-    "feature-definition": {
+    "property-names": {
       "patterns": [
         {
-          "match": "\\b(feature)\\s+(\\w+)\\s+(mandatory|optional|alternative)\\s*(selected)?\\b",
-          "captures": {
-            "1": {
-              "name": "keyword.other.sylang"
-            },
-            "2": {
-              "name": "entity.name.function.sylang"
-            },
-            "3": {
-              "name": "storage.type.sylang"
-            },
-            "4": {
-              "name": "keyword.other.selected.sylang"
-            }
-          }
+          "match": "\\b(name|description|owner|tags|safetylevel|variant|binding|constraint|expression|config)\\b",
+          "name": "variable.other.property.sylang"
         }
       ]
     },
-    "keywords": {
+    "special-keywords": {
       "patterns": [
         {
-          "match": "\\b(use|def|variantmodel|feature|mandatory|optional|alternative|selected)\\b",
-          "name": "keyword.control.sylang"
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(binds)\\s+(feature|function|component|parameter)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(maps)\\s+(feature|function|component|element)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(selects)\\s+(variant|configuration|option)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(partof|allocatedto|dependson|requires|constrains)\\b",
+          "name": "keyword.other.special.sylang"
+        }
+      ]
+    },
+    "safety-levels": {
+      "patterns": [
+        {
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
+        },
+        {
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
+        }
+      ]
+    },
+    "categories": {
+      "patterns": [
+        {
+          "match": "\\b(base|derived|concrete|abstract|virtual|bound|unbound)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
     "strings": {
       "patterns": [
         {
+          "name": "string.quoted.double.sylang",
           "begin": "\"",
           "end": "\"",
-          "name": "string.quoted.double.sylang",
           "patterns": [
             {
-              "match": "\\\\.",
-              "name": "constant.character.escape.sylang"
+              "name": "constant.character.escape.sylang",
+              "match": "\\\\."
             }
           ]
         }
@@ -119,6 +158,30 @@
         {
           "match": "\\b\\d+(\\.\\d+)?\\b",
           "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

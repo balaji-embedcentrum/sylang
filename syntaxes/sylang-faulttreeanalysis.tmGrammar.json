@@ -1,126 +1,145 @@
 {
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Fault Tree Analysis",
-  "scopeName": "source.faulttreeanalysis",
+  "scopeName": "source.sylang.faulttreeanalysis",
   "fileTypes": ["fta"],
   "patterns": [
-    {
-      "include": "#comments"
-    },
-    {
-      "include": "#keywords"
-    },
-    {
-      "include": "#definitions"
-    },
-    {
-      "include": "#properties"
-    },
-    {
-      "include": "#strings"
-    },
-    {
-      "include": "#numbers"
-    },
-    {
-      "include": "#identifiers"
-    }
+    { "include": "#comments" },
+    { "include": "#use-statements" },
+    { "include": "#def-faulttree" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
+    { "include": "#safety-levels" },
+    { "include": "#categories" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
+    { "include": "#identifiers" }
   ],
   "repository": {
     "comments": {
       "patterns": [
         {
-          "name": "comment.line.double-slash.faulttreeanalysis",
+          "name": "comment.line.double-slash.sylang",
           "begin": "//",
           "end": "$"
+        },
+        {
+          "name": "comment.block.sylang",
+          "begin": "/\\*",
+          "end": "\\*/"
         }
       ]
     },
-    "keywords": {
+    "def-faulttree": {
       "patterns": [
         {
-          "name": "keyword.control.def.faulttreeanalysis",
-          "match": "\\bdef\\b"
-        },
-        {
-          "name": "keyword.other.definition.faulttreeanalysis",
-          "match": "\\b(faulttree|topevent|intermediateevent|basicevent|gate|transfer)\\b"
-        },
-        {
-          "name": "keyword.other.gatetype.faulttreeanalysis",
-          "match": "\\b(AND|OR|XOR|NAND|NOR|NOT|INHIBIT|PRIORITY_AND|VOTING)\\b"
-        },
-        {
-          "name": "keyword.other.severity.faulttreeanalysis",
-          "match": "\\b(S0|S1|S2|S3)\\b"
-        },
-        {
-          "name": "keyword.other.category.faulttreeanalysis",
-          "match": "\\b(systematic|random|external|common_cause|human_error)\\b"
-        },
-        {
-          "name": "keyword.other.safetylevel.faulttreeanalysis",
-          "match": "\\b(QM|A|B|C|D)\\b"
-        },
-        {
-          "name": "keyword.other.dormancy.faulttreeanalysis",
-          "match": "\\b(none|low|medium|high)\\b"
-        },
-        {
-          "name": "keyword.other.standards.faulttreeanalysis",
-          "match": "\\b(ISO\\s+26262|IEC\\s+61025|IEC\\s+61508|ARP4761|MIL-STD-1629|NUREG-0492)\\b"
-        }
-      ]
-    },
-    "definitions": {
-      "patterns": [
-        {
-          "name": "entity.name.function.definition.faulttreeanalysis",
-          "match": "\\b(def)\\s+(faulttree|topevent|intermediateevent|basicevent|gate|transfer)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+          "match": "\\b(def)\\s+(faulttree)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
-            "1": {"name": "keyword.control.def.faulttreeanalysis"},
-            "2": {"name": "keyword.other.definition.faulttreeanalysis"},
-            "3": {"name": "entity.name.function.faulttreeanalysis"}
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.faulttree.sylang" }
           }
         }
       ]
     },
-    "properties": {
+    "def-keywords": {
       "patterns": [
         {
-          "name": "entity.name.tag.property.string.faulttreeanalysis",
-          "match": "\\b(name|description|owner|analysismethod|condition)\\b"
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(faulttree)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|owner|tags|safetylevel|topevent|gate|event|probability|config)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
         },
         {
-          "name": "entity.name.tag.property.list.faulttreeanalysis",
-          "match": "\\b(reviewers|standards|inputs|outputs)\\b"
+          "match": "\\b(and|or|not)\\s+(gate|event)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
         },
         {
-          "name": "entity.name.tag.property.identifier.faulttreeanalysis",
-          "match": "\\b(from|to|targetfta)\\b"
+          "match": "\\b(inhibit)\\s+(gate|condition)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
         },
         {
-          "name": "entity.name.tag.property.enum.faulttreeanalysis",
-          "match": "\\b(gatetype|severity|category|safetylevel|dormancy)\\b"
+          "match": "\\b(partof|allocatedto|dependson|requires|priority_and)\\b",
+          "name": "keyword.other.special.sylang"
+        }
+      ]
+    },
+    "safety-levels": {
+      "patterns": [
+        {
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
         },
         {
-          "name": "entity.name.tag.property.numeric.faulttreeanalysis",
-          "match": "\\b(probability|exposuretime|repairtime)\\b"
-        },
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
+        }
+      ]
+    },
+    "categories": {
+      "patterns": [
         {
-          "name": "entity.name.tag.property.crossref.faulttreeanalysis",
-          "match": "\\b(item|hazardidentification|riskassessment|safetygoals|productline|featureset|functiongroup)\\b"
+          "match": "\\b(basic_event|intermediate_event|undeveloped_event|external_event|house_event)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double.faulttreeanalysis",
+          "name": "string.quoted.double.sylang",
           "begin": "\"",
           "end": "\"",
           "patterns": [
             {
-              "name": "constant.character.escape.faulttreeanalysis",
+              "name": "constant.character.escape.sylang",
               "match": "\\\\."
             }
           ]
@@ -130,20 +149,32 @@
     "numbers": {
       "patterns": [
         {
-          "name": "constant.numeric.scientific.faulttreeanalysis",
-          "match": "\\b[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\\b"
-        },
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
         {
-          "name": "constant.numeric.decimal.faulttreeanalysis",
-          "match": "\\b[0-9]*\\.?[0-9]+\\b"
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
         }
       ]
     },
     "identifiers": {
       "patterns": [
         {
-          "name": "variable.other.identifier.faulttreeanalysis",
-          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

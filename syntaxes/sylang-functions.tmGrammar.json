@@ -2,14 +2,22 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Functions",
   "scopeName": "source.sylang.functions",
+  "fileTypes": ["fun"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#imports" },
-    { "include": "#keywords" },
-    { "include": "#strings" },
+    { "include": "#use-statements" },
+    { "include": "#def-function" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
     { "include": "#safety-levels" },
-    { "include": "#partof-values" },
-    { "include": "#attributes" }
+    { "include": "#categories" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
+    { "include": "#identifiers" }
   ],
   "repository": {
     "comments": {
@@ -26,49 +34,107 @@
         }
       ]
     },
-    "imports": {
+    "def-function": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "match": "\\b(def)\\s+(functiongroup|function)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.function.sylang" }
           }
         }
       ]
     },
-    "keywords": {
+    "def-keywords": {
       "patterns": [
         {
-          "name": "keyword.control.sylang",
-          "match": "\\b(use|def|functiongroup|function)\\b"
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(functiongroup|function)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|owner|tags|safetylevel|category|partof|config)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "keyword.other.sylang",
-          "match": "\\b(name|description|owner|tags|enables|partof|feature)\\b"
+          "match": "\\b(partof)\\s+(system|subsystem|component|module|unit|assembly|circuit|part)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
+        },
+        {
+          "match": "\\b(allocatedto)\\s+(system|subsystem|component|module|unit|assembly|circuit|part)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
+        },
+        {
+          "match": "\\b(implements)\\s+(function)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
+        },
+        {
+          "match": "\\b(dependson|requires|extends|contains|provides|inherits|calls|invokes|returns)\\b",
+          "name": "keyword.other.special.sylang"
         }
       ]
     },
     "safety-levels": {
       "patterns": [
         {
-          "name": "constant.language.safety-level.sylang",
-          "match": "\\b([ABCD]|QM)\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
+        },
+        {
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
         }
       ]
     },
-    "partof-values": {
+    "categories": {
       "patterns": [
         {
-          "name": "constant.language.partof-value.sylang",
-          "match": "\\b(system|subsystem|component|module|unit|assembly|circuit|part)\\b"
+          "match": "\\b(system|subsystem|component|module|unit|software|algorithm|control|sensing|actuation)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
@@ -87,11 +153,35 @@
         }
       ]
     },
-    "attributes": {
+    "numbers": {
       "patterns": [
         {
-          "name": "entity.name.tag.sylang",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*[\":])"
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

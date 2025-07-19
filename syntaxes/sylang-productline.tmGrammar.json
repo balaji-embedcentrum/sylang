@@ -2,13 +2,22 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang ProductLine",
   "scopeName": "source.sylang.productline",
+  "fileTypes": ["ple"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#imports" },
-    { "include": "#keywords" },
-    { "include": "#strings" },
+    { "include": "#use-statements" },
+    { "include": "#def-productline" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
     { "include": "#safety-levels" },
-    { "include": "#attributes" }
+    { "include": "#categories" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
+    { "include": "#identifiers" }
   ],
   "repository": {
     "comments": {
@@ -25,49 +34,93 @@
         }
       ]
     },
-    "imports": {
+    "def-productline": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "match": "\\b(def)\\s+(productline)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.productline.sylang" }
           }
         }
       ]
     },
-    "keywords": {
+    "def-keywords": {
       "patterns": [
         {
-          "name": "keyword.control.definition.sylang",
-          "match": "\\b(use|def)\\b"
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(productline|featureset|feature)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|owner|tags|domain|compliance|firstrelease|region|safetylevel)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "keyword.control.sylang",
-          "match": "\\b(productline)\\b"
+          "match": "\\b(partof)\\s+(system|subsystem|component|module|unit|assembly|circuit|part)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "keyword.other.sylang",
-          "match": "\\b(description|owner|domain|compliance|firstrelease|tags|region)\\b"
+          "match": "\\b(allocatedto|dependson|requires|implements|extends|contains|provides|inherits)\\b",
+          "name": "keyword.other.special.sylang"
         }
       ]
     },
     "safety-levels": {
       "patterns": [
         {
-          "name": "constant.language.safety-level.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM)\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
         },
         {
-          "name": "keyword.other.safety.sylang",
-          "match": "\\b(safetylevel)\\b"
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
+        }
+      ]
+    },
+    "categories": {
+      "patterns": [
+        {
+          "match": "\\b(system|subsystem|component|module|unit|assembly|circuit|part|software|hardware|mechanical|electrical|automotive|aerospace|medical)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
@@ -86,11 +139,35 @@
         }
       ]
     },
-    "attributes": {
+    "numbers": {
       "patterns": [
         {
-          "name": "entity.name.tag.sylang",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*[\":])"
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

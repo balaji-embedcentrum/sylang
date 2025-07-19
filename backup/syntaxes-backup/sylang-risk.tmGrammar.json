@@ -1,0 +1,139 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Risk Assessment",
+  "scopeName": "source.sylang.risk",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#imports" },
+    { "include": "#def-statements" },
+    { "include": "#section-headers" },
+    { "include": "#properties" },
+    { "include": "#strings" },
+    { "include": "#risk-levels" },
+    { "include": "#safetylevel-values" },
+    { "include": "#safetylevel-levels" },
+    { "include": "#numbers" },
+    { "include": "#identifiers" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash",
+          "begin": "//",
+          "end": "$"
+        },
+        {
+          "name": "comment.block",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "imports": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(hazardanalysis|hazardidentification|item|riskassessment|configset)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "captures": {
+            "1": {
+              "name": "keyword.control.import.sylang"
+            },
+            "2": {
+              "name": "storage.type.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.sylang"
+            }
+          }
+        }
+      ]
+    },
+    "def-statements": {
+      "patterns": [
+        {
+          "match": "\\b(def)\\s+(riskassessment|severity|exposure|controllability|risk|safetylevel|asil)\\s+([A-Z][A-Za-z0-9_]*)",
+          "captures": {
+            "1": { "name": "keyword.control" },
+            "2": { "name": "storage.type" },
+            "3": { "name": "entity.name.function" }
+          }
+        },
+        {
+          "name": "keyword.control",
+          "match": "\\b(def)\\b"
+        }
+      ]
+    },
+    "section-headers": {
+      "patterns": [
+        {
+          "name": "entity.name.section",
+          "match": "\\b(riskcriteria|riskdetermination|asildetermination|asilassessment)\\b"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "variable.parameter",
+          "match": "\\b(name|description|severity|exposure|controllability|risk|scenario|safetylevel|rationale|subsystem|hazard|hazardanalysis|hazardidentification|item|methodology|asil)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "risk-levels": {
+      "patterns": [
+        {
+          "name": "constant.numeric",
+          "match": "\\b(S[0-3]|E[0-4]|C[0-3]|S[0-3]E[0-4]C[0-3])\\b"
+        }
+      ]
+    },
+    "safetylevel-values": {
+      "patterns": [
+        {
+          "name": "constant.language.safetylevel.risk",
+          "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD]|(?<![A-Z])[ABCD](?![A-Z]))\\b"
+        }
+      ]
+    },
+    "safetylevel-levels": {
+      "patterns": [
+        {
+          "name": "constant.language.safetylevel.sylang",
+          "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD])\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    "identifiers": {
+      "patterns": [
+        {
+          "name": "variable.other",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        }
+      ]
+    }
+  }
+}

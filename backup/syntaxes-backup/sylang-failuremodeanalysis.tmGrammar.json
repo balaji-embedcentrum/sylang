@@ -1,0 +1,251 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Failure Mode Analysis",
+  "scopeName": "source.sylang.failuremodeanalysis",
+  "fileTypes": ["fma"],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#failuremodeanalysis"
+    },
+    {
+      "include": "#failuremode"
+    },
+    {
+      "include": "#properties"
+    },
+    {
+      "include": "#safety-levels"
+    },
+    {
+      "include": "#strings"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sylang",
+          "begin": "//",
+          "end": "$"
+        }
+      ]
+    },
+    "failuremodeanalysis": {
+      "patterns": [
+        {
+          "name": "meta.definition.failuremodeanalysis.sylang",
+          "match": "\\b(def)\\s+(failuremodeanalysis)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "storage.type.failuremodeanalysis.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.failuremodeanalysis.sylang"
+            }
+          }
+        }
+      ]
+    },
+    "failuremode": {
+      "patterns": [
+        {
+          "name": "meta.definition.failuremode.sylang",
+          "match": "\\b(def)\\s+(failuremode)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "storage.type.failuremode.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.failuremode.sylang"
+            }
+          }
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "meta.property.string.sylang",
+          "begin": "\\b(name|description)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "string.quoted.double.sylang",
+              "begin": "\"",
+              "end": "\"",
+              "patterns": [
+                {
+                  "name": "constant.character.escape.sylang",
+                  "match": "\\\\."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "meta.property.function.sylang",
+          "begin": "\\b(in)\\s+(function)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            },
+            "2": {
+              "name": "storage.type.function.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "entity.name.function.sylang",
+              "match": "\\w+"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.numeric.sylang",
+          "begin": "\\b(severity|occurrence|detection|rpn)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.numeric.sylang",
+              "match": "\\d+"
+            },
+            {
+              "name": "constant.language.sylang",
+              "match": "\\bauto\\b"
+            },
+            {
+              "name": "entity.name.variable.control.sylang",
+              "match": "\\w+"
+            },
+            {
+              "name": "punctuation.separator.comma.sylang",
+              "match": ","
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.sylang",
+          "begin": "\\b(actionpriority)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(high|medium|low)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.asil.sylang",
+          "begin": "\\b(asil)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.asil.sylang",
+              "match": "\\b(QM|A|B|C|D)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.failuremode-references.sylang",
+          "begin": "\\b(causes|effects)\\s+(failuremode)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            },
+            "2": {
+              "name": "storage.type.failuremode.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "entity.name.type.failuremode.sylang",
+              "match": "\\w+"
+            },
+            {
+              "name": "punctuation.separator.comma.sylang",
+              "match": ","
+            }
+          ]
+        },
+        {
+          "name": "meta.property.controls.sylang",
+          "begin": "\\b(mitigation)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "entity.name.variable.control.sylang",
+              "match": "\\w+"
+            },
+            {
+              "name": "punctuation.separator.comma.sylang",
+              "match": ","
+            }
+          ]
+        }
+      ]
+    },
+    "safety-levels": {
+      "patterns": [
+        {
+          "name": "constant.language.safety-level.sylang",
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b"
+        },
+        {
+          "name": "keyword.other.safety.sylang",
+          "match": "\\b(safetylevel)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.sylang",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.sylang",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    }
+  }
+} 
