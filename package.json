@@ -49,6 +49,8 @@
   },
   "icon": "icon.png",
   "main": "./out/extension.js",
+  "_main_comment": "Current: Backup system (./out/extension.js) | New: Modular system (./out/src/extension.js)",
+  "_switching_instructions": "To switch: Change main to './out/src/extension.js' and recompile",
   "contributes": {
     "languages": [
       {
