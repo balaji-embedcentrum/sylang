@@ -697,19 +697,32 @@ class ModularPropertyValidator {
             return;
         }
 
-        const importMatch = trimmedLine.match(/use\s+(\w+)\s+(\w+)/);
-        if (!importMatch) {
-            const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
-            diagnostics.push(new vscode.Diagnostic(
-                range,
-                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid import syntax. Expected: use <type> <name>`,
-                vscode.DiagnosticSeverity.Error
-            ));
-            return;
+        // 🎯 PARSE COMPOUND IMPORTS: use type name OR use type subtype name
+        let compoundImportMatch = trimmedLine.match(/use\s+(\w+)\s+(\w+)\s+(\w+)/); // compound: use block subsystem MeasurementSubsystem
+        let importType: string;
+        let importName: string;
+        
+        if (compoundImportMatch) {
+            // Compound import: use block subsystem MeasurementSubsystem
+            importType = compoundImportMatch[1]; // "block" 
+            const subType = compoundImportMatch[2]; // "subsystem" (ignored for search)
+            importName = compoundImportMatch[3]; // "MeasurementSubsystem" ✅
+            console.log(`🔍 Compound import: use ${importType} ${subType} ${importName}`);
+        } else {
+            // Simple import: use featureset BloodPressureFeatures
+            const simpleImportMatch = trimmedLine.match(/use\s+(\w+)\s+(\w+)/);
+            if (!simpleImportMatch) {
+                const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
+                diagnostics.push(new vscode.Diagnostic(
+                    range,
+                    `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid import syntax. Expected: use <type> <name> or use <type> <subtype> <name>`,
+                    vscode.DiagnosticSeverity.Error
+                ));
+                return;
+            }
+            importType = simpleImportMatch[1]; // featureset, configset, etc.
+            importName = simpleImportMatch[2]; // BloodPressureFeatures, etc.
         }
-
-        const importType = importMatch[1]; // featureset, configset, block, etc.
-        const importName = importMatch[2]; // BloodPressureFeatures, etc.
         
         // ✅ UNRESTRICTED TYPE: Allow any import type (no type validation)
         console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Accepting import type: ${importType}`);
