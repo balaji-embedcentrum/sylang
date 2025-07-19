@@ -58,6 +58,75 @@
         }
       ]
     },
+    "compound-properties": {
+      "patterns": [
+        {
+          "match": "\\b(implements)\\s+(function|requirement|safetygoal|feature)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        },
+        {
+          "match": "\\b(allocatedto)\\s+(system|subsystem|component|subcomponent|module|unit|assembly|circuit|part)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        },
+        {
+          "match": "\\b(partof)\\s+(system|subsystem|component|subcomponent|module|unit|assembly|circuit|part|functiongroup|featureset)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        },
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        },
+        {
+          "match": "\\b(verifies|validates)\\s+(requirement|function|feature|component)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        },
+        {
+          "match": "\\b(mitigates|controls)\\s+(hazard|risk|failuremode)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        },
+        {
+          "match": "\\b(derivedfrom|depends|requires|extends|inherits)\\s+(requirement|function|component|block)\\s+([A-Za-z0-9_,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.other.compound.primary.sylang", "foreground": "#C586C0" },
+            "2": { "name": "keyword.other.compound.secondary.sylang", "foreground": "#4FC1FF" },
+            "3": { "name": "entity.name.reference.sylang", "foreground": "#9CDCFE" }
+          }
+        }
+      ]
+    },
+    "secondary-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(function|requirement|feature|component|block|system|subsystem|subcomponent|module|unit|assembly|circuit|part|hazard|risk|failuremode|safetygoal|test|testcase)\\b",
+          "name": "keyword.other.secondary.sylang",
+          "foreground": "#4FC1FF"
+        }
+      ]
+    },
     "identifiers": {
       "patterns": [
         {
