@@ -488,7 +488,7 @@ class ModularPropertyValidator {
             
             // Validate import statements
             if (trimmedLine.startsWith('use ')) {
-                this.validateImportStatement(diagnostics, lineIndex, trimmedLine, line);
+                this.validateImportStatement(diagnostics, lineIndex, trimmedLine, line, document);
                 continue;
             }
             
@@ -550,8 +550,20 @@ class ModularPropertyValidator {
         diagnostics: vscode.Diagnostic[], 
         lineIndex: number, 
         trimmedLine: string, 
-        fullLine: string
+        fullLine: string,
+        document: vscode.TextDocument
     ): void {
+        // Skip import validation for .ple files (master files don't use imports)
+        if (document.fileName.endsWith('.ple')) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Product line files (.ple) should not use import statements`,
+                vscode.DiagnosticSeverity.Warning
+            ));
+            return;
+        }
+
         const importMatch = trimmedLine.match(/use\s+(\w+)\s+(\w+)/);
         if (!importMatch) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
@@ -566,20 +578,9 @@ class ModularPropertyValidator {
         const importType = importMatch[1];
         const importName = importMatch[2];
         
-        // Validate import type
-        const validImportTypes = ['functiongroup', 'featureset', 'productline', 'variantmodel', 'configset'];
-        if (!validImportTypes.includes(importType)) {
-            const typeStart = fullLine.indexOf(importType);
-            const range = new vscode.Range(
-                lineIndex, typeStart, lineIndex, typeStart + importType.length
-            );
-            
-            diagnostics.push(new vscode.Diagnostic(
-                range,
-                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid import type "${importType}". Valid: ${validImportTypes.join(', ')}`,
-                vscode.DiagnosticSeverity.Error
-            ));
-        }
+        // 🎯 UNRESTRICTED: Allow any import type except in .ple files
+        // No validation of importType - any definition type can be imported
+        console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Accepting import: use ${importType} ${importName}`);
     }
 
     private validateCompoundProperty(

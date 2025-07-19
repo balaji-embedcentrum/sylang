@@ -6,6 +6,8 @@
   "patterns": [
     { "include": "#comments" },
     { "include": "#use-statements" },
+    { "include": "#compound-properties" },
+    { "include": "#secondary-keywords" },
     { "include": "#def-requirement" },
     { "include": "#def-keywords" },
     { "include": "#definition-types" },
