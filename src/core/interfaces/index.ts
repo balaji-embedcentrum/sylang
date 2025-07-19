@@ -9,7 +9,12 @@ export * from './ILanguagePlugin';
 export * from './ISymbolManager';
 
 // Configuration Management Interfaces  
-export * from './IConfigurationManager';
+export type {
+    IConfigurationManager,
+    ILanguageConfiguration,
+    IGlobalConfiguration,
+    CompoundPropertyDef
+} from './IConfigurationManager';
 
 // Import Management Interfaces
 export * from './IImportManager';
@@ -43,7 +48,23 @@ import {
 import {
     IConfigurationManager,
     ILanguageConfiguration,
-    IGlobalConfiguration
+    IGlobalConfiguration,
+    IPluginConfiguration,
+    IProjectSettings,
+    IValidationRuleConfig,
+    IRuleCondition,
+    IConfigValidationResult,
+    IConfigValidationError,
+    IConfigValidationWarning,
+    IConfigurationChangeEvent,
+    ILanguageConfigChangeEvent,
+    IWorkspaceConfiguration,
+    ICacheSettings,
+    IParsingOptions,
+    ICompletionOptions,
+    ISnippetOptions,
+    ISyntaxHighlightingConfig,
+    CompoundPropertyDef
 } from './IConfigurationManager';
 
 import {
