@@ -38,6 +38,7 @@ import {
     IValidationRuleConfig,
     VALIDATION_STAGES_ORDER
 } from '../interfaces';
+import { PropertyValidationRule } from '../rules/PropertyValidationRule';
 
 // =============================================================================
 // VALIDATION PIPELINE IMPLEMENTATION
@@ -936,7 +937,53 @@ export class ValidationPipeline implements IValidationPipeline {
         const errors: IValidationError[] = [];
         const warnings: IValidationWarning[] = [];
         
-        // Execute syntax validation rules
+        // Create and execute the PropertyValidationRule
+        const propertyValidationRule = new PropertyValidationRule(this.configurationManager);
+        
+        if (propertyValidationRule.supportsContext({ 
+            document,
+            symbols: context.previousResults.flatMap(r => r.symbols),
+            symbolIndex: context.symbolIndex,
+            configuration: context.configuration,
+            imports: context.imports,
+            stage: ValidationStage.SYNTAX_VALIDATION
+        })) {
+            try {
+                const ruleContext: IRuleValidationContext = {
+                    document,
+                    symbols: context.previousResults.flatMap(r => r.symbols),
+                    symbolIndex: context.symbolIndex,
+                    configuration: context.configuration,
+                    imports: context.imports,
+                    stage: ValidationStage.SYNTAX_VALIDATION
+                };
+                
+                const ruleResult = await propertyValidationRule.validate(ruleContext);
+                
+                diagnostics.push(...ruleResult.diagnostics);
+                
+                if (!ruleResult.isValid) {
+                    errors.push({
+                        code: propertyValidationRule.id,
+                        message: `Property validation failed for ${document.fileName}`,
+                        range: new vscode.Range(0, 0, 0, 0),
+                        severity: propertyValidationRule.severity as any,
+                        source: 'property-validator'
+                    });
+                }
+            } catch (error) {
+                console.error(`Property validation rule failed:`, error);
+                errors.push({
+                    code: 'PROPERTY_VALIDATION_ERROR',
+                    message: `Property validation error: ${error}`,
+                    range: new vscode.Range(0, 0, 0, 0),
+                    severity: 'error',
+                    source: 'property-validator'
+                });
+            }
+        }
+        
+        // Execute other syntax validation rules if any
         const syntaxRules = this.rulesByStage.get(ValidationStage.SYNTAX_VALIDATION) || [];
         
         for (const rule of syntaxRules) {
@@ -980,7 +1027,7 @@ export class ValidationPipeline implements IValidationPipeline {
             cacheHit: false,
             errors,
             warnings,
-            metadata: this.createStageMetadata(ValidationStage.SYNTAX_VALIDATION, syntaxRules.map(r => r.id))
+            metadata: this.createStageMetadata(ValidationStage.SYNTAX_VALIDATION, [propertyValidationRule.id, ...syntaxRules.map(r => r.id)])
         };
     }
 

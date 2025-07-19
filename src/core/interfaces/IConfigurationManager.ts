@@ -23,7 +23,6 @@ export interface IConfigurationManager {
     getGlobalConfiguration(): IGlobalConfiguration;
     
     // Visibility and graying rules
-    isSymbolVisible(symbolId: string): boolean;
     isSymbolEnabled(symbolId: string): boolean;
     getAffectedSymbols(configKey: string): string[];
     updateSymbolVisibility(configKey: string, value: number): Promise<void>;
@@ -31,6 +30,9 @@ export interface IConfigurationManager {
     // Configuration validation
     validateConfigurationReference(configKey: string): IConfigValidationResult;
     validateConfigurationFile(documentUri: string): IConfigValidationResult[];
+    
+    // NEW: Modular property validation
+    getValidPropertiesForContext(languageId: string, context: string): string[];
     
     // Event handling
     onConfigurationChanged(listener: (event: IConfigurationChangeEvent) => void): vscode.Disposable;
@@ -44,7 +46,7 @@ export interface IConfigurationManager {
     // Workspace integration
     getWorkspaceConfiguration(): IWorkspaceConfiguration;
     applyWorkspaceSettings(): Promise<void>;
-}
+  }
 
 /**
  * Language-specific configuration
