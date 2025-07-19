@@ -159,7 +159,7 @@ class ConfigStateManager {
 
 class SymbolResolver {
     private symbols = new Map<string, SymbolDefinition>();
-    private imports = new Map<string, ImportedFile>();
+    public imports = new Map<string, ImportedFile>(); // Made public for child symbol access
 
     async resolveImportsForDocument(document: vscode.TextDocument): Promise<void> {
         const text = document.getText();
@@ -208,14 +208,45 @@ class SymbolResolver {
     }
 
     private getExtensionForImportType(importType: string): string {
-        const mapping: Record<string, string> = {
-            'functiongroup': '.fun',
+        // Map import types to file extensions - support ALL def types
+        const extensionMap: Record<string, string> = {
+            // Container types
             'featureset': '.fml',
-            'productline': '.ple',
+            'functiongroup': '.fun', 
+            'configset': '.vcf',
             'variantmodel': '.vml',
-            'configset': '.vcf'
+            'productline': '.ple',
+            
+            // Block types (all can be imported)
+            'system': '.blk',
+            'subsystem': '.blk', 
+            'component': '.blk',
+            'subcomponent': '.blk',
+            'module': '.blk',
+            'unit': '.blk',
+            'assembly': '.blk',
+            'circuit': '.blk',
+            'part': '.blk',
+            'block': '.blk', // Generic block
+            
+            // Individual types
+            'function': '.fun',
+            'requirement': '.req',
+            'test': '.tst',
+            'testcase': '.tst',
+            'feature': '.fml',
+            
+            // Safety types
+            'hazard': '.haz',
+            'safetygoal': '.sgl',
+            'risk': '.rsk',
+            'failuremode': '.fma',
+            'control': '.fmc',
+            'faulttree': '.fta',
+            'item': '.itm'
         };
-        return mapping[importType] || '.txt';
+        
+        return extensionMap[importType] || '.txt'; // Default fallback
     }
 
     private parseSymbolsFromContent(content: string, filePath: string): Map<string, SymbolDefinition> {
@@ -225,14 +256,14 @@ class SymbolResolver {
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
             
-            // Match function definitions: def function FunctionName
-            const functionMatch = line.match(/def\s+function\s+(\w+)/);
-            if (functionMatch) {
-                const functionName = functionMatch[1];
+            // Match ALL definition types: def <type> <name>
+            const defMatch = line.match(/def\s+(\w+)\s+(\w+)/);
+            if (defMatch) {
+                const defType = defMatch[1]; // featureset, configset, function, subsystem, component, etc.
+                const defName = defMatch[2]; // BloodPressureFeatures, DeflateCuff, MeasurementSubsystem, etc.
                 let configKey: string | undefined;
-                let configValue: number | undefined;
                 
-                // Look for config in the following lines
+                // Look for config in ALL def types (not just functions!)
                 for (let j = i + 1; j < Math.min(i + 20, lines.length); j++) {
                     const configLine = lines[j].trim();
                     const configMatch = configLine.match(/config\s+(\w+)/);
@@ -244,17 +275,16 @@ class SymbolResolver {
                     if (configLine.startsWith('def ')) break;
                 }
                 
-                symbols.set(functionName, {
-                    id: functionName,
-                    name: functionName,
-                    type: 'function',
+                symbols.set(defName, {
+                    id: defName,
+                    name: defName,
+                    type: defType, // featureset, configset, function, subsystem, component, etc.
                     fileUri: filePath,
                     isVisible: true, // Will be updated based on config
-                    configKey: configKey,
-                    configValue: configValue
+                    configKey: configKey
                 });
                 
-                console.log(`🔍 Found symbol v${EXTENSION_VERSION}: ${functionName} (config: ${configKey})`);
+                console.log(`🔍 Found symbol v${EXTENSION_VERSION}: ${defName} (type: ${defType}, config: ${configKey})`);
             }
         }
         
@@ -546,7 +576,7 @@ class ModularPropertyValidator {
         fullLine: string,
         document: vscode.TextDocument
     ): void {
-        // Skip import validation for .ple files (master files don't use imports)
+        // Only restriction: .ple files cannot use imports
         if (document.fileName.endsWith('.ple')) {
             const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
             diagnostics.push(new vscode.Diagnostic(
@@ -568,13 +598,13 @@ class ModularPropertyValidator {
             return;
         }
 
-        const importType = importMatch[1];
-        const importName = importMatch[2];
+        const importType = importMatch[1]; // featureset, configset, block, etc.
+        const importName = importMatch[2]; // BloodPressureFeatures, etc.
         
-        // 🎯 UNRESTRICTED TYPE: Allow any import type (block, function, etc.)
-        console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Accepting import: use ${importType} ${importName}`);
+        // ✅ UNRESTRICTED TYPE: Allow any import type (no type validation)
+        console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Accepting import type: ${importType}`);
         
-        // 🔍 VALIDATE SYMBOL EXISTS: Check if the imported symbol actually exists
+        // ✅ VALIDATE SYMBOL EXISTS: Check if the imported symbol actually exists
         const symbol = this.symbolResolver.getSymbol(importName);
         if (!symbol) {
             const symbolStart = fullLine.indexOf(importName);
@@ -584,10 +614,33 @@ class ModularPropertyValidator {
             
             diagnostics.push(new vscode.Diagnostic(
                 range,
-                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Symbol "${importName}" not found. Check if the ${importType} is defined and exported.`,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Symbol "${importName}" not found. Check if '${importType} ${importName}' is defined.`,
                 vscode.DiagnosticSeverity.Error
             ));
+        } else {
+            // ✅ SHOW CHILD SYMBOLS: List what's available in this import
+            const childSymbols = this.getChildSymbolsForImport(symbol);
+            if (childSymbols.length > 0) {
+                console.log(`📋 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Imported "${importName}" provides: ${childSymbols.join(', ')}`);
+            }
         }
+    }
+
+    private getChildSymbolsForImport(symbol: SymbolDefinition): string[] {
+        // For container symbols (featureset, functiongroup, etc.), find child symbols in the same file
+        const childSymbols: string[] = [];
+        
+        for (const importedFile of this.symbolResolver.imports.values()) {
+            if (importedFile.uri === symbol.fileUri) {
+                for (const childSymbol of importedFile.symbols.values()) {
+                    if (childSymbol.name !== symbol.name) { // Don't include the container itself
+                        childSymbols.push(childSymbol.name);
+                    }
+                }
+            }
+        }
+        
+        return childSymbols;
     }
 
     private validateCompoundProperty(
