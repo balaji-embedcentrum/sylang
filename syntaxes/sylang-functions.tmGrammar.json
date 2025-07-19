@@ -67,6 +67,15 @@
     "use-statements": {
       "patterns": [
         {
+          "match": "\\b(use)\\s+(\\w+)\\s+(\\w+)\\s+([A-Za-z0-9_]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "storage.type.import.secondary.sylang" },
+            "4": { "name": "entity.name.import.sylang" }
+          }
+        },
+        {
           "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
           "captures": {
             "1": { "name": "keyword.control.import.sylang" },
