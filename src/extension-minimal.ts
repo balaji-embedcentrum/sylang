@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { EXTENSION_VERSION, EXTENSION_NAME, EXTENSION_ID } from './constants';
 
 /**
  * NEW MODULAR SYSTEM - Complete with config graying, import validation, cross-file validation
@@ -29,9 +30,102 @@ class ConfigStateManager {
     private configValues = new Map<string, number>();
     private symbolVisibility = new Map<string, boolean>();
 
-    updateConfigFromDocument(document: vscode.TextDocument): void {
+    async updateConfigFromImports(document: vscode.TextDocument): Promise<void> {
+        // First check current document for config
+        this.updateConfigFromDocument(document);
+        
+        // Then load config from imported .vcf files
         const text = document.getText();
         const lines = text.split('\n');
+        const documentDir = path.dirname(document.uri.fsPath);
+        
+        // Load explicitly imported config files
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            // Match: use configset ConfigName or use variantmodel ConfigName
+            const importMatch = trimmedLine.match(/use\s+(configset|variantmodel)\s+(\w+)/);
+            if (importMatch) {
+                const importType = importMatch[1];
+                const importName = importMatch[2];
+                
+                await this.loadConfigFromImportedFile(documentDir, importType, importName);
+            }
+        }
+
+        // AUTO-SEARCH for config files if none imported explicitly
+        if (this.configValues.size === 0) {
+            console.log(`🔍 Auto-searching for config files from: ${documentDir}`);
+            await this.autoSearchConfigFiles(documentDir);
+        }
+    }
+
+    private async loadConfigFromImportedFile(documentDir: string, importType: string, importName: string): Promise<void> {
+        try {
+            const extension = importType === 'configset' ? '.vcf' : '.vml';
+            const possiblePaths = [
+                path.join(documentDir, `${importName}${extension}`),
+                path.join(documentDir, '..', 'platform-engineering', `${importName}${extension}`),
+                path.join(documentDir, '..', 'system-engineering', `${importName}${extension}`),
+                // Try with -Config suffix for generated config files
+                path.join(documentDir, `${importName}-Config.vcf`),
+                path.join(documentDir, '..', 'platform-engineering', `${importName}-Config.vcf`)
+            ];
+
+            for (const filePath of possiblePaths) {
+                if (fs.existsSync(filePath)) {
+                    console.log(`🔧 Loading config v${EXTENSION_VERSION}: ${filePath}`);
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    this.parseConfigFromContent(content);
+                    break;
+                }
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load config ${importName}:`, error);
+        }
+    }
+
+    private async autoSearchConfigFiles(documentDir: string): Promise<void> {
+        // Search patterns for config files
+        const searchDirs = [
+            documentDir,
+            path.join(documentDir, '..', 'platform-engineering'),
+            path.join(documentDir, '..', 'system-engineering'),
+            path.join(documentDir, '..')
+        ];
+
+        for (const searchDir of searchDirs) {
+            try {
+                if (fs.existsSync(searchDir)) {
+                    const files = fs.readdirSync(searchDir);
+                    
+                    // Look for .vcf files (config files)
+                    const configFiles = files.filter(file => 
+                        file.endsWith('.vcf') || 
+                        file.endsWith('-Config.vcf') ||
+                        file.includes('Config') && file.endsWith('.vcf')
+                    );
+                    
+                    for (const configFile of configFiles) {
+                        const configPath = path.join(searchDir, configFile);
+                        console.log(`🔧 Auto-loading config v${EXTENSION_VERSION}: ${configPath}`);
+                        
+                        const content = fs.readFileSync(configPath, 'utf8');
+                        this.parseConfigFromContent(content);
+                    }
+                    
+                    if (configFiles.length > 0) {
+                        console.log(`📋 Found ${configFiles.length} config files in ${searchDir}`);
+                        break; // Stop searching once we find config files
+                    }
+                }
+            } catch (error) {
+                console.warn(`⚠️ Failed to search directory ${searchDir}:`, error);
+            }
+        }
+    }
+
+    private parseConfigFromContent(content: string): void {
+        const lines = content.split('\n');
         
         for (const line of lines) {
             const trimmedLine = line.trim();
@@ -41,14 +135,21 @@ class ConfigStateManager {
                 const configKey = configMatch[1];
                 const configValue = parseInt(configMatch[2]);
                 this.configValues.set(configKey, configValue);
-                console.log(`🔧 Config updated: ${configKey} = ${configValue}`);
+                console.log(`🔧 Config v${EXTENSION_VERSION}: ${configKey} = ${configValue} (from imported file)`);
             }
         }
     }
 
+    updateConfigFromDocument(document: vscode.TextDocument): void {
+        const text = document.getText();
+        this.parseConfigFromContent(text);
+    }
+
     isSymbolVisible(configKey: string): boolean {
         const value = this.configValues.get(configKey);
-        return value === undefined || value === 1; // Default visible if not found
+        const visible = value === undefined || value === 1; // Default visible if not found
+        console.log(`👁️ Check visibility v${EXTENSION_VERSION}: ${configKey} = ${value} → visible: ${visible}`);
+        return visible;
     }
 
     getConfigValue(configKey: string): number | undefined {
@@ -90,7 +191,7 @@ class SymbolResolver {
 
             for (const filePath of possiblePaths) {
                 if (fs.existsSync(filePath)) {
-                    console.log(`📦 Loading imported symbols from: ${filePath}`);
+                    console.log(`📦 Loading v${EXTENSION_VERSION}: ${filePath}`);
                     const content = fs.readFileSync(filePath, 'utf8');
                     const symbols = this.parseSymbolsFromContent(content, filePath);
                     
@@ -153,7 +254,7 @@ class SymbolResolver {
                     configValue: configValue
                 });
                 
-                console.log(`🔍 Found symbol: ${functionName} (config: ${configKey})`);
+                console.log(`🔍 Found symbol v${EXTENSION_VERSION}: ${functionName} (config: ${configKey})`);
             }
         }
         
@@ -181,7 +282,7 @@ class SymbolResolver {
             for (const symbol of importedFile.symbols.values()) {
                 if (symbol.configKey) {
                     symbol.isVisible = configManager.isSymbolVisible(symbol.configKey);
-                    console.log(`👁️ Symbol ${symbol.name} visibility: ${symbol.isVisible} (config: ${symbol.configKey})`);
+                    console.log(`👁️ Symbol v${EXTENSION_VERSION}: ${symbol.name} visibility: ${symbol.isVisible} (config: ${symbol.configKey})`);
                 }
             }
         }
@@ -371,8 +472,8 @@ class ModularPropertyValidator {
         const text = document.getText();
         const lines = text.split('\n');
         
-        // First, resolve imports and update config
-        this.configManager.updateConfigFromDocument(document);
+        // First, resolve imports and update config FROM IMPORTED FILES
+        await this.configManager.updateConfigFromImports(document);
         await this.symbolResolver.resolveImportsForDocument(document);
         this.symbolResolver.updateSymbolVisibility(this.configManager);
         
@@ -433,7 +534,7 @@ class ModularPropertyValidator {
                     
                     diagnostics.push(new vscode.Diagnostic(
                         range,
-                        `🎯 NEW MODULAR SYSTEM: Invalid keyword "${keyword}" in ${currentContext}.\n` +
+                        `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid keyword "${keyword}" in ${currentContext}.\n` +
                         `Simple properties: ${validSimpleProperties.join(', ')}\n` +
                         `Compound properties: ${compoundSyntaxHints}`,
                         vscode.DiagnosticSeverity.Error
@@ -456,7 +557,7 @@ class ModularPropertyValidator {
             const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
             diagnostics.push(new vscode.Diagnostic(
                 range,
-                `🎯 NEW MODULAR SYSTEM: Invalid import syntax. Expected: use <type> <name>`,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid import syntax. Expected: use <type> <name>`,
                 vscode.DiagnosticSeverity.Error
             ));
             return;
@@ -475,7 +576,7 @@ class ModularPropertyValidator {
             
             diagnostics.push(new vscode.Diagnostic(
                 range,
-                `🎯 NEW MODULAR SYSTEM: Invalid import type "${importType}". Valid: ${validImportTypes.join(', ')}`,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid import type "${importType}". Valid: ${validImportTypes.join(', ')}`,
                 vscode.DiagnosticSeverity.Error
             ));
         }
@@ -494,7 +595,7 @@ class ModularPropertyValidator {
             const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
             diagnostics.push(new vscode.Diagnostic(
                 range,
-                `🎯 NEW MODULAR SYSTEM: Invalid ${definition.primaryKeyword} syntax. Expected: ${definition.syntax}`,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid ${definition.primaryKeyword} syntax. Expected: ${definition.syntax}`,
                 vscode.DiagnosticSeverity.Error
             ));
             return;
@@ -509,7 +610,7 @@ class ModularPropertyValidator {
             
             diagnostics.push(new vscode.Diagnostic(
                 range,
-                `🎯 NEW MODULAR SYSTEM: Invalid secondary keyword "${secondaryKeyword}" for ${definition.primaryKeyword}. Valid: ${definition.secondaryKeywords.join(', ')}`,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Invalid secondary keyword "${secondaryKeyword}" for ${definition.primaryKeyword}. Valid: ${definition.secondaryKeywords.join(', ')}`,
                 vscode.DiagnosticSeverity.Error
             ));
             return;
@@ -532,7 +633,7 @@ class ModularPropertyValidator {
                         
                         diagnostics.push(new vscode.Diagnostic(
                             range,
-                            `🎯 NEW MODULAR SYSTEM: Function "${symbolName}" not found. Check imports.`,
+                            `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Function "${symbolName}" not found. Check imports.`,
                             vscode.DiagnosticSeverity.Error
                         ));
                     } else if (!symbol.isVisible) {
@@ -544,7 +645,7 @@ class ModularPropertyValidator {
                         
                         diagnostics.push(new vscode.Diagnostic(
                             range,
-                            `🎯 NEW MODULAR SYSTEM: Function "${symbolName}" is disabled by configuration (${symbol.configKey} = 0)`,
+                            `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Function "${symbolName}" is disabled by configuration (${symbol.configKey} = 0)`,
                             vscode.DiagnosticSeverity.Warning
                         ));
                     }
@@ -582,8 +683,8 @@ class ConfigDecorationProvider {
         const document = editor.document;
         if (!isSylangDocument(document)) return;
 
-        // Update config from current document
-        configManager.updateConfigFromDocument(document);
+        // Update config from imported files (this is the key fix!)
+        await configManager.updateConfigFromImports(document);
         await symbolResolver.resolveImportsForDocument(document);
         symbolResolver.updateSymbolVisibility(configManager);
 
@@ -646,7 +747,7 @@ class ConfigDecorationProvider {
 
         // Apply gray decorations
         editor.setDecorations(this.grayDecorationType, grayRanges);
-        console.log(`🎨 Applied ${grayRanges.length} gray decorations`);
+        console.log(`🎨 Applied ${grayRanges.length} gray decorations v${EXTENSION_VERSION}`);
     }
 
     dispose(): void {
@@ -659,21 +760,21 @@ class ConfigDecorationProvider {
 // =============================================================================
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('🚀 NEW MODULAR SYSTEM ACTIVATED! Config graying, import validation, cross-file validation included.');
+    console.log(`🚀 ${EXTENSION_NAME} v${EXTENSION_VERSION} ACTIVATED! Config graying, import validation, cross-file validation included.`);
     
     const propertyManager = new ModularPropertyManager();
     const configManager = new ConfigStateManager();
     const symbolResolver = new SymbolResolver();
     const validator = new ModularPropertyValidator(propertyManager, configManager, symbolResolver);
     const decorationProvider = new ConfigDecorationProvider();
-    const diagnosticCollection = vscode.languages.createDiagnosticCollection('sylang-new-modular');
+    const diagnosticCollection = vscode.languages.createDiagnosticCollection(EXTENSION_ID);
     
     const validateDocument = async (document: vscode.TextDocument) => {
         if (isSylangDocument(document)) {
-            console.log(`🔍 NEW MODULAR SYSTEM: Validating ${document.fileName}`);
+            console.log(`🔍 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Validating ${document.fileName}`);
             const diagnostics = await validator.validateDocument(document);
             diagnosticCollection.set(document.uri, diagnostics);
-            console.log(`✅ NEW MODULAR SYSTEM: Found ${diagnostics.length} diagnostics`);
+            console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Found ${diagnostics.length} diagnostics`);
         }
     };
 
@@ -709,11 +810,11 @@ export function activate(context: vscode.ExtensionContext) {
         updateDecorations(vscode.window.activeTextEditor);
     }
     
-    console.log('✅ NEW MODULAR SYSTEM: Ready with config graying, import validation, and cross-file validation!');
+    console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Ready with config graying, import validation, and cross-file validation!`);
 }
 
 export function deactivate() {
-    console.log('👋 NEW MODULAR SYSTEM: Deactivated');
+    console.log(`👋 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Deactivated`);
 }
 
 function isSylangDocument(document: vscode.TextDocument): boolean {
