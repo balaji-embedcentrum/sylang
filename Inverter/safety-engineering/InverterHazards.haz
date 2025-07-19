@@ -1,3 +1,5 @@
+use functiongroup InverterFunctions
+
 def hazardidentification InverterHazards
 	name "Automotive Inverter System - Comprehensive Hazard Identification"
 	description "Systematic identification of all potential hazards in the inverter system using FMEA and HAZOP methodologies"
@@ -45,7 +47,7 @@ def hazardidentification InverterHazards
 				cause "Regenerative braking overcharge, voltage regulator failure"
 				effect "Component damage, insulation breakdown, fire risk"
 				category ElectricalHazards
-				functions_affected "PowerElectronicsController", "OvervoltageProtectionUnit"
+				function "PowerElectronicsController", "OvervoltageProtectionUnit"
 				
 			def hazard H_PWR_003
 				name "Power Stage Complete Failure"
@@ -53,7 +55,7 @@ def hazardidentification InverterHazards
 				cause "Multiple IGBT failure, gate driver failure, power supply loss"
 				effect "Complete loss of motor control and propulsion"
 				category LossOfPropulsion
-				functions_affected "PowerElectronicsController", "SafetyMonitoringEngine"
+				function "PowerElectronicsController", "SafetyMonitoringEngine"
 				
 			def hazard H_PWR_004
 				name "Short Circuit in Power Stage"
@@ -61,7 +63,7 @@ def hazardidentification InverterHazards
 				cause "Component failure, insulation breakdown, mechanical damage"
 				effect "High fault current, fire risk, component destruction"
 				category ElectricalHazards
-				functions_affected "ShortCircuitDetector", "OvercurrentProtectionUnit"
+				function "ShortCircuitDetector", "OvercurrentProtectionUnit"
 
 		subsystem MotorControl
 			def hazard H_MOT_001
@@ -70,7 +72,7 @@ def hazardidentification InverterHazards
 				cause "Software fault, calibration error, sensor input corruption"
 				effect "Unexpected vehicle acceleration or deceleration"
 				category UncontrolledTorque
-				functions_affected "MotorControlAlgorithmEngine", "TorqueManagementProcessor"
+				function "MotorControlAlgorithmEngine", "TorqueManagementProcessor"
 				
 			def hazard H_MOT_002
 				name "Vector Control Instability"
@@ -78,7 +80,7 @@ def hazardidentification InverterHazards
 				cause "Control parameter drift, feedback loop corruption"
 				effect "Motor torque oscillation, vehicle handling issues"
 				category ControlMalfunctions
-				functions_affected "MotorControlAlgorithmEngine", "TorqueManagementProcessor"
+				function "MotorControlAlgorithmEngine", "TorqueManagementProcessor"
 				
 			def hazard H_MOT_003
 				name "Speed Control Runaway"
@@ -86,7 +88,7 @@ def hazardidentification InverterHazards
 				cause "Speed sensor failure, control logic error"
 				effect "Uncontrolled vehicle acceleration"
 				category UncontrolledTorque
-				functions_affected "SpeedRegulationController", "MotorControlAlgorithmEngine"
+				function "SpeedRegulationController", "MotorControlAlgorithmEngine"
 				
 			def hazard H_MOT_004
 				name "Regenerative Braking Failure"
@@ -94,7 +96,7 @@ def hazardidentification InverterHazards
 				cause "Control algorithm failure, power stage fault"
 				effect "Increased braking distance, collision risk"
 				category LossOfPropulsion
-				functions_affected "RegenerativeBrakingController", "PowerElectronicsController"
+				function "RegenerativeBrakingController", "PowerElectronicsController"
 
 		subsystem ThermalManagement
 			def hazard H_THM_001
@@ -103,7 +105,7 @@ def hazardidentification InverterHazards
 				cause "Coolant leak, pump failure, radiator blockage"
 				effect "Component overheating, thermal protection activation"
 				category ThermalHazards
-				functions_affected "ThermalManagementSystem", "CoolantFlowController"
+				function "ThermalManagementSystem", "CoolantFlowController"
 				
 			def hazard H_THM_002
 				name "Temperature Sensor Failure"
@@ -111,7 +113,7 @@ def hazardidentification InverterHazards
 				cause "Sensor degradation, wiring fault, calibration drift"
 				effect "Inadequate thermal protection, potential overheating"
 				category ThermalHazards
-				functions_affected "ThermalProtectionMonitor", "TemperatureSensingInterface"
+				function "ThermalProtectionMonitor", "TemperatureSensingInterface"
 				
 			def hazard H_THM_003
 				name "Thermal Runaway"
@@ -119,7 +121,7 @@ def hazardidentification InverterHazards
 				cause "Excessive power dissipation, cooling system inadequacy"
 				effect "Component damage, fire risk, toxic gas emission"
 				category ThermalHazards
-				functions_affected "ThermalProtectionMonitor", "ThermalManagementSystem"
+				function "ThermalProtectionMonitor", "ThermalManagementSystem"
 
 		subsystem SafetySystems
 			def hazard H_SAF_001
@@ -128,7 +130,7 @@ def hazardidentification InverterHazards
 				cause "Monitoring circuit failure, sensor degradation"
 				effect "Undetected isolation loss, electric shock risk"
 				category ElectricalHazards
-				functions_affected "IsolationMonitoringSystem", "SafetyMonitoringEngine"
+				function "IsolationMonitoringSystem", "SafetyMonitoringEngine"
 				
 			def hazard H_SAF_002
 				name "Overcurrent Protection Failure"
@@ -136,7 +138,7 @@ def hazardidentification InverterHazards
 				cause "Current sensor failure, protection logic error"
 				effect "Component damage, fire risk from overcurrent"
 				category ElectricalHazards
-				functions_affected "OvercurrentProtectionUnit", "SafetyMonitoringEngine"
+				function "OvercurrentProtectionUnit", "SafetyMonitoringEngine"
 				
 			def hazard H_SAF_003
 				name "Safety Monitoring System Failure"
@@ -144,7 +146,7 @@ def hazardidentification InverterHazards
 				cause "Processor failure, software fault, power loss"
 				effect "Loss of safety oversight, undetected hazardous conditions"
 				category ControlMalfunctions
-				functions_affected "SafetyMonitoringEngine", "PowerElectronicsController"
+				function "SafetyMonitoringEngine", "PowerElectronicsController"
 
 		subsystem SensorInterfaces
 			def hazard H_SEN_001
@@ -153,7 +155,7 @@ def hazardidentification InverterHazards
 				cause "Sensor degradation, EMI interference, wiring fault"
 				effect "Incorrect torque control, potential motor damage"
 				category ControlMalfunctions
-				functions_affected "CurrentSensingInterface", "MotorControlAlgorithmEngine"
+				function "CurrentSensingInterface", "MotorControlAlgorithmEngine"
 				
 			def hazard H_SEN_002
 				name "Position Sensor Failure"
@@ -161,7 +163,7 @@ def hazardidentification InverterHazards
 				cause "Sensor damage, magnetic interference, calibration loss"
 				effect "Loss of motor synchronization, torque disturbances"
 				category ControlMalfunctions
-				functions_affected "PositionSensingInterface", "MotorControlAlgorithmEngine"
+				function "PositionSensingInterface", "MotorControlAlgorithmEngine"
 				
 			def hazard H_SEN_003
 				name "Sensor Signal Corruption"
@@ -169,7 +171,7 @@ def hazardidentification InverterHazards
 				cause "EMI burst, power supply noise, ground fault"
 				effect "Complete loss of motor control feedback"
 				category LossOfPropulsion
-				functions_affected "SensorInterfaceController", "SafetyMonitoringEngine"
+				function "SensorInterfaceController", "SafetyMonitoringEngine"
 
 		subsystem CommunicationInterfaces
 			def hazard H_COM_001
@@ -178,7 +180,7 @@ def hazardidentification InverterHazards
 				cause "Bus fault, connector corrosion, EMI interference"
 				effect "Loss of coordination with other vehicle systems"
 				category CommunicationFailures
-				functions_affected "CANBusController", "CommunicationInterface"
+				function "CANBusController", "CommunicationInterface"
 				
 			def hazard H_COM_002
 				name "Message Corruption"
@@ -186,7 +188,7 @@ def hazardidentification InverterHazards
 				cause "EMI interference, bus overload, connector issues"
 				effect "Incorrect torque commands, system coordination errors"
 				category ControlMalfunctions
-				functions_affected "CANBusController", "SafetyMonitoringEngine"
+				function "CANBusController", "SafetyMonitoringEngine"
 
 		subsystem PowerModes
 			def hazard H_PWM_001
@@ -195,4 +197,4 @@ def hazardidentification InverterHazards
 				cause "Software fault, EMI interference, power supply glitch"
 				effect "Temporary loss of function, unexpected behavior"
 				category ControlMalfunctions
-				functions_affected "PowerModeManager", "SafetyMonitoringEngine"
+				function "PowerModeManager", "SafetyMonitoringEngine"

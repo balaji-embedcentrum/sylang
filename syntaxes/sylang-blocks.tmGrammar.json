@@ -2,16 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Blocks",
   "scopeName": "source.sylang.blocks",
+  "fileTypes": ["blk"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#imports" },
-    { "include": "#def-keyword" },
-    { "include": "#block-types" },
-    { "include": "#secondary-keywords" },
-    { "include": "#properties" },
-    { "include": "#safetylevel-levels" },
-    { "include": "#port-types" },
+    { "include": "#use-statements" },
+    { "include": "#def-block" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
+    { "include": "#safety-levels" },
+    { "include": "#categories" },
     { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
     { "include": "#identifiers" }
   ],
   "repository": {
@@ -19,7 +24,8 @@
       "patterns": [
         {
           "name": "comment.line.double-slash.sylang",
-          "match": "//.*$"
+          "begin": "//",
+          "end": "$"
         },
         {
           "name": "comment.block.sylang",
@@ -28,77 +34,107 @@
         }
       ]
     },
-    "imports": {
+    "def-block": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "match": "\\b(def)\\s+(block|system|subsystem|component|subcomponent|module|unit|assembly|circuit|part)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.block.sylang" }
           }
         }
       ]
     },
-    "def-keyword": {
+    "def-keywords": {
       "patterns": [
         {
-          "name": "keyword.control.def.sylang",
-          "match": "\\b(use|def)\\b"
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
         }
       ]
     },
-    "block-types": {
+    "definition-types": {
       "patterns": [
         {
-          "name": "keyword.control.block.sylang",
-          "match": "\\bblock\\b"
+          "match": "\\b(block|system|subsystem|component|subcomponent|module|unit|assembly|circuit|part)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|owner|tags|safetylevel|config|contains|partof|enables|implements|interfaces|port|type)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "entity.name.type.block-type.sylang",
-          "match": "\\b(product|system|subsystem|component|subcomponent|module|submodule|unit|subunit|assembly|subassembly|circuit|part)\\b"
-        }
-      ]
-    },
-    "secondary-keywords": {
-      "patterns": [
-        {
-          "name": "variable.other.reference.sylang",
-          "match": "\\b(product|system|subsystem|component|subcomponent|module|submodule|unit|subunit|assembly|subassembly|circuit|part|feature|function)\\b"
-        }
-      ]
-    },
-    "properties": {
-      "patterns": [
-        {
-          "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|tags|contains|partof|enables|implements|interfaces|port|type)\\b"
+          "match": "\\b(partof)\\s+(system|subsystem|component|module|unit|assembly|circuit|part)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "keyword.control.port.sylang", 
-          "match": "\\b(port)\\s+(in|out)\\b"
+          "match": "\\b(allocatedto)\\s+(system|subsystem|component|module|unit|assembly|circuit|part)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
+        },
+        {
+          "match": "\\b(implements)\\s+(function)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
+        },
+        {
+          "match": "\\b(dependson|requires|contains|connects|interfaces)\\b",
+          "name": "keyword.other.special.sylang"
         }
       ]
     },
-    "safetylevel-levels": {
+    "safety-levels": {
       "patterns": [
         {
-          "name": "constant.language.safetylevel.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM)\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
+        },
+        {
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
         }
       ]
     },
-    "port-types": {
+    "categories": {
       "patterns": [
         {
-          "name": "constant.language.port-type.sylang",
-          "match": "\\b(electrical|mechanical|data|CAN|Ethernet|hydraulic|pneumatic|optical|thermal|audio|RF|sensor|actuator)\\b"
+          "match": "\\b(software|hardware|mechanical|electrical|hybrid|embedded|distributed|centralized)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
@@ -117,15 +153,35 @@
         }
       ]
     },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
+        }
+      ]
+    },
     "identifiers": {
       "patterns": [
         {
-          "name": "entity.name.function.identifier.sylang",
-          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
-        },
-        {
-          "name": "variable.other.sylang",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

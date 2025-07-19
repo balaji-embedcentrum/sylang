@@ -2,138 +2,181 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Risk Assessment",
   "scopeName": "source.sylang.risk",
+  "fileTypes": ["rsk"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#imports" },
-    { "include": "#def-statements" },
-    { "include": "#section-headers" },
-    { "include": "#properties" },
+    { "include": "#use-statements" },
+    { "include": "#def-risk" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
+    { "include": "#safety-levels" },
+    { "include": "#categories" },
     { "include": "#strings" },
-    { "include": "#risk-levels" },
-    { "include": "#safetylevel-values" },
-    { "include": "#safetylevel-levels" },
     { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
     { "include": "#identifiers" }
   ],
   "repository": {
     "comments": {
       "patterns": [
         {
-          "name": "comment.line.double-slash",
+          "name": "comment.line.double-slash.sylang",
           "begin": "//",
           "end": "$"
         },
         {
-          "name": "comment.block",
+          "name": "comment.block.sylang",
           "begin": "/\\*",
           "end": "\\*/"
         }
       ]
     },
-    "imports": {
+    "def-risk": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(hazardanalysis|hazardidentification|item|riskassessment|configset)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
+          "match": "\\b(def)\\s+(risk)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
+            "1": { "name": "keyword.control.def.sylang" },
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.risk.sylang" }
           }
         }
       ]
     },
-    "def-statements": {
+    "def-keywords": {
       "patterns": [
         {
-          "match": "\\b(def)\\s+(riskassessment|severity|exposure|controllability|risk|safetylevel|asil)\\s+([A-Z][A-Za-z0-9_]*)",
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(risk)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
           "captures": {
-            "1": { "name": "keyword.control" },
-            "2": { "name": "storage.type" },
-            "3": { "name": "entity.name.function" }
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|hazardanalysis|hazardidentification|item|methodology|severity|exposure|controllability|scenario|safetylevel|rationale)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
           }
         },
         {
-          "name": "keyword.control",
-          "match": "\\b(def)\\b"
+          "match": "\\b(assessed_by)\\s+(expert|team|method|tool)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(mitigated_by)\\s+(control|measure|action|procedure)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "storage.type.definition.sylang" }
+          }
+        },
+        {
+          "match": "\\b(partof|allocatedto|dependson|requires|monitored_by)\\b",
+          "name": "keyword.other.special.sylang"
         }
       ]
     },
-    "section-headers": {
+    "safety-levels": {
       "patterns": [
         {
-          "name": "entity.name.section",
-          "match": "\\b(riskcriteria|riskdetermination|asildetermination|asilassessment)\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
+        },
+        {
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
         }
       ]
     },
-    "properties": {
+    "categories": {
       "patterns": [
         {
-          "name": "variable.parameter",
-          "match": "\\b(name|description|severity|exposure|controllability|risk|scenario|safetylevel|rationale|subsystem|hazard|hazardanalysis|hazardidentification|item|methodology|asil)\\b"
+          "match": "\\b(high|medium|low|critical|major|minor|negligible|frequent|probable|occasional|remote|improbable)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double",
+          "name": "string.quoted.double.sylang",
           "begin": "\"",
           "end": "\"",
           "patterns": [
             {
-              "name": "constant.character.escape",
+              "name": "constant.character.escape.sylang",
               "match": "\\\\."
             }
           ]
         }
       ]
     },
-    "risk-levels": {
-      "patterns": [
-        {
-          "name": "constant.numeric",
-          "match": "\\b(S[0-3]|E[0-4]|C[0-3]|S[0-3]E[0-4]C[0-3])\\b"
-        }
-      ]
-    },
-    "safetylevel-values": {
-      "patterns": [
-        {
-          "name": "constant.language.safetylevel.risk",
-          "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD]|(?<![A-Z])[ABCD](?![A-Z]))\\b"
-        }
-      ]
-    },
-    "safetylevel-levels": {
-      "patterns": [
-        {
-          "name": "constant.language.safetylevel.sylang",
-          "match": "\\b(QM|ASIL-[ABCD]|ASIL_[ABCD])\\b"
-        }
-      ]
-    },
     "numbers": {
       "patterns": [
         {
-          "name": "constant.numeric",
-          "match": "\\b\\d+\\b"
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
         }
       ]
     },
     "identifiers": {
       "patterns": [
         {
-          "name": "variable.other",
-          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }
   }
-}
+} 

@@ -1,0 +1,33 @@
+// Variant Configuration for Development Build
+def configset development_config
+    name "Development Configuration"
+    description "Configuration for development and testing"
+    category development
+    
+    // Visibility control sections
+    [visibility.grayout]
+    features = ["legacy_cruise_control", "deprecated_adas"]
+    blocks = ["old_sensor_interface", "test_components"]
+    
+    [visibility.show]
+    features = ["adaptive_cruise_control", "lane_keep_assist"] 
+    components = ["camera_system", "radar_system"]
+    
+    [config.debug]
+    logging_enabled = true
+    debug_mode = enabled
+    test_harness = true
+    
+def config production_variant
+    name "Production Variant"
+    description "Configuration for production deployment"
+    category production
+    
+    enables feature adaptive_cruise_control
+    includes component forward_radar
+    excludes feature test_diagnostics
+    
+    safetylevel ASIL-C
+    verification required
+
+use features adaptive_cruise_control 

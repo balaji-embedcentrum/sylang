@@ -1,0 +1,358 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sylang Failure Mode Controls",
+  "scopeName": "source.sylang.failuremodecontrols",
+  "fileTypes": ["fmc"],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#controlmeasures"
+    },
+    {
+      "include": "#measures"
+    },
+    {
+      "include": "#properties"
+    },
+    {
+      "include": "#safety-levels"
+    },
+    {
+      "include": "#strings"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sylang",
+          "begin": "//",
+          "end": "$"
+        }
+      ]
+    },
+    "controlmeasures": {
+      "patterns": [
+        {
+          "name": "meta.definition.controlmeasures.sylang",
+          "match": "\\b(def)\\s+(controlmeasures)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "storage.type.controlmeasures.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.controlmeasures.sylang"
+            }
+          }
+        }
+      ]
+    },
+    "measures": {
+      "patterns": [
+        {
+          "name": "meta.definition.prevention.sylang",
+          "match": "\\b(def)\\s+(prevention)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "storage.type.prevention.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.prevention.sylang"
+            }
+          }
+        },
+        {
+          "name": "meta.definition.detection.sylang",
+          "match": "\\b(def)\\s+(detection)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "storage.type.detection.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.detection.sylang"
+            }
+          }
+        },
+        {
+          "name": "meta.definition.mitigation.sylang",
+          "match": "\\b(def)\\s+(mitigation)\\s+(\\w+)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.definition.sylang"
+            },
+            "2": {
+              "name": "storage.type.mitigation.sylang"
+            },
+            "3": {
+              "name": "entity.name.type.mitigation.sylang"
+            }
+          }
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "name": "meta.property.string.sylang",
+          "begin": "\\b(name|description|implementation|verification|responsibility)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "string.quoted.double.sylang",
+              "begin": "\"",
+              "end": "\"",
+              "patterns": [
+                {
+                  "name": "constant.character.escape.sylang",
+                  "match": "\\\\."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "meta.property.numeric.sylang",
+          "begin": "\\b(detectionrating|occurrencereduction|severityreduction|diagnosticcoverage)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.numeric.sylang",
+              "match": "\\d+"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.effectiveness.sylang",
+          "begin": "\\b(effectiveness)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(high|medium|low)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.cost.sylang",
+          "begin": "\\b(cost)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(low|medium|high)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.complexity.sylang",
+          "begin": "\\b(complexity)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(simple|moderate|complex)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.scope.sylang",
+          "begin": "\\b(scope)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(internal|external)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.frequency.sylang",
+          "begin": "\\b(frequency)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(continuous|periodic|monthly|quarterly)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.time.sylang",
+          "begin": "\\b(detecttime|responsetime)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(immediate|delayed)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.coverage.sylang",
+          "begin": "\\b(coverage)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(complete|partial)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.independence.sylang",
+          "begin": "\\b(independence)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(high|medium|low)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.enum.maturity.sylang",
+          "begin": "\\b(maturity)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.enum.sylang",
+              "match": "\\b(mature|developing|research)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.asil.sylang",
+          "begin": "\\b(asil)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "constant.language.asil.sylang",
+              "match": "\\b(QM|A|B|C|D)\\b"
+            }
+          ]
+        },
+        {
+          "name": "meta.property.dependencies.sylang",
+          "begin": "\\b(depends)\\s+(measure)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other.property.sylang"
+            },
+            "2": {
+              "name": "storage.type.measure.sylang"
+            }
+          },
+          "end": "$",
+          "patterns": [
+            {
+              "name": "entity.name.type.measure.sylang",
+              "match": "\\w+"
+            },
+            {
+              "name": "punctuation.separator.comma.sylang",
+              "match": ","
+            }
+          ]
+        }
+      ]
+    },
+    "safety-levels": {
+      "patterns": [
+        {
+          "name": "constant.language.safety-level.sylang",
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b"
+        },
+        {
+          "name": "keyword.other.safety.sylang",
+          "match": "\\b(safetylevel)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.sylang",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.sylang",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    }
+  }
+} 

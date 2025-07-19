@@ -2,15 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sylang Safety",
   "scopeName": "source.sylang.safety",
+  "fileTypes": ["haz", "itm", "sgl"],
   "patterns": [
     { "include": "#comments" },
-    { "include": "#imports" },
-    { "include": "#def-statements" },
-    { "include": "#section-headers" },
-    { "include": "#safety-keywords" },
-    { "include": "#property-keywords" },
+    { "include": "#use-statements" },
+    { "include": "#def-safety" },
+    { "include": "#def-keywords" },
+    { "include": "#definition-types" },
+    { "include": "#property-names" },
+    { "include": "#special-keywords" },
     { "include": "#safety-levels" },
+    { "include": "#categories" },
     { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#operators" },
     { "include": "#identifiers" }
   ],
   "repository": {
@@ -28,84 +34,100 @@
         }
       ]
     },
-    "imports": {
+    "def-safety": {
       "patterns": [
         {
-          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_]+(?:\\.[A-Za-z0-9_]+,?\\s*)*)\\b",
-          "captures": {
-            "1": {
-              "name": "keyword.control.import.sylang"
-            },
-            "2": {
-              "name": "storage.type.sylang"
-            },
-            "3": {
-              "name": "entity.name.type.sylang"
-            }
-          }
-        }
-      ]
-    },
-    "def-statements": {
-      "patterns": [
-        {
-          "match": "\\b(use|def)\\s+(item|scenario|condition|vehiclestate|drivingstate|environment|boundary|overallsafetystrategy|safetystrategy|principle|assumptionsofuse|foreseeablemisuse|goal|hazard|measure|criterion|hazardanalysis)\\b",
+          "match": "\\b(def)\\s+(hazard|item|safetygoal)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
           "captures": {
             "1": { "name": "keyword.control.def.sylang" },
-            "2": { "name": "entity.name.type.sylang" }
+            "2": { "name": "storage.type.definition.sylang" },
+            "3": { "name": "entity.name.type.safety.sylang" }
+          }
+        }
+      ]
+    },
+    "def-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(def)\\b",
+          "name": "keyword.control.def.sylang"
+        }
+      ]
+    },
+    "definition-types": {
+      "patterns": [
+        {
+          "match": "\\b(hazard|item|safetygoal)\\b",
+          "name": "storage.type.definition.sylang"
+        }
+      ]
+    },
+    "use-statements": {
+      "patterns": [
+        {
+          "match": "\\b(use)\\s+(\\w+)\\s+([A-Za-z0-9_.,\\s]+)",
+          "captures": {
+            "1": { "name": "keyword.control.import.sylang" },
+            "2": { "name": "storage.type.import.sylang" },
+            "3": { "name": "entity.name.import.sylang" }
+          }
+        }
+      ]
+    },
+    "property-names": {
+      "patterns": [
+        {
+          "match": "\\b(name|description|owner|reviewers|productline|featureset|functiongroup|vehiclestate|environment|driverstate|characteristics|conditions|range|impact|standard|cause|effect|category|function|mitigation|hazardanalysis|methodology)\\b",
+          "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "special-keywords": {
+      "patterns": [
+        {
+          "match": "\\b(enables)\\s+(feature|function|component|block|requirement)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
           }
         },
         {
-          "name": "keyword.control.def.sylang",
-          "match": "\\bdef\\b"
-        }
-      ]
-    },
-    "section-headers": {
-      "patterns": [
-        {
-          "name": "keyword.control.section.sylang",
-          "match": "^\\s*(operationalscenarios|operationalconditions|vehiclestates|driverstates|environments|safetyconcept|itemdef|hazardanalysis|riskassessment|safetygoals|safetymeasures)\\b"
-        }
-      ]
-    },
-    "safety-keywords": {
-      "patterns": [
-        {
-          "name": "keyword.other.safety-structure.sylang",
-          "match": "\\b(principle|assumption|misuse|includes|excludes|systemboundaries|subsystems)\\b"
+          "match": "\\b(mitigates)\\s+(hazard|risk|failure|control)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "keyword.other.safety-reference.sylang",
-          "match": "\\b(productline|featureset|functiongroup|vehiclestate|environment|driverstate|conditions)\\b"
+          "match": "\\b(controls)\\s+(hazard|risk|failure)\\b",
+          "captures": {
+            "1": { "name": "keyword.other.special.sylang" },
+            "2": { "name": "constant.language.category.sylang" }
+          }
         },
         {
-          "name": "keyword.other.methodology.sylang",
-          "match": "\\b(FMEA|HAZOP|STPA|FTA|ETA|HARA)\\b"
-        }
-      ]
-    },
-    "property-keywords": {
-      "patterns": [
-        {
-          "name": "keyword.other.property.multi-word.sylang",
-          "match": "\\b(enabledby\\s+function)\\b"
-        },
-        {
-          "name": "keyword.other.property.sylang",
-          "match": "\\b(name|description|owner|reviewers|tags|severity|probability|controllability|verification|rationale|methodology|context|conditions|consequences|characteristics|range|impact|standard|cause|effect|category|function|hazard|scenario|item|riskassessment|hazardidentification|mitigation|enabledby)\\b"
+          "match": "\\b(partof|allocatedto|dependson|requires|triggers|causes)\\b",
+          "name": "keyword.other.special.sylang"
         }
       ]
     },
     "safety-levels": {
       "patterns": [
         {
-          "name": "constant.language.safety-level.sylang",
-          "match": "\\b(ASIL-[ABCD]|QM|[ABCD]|S[123]|E[1234]|C[123])\\b"
+          "match": "\\b(ASIL-[ABCD]|QM|[ABCD])\\b",
+          "name": "constant.language.safety.sylang"
         },
         {
-          "name": "keyword.other.safety.sylang",
-          "match": "\\b(safetylevel|mandatory|optional|alternative|or)\\b"
+          "match": "\\b(safetylevel)\\b",
+          "name": "variable.other.safety.sylang"
+        }
+      ]
+    },
+    "categories": {
+      "patterns": [
+        {
+          "match": "\\b(systematic|random|common_cause|single_point|residual|latent|multiple_point)\\b",
+          "name": "constant.language.category.sylang"
         }
       ]
     },
@@ -124,15 +146,35 @@
         }
       ]
     },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.sylang"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|enabled|disabled)\\b",
+          "name": "constant.language.boolean.sylang"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "[=:;,\\[\\]{}()]",
+          "name": "punctuation.operator.sylang"
+        }
+      ]
+    },
     "identifiers": {
       "patterns": [
         {
-          "name": "entity.name.function.sylang",
-          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
-        },
-        {
-          "name": "variable.other.sylang",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b",
+          "name": "entity.name.identifier.sylang"
         }
       ]
     }

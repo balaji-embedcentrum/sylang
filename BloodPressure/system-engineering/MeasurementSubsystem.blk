@@ -1,0 +1,21 @@
+use block system BloodPressureMonitoringSystem
+use configset BloodPressureVariantsConfigs
+
+def block subsystem MeasurementSubsystem
+  name "Blood Pressure Measurement Subsystem"
+  description "Core measurement functionality including cuff control and pressure sensing"
+  owner "Biomedical Engineering Team"
+  tags "measurement", "sensing", "actuator", "safety-critical"
+  safetylevel ASIL-C
+  partof BloodPressureMonitoringSystem
+    
+  port in BloodPressureResults
+
+  def port out CuffPressureOutput
+    name "Cuff Pressure Measurement"
+    config c_AdvancedAlgorithms_PredictiveAnalytics
+    description "Real-time pneumatic cuff pressure readings"
+    type sensor
+    owner "Sensor Team"
+    safetylevel ASIL-C
+    tags "pressure", "safety-critical", "real-time"
