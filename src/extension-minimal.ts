@@ -387,6 +387,21 @@ class SymbolResolver {
             }
         }
     }
+
+    public isChildSymbolAccessible(symbolName: string): boolean {
+        // Check if this symbol is available as a child symbol in any imported container
+        for (const importedFile of this.imports.values()) {
+            for (const symbol of importedFile.symbols.values()) {
+                if (symbol.name === symbolName) {
+                    console.log(`✅ Child symbol '${symbolName}' found in imported container via ${importedFile.uri}`);
+                    return true;
+                }
+            }
+        }
+        
+        console.log(`❌ Child symbol '${symbolName}' NOT accessible - no parent container imported`);
+        return false;
+    }
 }
 
 // =============================================================================
@@ -747,26 +762,47 @@ class ModularPropertyValidator {
             return;
         }
 
-        // Validate referenced symbols (for function references)
-        if (definition.primaryKeyword === 'implements' && secondaryKeyword === 'function') {
+        // 🎯 VALIDATE REFERENCED SYMBOLS FOR ALL COMPOUND PROPERTIES!
+        const symbolValidationRules = [
+            { primary: 'implements', secondary: 'function', type: 'Function' },
+            { primary: 'enables', secondary: 'feature', type: 'Feature' },
+            { primary: 'allocatedto', secondary: 'subsystem', type: 'Subsystem' },
+            { primary: 'allocatedto', secondary: 'component', type: 'Component' },
+            { primary: 'allocatedto', secondary: 'system', type: 'System' },
+            { primary: 'partof', secondary: 'system', type: 'System' },
+            { primary: 'partof', secondary: 'subsystem', type: 'Subsystem' }
+        ];
+        
+        const matchingRule = symbolValidationRules.find(rule => 
+            definition.primaryKeyword === rule.primary && secondaryKeyword === rule.secondary
+        );
+        
+        if (matchingRule) {
             const symbolNames = parts.slice(2).join(' ').split(',').map(s => s.trim());
             
             for (const symbolName of symbolNames) {
                 if (symbolName) {
+                    console.log(`🔍 Validating ${matchingRule.primary} ${matchingRule.secondary} ${symbolName}`);
+                    
+                    // Check if symbol exists anywhere
                     const symbol = this.symbolResolver.getSymbol(symbolName);
                     
                     if (!symbol) {
-                        // Symbol not found
-                        const symbolStart = fullLine.indexOf(symbolName);
-                        const range = new vscode.Range(
-                            lineIndex, symbolStart, lineIndex, symbolStart + symbolName.length
-                        );
+                        // Check if it's a child symbol that needs import validation
+                        const isChildSymbolAccessible = this.symbolResolver.isChildSymbolAccessible(symbolName);
                         
-                        diagnostics.push(new vscode.Diagnostic(
-                            range,
-                            `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Function "${symbolName}" not found. Check imports.`,
-                            vscode.DiagnosticSeverity.Error
-                        ));
+                        if (!isChildSymbolAccessible) {
+                            const symbolStart = fullLine.indexOf(symbolName);
+                            const range = new vscode.Range(
+                                lineIndex, symbolStart, lineIndex, symbolStart + symbolName.length
+                            );
+                            
+                            diagnostics.push(new vscode.Diagnostic(
+                                range,
+                                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: ${matchingRule.type} "${symbolName}" not found. Check if it's defined or properly imported.`,
+                                vscode.DiagnosticSeverity.Error
+                            ));
+                        }
                     } else if (!symbol.isVisible) {
                         // Symbol found but hidden by config
                         const symbolStart = fullLine.indexOf(symbolName);
@@ -776,7 +812,7 @@ class ModularPropertyValidator {
                         
                         diagnostics.push(new vscode.Diagnostic(
                             range,
-                            `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Function "${symbolName}" is disabled by configuration (${symbol.configKey} = 0)`,
+                            `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: ${matchingRule.type} "${symbolName}" is disabled by configuration (${symbol.configKey} = 0)`,
                             vscode.DiagnosticSeverity.Warning
                         ));
                     }
