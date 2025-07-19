@@ -332,12 +332,12 @@ class SymbolResolver {
                 
                 console.log(`✅ Stored symbol: ${defName} (type: ${defType}, config: ${configKey})`);
             } else {
-                // Also try compound def patterns: def block subsystem Name, def port out Name, etc.
+                // 🎯 COMPOUND DEF PATTERNS: def block subsystem Name, def port out Name, etc.
                 const compoundDefMatch = line.match(/def\s+(\w+)\s+(\w+)\s+(\w+)/);
                 if (compoundDefMatch) {
                     const defCategory = compoundDefMatch[1]; // "block"
                     const defType = compoundDefMatch[2]; // "subsystem"
-                    const defName = compoundDefMatch[3]; // "MeasurementSubsystem"
+                    const defName = compoundDefMatch[3]; // "MeasurementSubsystem" ✅
                     
                     console.log(`🎯 Found compound def: def ${defCategory} ${defType} ${defName} at line ${i + 1}`);
                     
@@ -351,6 +351,31 @@ class SymbolResolver {
                     });
                     
                     console.log(`✅ Stored compound symbol: ${defName} (type: ${defCategory}.${defType})`);
+                } else {
+                    // 🎯 SPECIAL CASE: def block subsystem (without name on same line)
+                    const incompleteCompoundMatch = line.match(/def\s+(\w+)\s+(\w+)$/);
+                    if (incompleteCompoundMatch && i + 1 < lines.length) {
+                        const nextLine = lines[i + 1].trim();
+                        const nextLineNameMatch = nextLine.match(/^(\w+)/);
+                        if (nextLineNameMatch) {
+                            const defCategory = incompleteCompoundMatch[1]; // "block"
+                            const defType = incompleteCompoundMatch[2]; // "subsystem"
+                            const defName = nextLineNameMatch[1]; // "MeasurementSubsystem" ✅
+                            
+                            console.log(`🎯 Found split compound def: def ${defCategory} ${defType} ${defName} at lines ${i + 1}-${i + 2}`);
+                            
+                            symbols.set(defName, {
+                                id: defName,
+                                name: defName,
+                                type: `${defCategory}.${defType}`, // "block.subsystem"
+                                fileUri: filePath,
+                                isVisible: true,
+                                configKey: undefined
+                            });
+                            
+                            console.log(`✅ Stored split compound symbol: ${defName} (type: ${defCategory}.${defType})`);
+                        }
+                    }
                 }
             }
         }
