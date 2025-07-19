@@ -294,6 +294,9 @@ class SymbolResolver {
         const symbols = new Map<string, SymbolDefinition>();
         const lines = content.split('\n');
         
+        console.log(`🔍 v${EXTENSION_VERSION}: Parsing symbols from: ${filePath}`);
+        console.log(`🔍 Content preview: ${lines.slice(0, 5).join(' | ')}`);
+        
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
             
@@ -304,12 +307,15 @@ class SymbolResolver {
                 const defName = defMatch[2]; // BloodPressureFeatures, DeflateCuff, MeasurementSubsystem, etc.
                 let configKey: string | undefined;
                 
+                console.log(`🎯 Found def: def ${defType} ${defName} at line ${i + 1}`);
+                
                 // Look for config in ALL def types (not just functions!)
                 for (let j = i + 1; j < Math.min(i + 20, lines.length); j++) {
                     const configLine = lines[j].trim();
                     const configMatch = configLine.match(/config\s+(\w+)/);
                     if (configMatch) {
                         configKey = configMatch[1];
+                        console.log(`🔧 Found config: ${configKey} for ${defName}`);
                         break;
                     }
                     // Stop if we hit another def
@@ -325,9 +331,33 @@ class SymbolResolver {
                     configKey: configKey
                 });
                 
-                console.log(`🔍 Found symbol v${EXTENSION_VERSION}: ${defName} (type: ${defType}, config: ${configKey})`);
+                console.log(`✅ Stored symbol: ${defName} (type: ${defType}, config: ${configKey})`);
+            } else {
+                // Also try compound def patterns: def block subsystem Name, def port out Name, etc.
+                const compoundDefMatch = line.match(/def\s+(\w+)\s+(\w+)\s+(\w+)/);
+                if (compoundDefMatch) {
+                    const defCategory = compoundDefMatch[1]; // "block"
+                    const defType = compoundDefMatch[2]; // "subsystem"
+                    const defName = compoundDefMatch[3]; // "MeasurementSubsystem"
+                    
+                    console.log(`🎯 Found compound def: def ${defCategory} ${defType} ${defName} at line ${i + 1}`);
+                    
+                    symbols.set(defName, {
+                        id: defName,
+                        name: defName,
+                        type: `${defCategory}.${defType}`, // "block.subsystem"
+                        fileUri: filePath,
+                        isVisible: true,
+                        configKey: undefined
+                    });
+                    
+                    console.log(`✅ Stored compound symbol: ${defName} (type: ${defCategory}.${defType})`);
+                }
             }
         }
+        
+        console.log(`📋 Total symbols found in ${filePath}: ${symbols.size}`);
+        console.log(`📋 Symbol names: ${Array.from(symbols.keys()).join(', ')}`);
         
         return symbols;
     }
