@@ -595,9 +595,47 @@ export class SymbolManager implements ISymbolManager {
             
             // Look for definition lines (simplified pattern matching)
             if (line.startsWith('def ')) {
-                const defMatch = line.match(/def\s+(\w+)\s+(\w+)/);
-                if (defMatch) {
-                    const [, defType, defName] = defMatch;
+                // 🎯 HANDLE COMPOUND DEFS: def block subsystem MeasurementSubsystem
+                const compoundDefMatch = line.match(/def\s+(\w+)\s+(\w+)\s+(\w+)/);
+                if (compoundDefMatch) {
+                    const [, defCategory, defType, defName] = compoundDefMatch;
+                    console.log(`🎯 Found compound def: def ${defCategory} ${defType} ${defName} at line ${i + 1}`);
+                    
+                    const symbolType = this.mapCompoundDefTypeToSymbolType(defCategory, defType);
+                    if (symbolType) {
+                        const symbol: ISymbolDefinition = {
+                            id: this.generateSymbolId(documentUri, defName),
+                            name: defName, // ✅ Use the actual symbol name, not the type
+                            type: symbolType,
+                            fileUri: documentUri,
+                            location: new vscode.Location(document.uri, new vscode.Position(i, 0)),
+                            range: new vscode.Range(i, 0, i, line.length),
+                            parentSymbol: undefined,
+                            childSymbols: [],
+                            isExported: true,
+                            isVisible: true,
+                            isEnabled: true,
+                            properties: new Map(),
+                            metadata: {
+                                pluginId: 'sylang-core',
+                                documentUri,
+                                version: 1,
+                                lastModified: new Date(),
+                                checksum: this.generateChecksum(line),
+                                dependencies: [],
+                                dependents: []
+                            }
+                        };
+                        
+                        this.addSymbol(symbol);
+                        continue;
+                    }
+                }
+                
+                // 🎯 SIMPLE DEFS: def featureset BloodPressureFeatures
+                const simpleDefMatch = line.match(/def\s+(\w+)\s+(\w+)/);
+                if (simpleDefMatch) {
+                    const [, defType, defName] = simpleDefMatch;
                     
                     const symbolType = this.mapDefTypeToSymbolType(defType);
                     if (symbolType) {
@@ -643,6 +681,19 @@ export class SymbolManager implements ISymbolManager {
             case 'testsuite': return SymbolType.TEST_SUITE;
             default: return undefined;
         }
+    }
+
+    private mapCompoundDefTypeToSymbolType(defCategory: string, defType: string): SymbolType | undefined {
+        if (defCategory === 'block') {
+            switch (defType) {
+                case 'system': return SymbolType.BLOCK_SYSTEM;
+                case 'subsystem': return SymbolType.BLOCK_SUBSYSTEM;
+                case 'component': return SymbolType.BLOCK_COMPONENT;
+                default: return undefined;
+            }
+        }
+        // Add other compound categories as needed
+        return undefined;
     }
 
     private generateSymbolId(documentUri: string, name: string): string {

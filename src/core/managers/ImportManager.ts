@@ -67,15 +67,28 @@ export class ImportManager implements IImportManager {
             return undefined;
         }
         
-        // Parse the import statement: use <keyword> [subkeyword] <identifiers>
-        const usePattern = /^use\s+(\w+)(?:\s+(\w+))?\s+(.+)$/;
-        const match = trimmedLine.match(usePattern);
+        // 🎯 PARSE COMPOUND IMPORTS: use block subsystem MeasurementSubsystem
+        let compoundMatch = trimmedLine.match(/^use\s+(\w+)\s+(\w+)\s+(.+)$/);
+        let keyword: string;
+        let subkeyword: string | undefined;
+        let identifiersPart: string;
         
-        if (!match) {
-            return this.createInvalidImportStatement(line, document, lineIndex, 'Invalid use statement syntax');
+        if (compoundMatch) {
+            // Compound import: use block subsystem MeasurementSubsystem
+            keyword = compoundMatch[1]; // "block"
+            subkeyword = compoundMatch[2]; // "subsystem"
+            identifiersPart = compoundMatch[3]; // "MeasurementSubsystem" ✅
+            console.log(`🔍 Compound import: use ${keyword} ${subkeyword} ${identifiersPart}`);
+        } else {
+            // Simple import: use featureset BloodPressureFeatures
+            const simpleMatch = trimmedLine.match(/^use\s+(\w+)\s+(.+)$/);
+            if (!simpleMatch) {
+                return this.createInvalidImportStatement(line, document, lineIndex, 'Invalid use statement syntax');
+            }
+            keyword = simpleMatch[1]; // "featureset"
+            subkeyword = undefined;
+            identifiersPart = simpleMatch[2]; // "BloodPressureFeatures"
         }
-        
-        const [, keyword, subkeyword, identifiersPart] = match;
         
         // Parse identifiers (comma-separated)
         const identifiers = this.parseIdentifiers(identifiersPart);
