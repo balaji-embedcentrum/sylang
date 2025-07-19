@@ -2,6 +2,6 @@
  * Global constants for the Sylang extension
  */
 
-export const EXTENSION_VERSION = "2.3.7";
-export const EXTENSION_NAME = "NEW MODULAR SYSTEM";
-export const EXTENSION_ID = "sylang-new-modular"; 
+export const EXTENSION_VERSION = "3.0.1";
+export const EXTENSION_NAME = "FIXED PARSING SYSTEM";
+export const EXTENSION_ID = "sylang-fixed"; 
