@@ -1,8 +1,192 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
 
 /**
- * MINIMAL NEW MODULAR SYSTEM - Demonstrates modular property validation
+ * NEW MODULAR SYSTEM - Complete with config graying, import validation, cross-file validation
  */
+
+// =============================================================================
+// SYMBOL AND CONFIG MANAGEMENT
+// =============================================================================
+
+interface SymbolDefinition {
+    id: string;
+    name: string;
+    type: string;
+    fileUri: string;
+    isVisible: boolean; // Based on config
+    configKey?: string;
+    configValue?: number;
+}
+
+interface ImportedFile {
+    uri: string;
+    symbols: Map<string, SymbolDefinition>;
+}
+
+class ConfigStateManager {
+    private configValues = new Map<string, number>();
+    private symbolVisibility = new Map<string, boolean>();
+
+    updateConfigFromDocument(document: vscode.TextDocument): void {
+        const text = document.getText();
+        const lines = text.split('\n');
+        
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            // Match: def config c_Something 0
+            const configMatch = trimmedLine.match(/def\s+config\s+(\w+)\s+([01])/);
+            if (configMatch) {
+                const configKey = configMatch[1];
+                const configValue = parseInt(configMatch[2]);
+                this.configValues.set(configKey, configValue);
+                console.log(`🔧 Config updated: ${configKey} = ${configValue}`);
+            }
+        }
+    }
+
+    isSymbolVisible(configKey: string): boolean {
+        const value = this.configValues.get(configKey);
+        return value === undefined || value === 1; // Default visible if not found
+    }
+
+    getConfigValue(configKey: string): number | undefined {
+        return this.configValues.get(configKey);
+    }
+}
+
+class SymbolResolver {
+    private symbols = new Map<string, SymbolDefinition>();
+    private imports = new Map<string, ImportedFile>();
+
+    async resolveImportsForDocument(document: vscode.TextDocument): Promise<void> {
+        const text = document.getText();
+        const lines = text.split('\n');
+        const documentDir = path.dirname(document.uri.fsPath);
+        
+        for (const line of lines) {
+            const trimmedLine = line.trim();
+            // Match: use functiongroup MyFunctions
+            const importMatch = trimmedLine.match(/use\s+(\w+)\s+(\w+)/);
+            if (importMatch) {
+                const importType = importMatch[1]; // functiongroup, featureset, etc.
+                const importName = importMatch[2]; // MyFunctions
+                
+                await this.loadImportedSymbols(documentDir, importType, importName);
+            }
+        }
+    }
+
+    private async loadImportedSymbols(documentDir: string, importType: string, importName: string): Promise<void> {
+        try {
+            // Find the file based on import type
+            const extension = this.getExtensionForImportType(importType);
+            const possiblePaths = [
+                path.join(documentDir, `${importName}${extension}`),
+                path.join(documentDir, '..', 'platform-engineering', `${importName}${extension}`),
+                path.join(documentDir, '..', 'system-engineering', `${importName}${extension}`)
+            ];
+
+            for (const filePath of possiblePaths) {
+                if (fs.existsSync(filePath)) {
+                    console.log(`📦 Loading imported symbols from: ${filePath}`);
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    const symbols = this.parseSymbolsFromContent(content, filePath);
+                    
+                    this.imports.set(importName, {
+                        uri: filePath,
+                        symbols: symbols
+                    });
+                    break;
+                }
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to load import ${importName}:`, error);
+        }
+    }
+
+    private getExtensionForImportType(importType: string): string {
+        const mapping: Record<string, string> = {
+            'functiongroup': '.fun',
+            'featureset': '.fml',
+            'productline': '.ple',
+            'variantmodel': '.vml',
+            'configset': '.vcf'
+        };
+        return mapping[importType] || '.txt';
+    }
+
+    private parseSymbolsFromContent(content: string, filePath: string): Map<string, SymbolDefinition> {
+        const symbols = new Map<string, SymbolDefinition>();
+        const lines = content.split('\n');
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Match function definitions: def function FunctionName
+            const functionMatch = line.match(/def\s+function\s+(\w+)/);
+            if (functionMatch) {
+                const functionName = functionMatch[1];
+                let configKey: string | undefined;
+                let configValue: number | undefined;
+                
+                // Look for config in the following lines
+                for (let j = i + 1; j < Math.min(i + 20, lines.length); j++) {
+                    const configLine = lines[j].trim();
+                    const configMatch = configLine.match(/config\s+(\w+)/);
+                    if (configMatch) {
+                        configKey = configMatch[1];
+                        break;
+                    }
+                    // Stop if we hit another def
+                    if (configLine.startsWith('def ')) break;
+                }
+                
+                symbols.set(functionName, {
+                    id: functionName,
+                    name: functionName,
+                    type: 'function',
+                    fileUri: filePath,
+                    isVisible: true, // Will be updated based on config
+                    configKey: configKey,
+                    configValue: configValue
+                });
+                
+                console.log(`🔍 Found symbol: ${functionName} (config: ${configKey})`);
+            }
+        }
+        
+        return symbols;
+    }
+
+    getSymbol(symbolName: string): SymbolDefinition | undefined {
+        // Check direct symbols first
+        if (this.symbols.has(symbolName)) {
+            return this.symbols.get(symbolName);
+        }
+        
+        // Check imported symbols
+        for (const importedFile of this.imports.values()) {
+            if (importedFile.symbols.has(symbolName)) {
+                return importedFile.symbols.get(symbolName);
+            }
+        }
+        
+        return undefined;
+    }
+
+    updateSymbolVisibility(configManager: ConfigStateManager): void {
+        for (const importedFile of this.imports.values()) {
+            for (const symbol of importedFile.symbols.values()) {
+                if (symbol.configKey) {
+                    symbol.isVisible = configManager.isSymbolVisible(symbol.configKey);
+                    console.log(`👁️ Symbol ${symbol.name} visibility: ${symbol.isVisible} (config: ${symbol.configKey})`);
+                }
+            }
+        }
+    }
+}
 
 // =============================================================================
 // MODULAR PROPERTY CONFIGURATION
@@ -78,13 +262,9 @@ class ModularPropertyManager {
                     };
                     definitions['allocatedto'] = {
                         primaryKeyword: 'allocatedto',
-                        secondaryKeywords: [
-                            'system', 'subsystem', 'component', 'subcomponent', 
-                            'module', 'submodule', 'unit', 'subunit', 
-                            'assembly', 'subassembly', 'circuit', 'part'
-                        ],
+                        secondaryKeywords: ['component', 'subsystem'],
                         valueType: 'identifier-list',
-                        syntax: 'allocatedto component <ComponentList> | allocatedto subsystem <SubsystemList> | etc.'
+                        syntax: 'allocatedto component <ComponentList>'
                     };
                     // 🔧 ADD NEW COMPOUND REQUIREMENT PROPERTIES HERE!
                     // definitions['traces'] = {
@@ -112,23 +292,15 @@ class ModularPropertyManager {
                     };
                     definitions['contains'] = {
                         primaryKeyword: 'contains',
-                        secondaryKeywords: [
-                            'system', 'subsystem', 'component', 'subcomponent', 
-                            'module', 'submodule', 'unit', 'subunit', 
-                            'assembly', 'subassembly', 'circuit', 'part'
-                        ],
+                        secondaryKeywords: ['subsystem', 'component', 'module'],
                         valueType: 'identifier-list',
-                        syntax: 'contains subsystem <SubsystemList> | contains component <ComponentList> | etc.'
+                        syntax: 'contains subsystem <SubsystemList>'
                     };
                     definitions['partof'] = {
                         primaryKeyword: 'partof',
-                        secondaryKeywords: [
-                            'system', 'subsystem', 'component', 'subcomponent', 
-                            'module', 'submodule', 'unit', 'subunit', 
-                            'assembly', 'subassembly', 'circuit', 'part'
-                        ],
+                        secondaryKeywords: ['system', 'subsystem'],
                         valueType: 'identifier',
-                        syntax: 'partof system <SystemName> | partof subsystem <SubsystemName> | etc.'
+                        syntax: 'partof system <SystemName>'
                     };
                     // 🔧 ADD NEW COMPOUND BLOCK PROPERTIES HERE!
                     // definitions['connects'] = {
@@ -156,13 +328,9 @@ class ModularPropertyManager {
                     };
                     definitions['allocatedto'] = {
                         primaryKeyword: 'allocatedto',
-                        secondaryKeywords: [
-                            'system', 'subsystem', 'component', 'subcomponent', 
-                            'module', 'submodule', 'unit', 'subunit', 
-                            'assembly', 'subassembly', 'circuit', 'part'
-                        ],
+                        secondaryKeywords: ['component', 'module'],
                         valueType: 'identifier-list',
-                        syntax: 'allocatedto component <ComponentList> | allocatedto module <ModuleList> | etc.'
+                        syntax: 'allocatedto component <ComponentList>'
                     };
                     // 🔧 ADD NEW COMPOUND FUNCTION PROPERTIES HERE!
                     // definitions['calls'] = {
@@ -191,13 +359,22 @@ interface CompoundPropertyDef {
 }
 
 class ModularPropertyValidator {
-    constructor(private propertyManager: ModularPropertyManager) {}
+    constructor(
+        private propertyManager: ModularPropertyManager,
+        private configManager: ConfigStateManager,
+        private symbolResolver: SymbolResolver
+    ) {}
 
-    validateDocument(document: vscode.TextDocument): vscode.Diagnostic[] {
+    async validateDocument(document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
         const diagnostics: vscode.Diagnostic[] = [];
         const languageId = this.getLanguageIdFromDocument(document);
         const text = document.getText();
         const lines = text.split('\n');
+        
+        // First, resolve imports and update config
+        this.configManager.updateConfigFromDocument(document);
+        await this.symbolResolver.resolveImportsForDocument(document);
+        this.symbolResolver.updateSymbolVisibility(this.configManager);
         
         let currentContext = '';
         
@@ -206,7 +383,13 @@ class ModularPropertyValidator {
             const trimmedLine = line.trim();
             
             // Skip empty lines and comments
-            if (!trimmedLine || trimmedLine.startsWith('//') || trimmedLine.startsWith('use ')) continue;
+            if (!trimmedLine || trimmedLine.startsWith('//')) continue;
+            
+            // Validate import statements
+            if (trimmedLine.startsWith('use ')) {
+                this.validateImportStatement(diagnostics, lineIndex, trimmedLine, line);
+                continue;
+            }
             
             // Track context changes
             if (trimmedLine.startsWith('def ')) {
@@ -262,6 +445,42 @@ class ModularPropertyValidator {
         return diagnostics;
     }
 
+    private validateImportStatement(
+        diagnostics: vscode.Diagnostic[], 
+        lineIndex: number, 
+        trimmedLine: string, 
+        fullLine: string
+    ): void {
+        const importMatch = trimmedLine.match(/use\s+(\w+)\s+(\w+)/);
+        if (!importMatch) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, fullLine.length);
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `🎯 NEW MODULAR SYSTEM: Invalid import syntax. Expected: use <type> <name>`,
+                vscode.DiagnosticSeverity.Error
+            ));
+            return;
+        }
+
+        const importType = importMatch[1];
+        const importName = importMatch[2];
+        
+        // Validate import type
+        const validImportTypes = ['functiongroup', 'featureset', 'productline', 'variantmodel', 'configset'];
+        if (!validImportTypes.includes(importType)) {
+            const typeStart = fullLine.indexOf(importType);
+            const range = new vscode.Range(
+                lineIndex, typeStart, lineIndex, typeStart + importType.length
+            );
+            
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `🎯 NEW MODULAR SYSTEM: Invalid import type "${importType}". Valid: ${validImportTypes.join(', ')}`,
+                vscode.DiagnosticSeverity.Error
+            ));
+        }
+    }
+
     private validateCompoundProperty(
         diagnostics: vscode.Diagnostic[], 
         lineIndex: number, 
@@ -293,6 +512,44 @@ class ModularPropertyValidator {
                 `🎯 NEW MODULAR SYSTEM: Invalid secondary keyword "${secondaryKeyword}" for ${definition.primaryKeyword}. Valid: ${definition.secondaryKeywords.join(', ')}`,
                 vscode.DiagnosticSeverity.Error
             ));
+            return;
+        }
+
+        // Validate referenced symbols (for function references)
+        if (definition.primaryKeyword === 'implements' && secondaryKeyword === 'function') {
+            const symbolNames = parts.slice(2).join(' ').split(',').map(s => s.trim());
+            
+            for (const symbolName of symbolNames) {
+                if (symbolName) {
+                    const symbol = this.symbolResolver.getSymbol(symbolName);
+                    
+                    if (!symbol) {
+                        // Symbol not found
+                        const symbolStart = fullLine.indexOf(symbolName);
+                        const range = new vscode.Range(
+                            lineIndex, symbolStart, lineIndex, symbolStart + symbolName.length
+                        );
+                        
+                        diagnostics.push(new vscode.Diagnostic(
+                            range,
+                            `🎯 NEW MODULAR SYSTEM: Function "${symbolName}" not found. Check imports.`,
+                            vscode.DiagnosticSeverity.Error
+                        ));
+                    } else if (!symbol.isVisible) {
+                        // Symbol found but hidden by config
+                        const symbolStart = fullLine.indexOf(symbolName);
+                        const range = new vscode.Range(
+                            lineIndex, symbolStart, lineIndex, symbolStart + symbolName.length
+                        );
+                        
+                        diagnostics.push(new vscode.Diagnostic(
+                            range,
+                            `🎯 NEW MODULAR SYSTEM: Function "${symbolName}" is disabled by configuration (${symbol.configKey} = 0)`,
+                            vscode.DiagnosticSeverity.Warning
+                        ));
+                    }
+                }
+            }
         }
     }
 
@@ -308,37 +565,151 @@ class ModularPropertyValidator {
 }
 
 // =============================================================================
+// VISUAL DECORATION FOR CONFIG GRAYING
+// =============================================================================
+
+class ConfigDecorationProvider {
+    private grayDecorationType = vscode.window.createTextEditorDecorationType({
+        opacity: '0.5',
+        color: '#888888'
+    });
+
+    async updateDecorations(
+        editor: vscode.TextEditor, 
+        configManager: ConfigStateManager,
+        symbolResolver: SymbolResolver
+    ): Promise<void> {
+        const document = editor.document;
+        if (!isSylangDocument(document)) return;
+
+        // Update config from current document
+        configManager.updateConfigFromDocument(document);
+        await symbolResolver.resolveImportsForDocument(document);
+        symbolResolver.updateSymbolVisibility(configManager);
+
+        const grayRanges: vscode.Range[] = [];
+        const text = document.getText();
+        const lines = text.split('\n');
+        
+        let inFunction = false;
+        let functionStartLine = -1;
+        let currentFunctionConfig: string | undefined;
+
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const line = lines[lineIndex];
+            const trimmedLine = line.trim();
+            
+            // Check for function definition start
+            const functionMatch = trimmedLine.match(/def\s+function\s+(\w+)/);
+            if (functionMatch) {
+                inFunction = true;
+                functionStartLine = lineIndex;
+                currentFunctionConfig = undefined;
+                continue;
+            }
+            
+            // Check for config line within function
+            if (inFunction && trimmedLine.match(/config\s+(\w+)/)) {
+                const configMatch = trimmedLine.match(/config\s+(\w+)/);
+                if (configMatch) {
+                    currentFunctionConfig = configMatch[1];
+                }
+                continue;
+            }
+            
+            // Check for end of function (next def or end of file)
+            if (inFunction && (trimmedLine.startsWith('def ') || lineIndex === lines.length - 1)) {
+                // Gray out the entire function if config = 0
+                if (currentFunctionConfig && !configManager.isSymbolVisible(currentFunctionConfig)) {
+                    const endLine = trimmedLine.startsWith('def ') ? lineIndex - 1 : lineIndex;
+                    for (let i = functionStartLine; i <= endLine; i++) {
+                        grayRanges.push(new vscode.Range(i, 0, i, lines[i].length));
+                    }
+                    console.log(`👁️ Graying out function lines ${functionStartLine}-${endLine} (config: ${currentFunctionConfig})`);
+                }
+                
+                // Reset for next function
+                if (trimmedLine.startsWith('def ')) {
+                    const newFunctionMatch = trimmedLine.match(/def\s+function\s+(\w+)/);
+                    if (newFunctionMatch) {
+                        inFunction = true;
+                        functionStartLine = lineIndex;
+                        currentFunctionConfig = undefined;
+                    } else {
+                        inFunction = false;
+                    }
+                } else {
+                    inFunction = false;
+                }
+            }
+        }
+
+        // Apply gray decorations
+        editor.setDecorations(this.grayDecorationType, grayRanges);
+        console.log(`🎨 Applied ${grayRanges.length} gray decorations`);
+    }
+
+    dispose(): void {
+        this.grayDecorationType.dispose();
+    }
+}
+
+// =============================================================================
 // EXTENSION ACTIVATION - NEW MODULAR SYSTEM
 // =============================================================================
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('🚀 NEW MODULAR SYSTEM ACTIVATED! This is the new architecture.');
+    console.log('🚀 NEW MODULAR SYSTEM ACTIVATED! Config graying, import validation, cross-file validation included.');
     
     const propertyManager = new ModularPropertyManager();
-    const validator = new ModularPropertyValidator(propertyManager);
+    const configManager = new ConfigStateManager();
+    const symbolResolver = new SymbolResolver();
+    const validator = new ModularPropertyValidator(propertyManager, configManager, symbolResolver);
+    const decorationProvider = new ConfigDecorationProvider();
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('sylang-new-modular');
     
-    const validateDocument = (document: vscode.TextDocument) => {
+    const validateDocument = async (document: vscode.TextDocument) => {
         if (isSylangDocument(document)) {
             console.log(`🔍 NEW MODULAR SYSTEM: Validating ${document.fileName}`);
-            const diagnostics = validator.validateDocument(document);
+            const diagnostics = await validator.validateDocument(document);
             diagnosticCollection.set(document.uri, diagnostics);
             console.log(`✅ NEW MODULAR SYSTEM: Found ${diagnostics.length} diagnostics`);
+        }
+    };
+
+    const updateDecorations = async (editor: vscode.TextEditor) => {
+        if (editor && isSylangDocument(editor.document)) {
+            await decorationProvider.updateDecorations(editor, configManager, symbolResolver);
         }
     };
     
     // Register event listeners
     context.subscriptions.push(
-        vscode.workspace.onDidChangeTextDocument(event => validateDocument(event.document)),
+        vscode.workspace.onDidChangeTextDocument(async event => {
+            await validateDocument(event.document);
+            const editor = vscode.window.visibleTextEditors.find(e => e.document === event.document);
+            if (editor) {
+                await updateDecorations(editor);
+            }
+        }),
         vscode.workspace.onDidOpenTextDocument(validateDocument),
         vscode.workspace.onDidSaveTextDocument(validateDocument),
-        diagnosticCollection
+        vscode.window.onDidChangeActiveTextEditor(async editor => {
+            if (editor) {
+                await updateDecorations(editor);
+            }
+        }),
+        diagnosticCollection,
+        decorationProvider
     );
     
-    // Validate currently open documents
+    // Validate currently open documents and apply decorations
     vscode.workspace.textDocuments.forEach(validateDocument);
+    if (vscode.window.activeTextEditor) {
+        updateDecorations(vscode.window.activeTextEditor);
+    }
     
-    console.log('✅ NEW MODULAR SYSTEM: Ready to validate Sylang files with modular properties!');
+    console.log('✅ NEW MODULAR SYSTEM: Ready with config graying, import validation, and cross-file validation!');
 }
 
 export function deactivate() {
