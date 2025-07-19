@@ -1,8 +1,0 @@
-Subsystem SensorMonitoringSubsystem
-  name "Sensor Monitoring Subsystem"
-  description "Monitors position sensors, cable health, and system feedback."
-  owner "Hardware Team"
-  tags "sensor", "monitoring", "feedback"
-  safetylevel ASIL-D
-  enables PositionSensing, CableMonitoring
-  implements PositionSensorInterface, CableHealthMonitor

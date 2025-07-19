@@ -39,7 +39,7 @@ export function createCoreManagers(options?: {
 }): CoreManagers {
     // Create managers in dependency order
     const cacheManager = new CacheManager(options?.cacheSettings);
-    const configurationManager = new ConfigurationManager();
+    const configurationManager = new ConfigurationManager(); // Fixed: no arguments
     const symbolManager = new SymbolManager(configurationManager);
     const importManager = new ImportManager(symbolManager, configurationManager);
     const validationPipeline = new ValidationPipeline(
@@ -66,10 +66,10 @@ export function createSymbolManager(configurationManager?: any): SymbolManager {
 }
 
 /**
- * Create configuration manager
+ * Create a configuration manager instance with symbol manager integration
  */
 export function createConfigurationManager(symbolManager?: any): ConfigurationManager {
-    return new ConfigurationManager(symbolManager);
+    return new ConfigurationManager(); // Fixed: no arguments
 }
 
 /**

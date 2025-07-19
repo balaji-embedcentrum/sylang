@@ -17,7 +17,7 @@
 8. [Function Definitions (.fun, .fma)](#8-function-definitions-fun-fma)
 9. [Safety Engineering (.sgl, .haz, .rsk, .fsr, .itm)](#9-safety-engineering-sgl-haz-rsk-fsr-itm)
 10. [Security Engineering (.tra, .thr, .sgo, .sre, .ast, .sec)](#10-security-engineering-tra-thr-sgo-sre-ast-sec)
-11. [Component Engineering (.cmp, .sub, .req)](#11-component-engineering-cmp-sub-req)
+11. [Component Engineering (.req)](#11-component-engineering-req)
 12. [Software Engineering (.mod, .prt)](#12-software-engineering-mod-prt)
 13. [Electronics Engineering (.ckt)](#13-electronics-engineering-ckt)
 14. [Mechanics Engineering (.asm)](#14-mechanics-engineering-asm)
@@ -117,7 +117,7 @@ Common properties across all file types:
 
 | Category | Purpose | Extensions |
 |----------|---------|------------|
-| **Systems Architecture** | System structure and hierarchy | `.ple`, `.cmp`, `.sub` |
+| **Systems Architecture** | System structure and hierarchy | `.ple`, `.blk` |
 | **Functional Design** | Functions and features | `.fun`, `.fma`, `.fml` |
 | **Safety Engineering** | Safety analysis and requirements | `.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm` |
 | **Security Engineering** | Security analysis and threats | `.tra`, `.thr`, `.sgo`, `.sre`, `.ast`, `.sec` |
@@ -144,7 +144,7 @@ Sylang Language Family
 │   ├── Security Requirements (.sre)
 │   ├── Assets (.ast)
 │   └── Security (.sec)
-├── Component Engineering (.cmp, .sub, .req)
+├── Component Engineering (.req)
 ├── Software Engineering (.mod, .prt)
 ├── Electronics Engineering (.ckt)
 └── Mechanics Engineering (.asm)
@@ -174,7 +174,6 @@ Sylang Language Family
 | `.ast` | sylang-security | Assets | `assets` |
 | `.sec` | sylang-security | Security models | `security` |
 | `.cmp` | sylang-components | Components | `component` |
-| `.sub` | sylang-components | Subsystems | `subsystem` |
 | `.req` | sylang-components | Requirements | `requirement` |
 | `.mod` | sylang-software | Software modules | `module` |
 | `.prt` | sylang-software | Software parts | `part` |
@@ -675,7 +674,7 @@ def assets <AssetsIdentifier>
 
 ---
 
-## 11. Component Engineering (.cmp, .sub, .req)
+## 11. Component Engineering (.req)
 
 ### 11.1 Components (.cmp)
 
@@ -702,37 +701,7 @@ def component <ComponentIdentifier>
       safetylevel <ASIL-Level>
 ```
 
-### 11.2 Subsystems (.sub)
-
-#### Purpose
-Define larger subsystems that group related components.
-
-#### Syntax Structure
-```sylang
-def subsystem <SubsystemIdentifier>
-  name "<Subsystem Name>"
-  description "<Subsystem Description>"
-  owner "<Team Name>"
-  tags "<tag1>", "<tag2>"
-  safetylevel <ASIL-Level>
-  enables <FeatureList>
-  implements <FunctionList>
-  aggregatedby <ParentSubsystem>
-```
-
-#### Complete Example
-```sylang
-def subsystem ActuationControlSubsystem
-  name "Actuation Control Subsystem"
-  description "Controls physical brake actuators and force regulation mechanisms."
-  owner "Hardware Team"
-  tags "actuator", "control", "hardware"
-  safetylevel ASIL-D
-  enables ActuatorSystem, ActuatorType, ForceControl
-  implements ActuationSystemManager, ActuatorTypeSelector, ForceRegulationModule
-```
-
-### 11.3 Requirements (.req)
+### 11.2 Requirements (.req)
 
 #### Purpose
 Define detailed requirements specifications.
@@ -1065,8 +1034,6 @@ EPB_System/
 │   │   ├── EPBHazards.haz
 │   │   └── EPBRequirements.fsr
 │   └── subsystems/
-│       ├── ActuationSubsystem.sub
-│       └── HMISubsystem.sub
 ```
 
 #### Complete Product Line Definition
@@ -1206,7 +1173,6 @@ def productline InsulinPumpSystem
 | `.rsk` | Risks | All | ISO 26262, ISO 14971 |
 | `.itm` | Safety Items | All | ISO 26262, ISO 14971 |
 | `.cmp` | Components | All | Various |
-| `.sub` | Subsystems | All | Various |
 
 ### Appendix D: Validation Checklist
 

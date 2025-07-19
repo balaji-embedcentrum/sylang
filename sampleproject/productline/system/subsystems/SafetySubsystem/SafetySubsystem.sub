@@ -1,8 +1,0 @@
-Subsystem SafetySubsystem
-  name "Safety Subsystem"
-  description "Provides emergency release mechanisms and safety-critical functions."
-  owner "Safety Team"
-  tags "safety", "emergency", "critical"
-  safetylevel ASIL-B
-  enables CableEmergencyRelease
-  implements EmergencyReleaseValve 

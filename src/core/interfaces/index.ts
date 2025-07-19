@@ -2,10 +2,14 @@
 export type {
     IConfigurationManager,
     ILanguageConfiguration,
-    IGlobalConfiguration
+    IGlobalConfiguration,
+    ICacheSettings
 } from './IConfigurationManager';
 
-// Import Management Interfaces
+// Symbol Management Interfaces
+export * from './ISymbolManager';
+
+// Import Management Interfaces  
 export * from './IImportManager';
 
 // Cache Management Interfaces
@@ -13,6 +17,9 @@ export * from './ICacheManager';
 
 // Validation Pipeline Interfaces
 export * from './IValidationPipeline';
+
+// Language Plugin Interfaces
+export * from './ILanguagePlugin';
 
 // =============================================================================
 // CONVENIENCE TYPE ALIASES
@@ -137,7 +144,7 @@ export type SubDefinitionTypes =
     | SymbolType.NODE
     | SymbolType.ITEM;
 
-// File Extension Mappings
+// File Extension Mappings - EXACTLY 15 EXTENSIONS
 export const FILE_EXTENSIONS = {
     PRODUCT_LINE: '.ple',
     FEATURE_MODEL: '.fml',
@@ -156,23 +163,23 @@ export const FILE_EXTENSIONS = {
     SAFETY_GOAL: '.sgl'
 } as const;
 
-// Language ID Mappings
+// Language IDs - EXACTLY 15 LANGUAGES
 export const LANGUAGE_IDS = {
     PRODUCT_LINE: 'sylang-productline',
-    FEATURE_MODEL: 'sylang-feature',
+    FEATURE_MODEL: 'sylang-features',
     VARIANT_MODEL: 'sylang-variantmodel',
     VARIANT_CONFIG: 'sylang-variantconfig',
-    FUNCTION: 'sylang-function',
-    BLOCK: 'sylang-block',
-    REQUIREMENT: 'sylang-requirement',
+    FUNCTION: 'sylang-functions',
+    BLOCK: 'sylang-blocks',
+    REQUIREMENT: 'sylang-requirements',
     TEST: 'sylang-test',
     FAILURE_MODE_ANALYSIS: 'sylang-failuremodeanalysis',
-    FAILURE_MODE_CONTROLS: 'sylang-failuremodecontrol',
+    FAILURE_MODE_CONTROLS: 'sylang-failuremodecontrols',
     FAULT_TREE_ANALYSIS: 'sylang-faulttreeanalysis',
-    ITEM: 'sylang-item',
-    HAZARD: 'sylang-hazard',
+    ITEM: 'sylang-items',
+    HAZARD: 'sylang-hazards',
     RISK: 'sylang-risk',
-    SAFETY_GOAL: 'sylang-safetygoal'
+    SAFETY_GOAL: 'sylang-safetygoals'
 } as const;
 
 // Validation Stage Order

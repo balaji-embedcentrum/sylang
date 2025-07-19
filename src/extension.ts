@@ -7,17 +7,18 @@ import {
 } from './core/managers';
 import { PropertyValidationRule } from './core/rules/PropertyValidationRule';
 import { VALIDATION_STAGES_ORDER } from './core/interfaces';
+import { getSupportedExtensions } from './config/LanguageConfigs';
 
 /**
- * Extension activation - New modular ValidationPipeline system
+ * Extension activation - Complete Sylang validation system
  */
 export function activate(context: vscode.ExtensionContext) {
-    console.log('🚀 Sylang Extension Activating (New Modular System)...');
+    console.log('🚀 Sylang Extension Activating - FULL VALIDATION SYSTEM...');
     
     // Initialize core managers
     const configurationManager = new ConfigurationManager();
     const symbolManager = new SymbolManager(configurationManager);
-    const importManager = new ImportManager(symbolManager);
+    const importManager = new ImportManager(symbolManager, configurationManager);
     const validationPipeline = new ValidationPipeline(
         symbolManager,
         configurationManager, 
@@ -25,14 +26,18 @@ export function activate(context: vscode.ExtensionContext) {
     );
     
     // Create diagnostic collection
-    const diagnosticCollection = vscode.languages.createDiagnosticCollection('sylang-modular');
+    const diagnosticCollection = vscode.languages.createDiagnosticCollection('sylang-validation');
+    context.subscriptions.push(diagnosticCollection);
     
     // Register validation on file changes
     const validateDocument = async (document: vscode.TextDocument) => {
         if (!isSylangDocument(document)) return;
         
         try {
-            console.log(`🔍 Validating ${document.fileName} with new modular system`);
+            console.log(`🔍 VALIDATING ${document.fileName} with FULL VALIDATION PIPELINE`);
+            
+            // Clear previous diagnostics
+            diagnosticCollection.delete(document.uri);
             
             // Create validation context
             const validationContext = {
@@ -40,73 +45,74 @@ export function activate(context: vscode.ExtensionContext) {
                 symbolManager,
                 configurationManager,
                 importManager,
-                cacheManager: undefined, // Optional for now
+                cacheManager: undefined,
                 enabledStages: VALIDATION_STAGES_ORDER,
                 validationMode: 'strict' as const,
                 maxConcurrency: 5,
                 timeout: 10000
             };
             
-            // Run validation
+            // Run complete validation pipeline
             const result = await validationPipeline.validateDocument(document, validationContext);
             
-            // Set diagnostics
-            diagnosticCollection.set(document.uri, result.finalDiagnostics);
+            // Convert validation results to VSCode diagnostics
+            const diagnostics: vscode.Diagnostic[] = result.finalDiagnostics || [];
             
-            console.log(`✅ Validation complete: ${result.finalDiagnostics.length} diagnostics`);
+            // Set diagnostics
+            diagnosticCollection.set(document.uri, diagnostics);
+            
+            console.log(`✅ Validation complete: ${diagnostics.length} diagnostics`);
             
         } catch (error) {
-            console.error('❌ Validation error:', error);
-            
-            // Clear diagnostics on error to avoid showing stale results
-            diagnosticCollection.set(document.uri, []);
+            console.error('❌ Validation failed:', error);
+            // Show critical validation errors
+            const diagnostic = new vscode.Diagnostic(
+                new vscode.Range(0, 0, 0, 1),
+                `Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                vscode.DiagnosticSeverity.Error
+            );
+            diagnostic.source = 'sylang-validation';
+            diagnosticCollection.set(document.uri, [diagnostic]);
         }
     };
     
-    // Register event listeners
+    // Validate on document change
     context.subscriptions.push(
-        // Validate on document change
-        vscode.workspace.onDidChangeTextDocument(async (event) => {
-            await validateDocument(event.document);
-        }),
-        
-        // Validate on document open
-        vscode.workspace.onDidOpenTextDocument(async (document) => {
-            await validateDocument(document);
-        }),
-        
-        // Validate on document save
-        vscode.workspace.onDidSaveTextDocument(async (document) => {
-            await validateDocument(document);
-        }),
-        
-        // Clean up diagnostics when document closes
-        vscode.workspace.onDidCloseTextDocument((document) => {
-            diagnosticCollection.delete(document.uri);
-        }),
-        
-        // Register diagnostic collection for cleanup
-        diagnosticCollection
+        vscode.workspace.onDidChangeTextDocument(event => {
+            if (isSylangDocument(event.document)) {
+                // Debounced validation
+                setTimeout(() => validateDocument(event.document), 500);
+            }
+        })
     );
     
-    // Validate currently open documents
-    vscode.workspace.textDocuments.forEach(validateDocument);
+    // Validate on document open
+    context.subscriptions.push(
+        vscode.workspace.onDidOpenTextDocument(document => {
+            if (isSylangDocument(document)) {
+                validateDocument(document);
+            }
+        })
+    );
     
-    console.log('✅ Sylang Extension Activated (New Modular System)');
-}
-
-export function deactivate() {
-    console.log('👋 Sylang Extension Deactivated (New Modular System)');
+    // Validate all open documents on startup
+    vscode.workspace.textDocuments.forEach(document => {
+        if (isSylangDocument(document)) {
+            validateDocument(document);
+        }
+    });
+    
+    console.log('✅ Sylang Extension FULLY ACTIVATED with validation pipeline!');
 }
 
 /**
  * Check if document is a Sylang file
  */
 function isSylangDocument(document: vscode.TextDocument): boolean {
-    const sylangExtensions = [
-        '.ple', '.fml', '.vml', '.vcf', '.fun', '.blk', '.req', '.tst',
-        '.fma', '.fmc', '.fta', '.itm', '.haz', '.rsk', '.sgl', '.sub', '.sys'
-    ];
-    
-    return sylangExtensions.some(ext => document.fileName.toLowerCase().endsWith(ext));
+    const supportedExtensions = getSupportedExtensions();
+    return supportedExtensions.some(ext => document.fileName.toLowerCase().endsWith(ext));
+}
+
+export function deactivate() {
+    console.log('🔄 Sylang Extension Deactivated');
 } 

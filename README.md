@@ -39,17 +39,32 @@
 
 ## 📋 **Supported Engineering Domains**
 
-| Domain | Extensions | Industry Standards |
-|--------|------------|-------------------|
-| **Systems Architecture** | `.ple` | Systems modeling, component hierarchies |
-| **Functional Design** | `.fun`, `.fma` | System functions, behavioral models |
-| **Feature Models** | `.fml` | Variability modeling, product lines |
-| **Safety Engineering** | `.sgl`, `.haz`, `.rsk`, `.fsr`, `.itm` | ISO 26262, DO-178C, IEC 62304 |
-| **Security Engineering** | `.sgo`, `.ast`, `.sec`, `.tra`, `.thr`, `.sre` | Cybersecurity, threat analysis |
-| **Component Engineering** | `.cmp`, `.sub`, `.req` | Component specs, subsystem design |
-| **Software Engineering** | `.mod`, `.prt` | Software architecture, modules |
-| **Electronics Design** | `.ckt` | Circuit design, signal integrity |
-| **Mechanical Design** | `.asm` | Mechanical assemblies, actuators |
+Sylang supports **EXACTLY 15 specialized file extensions** for comprehensive systems engineering:
+
+| Extension | Purpose | Keywords | Industry Standards |
+|-----------|---------|----------|-------------------|
+| **`.ple`** | Product Line Engineering | `productline` | Systems modeling, architecture |
+| **`.fml`** | Feature Modeling | `featureset`, `feature` | Variability modeling, product lines |
+| **`.vml`** | Variant Modeling | `variantmodel`, `variant` | Product variants, configurations |
+| **`.vcf`** | Variant Configuration | `configset`, `config` | Configuration management |
+| **`.fun`** | Function Definitions | `functiongroup`, `function` | System functions, behavioral models |
+| **`.blk`** | Block Architecture | `system`, `subsystem`, `component` | System architecture, hierarchies |
+| **`.req`** | Requirements | `requirement` | Requirements engineering, traceability |
+| **`.tst`** | Test Specifications | `testsuite`, `testcase` | Testing, verification, validation |
+| **`.fma`** | Failure Mode Analysis | `failuremodeanalysis`, `failuremode` | FMEA, failure analysis |
+| **`.fmc`** | Failure Mode Controls | `controlmeasures`, `control` | FMEA controls, mitigation |
+| **`.fta`** | Fault Tree Analysis | `faulttreeanalysis`, `faulttree` | FTA, fault analysis |
+| **`.itm`** | Items/Operational Scenarios | `itemdefinition`, `item` | Operational scenarios |
+| **`.haz`** | Hazard Analysis | `hazardidentification`, `hazard` | ISO 26262, hazard analysis |
+| **`.rsk`** | Risk Assessment | `riskassessment`, `risk` | Risk analysis, ASIL |
+| **`.sgl`** | Safety Goals | `safetygoals`, `safetygoal` | Safety goals, ASIL allocation |
+
+### **Industry Focus**
+- **Automotive Safety**: ASIL levels, functional safety requirements, hazard analysis, ISO 26262
+- **Aerospace Systems**: DO-178C compliance, safety-critical software development
+- **Medical Devices**: IEC 62304, risk management, device safety requirements
+- **Systems Architecture**: Component hierarchies, interfaces, traceability
+- **Requirements Engineering**: EARS format, traceability, verification, validation
 
 ## 🤖 **Agentic AI Features**
 

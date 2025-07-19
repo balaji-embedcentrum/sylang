@@ -1,8 +1,0 @@
-Subsystem HMIControlSubsystem
-  name "Human-Machine Interface Control Subsystem"
-  description "Manages all user interface components and driver interaction mechanisms."
-  owner "HMI Team"
-  tags "HMI", "interface", "user"
-  safetylevel ASIL-B
-  enables UserInterface, SwitchType, StatusDisplay
-  implements HMIInterfaceProcessor, InputDeviceController, VisualFeedbackManager

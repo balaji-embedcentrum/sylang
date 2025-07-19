@@ -1,8 +1,0 @@
-Subsystem AutomationLogicSubsystem
-  name "Automation Logic Subsystem"
-  description "Handles automatic functions like auto-hold and hill-start assist."
-  owner "Software Team"
-  tags "automation", "logic", "convenience"
-  safetylevel ASIL-C
-  enables AutomaticFunctions, AutoHold, HillStartAssist
-  implements AutomationCoordinator, AutoHoldStateMachine, HillAssistLogicController

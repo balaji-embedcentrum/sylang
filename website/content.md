@@ -162,7 +162,7 @@ graph TD
 
 ## 📋 Complete Sylang File Type Reference
 
-Sylang provides **15 specialized file extensions**, each designed for specific engineering domains:
+Sylang provides **EXACTLY 15 specialized file extensions**, each designed for specific engineering domains:
 
 ### 🏗️ System Architecture Files
 
@@ -170,400 +170,69 @@ Sylang provides **15 specialized file extensions**, each designed for specific e
 **Purpose**: Define product line architecture and metadata
 **Usage**: ONE per workspace (top-level system definition)
 
-```sylang
-productline <ProductLineName>
-  name <string_literal>
-  description <string_literal>
-  owner <string_literal>
-  domain <domain_list>
-  compliance <standards_list>
-  firstrelease <date_string>
-  safetylevel <safety_level>
-  region <region_list>
-  tags <tag_list>
-```
-
-**Keywords Explained:**
-- `productline` - Root definition keyword
-- `name` - Human-readable product line name
-- `description` - Detailed purpose and scope
-- `owner` - Responsible engineering team
-- `domain` - Application domains (automotive, aerospace, medical)
-- `compliance` - Standards compliance (ISO 26262, DO-178C, IEC 62304)
-- `firstrelease` - Planned first release date (YYYY-MM-DD)
-- `safetylevel` - Highest safety level (ASIL-A/B/C/D, QM)
-- `region` - Target markets
-- `tags` - Classification tags
-
 #### `.fml` - Feature Modeling
 **Purpose**: Define variability and feature selection
-**Usage**: Multiple files for complex product lines
+**Usage**: ONE per workspace (feature model definition)
 
-```sylang
-def featureset <FeatureSetName>
-  def feature <FeatureName> <variability_type>
-    name <string_literal>
-    description <string_literal>
-    owner <string_literal>
-    tags <tag_list>
-    safetylevel <safety_level>
-    
-    def feature <ChildFeature> <variability_type>
-      # Nested feature hierarchy
-```
+#### `.vml` - Variant Modeling  
+**Purpose**: Define product variants and configurations
+**Usage**: ONE per workspace (variant model definition)
 
-**Variability Types:**
-- `mandatory` - Must be included in all variants
-- `optional` - May be included
-- `alternative` - Exactly one from group
-- `or` - One or more from group
+#### `.vcf` - Variant Configuration
+**Purpose**: Configure specific product variants
+**Usage**: ONE per workspace (configuration definition)
 
 ### 🎯 Functional Design Files
 
 #### `.fun` - Function Definitions
 **Purpose**: Define system functions and behaviors
-**Usage**: Multiple files organized by subsystem
+**Usage**: Multiple files allowed (function groups)
 
-```sylang
-def functiongroup <FunctionGroupName>
-  def function <FunctionName>
-    name <string_literal>
-    description <string_literal>
-    owner <string_literal>
-    safetylevel <safety_level>
-    inputs <parameter_list>
-    outputs <parameter_list>
-    preconditions <condition_list>
-    postconditions <condition_list>
-    enables <feature_reference>
-```
+#### `.blk` - Block Architecture
+**Purpose**: Define system, subsystem, and component hierarchies
+**Usage**: Multiple files allowed (architectural blocks)
 
-**Function Properties:**
-- `inputs` - Function input parameters with types
-- `outputs` - Function output parameters with types
-- `preconditions` - Conditions that must be true before execution
-- `postconditions` - Conditions guaranteed after execution
-- `enables` - Features this function enables
-
-### 🛡️ Safety Engineering Files (Ordered by Workflow)
-
-#### `.itm` - Safety Items
-**Purpose**: Define safety-related system elements
-**Usage**: First step in safety analysis
-
-```sylang
-def safetyitems <SafetyItemsName>
-  def safetyitem <ItemName>
-    name <string_literal>
-    description <string_literal>
-    category <item_category>
-    safetylevel <safety_level>
-    functions <function_list>
-    interfaces <interface_list>
-```
-
-#### `.haz` - Hazard Analysis
-**Purpose**: Identify and analyze system hazards
-**Usage**: Second step - identify hazards
-
-```sylang
-def hazards <HazardsName>
-  def hazard <HazardID>
-    name <string_literal>
-    description <string_literal>
-    category <hazard_category>
-    cause <cause_description>
-    effect <effect_description>
-    severity <severity_level>
-    exposure <exposure_level>
-    controllability <controllability_level>
-    functions_affected <function_list>
-```
-
-**Severity Levels (ISO 26262):**
-- `S0` - No injuries
-- `S1` - Light to moderate injuries
-- `S2` - Severe to life-threatening injuries
-- `S3` - Life-threatening to fatal injuries
-
-#### `.rsk` - Risk Assessment
-**Purpose**: Assess and categorize risks
-**Usage**: Third step - quantify risks
-
-```sylang
-def riskassessment <RiskAssessmentName>
-  def risk <RiskID>
-    name <string_literal>
-    description <string_literal>
-    hazard <hazard_reference>
-    severity <severity_level>
-    exposure <exposure_level>
-    controllability <controllability_level>
-    asil <asil_level>
-    risklevel <risk_level>
-```
-
-#### `.sgl` - Safety Goals
-**Purpose**: Define safety objectives
-**Usage**: Fourth step - establish safety goals
-
-```sylang
-def safetygoals <SafetyGoalsName>
-  def safetygoal <GoalID>
-    name <string_literal>
-    description <string_literal>
-    safetylevel <safety_level>
-    allocatedto <component_list>
-    derivedfrom <requirement_list>
-    verifiesby <verification_list>
-```
+### 📝 Requirements & Testing Files
 
 #### `.req` - Requirements
-**Purpose**: Detailed functional and safety requirements
-**Usage**: Fifth step - specify requirements
+**Purpose**: Specify system requirements and constraints
+**Usage**: Multiple files allowed (requirement specifications)
 
-```sylang
-def requirements <RequirementsName>
-  def requirement <RequirementID>
-    name <string_literal>
-    description <string_literal>
-    type <requirement_type>
-    safetylevel <safety_level>
-    rationale <string_literal>
-    specification <string_literal>
-    allocatedto <component_list>
-    satisfies <safety_goal_reference>
-    derivedfrom <parent_requirement>
-    verificationcriteria <criteria_list>
-```
+#### `.tst` - Test Specifications
+**Purpose**: Define test cases and validation procedures
+**Usage**: Multiple files allowed (test suites)
 
-**Requirement Types:**
-- `functional` - Functional requirements
-- `safety` - Safety requirements
-- `performance` - Performance requirements
-- `interface` - Interface requirements
-
-#### `.fta` - Fault Tree Analysis
-**Purpose**: Analyze failure propagation
-**Usage**: Final step - failure analysis
-
-```sylang
-def faulttree <FaultTreeName>
-  name <string_literal>
-  description <string_literal>
-  topevent <event_name>
-  
-  def event <EventName>
-    name <string_literal>
-    description <string_literal>
-    type <event_type>
-    probability <probability_value>
-    gate <gate_type>
-    inputs <event_list>
-```
-
-**Gate Types:**
-- `AND` - All inputs must occur
-- `OR` - Any input can cause event
-- `XOR` - Exactly one input
-- `INHIBIT` - Conditional gate
-
-### 🔧 Implementation Files
-
-#### `.sys` - System Definitions
-**Purpose**: Define system architecture and subsystems
-**Usage**: Multiple files for complex systems
-
-```sylang
-def system <SystemName>
-  name <string_literal>
-  description <string_literal>
-  owner <string_literal>
-  safetylevel <safety_level>
-  
-  def subsystem <SubsystemName>
-    name <string_literal>
-    description <string_literal>
-    owner <string_literal>
-    safetylevel <safety_level>
-    interfaces <interface_list>
-```
-
-#### `.sub` - Subsystem Definitions
-**Purpose**: Detailed subsystem specifications
-**Usage**: One file per major subsystem
-
-```sylang
-def subsystem <SubsystemName>
-  name <string_literal>
-  description <string_literal>
-  owner <string_literal>
-  safetylevel <safety_level>
-  partof <parent_system>
-  
-  def component <ComponentName>
-    name <string_literal>
-    description <string_literal>
-    type <component_type>
-    safetylevel <safety_level>
-```
-
-#### `.blk` - Block Definitions
-**Purpose**: Define reusable system blocks
-**Usage**: Library of reusable components
-
-```sylang
-def block <BlockName>
-  name <string_literal>
-  description <string_literal>
-  type <block_type>
-  
-  def interface <InterfaceName>
-    name <string_literal>
-    type <interface_type>
-    direction <direction_type>
-    protocol <protocol_type>
-```
-
-**Interface Types:**
-- `Digital` - Digital signals
-- `Analog` - Analog signals
-- `Power` - Power interfaces
-- `Mechanical` - Mechanical interfaces
-- `Thermal` - Thermal interfaces
-
-#### `.tst` - Test Cases
-**Purpose**: Define verification and validation tests
-**Usage**: Comprehensive test coverage
-
-```sylang
-def testcases <TestCasesName>
-  def testcase <TestCaseID>
-    name <string_literal>
-    description <string_literal>
-    type <test_type>
-    priority <priority_level>
-    safetylevel <safety_level>
-    
-    def step <StepID>
-      action <string_literal>
-      expected <string_literal>
-      actual <string_literal>
-```
-
-### 🔄 Failure Analysis Files
+### 🔍 Analysis Files
 
 #### `.fma` - Failure Mode Analysis
-**Purpose**: Analyze component failure modes
-**Usage**: FMEA analysis for safety assessment
+**Purpose**: Analyze potential failure modes (FMEA)
+**Usage**: Multiple files allowed (failure analysis)
 
-```sylang
-def failuremodeanalysis <AnalysisName>
-  def failuremode <FailureModeID>
-    name <string_literal>
-    description <string_literal>
-    in function <function_reference>
-    severity <severity_rating>
-    occurrence <occurrence_rating>
-    detection <detection_rating>
-    rpn auto
-    actionpriority <priority_level>
-    safetylevel <safety_level>
-    causes failuremode <cause_list>
-    effects failuremode <effect_list>
-    detection <detection_method_list>
-    mitigation <mitigation_method_list>
-```
+#### `.fmc` - Failure Mode Controls
+**Purpose**: Define controls and mitigations for failure modes
+**Usage**: Multiple files allowed (control measures)
 
-**Rating Scales (1-10):**
-- `severity` - Impact of failure (1=minor, 10=catastrophic)
-- `occurrence` - Likelihood of failure (1=rare, 10=frequent)
-- `detection` - Ability to detect failure (1=excellent, 10=poor)
-- `rpn auto` - Risk Priority Number (automatically calculated)
+#### `.fta` - Fault Tree Analysis
+**Purpose**: Analyze fault propagation and root causes
+**Usage**: Multiple files allowed (fault trees)
 
-#### `.fmc` - Control Measures
-**Purpose**: Define prevention, detection, and mitigation measures
-**Usage**: Controls for identified failure modes
+### 🛡️ Safety Engineering Files
 
-```sylang
-def controlmeasures <ControlMeasuresName>
-  def prevention <MeasureName>
-    name <string_literal>
-    description <string_literal>
-    scope <scope_type>
-    effectiveness <effectiveness_level>
-    cost <cost_level>
-    complexity <complexity_level>
-    frequency <frequency_type>
-    occurrencereduction <percentage>
-    severityreduction <percentage>
-    coverage <coverage_type>
-    independence <independence_level>
-    maturity <maturity_level>
-    implementation <string_literal>
-    verification <string_literal>
-    responsibility <string_literal>
-    asil <safety_level>
-    
-  def detection <MeasureName>
-    name <string_literal>
-    description <string_literal>
-    scope <scope_type>
-    effectiveness <effectiveness_level>
-    detecttime <time_type>
-    detectionrating <rating_1_to_10>
-    diagnosticcoverage <percentage>
-    depends measure <measure_reference>
-    
-  def mitigation <MeasureName>
-    name <string_literal>
-    description <string_literal>
-    scope <scope_type>
-    effectiveness <effectiveness_level>
-    responsetime <time_type>
-    severityreduction <percentage>
-    depends measure <measure_reference>
-```
+#### `.itm` - Items/Operational Scenarios
+**Purpose**: Define operational items and scenarios
+**Usage**: Multiple files allowed (item definitions)
 
-### 🔀 Variability Files
+#### `.haz` - Hazard Analysis
+**Purpose**: Identify and analyze hazards
+**Usage**: Multiple files allowed (hazard identification)
 
-#### `.vml` - Variant Models
-**Purpose**: Define variant configurations
-**Usage**: Product line variant definitions
+#### `.rsk` - Risk Assessment
+**Purpose**: Assess and evaluate risks
+**Usage**: Multiple files allowed (risk assessments)
 
-```sylang
-def variantmodel <VariantModelName>
-  name <string_literal>
-  description <string_literal>
-  basedon <featureset_reference>
-  
-  def feature <FeatureName> <selection_type>
-    name <string_literal>
-    description <string_literal>
-    constraint <constraint_expression>
-```
-
-**Selection Types:**
-- `selected` - Feature is selected in this variant
-- `deselected` - Feature is not selected
-- `mandatory` - Feature must be selected
-- `optional` - Feature may be selected
-
-#### `.vcf` - Variant Configurations
-**Purpose**: Concrete variant configurations
-**Usage**: Specific product configurations
-
-```sylang
-def configset <ConfigSetName>
-  name <string_literal>
-  description <string_literal>
-  basedon <variantmodel_reference>
-  
-  def config <ConfigName>
-    feature <feature_reference>
-    value <config_value>
-    rationale <string_literal>
-```
+#### `.sgl` - Safety Goals
+**Purpose**: Define safety goals and ASIL allocation
+**Usage**: Multiple files allowed (safety goal definitions)
 
 ## 🎯 Real-World Example: Electric Parking Brake System
 
@@ -1043,7 +712,7 @@ code --install-extension balaji-embedcentrum.sylang
 2. **Features** (`.fml`) - Model variability
 3. **Functions** (`.fun`) - Define behaviors
 4. **Safety Analysis** (`.itm` → `.haz` → `.rsk` → `.sgl` → `.req`)
-5. **Implementation** (`.sys`, `.sub`, `.blk`)
+5. **Implementation** (`.blk`)
 6. **Testing** (`.tst`)
 
 ## 🎯 Best Practices
@@ -1066,10 +735,7 @@ automotive-system/
 │   ├── SafetyGoals.sgl
 │   └── Requirements.req
 ├── system-engineering/
-│   ├── SystemArchitecture.sys
 │   ├── Subsystems/
-│   │   ├── ControlSubsystem.sub
-│   │   └── ActuationSubsystem.sub
 │   └── Blocks/
 │       ├── SensorBlocks.blk
 │       └── ActuatorBlocks.blk

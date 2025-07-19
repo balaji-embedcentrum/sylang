@@ -212,7 +212,7 @@ def function TestFunction  // Should show error: incorrect indentation
 
 ## Integration Testing
 1. Test alongside existing `.fml` files for feature cross-references
-2. Test with `.sys` and `.sub` files for complete ecosystem validation
+2. Test with `.blk` files for complete ecosystem validation
 3. Verify no conflicts with other Sylang file types
 4. Test workspace-wide validation
 
