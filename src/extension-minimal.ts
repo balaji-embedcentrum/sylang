@@ -324,10 +324,10 @@ class ModularPropertyManager {
             'sylang-function': {
                 'functiongroup': ['name', 'description', 'owner', 'tags', 'safetylevel'],
                 'function': [
-                    // Simple properties (keyword + direct value)
+                    // Simple properties (keyword + direct value)  
                     'name', 'description', 'category', 'owner', 'tags', 'safetylevel', 'config'
                     // 🔧 ADD NEW SIMPLE FUNCTION PROPERTIES HERE!
-                    // 'complexity', 'performance', 'priority'
+                    // 'version', 'algorithm', 'performance'
                     // NOTE: Don't add compound properties here! Use getCompoundPropertyDefinitions instead.
                 ]
             }
@@ -423,23 +423,16 @@ class ModularPropertyManager {
                     };
                     definitions['partof'] = {
                         primaryKeyword: 'partof',
-                        secondaryKeywords: ['system', 'subsystem', 'component'],
+                        secondaryKeywords: ['system', 'subsystem', 'component', 'subcomponent', 'module', 'unit', 'assembly', 'circuit', 'part'],
                         valueType: 'identifier',
                         syntax: 'partof component <ComponentName>'
                     };
                     definitions['allocatedto'] = {
                         primaryKeyword: 'allocatedto',
-                        secondaryKeywords: ['component', 'module'],
+                        secondaryKeywords: ['system', 'subsystem', 'component', 'subcomponent', 'module', 'unit', 'assembly', 'circuit', 'part'],
                         valueType: 'identifier-list',
                         syntax: 'allocatedto component <ComponentList>'
                     };
-                    // 🔧 ADD NEW COMPOUND FUNCTION PROPERTIES HERE!
-                    // definitions['calls'] = {
-                    //     primaryKeyword: 'calls',
-                    //     secondaryKeywords: ['function', 'service'],
-                    //     valueType: 'identifier-list',
-                    //     syntax: 'calls function <FunctionList>'
-                    // };
                 }
                 break;
         }
@@ -578,9 +571,23 @@ class ModularPropertyValidator {
         const importType = importMatch[1];
         const importName = importMatch[2];
         
-        // 🎯 UNRESTRICTED: Allow any import type except in .ple files
-        // No validation of importType - any definition type can be imported
+        // 🎯 UNRESTRICTED TYPE: Allow any import type (block, function, etc.)
         console.log(`✅ ${EXTENSION_NAME} v${EXTENSION_VERSION}: Accepting import: use ${importType} ${importName}`);
+        
+        // 🔍 VALIDATE SYMBOL EXISTS: Check if the imported symbol actually exists
+        const symbol = this.symbolResolver.getSymbol(importName);
+        if (!symbol) {
+            const symbolStart = fullLine.indexOf(importName);
+            const range = new vscode.Range(
+                lineIndex, symbolStart, lineIndex, symbolStart + importName.length
+            );
+            
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `🎯 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Symbol "${importName}" not found. Check if the ${importType} is defined and exported.`,
+                vscode.DiagnosticSeverity.Error
+            ));
+        }
     }
 
     private validateCompoundProperty(

@@ -91,7 +91,7 @@ export class ConfigurationManager implements IConfigurationManager {
                     };
                     definitions['allocatedto'] = {
                         primaryKeyword: 'allocatedto',
-                        secondaryKeywords: ['component', 'subsystem'],
+                        secondaryKeywords: ['system', 'subsystem', 'component', 'subcomponent', 'module', 'unit', 'assembly', 'circuit', 'part'],
                         valueType: 'identifier-list', 
                         syntax: 'allocatedto component <ComponentList>'
                     };
