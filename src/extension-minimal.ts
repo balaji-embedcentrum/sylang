@@ -692,55 +692,56 @@ class ConfigDecorationProvider {
         const text = document.getText();
         const lines = text.split('\n');
         
-        let inFunction = false;
-        let functionStartLine = -1;
-        let currentFunctionConfig: string | undefined;
-
+        // Parse functions and their configs
+        const functions: Array<{name: string, startLine: number, endLine: number, configKey?: string}> = [];
+        
         for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
             const line = lines[lineIndex];
             const trimmedLine = line.trim();
             
-            // Check for function definition start
+            // Found function definition
             const functionMatch = trimmedLine.match(/def\s+function\s+(\w+)/);
             if (functionMatch) {
-                inFunction = true;
-                functionStartLine = lineIndex;
-                currentFunctionConfig = undefined;
-                continue;
-            }
-            
-            // Check for config line within function
-            if (inFunction && trimmedLine.match(/config\s+(\w+)/)) {
-                const configMatch = trimmedLine.match(/config\s+(\w+)/);
-                if (configMatch) {
-                    currentFunctionConfig = configMatch[1];
-                }
-                continue;
-            }
-            
-            // Check for end of function (next def or end of file)
-            if (inFunction && (trimmedLine.startsWith('def ') || lineIndex === lines.length - 1)) {
-                // Gray out the entire function if config = 0
-                if (currentFunctionConfig && !configManager.isSymbolVisible(currentFunctionConfig)) {
-                    const endLine = trimmedLine.startsWith('def ') ? lineIndex - 1 : lineIndex;
-                    for (let i = functionStartLine; i <= endLine; i++) {
-                        grayRanges.push(new vscode.Range(i, 0, i, lines[i].length));
+                const functionName = functionMatch[1];
+                const startLine = lineIndex;
+                
+                // Find the end of this function (next 'def' or end of file)
+                let endLine = lines.length - 1;
+                for (let j = lineIndex + 1; j < lines.length; j++) {
+                    if (lines[j].trim().startsWith('def ')) {
+                        endLine = j - 1;
+                        break;
                     }
-                    console.log(`👁️ Graying out function lines ${functionStartLine}-${endLine} (config: ${currentFunctionConfig})`);
                 }
                 
-                // Reset for next function
-                if (trimmedLine.startsWith('def ')) {
-                    const newFunctionMatch = trimmedLine.match(/def\s+function\s+(\w+)/);
-                    if (newFunctionMatch) {
-                        inFunction = true;
-                        functionStartLine = lineIndex;
-                        currentFunctionConfig = undefined;
-                    } else {
-                        inFunction = false;
+                // Look for config within this function
+                let configKey: string | undefined;
+                for (let j = startLine; j <= endLine; j++) {
+                    const configMatch = lines[j].trim().match(/config\s+(\w+)/);
+                    if (configMatch) {
+                        configKey = configMatch[1];
+                        break;
                     }
-                } else {
-                    inFunction = false;
+                }
+                
+                functions.push({
+                    name: functionName,
+                    startLine,
+                    endLine,
+                    configKey
+                });
+                
+                console.log(`🔍 Function v${EXTENSION_VERSION}: ${functionName} (lines ${startLine}-${endLine}, config: ${configKey})`);
+            }
+        }
+        
+        // Apply graying to functions with disabled configs
+        for (const func of functions) {
+            if (func.configKey && !configManager.isSymbolVisible(func.configKey)) {
+                console.log(`👁️ Graying out function ${func.name} lines ${func.startLine}-${func.endLine} (config: ${func.configKey})`);
+                
+                for (let i = func.startLine; i <= func.endLine; i++) {
+                    grayRanges.push(new vscode.Range(i, 0, i, lines[i].length));
                 }
             }
         }
