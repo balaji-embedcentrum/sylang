@@ -78,9 +78,13 @@ class ModularPropertyManager {
                     };
                     definitions['allocatedto'] = {
                         primaryKeyword: 'allocatedto',
-                        secondaryKeywords: ['component', 'subsystem'],
+                        secondaryKeywords: [
+                            'system', 'subsystem', 'component', 'subcomponent', 
+                            'module', 'submodule', 'unit', 'subunit', 
+                            'assembly', 'subassembly', 'circuit', 'part'
+                        ],
                         valueType: 'identifier-list',
-                        syntax: 'allocatedto component <ComponentList>'
+                        syntax: 'allocatedto component <ComponentList> | allocatedto subsystem <SubsystemList> | etc.'
                     };
                     // 🔧 ADD NEW COMPOUND REQUIREMENT PROPERTIES HERE!
                     // definitions['traces'] = {
@@ -108,15 +112,23 @@ class ModularPropertyManager {
                     };
                     definitions['contains'] = {
                         primaryKeyword: 'contains',
-                        secondaryKeywords: ['subsystem', 'component', 'module'],
+                        secondaryKeywords: [
+                            'system', 'subsystem', 'component', 'subcomponent', 
+                            'module', 'submodule', 'unit', 'subunit', 
+                            'assembly', 'subassembly', 'circuit', 'part'
+                        ],
                         valueType: 'identifier-list',
-                        syntax: 'contains subsystem <SubsystemList>'
+                        syntax: 'contains subsystem <SubsystemList> | contains component <ComponentList> | etc.'
                     };
                     definitions['partof'] = {
                         primaryKeyword: 'partof',
-                        secondaryKeywords: ['system', 'subsystem'],
+                        secondaryKeywords: [
+                            'system', 'subsystem', 'component', 'subcomponent', 
+                            'module', 'submodule', 'unit', 'subunit', 
+                            'assembly', 'subassembly', 'circuit', 'part'
+                        ],
                         valueType: 'identifier',
-                        syntax: 'partof system <SystemName>'
+                        syntax: 'partof system <SystemName> | partof subsystem <SubsystemName> | etc.'
                     };
                     // 🔧 ADD NEW COMPOUND BLOCK PROPERTIES HERE!
                     // definitions['connects'] = {
@@ -144,9 +156,13 @@ class ModularPropertyManager {
                     };
                     definitions['allocatedto'] = {
                         primaryKeyword: 'allocatedto',
-                        secondaryKeywords: ['component', 'module'],
+                        secondaryKeywords: [
+                            'system', 'subsystem', 'component', 'subcomponent', 
+                            'module', 'submodule', 'unit', 'subunit', 
+                            'assembly', 'subassembly', 'circuit', 'part'
+                        ],
                         valueType: 'identifier-list',
-                        syntax: 'allocatedto component <ComponentList>'
+                        syntax: 'allocatedto component <ComponentList> | allocatedto module <ModuleList> | etc.'
                     };
                     // 🔧 ADD NEW COMPOUND FUNCTION PROPERTIES HERE!
                     // definitions['calls'] = {
