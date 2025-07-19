@@ -181,7 +181,7 @@ class SymbolResolver {
 
     private async loadImportedSymbols(documentDir: string, importType: string, importName: string): Promise<void> {
         try {
-            // Find the file based on import type
+            // Find the file extension based on import type
             const extension = this.getExtensionForImportType(importType);
             
             // 🎯 FIND PROJECT ROOT BY LOOKING FOR .sylangrules FILE!
@@ -192,23 +192,22 @@ class SymbolResolver {
             }
             
             console.log(`🔍 v${EXTENSION_VERSION}: Project root found at: ${projectRoot}`);
-            console.log(`🔍 Searching for ${importName}${extension} in ALL subdirectories...`);
+            console.log(`🔍 Searching for symbol '${importName}' in ALL ${extension} files...`);
             
-            // Search ALL subdirectories in the project root recursively
-            const searchPattern = `**/${importName}${extension}`;
+            // 🎯 SEARCH ALL FILES WITH THE RIGHT EXTENSION, NOT BY NAME!
+            const searchPattern = `**/*${extension}`;
             const files = await vscode.workspace.findFiles(
                 new vscode.RelativePattern(projectRoot, searchPattern), 
                 '**/node_modules/**'
             );
             
-            console.log(`🔍 Found ${files.length} files matching pattern: ${searchPattern}`);
+            console.log(`🔍 Found ${files.length} ${extension} files to search through`);
             
             for (const file of files) {
                 const filePath = file.fsPath;
-                console.log(`📦 Checking file: ${filePath}`);
+                console.log(`📦 Checking ${extension} file: ${filePath}`);
                 
                 if (fs.existsSync(filePath)) {
-                    console.log(`📦 Loading v${EXTENSION_VERSION}: ${filePath}`);
                     const content = fs.readFileSync(filePath, 'utf8');
                     const symbols = this.parseSymbolsFromContent(content, filePath);
                     
@@ -221,7 +220,7 @@ class SymbolResolver {
                         });
                         return; // Found it!
                     } else {
-                        console.log(`❌ Symbol '${importName}' not found in ${filePath}, has: ${Array.from(symbols.keys()).join(', ')}`);
+                        console.log(`📄 File ${filePath} has symbols: ${Array.from(symbols.keys()).join(', ')}`);
                     }
                 }
             }
@@ -893,7 +892,9 @@ class ConfigDecorationProvider {
 // =============================================================================
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log(`🚀 ${EXTENSION_NAME} v${EXTENSION_VERSION} ACTIVATED! Config graying, import validation, cross-file validation included.`);
+    console.log('🚀🚀🚀 SYLANG EXTENSION STARTING v' + EXTENSION_VERSION + ' 🚀🚀🚀');
+    console.log('🔥 Extension activated at:', new Date().toISOString());
+    console.log('🔥 Workspace folders:', vscode.workspace.workspaceFolders?.map(f => f.uri.fsPath));
     
     const propertyManager = new ModularPropertyManager();
     const configManager = new ConfigStateManager();
@@ -903,6 +904,9 @@ export function activate(context: vscode.ExtensionContext) {
     const diagnosticCollection = vscode.languages.createDiagnosticCollection(EXTENSION_ID);
     
     const validateDocument = async (document: vscode.TextDocument) => {
+        console.log('🔍🔍🔍 VALIDATING DOCUMENT v' + EXTENSION_VERSION + ': ' + document.uri.fsPath);
+        console.log('🔍 File extension:', path.extname(document.uri.fsPath));
+        
         if (isSylangDocument(document)) {
             console.log(`🔍 ${EXTENSION_NAME} v${EXTENSION_VERSION}: Validating ${document.fileName}`);
             const diagnostics = await validator.validateDocument(document);
