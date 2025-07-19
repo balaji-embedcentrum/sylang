@@ -183,28 +183,69 @@ class SymbolResolver {
         try {
             // Find the file based on import type
             const extension = this.getExtensionForImportType(importType);
-            const possiblePaths = [
-                path.join(documentDir, `${importName}${extension}`),
-                path.join(documentDir, '..', 'platform-engineering', `${importName}${extension}`),
-                path.join(documentDir, '..', 'system-engineering', `${importName}${extension}`)
-            ];
-
-            for (const filePath of possiblePaths) {
+            
+            // 🎯 FIND PROJECT ROOT BY LOOKING FOR .sylangrules FILE!
+            const projectRoot = this.findProjectRoot(documentDir);
+            if (!projectRoot) {
+                console.warn(`⚠️ Could not find .sylangrules file in parent directories of ${documentDir}`);
+                return;
+            }
+            
+            console.log(`🔍 v${EXTENSION_VERSION}: Project root found at: ${projectRoot}`);
+            console.log(`🔍 Searching for ${importName}${extension} in ALL subdirectories...`);
+            
+            // Search ALL subdirectories in the project root recursively
+            const searchPattern = `**/${importName}${extension}`;
+            const files = await vscode.workspace.findFiles(
+                new vscode.RelativePattern(projectRoot, searchPattern), 
+                '**/node_modules/**'
+            );
+            
+            console.log(`🔍 Found ${files.length} files matching pattern: ${searchPattern}`);
+            
+            for (const file of files) {
+                const filePath = file.fsPath;
+                console.log(`📦 Checking file: ${filePath}`);
+                
                 if (fs.existsSync(filePath)) {
                     console.log(`📦 Loading v${EXTENSION_VERSION}: ${filePath}`);
                     const content = fs.readFileSync(filePath, 'utf8');
                     const symbols = this.parseSymbolsFromContent(content, filePath);
                     
-                    this.imports.set(importName, {
-                        uri: filePath,
-                        symbols: symbols
-                    });
-                    break;
+                    // Check if the symbol we're looking for actually exists in this file
+                    if (symbols.has(importName)) {
+                        console.log(`✅ Found symbol '${importName}' in ${filePath}`);
+                        this.imports.set(importName, {
+                            uri: filePath,
+                            symbols: symbols
+                        });
+                        return; // Found it!
+                    } else {
+                        console.log(`❌ Symbol '${importName}' not found in ${filePath}, has: ${Array.from(symbols.keys()).join(', ')}`);
+                    }
                 }
             }
+            
+            console.warn(`⚠️ Symbol '${importName}' not found in any ${extension} files in project root ${projectRoot}`);
         } catch (error) {
             console.warn(`⚠️ Failed to load import ${importName}:`, error);
         }
+    }
+
+    private findProjectRoot(startDir: string): string | null {
+        let currentDir = startDir;
+        
+        // Walk up the directory tree looking for .sylangrules file
+        while (currentDir !== path.dirname(currentDir)) { // Stop at filesystem root
+            const sylangRulesPath = path.join(currentDir, '.sylangrules');
+            if (fs.existsSync(sylangRulesPath)) {
+                console.log(`📋 Found .sylangrules at: ${sylangRulesPath}`);
+                return currentDir;
+            }
+            currentDir = path.dirname(currentDir);
+        }
+        
+        return null; // No .sylangrules found
     }
 
     private getExtensionForImportType(importType: string): string {
