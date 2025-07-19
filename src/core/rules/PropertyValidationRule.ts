@@ -7,6 +7,14 @@ import {
 } from '../interfaces/IValidationPipeline';
 import { IConfigurationManager } from '../interfaces/IConfigurationManager';
 
+// Local definition to avoid complex imports
+interface CompoundPropertyDef {
+    primaryKeyword: string;
+    secondaryKeywords: string[];
+    valueType: 'identifier' | 'identifier-list' | 'enum' | 'string';
+    syntax: string;
+}
+
 /**
  * Context-aware property validation rule
  * Uses ConfigurationManager.getValidPropertiesForContext() for modular validation
@@ -87,6 +95,22 @@ export class PropertyValidationRule implements IValidationRule {
                             vscode.DiagnosticSeverity.Error
                         ));
                     }
+                } else if (validProperties.includes(keyword)) {
+                    // Validate compound properties (with secondary keywords)
+                    const compoundDefs = this.configurationManager
+                        .getCompoundPropertyDefinitions(languageId, currentContext);
+                    
+                    if (compoundDefs[keyword]) {
+                        this.validateCompoundProperty(
+                            diagnostics, lineIndex, trimmedLine, 
+                            compoundDefs[keyword], line
+                        );
+                    } else {
+                        // Validate simple properties (name, description, etc.)
+                        this.validateSimpleProperty(
+                            diagnostics, lineIndex, trimmedLine, keyword
+                        );
+                    }
                 }
             }
         }
@@ -156,5 +180,136 @@ export class PropertyValidationRule implements IValidationRule {
         
         const containers = containerKeywords[languageId] || [];
         return containers.includes(keyword);
+    }
+
+    private validateCompoundProperty(
+        diagnostics: vscode.Diagnostic[], 
+        lineIndex: number, 
+        line: string, 
+        definition: CompoundPropertyDef, // CompoundPropertyDef type
+        fullLine: string
+    ): void {
+        const parts = line.trim().split(/\s+/);
+        
+        // Check minimum parts: primaryKeyword + secondaryKeyword + value
+        if (parts.length < 3) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `Invalid ${definition.primaryKeyword} syntax. Expected: ${definition.syntax}`,
+                vscode.DiagnosticSeverity.Error
+            ));
+            return;
+        }
+        
+        const primaryKeyword = parts[0];
+        const secondaryKeyword = parts[1];
+        const valueText = parts.slice(2).join(' ');
+        
+        // Validate secondary keyword
+        if (!definition.secondaryKeywords.includes(secondaryKeyword)) {
+            const secondaryStart = fullLine.indexOf(secondaryKeyword);
+            const range = new vscode.Range(
+                lineIndex, 
+                secondaryStart, 
+                lineIndex, 
+                secondaryStart + secondaryKeyword.length
+            );
+            
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `Invalid secondary keyword "${secondaryKeyword}" for ${primaryKeyword}. Valid: ${definition.secondaryKeywords.join(', ')}`,
+                vscode.DiagnosticSeverity.Error
+            ));
+            return;
+        }
+        
+        // Validate value based on type
+        this.validatePropertyValue(
+            diagnostics, lineIndex, valueText, 
+            definition.valueType, definition.syntax, fullLine
+        );
+    }
+
+    private validateSimpleProperty(
+        diagnostics: vscode.Diagnostic[], 
+        lineIndex: number, 
+        line: string, 
+        keyword: string
+    ): void {
+        // Basic validation for simple properties like "name", "description"
+        const parts = line.trim().split(/\s+/, 2);
+        
+        if (parts.length < 2) {
+            const range = new vscode.Range(lineIndex, 0, lineIndex, line.length);
+            diagnostics.push(new vscode.Diagnostic(
+                range,
+                `Property "${keyword}" requires a value`,
+                vscode.DiagnosticSeverity.Error
+            ));
+        }
+        
+        // Additional validation based on keyword type could be added here
+        // e.g., name/description should be quoted strings, safetylevel should be enum
+    }
+
+    private validatePropertyValue(
+        diagnostics: vscode.Diagnostic[], 
+        lineIndex: number, 
+        valueText: string, 
+        valueType: string,
+        syntaxExample: string,
+        fullLine: string
+    ): void {
+        switch (valueType) {
+            case 'identifier':
+                if (!/^[A-Z][A-Za-z0-9_]*$/.test(valueText.trim())) {
+                    const valueStart = fullLine.indexOf(valueText);
+                    const range = new vscode.Range(
+                        lineIndex, valueStart, lineIndex, valueStart + valueText.length
+                    );
+                    diagnostics.push(new vscode.Diagnostic(
+                        range,
+                        `Invalid identifier "${valueText}". Should use PascalCase`,
+                        vscode.DiagnosticSeverity.Error
+                    ));
+                }
+                break;
+                
+            case 'identifier-list':
+                const identifiers = valueText.split(',').map(id => id.trim());
+                for (const identifier of identifiers) {
+                    if (!/^[A-Z][A-Za-z0-9_]*$/.test(identifier)) {
+                        const idStart = fullLine.indexOf(identifier);
+                        const range = new vscode.Range(
+                            lineIndex, idStart, lineIndex, idStart + identifier.length
+                        );
+                        diagnostics.push(new vscode.Diagnostic(
+                            range,
+                            `Invalid identifier "${identifier}" in list. Should use PascalCase`,
+                            vscode.DiagnosticSeverity.Error
+                        ));
+                    }
+                }
+                break;
+                
+            case 'string':
+                if (!valueText.match(/^".*"$/)) {
+                    const valueStart = fullLine.indexOf(valueText);
+                    const range = new vscode.Range(
+                        lineIndex, valueStart, lineIndex, valueStart + valueText.length
+                    );
+                    diagnostics.push(new vscode.Diagnostic(
+                        range,
+                        `String value must be quoted: "${valueText}"`,
+                        vscode.DiagnosticSeverity.Error
+                    ));
+                }
+                break;
+                
+            case 'enum':
+                // Could add enum validation here if needed
+                break;
+        }
     }
 } 

@@ -1,25 +1,8 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-import {
+import { 
     IConfigurationManager,
     ILanguageConfiguration,
-    IPluginConfiguration,
-    IGlobalConfiguration,
-    IConfigValidationResult,
-    IConfigurationChangeEvent,
-    ILanguageConfigChangeEvent,
-    IWorkspaceConfiguration,
-    ICacheSettings,
-    IPerformanceSettings,
-    IDebugSettings,
-    IExperimentalFeatures,
-    IValidationRuleConfig,
-    IParsingOptions,
-    ICompletionOptions,
-    ISnippetOptions,
-    ISyntaxHighlightingConfig,
-    IProjectSettings
+    IGlobalConfiguration
 } from '../interfaces';
 
 // =============================================================================
@@ -367,15 +350,25 @@ export class ConfigurationManager implements IConfigurationManager {
         const contextSpecificProperties: Record<string, Record<string, string[]>> = {
             'sylang-requirement': {
                 'reqsection': ['name', 'description'],
-                'requirement': ['name', 'description', 'type', 'source', 'derivedfrom', 'rationale', 'allocatedto', 'verificationcriteria', 'status', 'implements']
+                'requirement': [
+                    'name', 'description', 'type', 'source', 'derivedfrom', 
+                    'safetylevel', 'rationale', 'allocatedto', 'verificationcriteria', 
+                    'status', 'implements'
+                ]
             },
             'sylang-block': {
-                'block': ['name', 'description', 'owner', 'tags', 'safetylevel', 'config', 'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'],
+                'block': [
+                    'name', 'description', 'owner', 'tags', 'safetylevel', 'config', 
+                    'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'
+                ],
                 'port': ['name', 'description', 'type', 'owner', 'tags', 'safetylevel', 'config']
             },
             'sylang-function': {
                 'functiongroup': ['name', 'description', 'owner', 'tags', 'safetylevel'],
-                'function': ['name', 'description', 'category', 'owner', 'tags', 'safetylevel', 'enables', 'partof', 'allocatedto', 'config']
+                'function': [
+                    'name', 'description', 'category', 'owner', 'tags', 'safetylevel', 
+                    'enables', 'partof', 'allocatedto', 'config'
+                ]
             }
             // Add more as needed...
         };
@@ -386,6 +379,79 @@ export class ConfigurationManager implements IConfigurationManager {
         }
         
         return baseProperties; // Fallback to base properties
+    }
+
+    // NEW: Get compound property definitions with secondary keywords
+    getCompoundPropertyDefinitions(languageId: string, context: string): Record<string, CompoundPropertyDef> {
+        const definitions: Record<string, CompoundPropertyDef> = {};
+        
+        // Define compound properties by context
+        switch (languageId) {
+            case 'sylang-requirement':
+                if (context === 'requirement') {
+                    definitions['implements'] = {
+                        primaryKeyword: 'implements',
+                        secondaryKeywords: ['function'],
+                        valueType: 'identifier-list',
+                        syntax: 'implements function <FunctionList>'
+                    };
+                    definitions['allocatedto'] = {
+                        primaryKeyword: 'allocatedto',
+                        secondaryKeywords: ['component', 'subsystem'],
+                        valueType: 'identifier-list', 
+                        syntax: 'allocatedto component <ComponentList>'
+                    };
+                }
+                break;
+                
+            case 'sylang-block':
+                if (context === 'block') {
+                    definitions['implements'] = {
+                        primaryKeyword: 'implements',
+                        secondaryKeywords: ['function'],
+                        valueType: 'identifier-list',
+                        syntax: 'implements function <FunctionList>'
+                    };
+                    definitions['enables'] = {
+                        primaryKeyword: 'enables',
+                        secondaryKeywords: ['feature'],
+                        valueType: 'identifier-list',
+                        syntax: 'enables feature <FeatureList>'
+                    };
+                    definitions['contains'] = {
+                        primaryKeyword: 'contains',
+                        secondaryKeywords: ['subsystem', 'component', 'module'],
+                        valueType: 'identifier-list',
+                        syntax: 'contains subsystem <SubsystemList>'
+                    };
+                    definitions['partof'] = {
+                        primaryKeyword: 'partof',
+                        secondaryKeywords: ['system', 'subsystem'],
+                        valueType: 'identifier',
+                        syntax: 'partof system <SystemName>'
+                    };
+                }
+                break;
+                
+            case 'sylang-function':
+                if (context === 'function') {
+                    definitions['enables'] = {
+                        primaryKeyword: 'enables',
+                        secondaryKeywords: ['feature'],
+                        valueType: 'identifier-list',
+                        syntax: 'enables feature <FeatureList>'
+                    };
+                    definitions['partof'] = {
+                        primaryKeyword: 'partof',
+                        secondaryKeywords: ['system', 'subsystem', 'component'],
+                        valueType: 'identifier',
+                        syntax: 'partof component <ComponentName>'
+                    };
+                }
+                break;
+        }
+        
+        return definitions;
     }
 
     // =============================================================================

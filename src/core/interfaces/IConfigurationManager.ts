@@ -34,6 +34,9 @@ export interface IConfigurationManager {
     // NEW: Modular property validation
     getValidPropertiesForContext(languageId: string, context: string): string[];
     
+    // NEW: Compound property definitions
+    getCompoundPropertyDefinitions(languageId: string, context: string): Record<string, CompoundPropertyDef>;
+    
     // Event handling
     onConfigurationChanged(listener: (event: IConfigurationChangeEvent) => void): vscode.Disposable;
     onLanguageConfigurationChanged(listener: (event: ILanguageConfigChangeEvent) => void): vscode.Disposable;
@@ -298,4 +301,14 @@ export interface IProjectSettings {
     readonly customKeywords: string[];         // Custom keywords
     readonly customEnums: Record<string, string[]>; // Custom enums
     readonly validationProfile: string;        // Validation profile
+}
+
+/**
+ * Compound property definition for properties with secondary keywords
+ */
+export interface CompoundPropertyDef {
+    readonly primaryKeyword: string;          // Primary keyword (e.g., 'implements')
+    readonly secondaryKeywords: string[];     // Valid secondary keywords (e.g., ['function'])
+    readonly valueType: 'identifier' | 'identifier-list' | 'enum' | 'string';
+    readonly syntax: string;                  // Example syntax for error messages
 } 
