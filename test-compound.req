@@ -1,0 +1,20 @@
+// Test file to demonstrate SIMPLE vs COMPOUND properties
+
+def requirement TestSimpleProperties
+    name "Simple Property Test"
+    description "This requirement tests simple properties"
+    type "functional"
+    safetylevel "ASIL-D"
+    status "draft"
+    
+def requirement TestCompoundProperties  
+    name "Compound Property Test"
+    description "This requirement tests compound properties"
+    implements function PowerControl, BrakeControl
+    allocatedto component ECU1, ECU2
+    
+def requirement TestInvalidProperties
+    name "Invalid Property Test"  
+    badproperty "This should show error"
+    implements "This should show compound error - missing secondary keyword"
+    implements wrongsecondary SomeFunction 

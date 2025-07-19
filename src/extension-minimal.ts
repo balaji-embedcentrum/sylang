@@ -10,41 +10,45 @@ import * as vscode from 'vscode';
 
 class ModularPropertyManager {
     /**
-     * 🎯 THIS IS WHERE YOU EXTEND KEYWORDS IN THE NEW SYSTEM!
+     * 🎯 THIS IS WHERE YOU EXTEND SIMPLE (FLAT) KEYWORDS!
+     * These are properties that take direct values: name "MyName", description "My description"
      */
     getValidPropertiesForContext(languageId: string, context: string): string[] {
         const contextSpecificProperties: Record<string, Record<string, string[]>> = {
             'sylang-requirement': {
                 'reqsection': ['name', 'description'],
                 'requirement': [
+                    // Simple properties (keyword + direct value)
                     'name', 'description', 'type', 'source', 'derivedfrom', 
-                    'safetylevel', 'rationale', 'allocatedto', 'verificationcriteria', 
-                    'status', 'implements'
-                    // 🔧 ADD NEW REQUIREMENT PROPERTIES HERE!
-                    // 'traces', 'version', 'your_new_property'
+                    'safetylevel', 'rationale', 'verificationcriteria', 'status'
+                    // 🔧 ADD NEW SIMPLE REQUIREMENT PROPERTIES HERE!
+                    // 'priority', 'version', 'category'
+                    // NOTE: Don't add compound properties here! Use getCompoundPropertyDefinitions instead.
                 ]
             },
             'sylang-block': {
                 'block': [
-                    'name', 'description', 'owner', 'tags', 'safetylevel', 'config', 
-                    'contains', 'partof', 'enables', 'implements', 'interfaces', 'port'
-                    // 🔧 ADD NEW BLOCK PROPERTIES HERE!
-                    // 'version', 'manufacturer', 'your_new_property'
+                    // Simple properties (keyword + direct value)  
+                    'name', 'description', 'owner', 'tags', 'safetylevel', 'config'
+                    // 🔧 ADD NEW SIMPLE BLOCK PROPERTIES HERE!
+                    // 'version', 'manufacturer', 'location'
+                    // NOTE: Don't add compound properties here! Use getCompoundPropertyDefinitions instead.
                 ],
                 'port': ['name', 'description', 'type', 'owner', 'tags', 'safetylevel', 'config']
             },
             'sylang-function': {
                 'functiongroup': ['name', 'description', 'owner', 'tags', 'safetylevel'],
                 'function': [
-                    'name', 'description', 'category', 'owner', 'tags', 'safetylevel', 
-                    'enables', 'partof', 'allocatedto', 'config'
-                    // 🔧 ADD NEW FUNCTION PROPERTIES HERE!
-                    // 'complexity', 'performance', 'your_new_property'
+                    // Simple properties (keyword + direct value)
+                    'name', 'description', 'category', 'owner', 'tags', 'safetylevel', 'config'
+                    // 🔧 ADD NEW SIMPLE FUNCTION PROPERTIES HERE!
+                    // 'complexity', 'performance', 'priority'
+                    // NOTE: Don't add compound properties here! Use getCompoundPropertyDefinitions instead.
                 ]
             }
             // 🔧 ADD NEW LANGUAGE CONTEXTS HERE!
             // 'sylang-newsystem': {
-            //     'newcontext': ['name', 'description', 'your_properties']
+            //     'newcontext': ['name', 'description', 'your_simple_properties']
             // }
         };
         
@@ -58,6 +62,7 @@ class ModularPropertyManager {
 
     /**
      * 🎯 THIS IS WHERE YOU DEFINE COMPOUND PROPERTIES WITH SECONDARY KEYWORDS!
+     * These are properties that require secondary keywords: implements function, enables feature, etc.
      */
     getCompoundPropertyDefinitions(languageId: string, context: string): Record<string, CompoundPropertyDef> {
         const definitions: Record<string, CompoundPropertyDef> = {};
@@ -77,7 +82,7 @@ class ModularPropertyManager {
                         valueType: 'identifier-list',
                         syntax: 'allocatedto component <ComponentList>'
                     };
-                    // 🔧 ADD NEW COMPOUND PROPERTIES HERE!
+                    // 🔧 ADD NEW COMPOUND REQUIREMENT PROPERTIES HERE!
                     // definitions['traces'] = {
                     //     primaryKeyword: 'traces',
                     //     secondaryKeywords: ['requirement', 'goal'],
@@ -113,7 +118,43 @@ class ModularPropertyManager {
                         valueType: 'identifier',
                         syntax: 'partof system <SystemName>'
                     };
-                    // 🔧 ADD NEW BLOCK COMPOUND PROPERTIES HERE!
+                    // 🔧 ADD NEW COMPOUND BLOCK PROPERTIES HERE!
+                    // definitions['connects'] = {
+                    //     primaryKeyword: 'connects',
+                    //     secondaryKeywords: ['port', 'interface'],
+                    //     valueType: 'identifier-list',
+                    //     syntax: 'connects port <PortList>'
+                    // };
+                }
+                break;
+                
+            case 'sylang-function':
+                if (context === 'function') {
+                    definitions['enables'] = {
+                        primaryKeyword: 'enables',
+                        secondaryKeywords: ['feature'],
+                        valueType: 'identifier-list',
+                        syntax: 'enables feature <FeatureList>'
+                    };
+                    definitions['partof'] = {
+                        primaryKeyword: 'partof',
+                        secondaryKeywords: ['system', 'subsystem', 'component'],
+                        valueType: 'identifier',
+                        syntax: 'partof component <ComponentName>'
+                    };
+                    definitions['allocatedto'] = {
+                        primaryKeyword: 'allocatedto',
+                        secondaryKeywords: ['component', 'module'],
+                        valueType: 'identifier-list',
+                        syntax: 'allocatedto component <ComponentList>'
+                    };
+                    // 🔧 ADD NEW COMPOUND FUNCTION PROPERTIES HERE!
+                    // definitions['calls'] = {
+                    //     primaryKeyword: 'calls',
+                    //     secondaryKeywords: ['function', 'service'],
+                    //     valueType: 'identifier-list',
+                    //     syntax: 'calls function <FunctionList>'
+                    // };
                 }
                 break;
         }
@@ -163,9 +204,23 @@ class ModularPropertyValidator {
             // Validate properties in current context
             const keyword = trimmedLine.split(' ')[0];
             if (keyword && currentContext) {
-                const validProperties = this.propertyManager.getValidPropertiesForContext(languageId, currentContext);
+                const validSimpleProperties = this.propertyManager.getValidPropertiesForContext(languageId, currentContext);
+                const compoundDefs = this.propertyManager.getCompoundPropertyDefinitions(languageId, currentContext);
                 
-                if (validProperties.length > 0 && !validProperties.includes(keyword)) {
+                // Check if this is a compound property
+                if (compoundDefs[keyword]) {
+                    // Validate compound property syntax
+                    this.validateCompoundProperty(diagnostics, lineIndex, trimmedLine, compoundDefs[keyword], line);
+                } else if (validSimpleProperties.includes(keyword)) {
+                    // Valid simple property - could add value validation here
+                    // For now, just accept it as valid
+                } else {
+                    // Invalid property - show both simple and compound options
+                    const allValidKeywords = [
+                        ...validSimpleProperties,
+                        ...Object.keys(compoundDefs)
+                    ].sort();
+                    
                     const range = new vscode.Range(
                         lineIndex, 
                         line.indexOf(keyword), 
@@ -173,17 +228,17 @@ class ModularPropertyValidator {
                         line.indexOf(keyword) + keyword.length
                     );
                     
+                    const compoundSyntaxHints = Object.values(compoundDefs)
+                        .map(def => def.syntax)
+                        .join(', ');
+                    
                     diagnostics.push(new vscode.Diagnostic(
                         range,
-                        `🎯 NEW MODULAR SYSTEM: Invalid keyword "${keyword}" in ${currentContext}. Valid: ${validProperties.join(', ')}`,
+                        `🎯 NEW MODULAR SYSTEM: Invalid keyword "${keyword}" in ${currentContext}.\n` +
+                        `Simple properties: ${validSimpleProperties.join(', ')}\n` +
+                        `Compound properties: ${compoundSyntaxHints}`,
                         vscode.DiagnosticSeverity.Error
                     ));
-                } else if (validProperties.includes(keyword)) {
-                    // Validate compound properties
-                    const compoundDefs = this.propertyManager.getCompoundPropertyDefinitions(languageId, currentContext);
-                    if (compoundDefs[keyword]) {
-                        this.validateCompoundProperty(diagnostics, lineIndex, trimmedLine, compoundDefs[keyword], line);
-                    }
                 }
             }
         }
