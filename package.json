@@ -48,9 +48,9 @@
     "theme": "dark"
   },
   "icon": "icon.png",
-  "main": "./out/extension.js",
-  "_main_comment": "Current: Backup system (./out/extension.js) | New: Modular system (./out/src/extension.js)",
-  "_switching_instructions": "To switch: Change main to './out/src/extension.js' and recompile",
+  "main": "./out/extension-minimal.js",
+  "_main_comment": "NOW USING: Minimal NEW modular system (./out/extension-minimal.js)",
+  "_switching_instructions": "Now active: NEW MINIMAL modular ValidationPipeline system",
   "contributes": {
     "languages": [
       {

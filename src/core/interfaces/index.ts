@@ -1,19 +1,8 @@
-// =============================================================================
-// SYLANG CORE INTERFACES - CENTRAL EXPORT
-// =============================================================================
-
-// Plugin and Language Interfaces
-export * from './ILanguagePlugin';
-
-// Symbol Management Interfaces
-export * from './ISymbolManager';
-
-// Configuration Management Interfaces  
+// Configuration manager interfaces
 export type {
     IConfigurationManager,
     ILanguageConfiguration,
-    IGlobalConfiguration,
-    CompoundPropertyDef
+    IGlobalConfiguration
 } from './IConfigurationManager';
 
 // Import Management Interfaces

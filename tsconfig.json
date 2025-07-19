@@ -7,13 +7,16 @@
       "es6"
     ],
     "sourceMap": true,
-    "rootDir": "backup/src-backup",
+    "rootDir": "src",
     "strict": false
   },
+  "include": [
+    "src/extension-minimal.ts"
+  ],
   "exclude": [
     "node_modules",
     ".vscode-test",
-    "src",
+    "backup",
     "out"
   ]
 } 
