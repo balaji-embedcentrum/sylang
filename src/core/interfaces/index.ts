@@ -1,25 +1,12 @@
-// Configuration manager interfaces
-export type {
-    IConfigurationManager,
-    ILanguageConfiguration,
-    IGlobalConfiguration,
-    ICacheSettings
-} from './IConfigurationManager';
-
-// Symbol Management Interfaces
+// Core interfaces
 export * from './ISymbolManager';
-
-// Import Management Interfaces  
 export * from './IImportManager';
-
-// Cache Management Interfaces
-export * from './ICacheManager';
-
-// Validation Pipeline Interfaces
+export * from './IConfigurationManager';
 export * from './IValidationPipeline';
+// export * from './ICacheManager';  // Temporarily disabled
 
-// Language Plugin Interfaces
-export * from './ILanguagePlugin';
+// Simple exports from language plugin
+export type { ILanguagePlugin, IValidationContext, IValidationResult } from './ILanguagePlugin';
 
 // =============================================================================
 // CONVENIENCE TYPE ALIASES
@@ -81,14 +68,14 @@ import {
     IValidationRule
 } from './IValidationPipeline';
 
-// Core Manager Types
-export type CoreManagers = {
+// Core manager definitions for dependency injection
+export interface CoreManagers {
     symbolManager: ISymbolManager;
-    configurationManager: IConfigurationManager;
     importManager: IImportManager;
-    cacheManager: ICacheManager;
+    configurationManager: IConfigurationManager;
+    // cacheManager: ICacheManager;  // Temporarily disabled
     validationPipeline: IValidationPipeline;
-};
+}
 
 // Plugin Types
 export type PluginComponents = {

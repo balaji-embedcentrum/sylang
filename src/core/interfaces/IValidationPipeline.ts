@@ -64,12 +64,13 @@ export interface IValidationPipeline {
  * Validation stages in the pipeline
  */
 export enum ValidationStage {
-    PARSING = 'parsing',                     // Stage 1: Parse and extract symbols
-    IMPORT_RESOLUTION = 'import_resolution', // Stage 2: Resolve imports and build symbol table
+    PARSING = 'parsing',                     // Stage 1: Parse document structure
+    IMPORT_RESOLUTION = 'import_resolution', // Stage 2: Resolve imports
     SYNTAX_VALIDATION = 'syntax_validation', // Stage 3: Validate syntax and structure
     REFERENCE_VALIDATION = 'reference_validation', // Stage 4: Validate cross-references
-    CONFIGURATION_VALIDATION = 'configuration_validation', // Stage 5: Validate configurations
-    SEMANTIC_VALIDATION = 'semantic_validation' // Stage 6: Validate semantic rules
+    CROSS_FILE_VALIDATION = 'cross_file_validation', // Stage 5: Validate cross-file references
+    CONFIGURATION_VALIDATION = 'configuration_validation', // Stage 6: Validate configurations
+    SEMANTIC_VALIDATION = 'semantic_validation' // Stage 7: Validate semantic rules
 }
 
 /**
@@ -289,17 +290,19 @@ export interface IRuleValidationContext {
     readonly configuration: any;            // Configuration state
     readonly imports: any[];                 // Imports
     readonly stage: ValidationStage;         // Current stage
+    readonly symbolManager?: any;           // Optional symbol manager for parent symbol registration
 }
 
 /**
- * Rule validation result
+ * Validation result from a single rule execution
  */
 export interface IRuleValidationResult {
-    readonly ruleId: string;                 // Rule ID
-    readonly diagnostics: vscode.Diagnostic[]; // Rule diagnostics
-    readonly isValid: boolean;               // Rule validity
-    readonly executionTime: number;          // Execution time
-    readonly metadata: Record<string, any>;  // Rule metadata
+    isValid: boolean;
+    diagnostics: vscode.Diagnostic[];
+    errors: IValidationError[];
+    warnings: IValidationWarning[];
+    performance: IValidationPerformanceMetrics;
+    metadata: IValidationMetadata;
 }
 
 /**
@@ -412,12 +415,14 @@ export interface IStageMetadata {
  * Validation performance metrics
  */
 export interface IValidationPerformanceMetrics {
-    totalValidations: number;                // Total validations (mutable)
-    averageValidationTime: number;           // Average validation time (mutable)
-    fastestValidation: number;               // Fastest validation time (mutable)
-    slowestValidation: number;               // Slowest validation time (mutable)
-    cacheHitRate: number;                    // Cache hit rate (mutable)
-    readonly stageMetrics: Map<ValidationStage, IStagePerformanceMetrics>;
+    executionTime: number;
+    memoryUsage: number;
+    cacheHitRate: number;
+    totalValidations?: number;
+    averageValidationTime?: number;
+    fastestValidation?: number;
+    slowestValidation?: number;
+    stageMetrics?: Map<any, any>;
 }
 
 /**
@@ -463,4 +468,12 @@ export interface IStageCompletedEvent {
     readonly stage: ValidationStage;         // Completed stage
     readonly result: IStageResult;           // Stage result
     readonly timestamp: Date;                // Completion timestamp
+} 
+
+// Add missing interface before IRuleValidationResult
+export interface IValidationMetadata {
+    ruleName: string;
+    ruleVersion: string;
+    validatedElements: number;
+    skippedElements: number;
 } 

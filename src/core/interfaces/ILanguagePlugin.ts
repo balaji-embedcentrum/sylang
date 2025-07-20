@@ -80,22 +80,12 @@ export interface IValidationContext {
  * Result from validation operations
  */
 export interface IValidationResult {
-    readonly documentUri: string;
+    readonly isValid: boolean;
     readonly diagnostics: vscode.Diagnostic[];
-    readonly symbols: ISymbolDefinition[];
-    readonly references: ISymbolReference[];
-    readonly imports: IImportInfo[];
-    readonly metadata: IValidationMetadata;
-}
-
-/**
- * Metadata about the validation process
- */
-export interface IValidationMetadata {
+    readonly errors: string[];
+    readonly warnings: string[];
     readonly executionTime: number;
-    readonly cacheHit: boolean;
-    readonly validatorVersion: string;
-    readonly ruleViolations: IRuleViolation[];
+    // Remove metadata to avoid duplicate
 }
 
 /**

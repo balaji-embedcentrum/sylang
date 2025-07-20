@@ -1,0 +1,298 @@
+{
+  "extensionId": "sylang-extended-keywords",
+  "extensionName": "Extended Sylang Keywords",
+  "version": "1.0.0",
+  "keywords": [
+    {
+      "id": "ext.productline",
+      "keyword": "productline",
+      "type": "primary_def",
+      "context": {
+        "fileExtensions": [".ple"],
+        "parentContexts": ["root"],
+        "allowedDepth": [0]
+      },
+      "validation": {
+        "required": true,
+        "valueType": "identifier"
+      },
+      "displayName": "Product Line Definition",
+      "description": "Defines a product line - the root container for all engineering artifacts",
+      "examples": [
+        "def productline AutomotiveInverter",
+        "def productline BloodPressureMonitor"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["productline", "header", "required"]
+    },
+    
+    {
+      "id": "ext.featureset",
+      "keyword": "featureset",
+      "type": "primary_def",
+      "context": {
+        "fileExtensions": [".fml"],
+        "parentContexts": ["root"],
+        "allowedDepth": [0]
+      },
+      "validation": {
+        "required": true,
+        "valueType": "identifier"
+      },
+      "displayName": "Feature Set Definition",
+      "description": "Defines a feature model container for variability management",
+      "examples": [
+        "def featureset InverterFeatures",
+        "def featureset EPBFeatures"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["features", "header", "required"]
+    },
+
+    {
+      "id": "ext.feature",
+      "keyword": "feature",
+      "type": "sub_def",
+      "context": {
+        "fileExtensions": [".fml"],
+        "parentContexts": ["featureset", "feature"],
+        "allowedDepth": [1, 2, 3, 4]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "compound"
+      },
+      "displayName": "Feature Definition",
+      "description": "Defines a feature with variability constraints",
+      "examples": [
+        "def feature PowerConversion mandatory",
+        "def feature BrakeType alternative"
+      ],
+      "secondaryKeywords": ["mandatory", "optional", "alternative", "or"],
+      "syntaxPattern": "def feature <Identifier> <VariabilityType>",
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["features", "variability"]
+    },
+
+    {
+      "id": "ext.functiongroup",
+      "keyword": "functiongroup",
+      "type": "primary_def",
+      "context": {
+        "fileExtensions": [".fun"],
+        "parentContexts": ["root"],
+        "allowedDepth": [0]
+      },
+      "validation": {
+        "required": true,
+        "valueType": "identifier"
+      },
+      "displayName": "Function Group Definition",
+      "description": "Defines a container for related system functions",
+      "examples": [
+        "def functiongroup PowerManagement",
+        "def functiongroup SafetyFunctions"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["functions", "header", "required"]
+    },
+
+    {
+      "id": "ext.function",
+      "keyword": "function",
+      "type": "sub_def",
+      "context": {
+        "fileExtensions": [".fun"],
+        "parentContexts": ["functiongroup"],
+        "allowedDepth": [1, 2]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "identifier"
+      },
+      "displayName": "Function Definition",
+      "description": "Defines a system function with specific behavior",
+      "examples": [
+        "def function ProcessPowerConversion",
+        "def function MonitorBrakeStatus"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["functions"]
+    },
+
+    {
+      "id": "ext.enables_feature",
+      "keyword": "enables",
+      "type": "compound_property",
+      "context": {
+        "fileExtensions": [".fun", ".blk", ".req"],
+        "parentContexts": ["function", "component", "requirement"],
+        "allowedDepth": [1, 2, 3]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "reference"
+      },
+      "displayName": "Enables Feature",
+      "description": "Specifies which feature this element enables",
+      "examples": [
+        "enables feature PowerConversion",
+        "enables feature AutoHold"
+      ],
+      "secondaryKeywords": ["feature"],
+      "syntaxPattern": "enables feature <FeatureIdentifier>",
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["relationship", "traceability"]
+    },
+
+    {
+      "id": "ext.implements_function",
+      "keyword": "implements",
+      "type": "compound_property",
+      "context": {
+        "fileExtensions": [".blk", ".req"],
+        "parentContexts": ["component", "requirement"],
+        "allowedDepth": [1, 2, 3]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "reference"
+      },
+      "displayName": "Implements Function",
+      "description": "Specifies which function this element implements",
+      "examples": [
+        "implements function ProcessPowerConversion",
+        "implements function ValidateInput"
+      ],
+      "secondaryKeywords": ["function"],
+      "syntaxPattern": "implements function <FunctionIdentifier>",
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["relationship", "implementation"]
+    },
+
+    {
+      "id": "ext.allocatedto_component",
+      "keyword": "allocatedto",
+      "type": "compound_property",
+      "context": {
+        "fileExtensions": [".req", ".fun"],
+        "parentContexts": ["requirement", "function"],
+        "allowedDepth": [1, 2, 3]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "reference"
+      },
+      "displayName": "Allocated To Component",
+      "description": "Specifies which component this element is allocated to",
+      "examples": [
+        "allocatedto component PowerController",
+        "allocatedto subsystem BrakeControl"
+      ],
+      "secondaryKeywords": ["component", "subsystem", "system"],
+      "syntaxPattern": "allocatedto <ComponentType> <ComponentIdentifier>",
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["relationship", "allocation"]
+    },
+
+    {
+      "id": "ext.mandatory",
+      "keyword": "mandatory",
+      "type": "modifier_keyword",
+      "context": {
+        "fileExtensions": [".fml"],
+        "parentContexts": ["feature"],
+        "allowedDepth": [1, 2, 3, 4]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "none"
+      },
+      "displayName": "Mandatory Feature",
+      "description": "Indicates this feature must be included in all product variants",
+      "examples": [
+        "def feature SafetySystem mandatory"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["variability", "constraint"]
+    },
+
+    {
+      "id": "ext.optional",
+      "keyword": "optional",
+      "type": "modifier_keyword",
+      "context": {
+        "fileExtensions": [".fml"],
+        "parentContexts": ["feature"],
+        "allowedDepth": [1, 2, 3, 4]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "none"
+      },
+      "displayName": "Optional Feature",
+      "description": "Indicates this feature may or may not be included in product variants",
+      "examples": [
+        "def feature AdvancedDiagnostics optional"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["variability", "constraint"]
+    },
+
+    {
+      "id": "ext.asil_a",
+      "keyword": "ASIL-A",
+      "type": "enum_value",
+      "context": {
+        "fileExtensions": [".ple", ".fml", ".fun", ".req", ".sgl"],
+        "parentContexts": ["*"],
+        "allowedDepth": [1, 2, 3, 4]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "none"
+      },
+      "displayName": "ASIL-A Safety Level",
+      "description": "Automotive Safety Integrity Level A - lowest safety requirements",
+      "examples": [
+        "safetylevel ASIL-A"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["safety", "asil", "enum"]
+    },
+
+    {
+      "id": "ext.asil_d",
+      "keyword": "ASIL-D",
+      "type": "enum_value",
+      "context": {
+        "fileExtensions": [".ple", ".fml", ".fun", ".req", ".sgl"],
+        "parentContexts": ["*"],
+        "allowedDepth": [1, 2, 3, 4]
+      },
+      "validation": {
+        "required": false,
+        "valueType": "none"
+      },
+      "displayName": "ASIL-D Safety Level",
+      "description": "Automotive Safety Integrity Level D - highest safety requirements",
+      "examples": [
+        "safetylevel ASIL-D"
+      ],
+      "definedBy": "sylang-extended-keywords",
+      "version": "1.0.0",
+      "tags": ["safety", "asil", "enum"]
+    }
+  ]
+} 

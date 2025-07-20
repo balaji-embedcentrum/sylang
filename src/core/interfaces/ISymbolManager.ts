@@ -108,16 +108,16 @@ export interface ISymbolReference {
  * Import information with resolution details
  */
 export interface IImportInfo {
-    readonly keyword: string;               // 'block', 'featureset', etc.
-    readonly subkeyword?: string;          // 'system', 'subsystem', etc.
+    readonly keyword: string;                // Import keyword (usually 'use')
+    readonly subkeyword?: string;            // Sub-keyword (e.g., 'block', 'functiongroup')
     readonly identifiers: string[];         // Imported identifiers
-    readonly location: vscode.Location;     // Import statement location
-    readonly range: vscode.Range;           // Import statement range
-    readonly resolvedSymbols: string[];     // Resolved symbol IDs
-    readonly unresolvedIdentifiers: string[]; // Unresolved identifiers
-    readonly documentUri: string;           // Document containing import
-    readonly isResolved: boolean;           // Whether import is fully resolved
-    readonly errors: IImportError[];        // Import resolution errors
+    readonly range: vscode.Range;            // Import statement range
+    readonly location: vscode.Location;      // Import statement location
+    readonly resolvedSymbols: ISymbolDefinition[]; // Successfully resolved symbols
+    readonly unresolvedIdentifiers: string[]; // Failed to resolve identifiers
+    readonly documentUri: string;            // Document containing the import
+    readonly isResolved: boolean;            // Whether all identifiers were resolved
+    readonly errors: string[];               // Import errors as string array
 }
 
 /**
