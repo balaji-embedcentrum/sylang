@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import { 
     ConfigurationManager,
     SymbolManager,
-    ImportManager,
-    ValidationPipeline
+    ImportManager
 } from './core/managers';
+import { ValidationManager } from './core/managers/ValidationManager';
 import { PropertyValidationRule } from './core/rules/PropertyValidationRule';
 import { VALIDATION_STAGES_ORDER } from './core/interfaces';
 import { getSupportedExtensions } from './config/LanguageConfigs';
@@ -18,71 +18,31 @@ export function activate(context: vscode.ExtensionContext) {
     // Initialize core managers
     const configurationManager = new ConfigurationManager();
     const symbolManager = new SymbolManager(configurationManager);
-    const importManager = new ImportManager(symbolManager, configurationManager);
-    const validationPipeline = new ValidationPipeline(
-        symbolManager,
-        configurationManager, 
-        importManager
-    );
+    const importManager = new ImportManager(symbolManager);
     
     // Create diagnostic collection
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('sylang-validation');
     context.subscriptions.push(diagnosticCollection);
     
-    // Register validation on file changes
-    const validateDocument = async (document: vscode.TextDocument) => {
-        if (!isSylangDocument(document)) return;
-        
-        try {
-            console.log(`🔍 VALIDATING ${document.fileName} with FULL VALIDATION PIPELINE`);
+    const validationManager = new ValidationManager(diagnosticCollection, importManager, symbolManager);
+    
+    // Validate on document events
+    function handleDocumentChange(document: vscode.TextDocument) {
+        if (document.languageId.startsWith('sylang-') || 
+            document.fileName.endsWith('.ple') || 
+            document.fileName.endsWith('.fml') ||
+            document.fileName.endsWith('.vml') ||
+            document.fileName.endsWith('.vcf')) {
             
-            // Clear previous diagnostics
-            diagnosticCollection.delete(document.uri);
-            
-            // Create validation context
-            const validationContext = {
-                workspaceRoot: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '',
-                symbolManager,
-                configurationManager,
-                importManager,
-                cacheManager: undefined,
-                enabledStages: VALIDATION_STAGES_ORDER,
-                validationMode: 'strict' as const,
-                maxConcurrency: 5,
-                timeout: 10000
-            };
-            
-            // Run complete validation pipeline
-            const result = await validationPipeline.validateDocument(document, validationContext);
-            
-            // Convert validation results to VSCode diagnostics
-            const diagnostics: vscode.Diagnostic[] = result.finalDiagnostics || [];
-            
-            // Set diagnostics
-            diagnosticCollection.set(document.uri, diagnostics);
-            
-            console.log(`✅ Validation complete: ${diagnostics.length} diagnostics`);
-            
-        } catch (error) {
-            console.error('❌ Validation failed:', error);
-            // Show critical validation errors
-            const diagnostic = new vscode.Diagnostic(
-                new vscode.Range(0, 0, 0, 1),
-                `Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                vscode.DiagnosticSeverity.Error
-            );
-            diagnostic.source = 'sylang-validation';
-            diagnosticCollection.set(document.uri, [diagnostic]);
+            console.log('📄 Document change detected:', document.fileName);
+            validationManager.validateDocument(document);
         }
-    };
+    }
     
     // Validate on document change
     context.subscriptions.push(
         vscode.workspace.onDidChangeTextDocument(event => {
-            if (isSylangDocument(event.document)) {
-                // Debounced validation
-                setTimeout(() => validateDocument(event.document), 500);
-            }
+            handleDocumentChange(event.document);
         })
     );
     
@@ -90,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument(document => {
             if (isSylangDocument(document)) {
-                validateDocument(document);
+                handleDocumentChange(document);
             }
         })
     );
@@ -98,11 +58,36 @@ export function activate(context: vscode.ExtensionContext) {
     // Validate all open documents on startup
     vscode.workspace.textDocuments.forEach(document => {
         if (isSylangDocument(document)) {
-            validateDocument(document);
+            handleDocumentChange(document);
         }
     });
     
     console.log('✅ Sylang Extension FULLY ACTIVATED with validation pipeline!');
+    
+    // Register VCF generation command
+    const vcfGeneratorCommand = vscode.commands.registerCommand('sylang.generateVariantConfig', async (uri?: vscode.Uri) => {
+        try {
+            if (!uri) {
+                const activeEditor = vscode.window.activeTextEditor;
+                if (!activeEditor || !activeEditor.document.fileName.endsWith('.vml')) {
+                    vscode.window.showErrorMessage('Please select a .vml file to generate variant config');
+                    return;
+                }
+                uri = activeEditor.document.uri;
+            }
+            
+            // Dynamic import to avoid circular dependencies
+            const { VcfGenerator } = await import('./core/generators/VcfGenerator');
+            const vcfGenerator = new VcfGenerator();
+            await vcfGenerator.generateVcfFromVml(uri);
+            
+        } catch (error) {
+            console.error('❌ VCF generation failed:', error);
+            vscode.window.showErrorMessage(`VCF generation failed: ${error}`);
+        }
+    });
+    
+    context.subscriptions.push(vcfGeneratorCommand);
 }
 
 /**

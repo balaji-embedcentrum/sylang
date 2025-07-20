@@ -115,15 +115,22 @@ export class PropertyValidationRule implements IValidationRule {
             }
         }
         
+        const isValid = diagnostics.length === 0;
         return {
-            ruleId: this.id,
-            isValid: diagnostics.length === 0,
+            isValid,
             diagnostics,
-            executionTime: performance.now() - startTime,
+            errors: [],
+            warnings: [],
+            performance: {
+                executionTime: performance.now() - startTime,
+                memoryUsage: 0,
+                cacheHitRate: 0
+            },
             metadata: {
-                linesProcessed: lines.length,
-                contextsFound: contextStack.length,
-                errorsFound: diagnostics.length
+                ruleName: this.name,
+                ruleVersion: '1.0.0',
+                validatedElements: lines.length,
+                skippedElements: 0
             }
         };
     }

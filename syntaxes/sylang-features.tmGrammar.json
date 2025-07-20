@@ -4,16 +4,16 @@
   "scopeName": "source.sylang.features",
   "fileTypes": ["fml"],
   "patterns": [
+    { "include": "#safety-levels" },
+    { "include": "#compound-properties" },
     { "include": "#comments" },
     { "include": "#use-statements" },
-    { "include": "#compound-properties" },
     { "include": "#secondary-keywords" },
     { "include": "#def-feature" },
     { "include": "#def-keywords" },
     { "include": "#definition-types" },
     { "include": "#property-names" },
     { "include": "#special-keywords" },
-    { "include": "#safety-levels" },
     { "include": "#categories" },
     { "include": "#strings" },
     { "include": "#numbers" },
@@ -79,8 +79,19 @@
     "property-names": {
       "patterns": [
         {
-          "match": "\\b(name|description|owner|tags|safetylevel)\\b",
+          "match": "\\b(name|description|owner|tags|safetylevel|requires|excludes)\\b",
           "name": "variable.other.property.sylang"
+        }
+      ]
+    },
+    "compound-properties": {
+      "patterns": [
+        {
+          "match": "\\b(feature)\\s+([A-Z][a-zA-Z0-9_]*)\\b",
+          "captures": {
+            "1": { "name": "storage.type.definition.sylang" },
+            "2": { "name": "support.class.reference.sylang" }
+          }
         }
       ]
     },
@@ -101,7 +112,7 @@
           }
         },
         {
-          "match": "\\b(allocatedto|dependson|requires|excludes|conflicts|alternative)\\b",
+          "match": "\\b(allocatedto|dependson|conflicts|alternative)\\b",
           "name": "keyword.other.special.sylang"
         }
       ]

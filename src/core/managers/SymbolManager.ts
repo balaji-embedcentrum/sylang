@@ -129,6 +129,31 @@ export class SymbolManager implements ISymbolManager {
         return this.symbolsByType.get(symbolType) || [];
     }
 
+    /**
+     * Get all symbols across all documents
+     */
+    getAllSymbols(): ISymbolDefinition[] {
+        return Array.from(this.symbols.values());
+    }
+
+    /**
+     * Register an individual symbol (used by validation rules)
+     */
+    registerSymbol(symbol: ISymbolDefinition): void {
+        this.addSymbol(symbol);
+        
+        // Emit change event
+        this.changeEventEmitter.fire({
+            type: 'added',
+            symbolId: symbol.id,
+            symbol: symbol,
+            documentUri: symbol.fileUri,
+            timestamp: new Date()
+        });
+        
+        console.log(`✅ Registered symbol: ${symbol.name} (${symbol.type})`);
+    }
+
     findReferences(symbolName: string, includeDeclaration = false): ISymbolReference[] {
         const allReferences: ISymbolReference[] = [];
         
@@ -415,13 +440,8 @@ export class SymbolManager implements ISymbolManager {
             this.reverseHierarchy.set(symbol.id, symbol.parentSymbol);
         }
         
-        // Set initial visibility
-        if (this.configurationManager) {
-            const isVisible = this.configurationManager.isSymbolVisible(symbol.id);
-            this.visibilityMap.set(symbol.id, isVisible);
-        } else {
-            this.visibilityMap.set(symbol.id, true);
-        }
+        // Update visibility - default to visible for now
+        this.visibilityMap.set(symbol.id, symbol.isVisible || true);
     }
 
     private removeSymbol(symbolId: string): void {

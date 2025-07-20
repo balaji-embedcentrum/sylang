@@ -39,6 +39,13 @@ import {
     VALIDATION_STAGES_ORDER
 } from '../interfaces';
 import { PropertyValidationRule } from '../rules/PropertyValidationRule';
+import { HeaderDefValidationRule } from '../rules/HeaderDefValidationRule';
+import { FileLimitValidationRule } from '../rules/FileLimitValidationRule';
+import { DynamicKeywordValidationRule } from '../rules/DynamicKeywordValidationRule';
+import { SymbolVisibilityValidationRule } from '../rules/SymbolVisibilityValidationRule';
+import { UseStatementValidationRule } from '../rules/UseStatementValidationRule';
+import { KeywordRegistry } from '../keywords/KeywordRegistry';
+import { ImportManager } from '../managers/ImportManager';
 
 // =============================================================================
 // VALIDATION PIPELINE IMPLEMENTATION
@@ -61,15 +68,32 @@ export class ValidationPipeline implements IValidationPipeline {
     private performanceMetrics: IValidationPerformanceMetrics;
     private totalValidations = 0;
 
+    // NEW: Keyword Registry Integration + Import Manager
+    private keywordRegistry: KeywordRegistry;
+    private importManager: ImportManager;
+
     constructor(
         private readonly symbolManager: any,
         private readonly configurationManager: any,
-        private readonly importManager: any,
+        importManager?: any,
         private readonly cacheManager?: any
     ) {
         // Initialize required properties
         this.configuration = this.createDefaultConfiguration();
         this.performanceMetrics = this.createDefaultPerformanceMetrics();
+        
+        // Initialize keyword registry
+        this.keywordRegistry = new KeywordRegistry();
+        
+        // FIX: Properly initialize import manager
+        if (importManager) {
+            this.importManager = importManager;
+        } else {
+            // Create a basic ImportManager if none provided
+            this.importManager = new ImportManager(this.symbolManager);
+        }
+        
+        console.log('✅ ValidationPipeline: ImportManager initialized:', !!this.importManager);
         
         this.initializeBuiltinRules();
     }
@@ -101,7 +125,9 @@ export class ValidationPipeline implements IValidationPipeline {
                     previousResults: stageResults,
                     symbolIndex: currentSymbolIndex,
                     configuration: this.configurationManager,
-                    imports: this.importManager?.getDocumentImports(documentUri) || []
+                    imports: this.importManager && typeof this.importManager.getDocumentImports === 'function' 
+                        ? this.importManager.getDocumentImports(documentUri) 
+                        : []
                 };
                 
                 const stageResult = await this.validateStage(stage, document, stageContext);
@@ -765,19 +791,58 @@ export class ValidationPipeline implements IValidationPipeline {
     }
 
     private initializeBuiltinRules(): void {
-        // Initialize built-in validation rules
-        // This would be expanded with actual rule implementations
-        const builtinRules = [
-            'syntax-check',
-            'import-resolution',
-            'reference-validation',
-            'config-validation',
-            'semantic-validation'
-        ];
+        // Initialize built-in validation rules with keyword registry and import manager
+        console.log('🔧 Initializing validation rules with keyword registry and import manager...');
         
-        for (const ruleId of builtinRules) {
-            this.configuration.enabledRules.push(ruleId);
+        try {
+            // 1. Use statement validation (highest priority for imports)
+            const useStatementRule = new UseStatementValidationRule(this.importManager);
+            this.registerRule(useStatementRule);
+            
+            // 2. Dynamic keyword validation  
+            const dynamicKeywordRule = new DynamicKeywordValidationRule(this.keywordRegistry);
+            this.registerRule(dynamicKeywordRule);
+            
+            // 3. Header def structure validation
+            const headerDefRule = new HeaderDefValidationRule();
+            this.registerRule(headerDefRule);
+            
+            // 4. File limit validation
+            const fileLimitRule = new FileLimitValidationRule();
+            this.registerRule(fileLimitRule);
+            
+            // 5. Symbol visibility validation (enforces use requirement)
+            const symbolVisibilityRule = new SymbolVisibilityValidationRule(this.importManager);
+            this.registerRule(symbolVisibilityRule);
+            
+            // 6. Legacy property validation (for backward compatibility)
+            const propertyRule = new PropertyValidationRule(this.configurationManager);
+            this.registerRule(propertyRule);
+            
+            console.log(`✅ Initialized ${this.validationRules.size} validation rules`);
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize validation rules:', error);
         }
+    }
+
+    private registerRule(rule: IValidationRule): void {
+        this.validationRules.set(rule.id, rule);
+        
+        // Index by stage
+        const stageRules = this.rulesByStage.get(rule.stage) || [];
+        stageRules.push(rule);
+        stageRules.sort((a, b) => b.priority - a.priority); // Higher priority first
+        this.rulesByStage.set(rule.stage, stageRules);
+        
+        // Index by file types
+        for (const fileType of rule.fileTypes) {
+            const fileTypeRules = this.rulesByFileType.get(fileType) || [];
+            fileTypeRules.push(rule);
+            this.rulesByFileType.set(fileType, fileTypeRules);
+        }
+        
+        console.log(`📝 Registered rule: ${rule.name} (stage: ${rule.stage}, priority: ${rule.priority})`);
     }
 
     private async executeStageValidation(stage: ValidationStage, document: vscode.TextDocument, context: IValidationStageContext): Promise<IStageResult> {
@@ -939,17 +1004,14 @@ export class ValidationPipeline implements IValidationPipeline {
         const errors: IValidationError[] = [];
         const warnings: IValidationWarning[] = [];
         
-        // Create and execute the PropertyValidationRule
-        const propertyValidationRule = new PropertyValidationRule(this.configurationManager);
+        // Get all syntax validation rules
+        const syntaxRules = this.rulesByStage.get(ValidationStage.SYNTAX_VALIDATION) || [];
         
-        if (propertyValidationRule.supportsContext({ 
-            document,
-            symbols: context.previousResults.flatMap(r => r.symbols),
-            symbolIndex: context.symbolIndex,
-            configuration: context.configuration,
-            imports: context.imports,
-            stage: ValidationStage.SYNTAX_VALIDATION
-        })) {
+        console.log(`🔍 Running ${syntaxRules.length} syntax validation rules...`);
+        
+        for (const rule of syntaxRules) {
+            if (!rule.enabled) continue;
+            
             try {
                 const ruleContext: IRuleValidationContext = {
                     document,
@@ -960,76 +1022,46 @@ export class ValidationPipeline implements IValidationPipeline {
                     stage: ValidationStage.SYNTAX_VALIDATION
                 };
                 
-                const ruleResult = await propertyValidationRule.validate(ruleContext);
+                // Check if rule supports this context
+                if (!rule.supportsContext(ruleContext)) {
+                    continue;
+                }
+                
+                console.log(`🔧 Running rule: ${rule.name}`);
+                const ruleResult = await rule.validate(ruleContext);
                 
                 diagnostics.push(...ruleResult.diagnostics);
+                errors.push(...ruleResult.errors);
+                warnings.push(...ruleResult.warnings);
                 
-                if (!ruleResult.isValid) {
-                    errors.push({
-                        code: propertyValidationRule.id,
-                        message: `Property validation failed for ${document.fileName}`,
-                        range: new vscode.Range(0, 0, 0, 0),
-                        severity: propertyValidationRule.severity as any,
-                        source: 'property-validator'
-                    });
-                }
+                console.log(`✅ Rule ${rule.name}: ${ruleResult.isValid ? 'PASSED' : 'FAILED'} (${ruleResult.diagnostics.length} diagnostics)`);
+                
             } catch (error) {
-                console.error(`Property validation rule failed:`, error);
+                console.error(`❌ Rule ${rule.id} failed:`, error);
                 errors.push({
-                    code: 'PROPERTY_VALIDATION_ERROR',
-                    message: `Property validation error: ${error}`,
+                    code: rule.id + '_ERROR',
+                    message: `Rule execution failed: ${error}`,
                     range: new vscode.Range(0, 0, 0, 0),
                     severity: 'error',
-                    source: 'property-validator'
+                    source: rule.id
                 });
             }
         }
         
-        // Execute other syntax validation rules if any
-        const syntaxRules = this.rulesByStage.get(ValidationStage.SYNTAX_VALIDATION) || [];
-        
-        for (const rule of syntaxRules) {
-            if (rule.enabled) {
-                try {
-                    const ruleContext: IRuleValidationContext = {
-                        document,
-                        symbols: context.previousResults.flatMap(r => r.symbols),
-                        symbolIndex: context.symbolIndex,
-                        configuration: context.configuration,
-                        imports: context.imports,
-                        stage: ValidationStage.SYNTAX_VALIDATION
-                    };
-                    
-                    const ruleResult = await rule.validate(ruleContext);
-                    
-                    diagnostics.push(...ruleResult.diagnostics);
-                    
-                    if (!ruleResult.isValid) {
-                        errors.push({
-                            code: rule.id,
-                            message: `Syntax rule '${rule.name}' failed`,
-                            range: new vscode.Range(0, 0, 0, 0),
-                            severity: rule.severity as any,
-                            source: 'syntax-validator'
-                        });
-                    }
-                } catch (error) {
-                    console.error(`Syntax rule ${rule.id} failed:`, error);
-                }
-            }
-        }
+        const isValid = errors.filter(e => e.severity === 'error').length === 0;
+        const executionTime = performance.now() - startTime;
         
         return {
             stage: ValidationStage.SYNTAX_VALIDATION,
-            documentUri,
-            diagnostics,
+            isValid,
             symbols,
-            isValid: errors.length === 0,
-            executionTime: performance.now() - startTime,
-            cacheHit: false,
+            diagnostics,
             errors,
             warnings,
-            metadata: this.createStageMetadata(ValidationStage.SYNTAX_VALIDATION, [propertyValidationRule.id, ...syntaxRules.map(r => r.id)])
+            documentUri,
+            executionTime,
+            cacheHit: false,
+            metadata: this.createStageMetadata(ValidationStage.SYNTAX_VALIDATION, [documentUri])
         };
     }
 
@@ -1597,6 +1629,8 @@ export class ValidationPipeline implements IValidationPipeline {
 
     private createDefaultPerformanceMetrics(): IValidationPerformanceMetrics {
         return {
+            executionTime: 0,
+            memoryUsage: 0,
             totalValidations: 0,
             averageValidationTime: 0,
             fastestValidation: Number.MAX_VALUE,
@@ -1648,5 +1682,37 @@ export class ValidationPipeline implements IValidationPipeline {
         const diagnostic = new vscode.Diagnostic(range, message, severity);
         diagnostic.source = 'sylang-validation';
         return diagnostic;
+    }
+
+    // Add method to extend keywords at runtime
+    async extendKeywords(extension: any): Promise<void> {
+        try {
+            await this.keywordRegistry.registerExtension(extension);
+            console.log(`✅ Extended keywords: ${extension.extensionName}`);
+        } catch (error) {
+            console.error(`❌ Failed to extend keywords:`, error);
+            throw error;
+        }
+    }
+
+    // Add method to reload keyword extensions
+    async reloadKeywordExtensions(): Promise<void> {
+        try {
+            await this.keywordRegistry.reloadExtensions();
+            console.log(`✅ Reloaded keyword extensions`);
+        } catch (error) {
+            console.error(`❌ Failed to reload keyword extensions:`, error);
+            throw error;
+        }
+    }
+
+    // Expose keyword registry for external access
+    getKeywordRegistry(): KeywordRegistry {
+        return this.keywordRegistry;
+    }
+
+    // Expose import manager for external access
+    getImportManager(): ImportManager {
+        return this.importManager;
     }
 } 
