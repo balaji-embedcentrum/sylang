@@ -1,0 +1,28 @@
+// Electronic Parking Brake Product Line
+productline ElectronicParkingBrake
+    description: "Electronic Parking Brake System for passenger vehicles"
+    version: "1.0.0"
+    domain: "Automotive"
+    
+    stakeholder Driver
+        role: "Primary User"
+        requirements: [safety, usability, reliability]
+        
+    stakeholder Manufacturer
+        role: "System Provider"
+        requirements: [cost_efficiency, maintainability, compliance]
+        
+    stakeholder Regulator
+        role: "Safety Authority"
+        requirements: [functional_safety, environmental_compliance]
+    
+    context OperationalEnvironment
+        temperature_range: [-40°C, 85°C]
+        humidity_range: [5%, 95%]
+        vibration_resistance: "ISO 16750-3"
+        electromagnetic_compatibility: "ISO 11452"
+        
+    context SafetyRequirements
+        safety_integrity_level: "ASIL_B"
+        failure_rate_target: "< 1E-7 per hour"
+        diagnostic_coverage: "> 90%"

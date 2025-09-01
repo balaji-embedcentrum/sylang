@@ -1,8 +1,0 @@
-def block subsystem PowerOutputSubsystem
-  name "Power Output Subsystem"
-  description "Filters and conditions AC output power for load connection."
-  owner "Power Output Team"
-  tags "output", "filtering", "ac", "regenerative", "emc"
-  safetylevel ASIL-C
-  enables feature RegenerativeBraking, EMCCompliance, EMIFiltering
-  implements function RegenerativeBrakingController, EMCComplianceManager, EMIFilteringController 
