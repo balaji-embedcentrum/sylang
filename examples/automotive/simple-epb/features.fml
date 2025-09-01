@@ -1,0 +1,56 @@
+// Electronic Parking Brake Feature Model
+feature_model EPB_Features
+    description: "Feature model for Electronic Parking Brake system"
+    
+    root_feature ElectronicParkingBrake
+        description: "Main EPB system feature"
+        
+        mandatory_feature BrakeActuation
+            description: "Core brake actuation capability"
+            
+            alternative_group ActuatorType
+                feature ElectricMotor
+                    description: "Electric motor-based actuation"
+                    properties:
+                        power_consumption: "< 50W"
+                        response_time: "< 500ms"
+                        
+                feature HydraulicActuator
+                    description: "Hydraulic-based actuation"
+                    properties:
+                        pressure_range: "0-200 bar"
+                        response_time: "< 300ms"
+        
+        mandatory_feature SafetyMonitoring
+            description: "Safety monitoring and diagnostics"
+            
+            mandatory_feature PositionSensing
+                description: "Brake position feedback"
+                
+            mandatory_feature ForceSensing
+                description: "Brake force measurement"
+                
+            optional_feature TemperatureMonitoring
+                description: "Actuator temperature monitoring"
+        
+        optional_feature UserInterface
+            description: "Driver interaction interface"
+            
+            alternative_group InterfaceType
+                feature PhysicalButton
+                    description: "Physical push button"
+                    
+                feature TouchInterface
+                    description: "Touch-based interface"
+                    
+                feature VoiceControl
+                    description: "Voice command interface"
+        
+        optional_feature AutomaticEngagement
+            description: "Automatic brake engagement features"
+            
+            optional_feature HillHoldAssist
+                description: "Automatic engagement on slopes"
+                
+            optional_feature AutoPark
+                description: "Automatic engagement when parking"

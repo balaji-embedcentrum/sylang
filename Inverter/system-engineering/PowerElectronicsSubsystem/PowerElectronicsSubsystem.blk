@@ -1,8 +1,0 @@
-def block subsystem PowerElectronicsSubsystem
-  name "Power Electronics Subsystem"
-  description "Handles DC to AC power conversion using IGBTs and switching circuits."
-  owner "Power Electronics Team"
-  tags "switching", "igbt", "conversion", "power-electronics"
-  safetylevel ASIL-D
-  enables feature PowerConversion, DCBusManagement, IGBTDrivers
-  implements function PowerElectronicsController 
