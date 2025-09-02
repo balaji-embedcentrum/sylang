@@ -8,6 +8,7 @@ This directory contains practical examples demonstrating Sylang language capabil
 - `aerospace/` - Aerospace systems examples (flight control, navigation)
 - `medical/` - Medical device examples (blood pressure monitors, pacemakers)
 - `industrial/` - Industrial systems examples (inverters, control systems)
+- `web-development/` - Web development examples (any kind of web applications)
 
 ## 🎯 Example Categories
 
