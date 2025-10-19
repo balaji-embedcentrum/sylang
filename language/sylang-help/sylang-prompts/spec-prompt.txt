@@ -1,0 +1,267 @@
+# Specification Documents (.spec) - AI Prompting Guide
+
+## Purpose
+Specification files generate beautiful, professional documentation with hierarchical sections and dynamic content. They auto-populate content from requirements, use cases, functions, blocks, tests, and other Sylang artifacts with advanced filtering, grouping, and sorting capabilities.
+
+## When to Use
+- Creating system requirements specifications
+- Generating design documentation
+- Building traceability matrices
+- Creating safety documentation (ISO 26262, ASPICE)
+- Producing test coverage reports
+- Generating stakeholder-facing documentation
+- Creating release documentation
+- Building compliance documentation
+
+## Key Syntax Elements
+```
+use requirementset [requirementset-ref]
+use functionset [functionset-ref]
+use testset [testset-ref]
+
+hdef specification [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  version [string-literal]
+
+  def section [identifier]
+    name [string-literal]
+    description [string-literal]
+    
+    def spec [identifier]
+      name [string-literal]
+      source ref [nodetype] [identifier]
+      where [filter-clause]
+      groupby [property]
+      orderby [property] [asc|desc]
+    
+    def diagram [identifier]
+      name [string-literal]
+      source ref [nodetype] [identifier]
+    
+    def table [identifier]
+      name [string-literal]
+      source ref [nodetype] [identifier]
+      where [filter-clause]
+      columns [property], [property], ...
+```
+
+## Node Types
+```
+requirementset, usecaseset, sequenceset, functionset, blockset, featureset,
+testcaseset, failuremodeset, faulttreeset, hazardset, agentset, sprintset,
+statemachineset, variantset, configset, interfaceset, operationset, signalset
+```
+
+## Where Clause Operators
+- `=` equals
+- `!=` not equals
+- `in [value1, value2]` in list
+- `contains` substring match
+- `and` logical AND
+- `or` logical OR
+- `()` grouping
+
+## Common Properties for Filtering
+- identifier, name, description, owner, tags, status, level, safetylevel
+- reqtype, functiontype, blocktype, testresult, severity, issuestatus
+- rationale, verificationcriteria, proposal (requirements)
+- testlevel, method, passcriteria (tests)
+- detectability, occurrence, rpn (failure modes)
+- priority, points, startdate, enddate (sprints)
+
+## AI Generation Guidelines
+
+### 1. Requirements Specification
+When generating requirements specifications:
+- Create hierarchical sections (Introduction, Functional Reqs, Non-Functional, Traceability)
+- Use tables for requirements lists with relevant columns
+- Filter by reqtype, status, safetylevel as needed
+- Include traceability sections showing relationships
+- Group by reqtype or level for organization
+- Sort by identifier for readability
+
+Example prompt:
+"Create a system requirements specification with sections for functional requirements (reqtype=functional, status=approved), safety requirements (safetylevel=ASIL-D), and traceability matrix showing requirements to functions"
+
+### 2. Safety Documentation
+For ISO 26262/ASPICE compliance:
+- Filter by safetylevel (ASIL-A through ASIL-D)
+- Include failure modes with severity analysis
+- Show traceability from safety goals to requirements to tests
+- Group by ASIL level
+- Include verification criteria
+
+Example prompt:
+"Generate safety documentation showing ASIL-D requirements, associated failure modes with RPN > 100, and test coverage"
+
+### 3. Test Coverage Reports
+For test documentation:
+- Show all tests with results
+- Filter by testresult, testlevel, method
+- Group by testresult or testlevel
+- Include columns: identifier, name, testresult, satisfies
+- Show pass/fail statistics
+
+Example prompt:
+"Create test coverage report showing all system-level tests, grouped by result, with traceability to requirements"
+
+### 4. Design Documentation
+For design specs:
+- Include function decomposition
+- Show block architecture
+- Include interface definitions
+- Add sequence diagrams
+- Show allocation relationships
+
+Example prompt:
+"Generate design specification with function hierarchy, block decomposition, and interface definitions"
+
+## Best Practices for AI
+
+1. **Structure Logically**: Create clear hierarchical sections
+2. **Filter Appropriately**: Use where clauses to show only relevant data
+3. **Include Traceability**: Always add traceability sections
+4. **Use Descriptive Names**: Give clear names to sections and content
+5. **Group Related Data**: Use groupby for categorization
+6. **Sort for Readability**: Use orderby for logical ordering
+7. **Select Relevant Columns**: Choose columns that provide value
+8. **Version Control**: Include version property
+9. **Add Descriptions**: Provide context in section descriptions
+10. **Export-Ready**: Structure for professional export to HTML/PDF
+
+## Common Patterns
+
+### Pattern 1: Requirements Specification
+```
+def section FunctionalRequirements
+  def table FunctionalReqs
+    source requirementset SystemReqs
+    where reqtype = functional and status = approved
+    orderby identifier asc
+    columns identifier, name, description, owner, status
+```
+
+### Pattern 2: Safety Analysis
+```
+def section SafetyAnalysis
+  def table SafetyRequirements
+    source requirementset SystemReqs
+    where safetylevel in [ASIL-C, ASIL-D]
+    columns identifier, name, safetylevel, verificationcriteria
+  
+  def table FailureModes
+    source failuremodeset SystemFailures
+    where severity in [S2, S3]
+    columns identifier, name, severity, detectability, rpn
+```
+
+### Pattern 3: Traceability Matrix
+```
+def section Traceability
+  def table ReqToFunction
+    source functionset SystemFunctions
+    where status = approved
+    columns identifier, name, implements, allocatedto
+  
+  def table FunctionToTest
+    source testcaseset SystemTests
+    columns identifier, name, satisfies, testresult
+```
+
+### Pattern 4: Test Coverage
+```
+def section TestCoverage
+  def table AllTests
+    source testcaseset SystemTests
+    groupby testresult
+    orderby identifier asc
+    columns identifier, name, testresult, method, satisfies
+```
+
+## Validation Rules
+- Must have `hdef specification`
+- Must have `name` property
+- `source` must specify valid nodetype and identifier
+- `where` clause must have valid syntax
+- `columns` must be valid properties for nodetype
+- `groupby` and `orderby` must be valid properties
+
+## Output Format
+- Renders as professional HTML document
+- Clean, modern design with professional blue theme
+- Small, readable fonts (9px)
+- Hierarchical navigation
+- Clickable identifiers
+- Export to HTML for print-to-PDF
+
+## Example Complete Specification
+```
+use requirementset VehicleRequirements
+use functionset VehicleFunctions
+use testset VehicleTests
+
+hdef specification VehicleSystemSpec
+  name "Vehicle System Requirements Specification"
+  description "Complete system requirements with traceability"
+  owner "Systems Engineering"
+  version "1.0"
+
+  def section Introduction
+    name "Introduction"
+    def spec Overview
+      name "System Overview"
+      source requirementset VehicleRequirements
+      where level = system
+      orderby identifier asc
+  
+  def section FunctionalRequirements
+    name "Functional Requirements"
+    
+    def table FunctionalReqs
+      name "Functional Requirements"
+      source requirementset VehicleRequirements
+      where reqtype = functional and status = approved
+      orderby identifier asc
+      columns identifier, name, description, owner, status
+    
+    def section SafetyRequirements
+      name "Safety-Critical Requirements"
+      
+      def table SafetyReqs
+        name "ASIL-D Requirements"
+        source requirementset VehicleRequirements
+        where safetylevel = ASIL-D
+        orderby identifier asc
+        columns identifier, name, verificationcriteria, status
+  
+  def section Traceability
+    name "Traceability Matrix"
+    
+    def table ReqToFunc
+      name "Requirements to Functions"
+      source functionset VehicleFunctions
+      orderby identifier asc
+      columns identifier, name, implements, status
+    
+    def table FuncToTest
+      name "Functions to Tests"
+      source testcaseset VehicleTests
+      where testresult in [pass, intest]
+      orderby identifier asc
+      columns identifier, name, satisfies, testresult
+```
+
+## Tips for AI Code Generation
+1. Always include `use` statements for referenced artifacts
+2. Create logical section hierarchy (3-4 levels max)
+3. Use meaningful identifiers (e.g., SafetyReqs, not SR1)
+4. Add descriptions to provide context
+5. Filter data appropriately for each section
+6. Include traceability sections
+7. Use tables for detailed data, spec for narrative
+8. Group related requirements/functions/tests
+9. Sort by identifier for consistency
+10. Include all relevant columns in tables
+

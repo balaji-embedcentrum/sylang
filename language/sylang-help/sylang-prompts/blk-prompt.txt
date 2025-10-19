@@ -1,0 +1,556 @@
+# Block Definition (.blk) - AI Prompting Guide
+
+## Purpose
+Block files define hardware/software architectural elements with AIAG VDA-compliant product characteristics. Each .blk file contains ONE block with its characteristics. Blocks represent physical components (ECUs, sensors) or logical components (software modules) with defined interfaces for communication. Blocks connect via relationship keywords like `decomposesto` and `decomposedfrom`.
+
+## When to Use
+- After requirements (.req) and functions (.fun) are defined
+- During system architecture and decomposition phase
+- For hardware/software partitioning decisions
+- When defining system decomposition (each block in separate file)
+- For FMEA component identification (characteristics used in .flr files)
+- During function allocation (functions → blocks via `implements`)
+
+## Key Syntax Elements
+```
+use configset [ref], use featureset [ref], use functionset [ref], use interfaceset [ref]
+
+hdef block [identifier]
+  name [string-literal]
+  description [string-literal]
+  designrationale [string-literal]
+  comment [string-literal]
+  owner [string-literal]
+  level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
+  tags [string-literal], [string-literal], ...
+  blocktype [hardware|software|hybrid]
+  
+  # Input interfaces (NEEDS)
+  needs ref operation [operation-ref], [operation-ref], ...
+  needs ref signal [signal-ref], [signal-ref], ...
+  
+  # Output interfaces (PROVIDES)
+  provides ref operation [operation-ref], [operation-ref], ...
+  provides ref signal [signal-ref], [signal-ref], ...
+  
+  # Block relationships
+  decomposedfrom ref block [block-ref]
+  decomposesto ref block [block-ref], [block-ref], ...
+  implements ref function [function-ref], [function-ref], ...
+  enables ref feature [feature-ref], [feature-ref], ...
+  derivedfrom ref requirement [requirement-ref], [requirement-ref], ...
+  implementedby ref requirement [requirement-ref], [requirement-ref], ...
+  when ref config [config-ref]
+
+  # Product Characteristics (AIAG VDA) - ONLY thing you can def
+  def characteristic [identifier]
+    name [string-literal]
+    description [string-literal]
+    chartype [special|critical|significant]
+    unit [string-literal]
+    nominalvalue [numeric-value]
+    upperlimit [numeric-value]
+    lowerlimit [numeric-value]
+    tolerance [numeric-value]
+    controlmethod [string-literal]
+    measuringequipment [string-literal]
+    samplingplan [string-literal]
+    inspectionfrequency [string-literal]
+    documentreference [string-literal]
+    derivedfrom ref requirement [requirement-ref]
+    meets ref requirement [requirement-ref]
+    verifiedby ref testcase [testcase-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, block, def, characteristic,
+name, description, designrationale, comment, owner, tags, level, 
+safetylevel, blocktype, chartype, unit, nominalvalue, upperlimit, lowerlimit,
+tolerance, controlmethod, measuringequipment, samplingplan, inspectionfrequency,
+documentreference, decomposedfrom, decomposesto, implements, enables,
+derivedfrom, implementedby, needs, meets, verifiedby,
+when, ref, config, feature, function, operation, signal, requirement, testcase
+```
+
+## Common Patterns
+
+### Block Decomposition
+- Use separate .blk files for each block
+- Link blocks via `decomposesto` (parent → children)
+- Link blocks via `decomposedfrom` (child → parent)
+- Create hierarchy: System → Subsystem → Component → Module
+
+### Interface Definition
+- Operations and signals defined in .ifc files
+- Blocks reference interfaces via `needs` (inputs) and `provides` (outputs)
+- NO `def operation` or `def signal` in .blk files
+
+### Characteristics
+- Define product characteristics per AIAG VDA
+- Critical characteristics: safety-relevant, performance-critical
+- Significant characteristics: important quality attributes
+- Special characteristics: customer-specified requirements
+
+---
+
+## Example Prompts
+
+### 1. Brake Control ECU Architecture
+```
+Create Sylang .blk file for an ASIL-D brake-by-wire ECU.
+
+Context:
+- Product: Autonomous vehicle brake control
+- Safety: ISO 26262 ASIL-D
+- Redundancy: Dual-channel architecture
+- Interfaces: CAN bus, brake actuators, wheel speed sensors
+
+Block: BrakeControlECU (hardware, ASIL-D)
+- Level: component
+- Interfaces:
+  * Needs: BrakePedalPosition (operation), WheelSpeed (signal), VehicleState (operation)
+  * Provides: BrakeActuatorCommand (operation), BrakeSystemStatus (signal), DiagnosticStatus (signal)
+- Decomposition:
+  * Decomposesto: PowerSupplyModule, PrimaryMicrocontroller, SecondaryMicrocontroller, CANTransceiver, BrakeActuatorInterface
+- Functions:
+  * Implements: BrakeControl, EmergencyBraking, BrakeDiagnostics
+- Characteristics:
+  * ProcessingLatency (critical): 10ms nominal, 15ms max
+  * PowerConsumption (significant): 15W nominal, 20W max
+  * OperatingTemperature (special): -40°C to 85°C
+
+Create separate .blk files for child blocks:
+1. PowerSupplyModule.blk
+   - Blocktype: hardware
+   - Level: module
+   - Decomposedfrom: BrakeControlECU
+   - Characteristics: OutputVoltage (critical), Efficiency (significant)
+
+2. PrimaryMicrocontroller.blk
+   - Blocktype: hardware
+   - Level: module
+   - Decomposedfrom: BrakeControlECU
+   - Characteristics: ClockSpeed (critical), MemorySize (significant)
+
+3. BrakeActuatorInterface.blk
+   - Blocktype: hardware
+   - Level: module
+   - Decomposedfrom: BrakeControlECU
+   - Needs: BrakeActuatorCommand
+   - Provides: ActuatorFeedback
+   - Characteristics: CurrentLimit (critical), ResponseTime (critical)
+
+For each block:
+- Include name, description (multiline with triple quotes)
+- Specify blocktype (hardware/software/hybrid)
+- Define needs/provides interfaces (reference BrakeInterfaces.ifc)
+- Add characteristics for FMEA linkage
+- Specify ASIL level for safety-critical blocks
+- Include owner (team responsible)
+- Add design rationale explaining architectural decisions
+
+File: BrakeControlECU.blk
+Reference: use interfaceset BrakeInterfaces, use functionset BrakeFunctions
+```
+
+### 2. Perception System Software Module
+```
+Generate .blk file for autonomous vehicle perception software module.
+
+Block: PerceptionProcessingModule (software, ASIL-D)
+- Level: module
+- Interfaces:
+  * Needs: RawCameraFrames (operation), RawLidarPointCloud (operation), RawRadarTargets (operation)
+  * Provides: EnvironmentalModel (operation), ObjectTrackingData (operation), HazardDetection (operation)
+- Decomposition:
+  * Decomposesto: CameraProcessingSubmodule, LidarProcessingSubmodule, FusionProcessingSubmodule, AIInferenceSubmodule
+- Functions:
+  * Implements: PerceptionProcessing, ObjectDetection, ObjectTracking, ObjectClassification
+- Requirements:
+  * Derivedfrom: SYS_REQ_001, SYS_REQ_002
+  * Implementedby: SW_REQ_100, SW_REQ_101
+- Characteristics:
+  * ProcessingLatency (critical): 50ms nominal, 75ms max, measured every cycle
+  * DetectionAccuracy (critical): 99.5% nominal, 98% min, verified monthly
+  * MemoryFootprint (significant): 512MB nominal, 768MB max
+  * CPUUtilization (significant): 70% nominal, 90% max
+
+For each characteristic, specify:
+- chartype (special, critical, significant)
+- unit (milliseconds, percent, MB, etc.)
+- nominalvalue, upperlimit, lowerlimit, tolerance
+- controlmethod (how it's monitored/controlled)
+- measuringequipment (tools used for measurement)
+- samplingplan (how often measured)
+- inspectionfrequency (testing frequency)
+- documentreference (specification documents)
+- derivedfrom/meets (requirement traceability)
+- verifiedby (test case references)
+
+File: PerceptionProcessingModule.blk
+```
+
+### 3. Medical Device ECG Acquisition Module
+```
+Create .blk file for patient monitoring ECG acquisition hardware.
+
+Block: ECG_AcquisitionModule (hardware, SIL-3)
+- Level: module
+- Compliance: IEC 60601-1, IEC 62304, ISO 14971
+- Interfaces:
+  * Needs: PowerSupply (signal), CalibrationData (operation), PatientElectrodes (signal)
+  * Provides: RawECGSignal (signal), ECGQuality (signal), LeadStatus (signal)
+- Decomposition:
+  * Decomposesto: AnalogFrontEnd, ADC_Converter, SignalAmplifier, IsolationBarrier
+- Functions:
+  * Implements: ECGSignalAcquisition, LeadOffDetection, SignalQualityAssessment
+- Requirements:
+  * Derivedfrom: MED_REQ_001, MED_REQ_002, SAFETY_REQ_010
+- Characteristics:
+  * SignalAmplitude (critical): 1.0mV nominal, 0.8-1.2mV range
+  * SamplingRate (critical): 1000Hz nominal, ±1Hz tolerance
+  * CommonModeRejection (critical): >100dB nominal
+  * InputImpedance (critical): >10MΩ nominal
+  * LeakageCurrent (special): <10µA max (IEC 60601-1)
+  * PowerConsumption (significant): 2.5W nominal, 3.5W max
+  * OperatingTemperature (special): 0°C to 40°C
+
+For characteristics:
+- Include IEC 60601 electrical safety requirements
+- Reference ISO 14971 risk mitigation measures
+- Specify medical device compliance standards
+- Link to verification test cases
+
+File: ECG_AcquisitionModule.blk
+```
+
+### 4. Aviation Flight Control Computer
+```
+Generate .blk file for commercial aircraft flight control computer.
+
+Block: FlightControlComputer (hardware, DAL-A)
+- Level: component
+- Certification: DO-178C Level A, DO-254 Level A
+- Interfaces:
+  * Needs: SensorData (operation), PilotInputs (operation), NavigationData (operation)
+  * Provides: FlightControlCommands (operation), SystemHealthStatus (signal)
+- Decomposition:
+  * Decomposesto: ProcessorCore, MemoryModule, ARINC_429_Interface, WatchdogTimer
+- Functions:
+  * Implements: FlightControlLaw, StabilityAugmentation, GustLoadAlleviation
+- Requirements:
+  * Derivedfrom: FAR_25_REQ_001, SAFETY_REQ_FC_001
+  * Implementedby: SW_FC_REQ_100, HW_FC_REQ_100
+- Characteristics:
+  * ProcessingLatency (critical): 20ms nominal, 25ms max, measured every cycle
+  * ComputationAccuracy (critical): ±0.01° nominal for control surface commands
+  * Redundancy (critical): Triple modular redundancy with voting
+  * MTBF (critical): >100,000 flight hours
+  * PowerConsumption (significant): 45W nominal, 60W max
+  * OperatingTemperature (special): -55°C to 85°C (avionics grade)
+  * Vibration (special): Per DO-160 Category U
+
+For characteristics:
+- Specify DO-178C software level and DO-254 hardware level
+- Include FAR Part 25 certification requirements
+- Reference DO-160 environmental testing standards
+- Link to structural coverage test cases
+
+File: FlightControlComputer.blk
+```
+
+### 5. Industrial Safety PLC
+```
+Create .blk file for manufacturing safety controller.
+
+Block: SafetyPLC (hardware, SIL-3)
+- Level: component
+- Standard: IEC 61508 SIL-3, IEC 61511
+- Interfaces:
+  * Needs: SafetyInputs (signal), ProcessCommands (operation), NetworkData (operation)
+  * Provides: SafetyOutputs (signal), DiagnosticStatus (signal), SystemHealthStatus (signal)
+- Decomposition:
+  * Decomposesto: PrimaryCPU, SecondaryCPU, CrossCheckModule, SafetyInputModule, SafetyOutputModule, PROFINET_Interface
+- Functions:
+  * Implements: SafetyLogic, EmergencyStop, DiagnosticsMonitor, SafetyInterlock
+- Requirements:
+  * Derivedfrom: SAFETY_REQ_001, IEC_61508_REQ_001
+  * Implementedby: PLC_SW_REQ_100, PLC_HW_REQ_100
+- Characteristics:
+  * CycleTime (critical): 10ms nominal, 12ms max
+  * SafetyIntegrityLevel (critical): SIL-3 verified per IEC 61508
+  * DiagnosticCoverage (critical): >99% coverage
+  * SafeFailureFraction (critical): >90%
+  * ResponseTime (critical): <20ms for emergency stop
+  * PowerConsumption (significant): 25W nominal, 35W max
+  * OperatingTemperature (special): -20°C to 60°C industrial
+
+For characteristics:
+- Include IEC 61508 SIL verification metrics
+- Specify diagnostic coverage calculation
+- Reference safety integrity calculations
+- Link to safety validation test cases
+
+File: SafetyPLC.blk
+```
+
+### 6. Generic Block Template
+```
+Create .blk file for {BLOCK_NAME}.
+
+Context:
+- Product: {PRODUCT_DESCRIPTION}
+- Safety: {ISO_26262_ASIL|IEC_61508_SIL|DO_178C_DAL}
+- Level: {system|subsystem|component|module}
+- Type: {hardware|software|hybrid}
+
+Block: {BLOCK_NAME} ({blocktype}, {safety-level})
+- Level: {hierarchy-level}
+- Interfaces:
+  * Needs: {input-operations}, {input-signals}
+  * Provides: {output-operations}, {output-signals}
+- Decomposition:
+  * Decomposesto: {child-block-1}, {child-block-2}, {child-block-3}
+  * OR Decomposedfrom: {parent-block}
+- Functions:
+  * Implements: {function-1}, {function-2}, {function-3}
+- Features:
+  * Enables: {feature-1}, {feature-2}
+- Requirements:
+  * Derivedfrom: {system-requirements}
+  * Implementedby: {detailed-requirements}
+- Characteristics:
+  * {Characteristic_1} ({chartype}): {nominal} {unit}, {limits}, {tolerance}
+  * {Characteristic_2} ({chartype}): {nominal} {unit}, {limits}, {tolerance}
+  * {Characteristic_3} ({chartype}): {nominal} {unit}, {limits}, {tolerance}
+
+For each characteristic:
+- name: descriptive name
+- chartype: special (customer-specified), critical (safety/performance), significant (important quality)
+- unit: measurement unit
+- nominalvalue: target value
+- upperlimit, lowerlimit: acceptable range
+- tolerance: allowed variation
+- controlmethod: how monitored/controlled
+- measuringequipment: measurement tools
+- samplingplan: measurement frequency
+- inspectionfrequency: testing schedule
+- documentreference: specification documents
+- derivedfrom/meets: requirement links
+- verifiedby: test case links
+
+File: {BLOCK_NAME}.blk
+References: use interfaceset {InterfaceSet}, use functionset {FunctionSet}
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef block` per file
+- [ ] All `use` statements at top (configset, featureset, functionset, interfaceset)
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Multiline descriptions use triple quotes `"""`
+- [ ] NO nested `def block` statements (use decomposesto/decomposedfrom instead)
+- [ ] NO `def operation/signal/parameter/datatype` (those go in .ifc files)
+
+### Block Properties
+- [ ] Block has unique identifier
+- [ ] `name` is descriptive and clear
+- [ ] `description` explains purpose and responsibilities
+- [ ] `designrationale` explains architectural decisions
+- [ ] `blocktype` specified (hardware, software, hybrid)
+- [ ] `level` specified (system, subsystem, component, module, etc.)
+- [ ] `owner` team/person identified
+- [ ] `tags` facilitate classification
+
+### Interfaces
+- [ ] `needs` defines all input ports (operations/signals from .ifc files)
+- [ ] `provides` defines all output ports (operations/signals from .ifc files)
+- [ ] All referenced operations/signals exist in .ifc files
+- [ ] Interface direction is correct (input vs output)
+
+### Block Relationships
+- [ ] `decomposesto` links to child blocks (if parent block)
+- [ ] `decomposedfrom` links to parent block (if child block)
+- [ ] `implements` links to functions (.fun files)
+- [ ] `enables` links to features (.fml files)
+- [ ] `derivedfrom` links to parent requirements
+- [ ] `implementedby` links to detailed requirements
+
+### Safety & Compliance
+- [ ] `safetylevel` specified for safety-critical blocks
+- [ ] Safety level appropriate for criticality
+- [ ] Compliance standards referenced (ISO 26262, IEC 61508, DO-178C)
+
+### Characteristics (AIAG VDA)
+- [ ] Multiple `def characteristic` statements
+- [ ] Each characteristic has name, description, chartype
+- [ ] Numeric characteristics have unit, nominal, upper/lower limits, tolerance
+- [ ] Critical characteristics have control method, measuring equipment
+- [ ] Sampling plan and inspection frequency defined
+- [ ] Document references included
+- [ ] Requirement traceability (derivedfrom, meets)
+- [ ] Test case verification (verifiedby)
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Nesting blocks inside blocks (use decomposesto/decomposedfrom instead)
+- Defining operations/signals in .blk files (those go in .ifc files)
+- Missing characteristics for critical product attributes
+- Incomplete characteristic definitions (missing limits, tolerances)
+- Circular decomposition dependencies
+- Missing interface definitions (needs/provides)
+- Missing safety levels for critical blocks
+- Forgetting ASPICE bilateral traceability (derivedfrom, implementedby)
+
+✅ **Best Practices:**
+- One .blk file per block
+- Use descriptive block names (noun + qualifier)
+- Link blocks via decomposition relationships
+- Define clear interface boundaries (needs/provides)
+- Include comprehensive characteristics per AIAG VDA
+- Link to requirements for traceability
+- Include design rationale explaining decisions
+- Maintain consistent abstraction levels
+- Follow domain-specific patterns (ECU, software modules, PLC)
+
+---
+
+## Block Type Guidelines
+
+### When to use HARDWARE
+- Physical components (ECUs, sensors, actuators)
+- Electrical/electronic modules
+- Mechanical components with interfaces
+- Communication hardware (transceivers, interfaces)
+
+### When to use SOFTWARE
+- Algorithms and control logic
+- Software modules and components
+- Application/middleware/driver layers
+- Operating system tasks/threads
+
+### When to use HYBRID
+- Mixed hardware-software components
+- Configurable hardware (FPGAs with software)
+- Software-defined hardware
+
+---
+
+## Example Generated Block (Target Quality)
+
+```sylang
+use configset AutonomousVehicleConfig
+use featureset AutonomousVehicleFeatures
+use functionset PerceptionProcessingFunctions
+use interfaceset PerceptionInterfaces
+
+hdef block AdvancedPerceptionControlModule
+  name "Advanced Perception Control Module"
+  description """
+    Comprehensive perception processing unit for Level 4 autonomous vehicle 
+    environmental awareness. Handles multi-sensor data fusion, object detection, 
+    tracking, prediction, and environmental model generation.
+    """
+  designrationale """
+    Centralized perception architecture enables optimal sensor fusion and 
+    reduces computational redundancy. Hardware-software co-design approach 
+    ensures deterministic real-time performance for safety-critical operations.
+    """
+  comment """
+    This module represents the core perception system for autonomous vehicles,
+    implementing ISO 26262 ASIL-D requirements for functional safety.
+    """
+  owner "Advanced Perception Engineering Team"
+  level module
+  safetylevel ASIL-D
+  blocktype hybrid
+  tags "perception", "sensor-fusion", "AI-processing", "safety-critical"
+  
+  # Input interfaces (NEEDS - what this block requires)
+  needs ref operation CameraRawData, LidarPointCloud, RadarTargets
+  needs ref operation CalibrationParameters, SystemConfiguration
+  needs ref signal SystemClockSignal, PowerSupplyStatus
+  needs ref signal CalibrationStatus, SystemHeartbeat
+  
+  # Output interfaces (PROVIDES - what this block offers)
+  provides ref operation EnvironmentalModel, ObjectTrackingData, HazardDetection
+  provides ref signal ProcessingHeartbeat, SensorHealthStatus
+  
+  # Block relationships (ASPICE bilateral traceability)
+  decomposesto ref block CameraProcessingSubmodule, LidarProcessingSubmodule
+  decomposesto ref block FusionProcessingSubmodule, AIInferenceSubmodule
+  implements ref function PerceptionProcessing, ObjectDetection
+  enables ref feature PerceptionSystem, ObjectDetection
+  derivedfrom ref requirement SYS_REQ_001, SYS_REQ_002
+  implementedby ref requirement SW_REQ_100, SW_REQ_101
+  when ref config c_CoreAutonomousFeatures_PerceptionSystem_L4
+
+  # Product Characteristics (AIAG VDA)
+  def characteristic ProcessingLatency
+    name "Perception Processing Cycle Latency"
+    description "Maximum time between sensor data input and environmental model output"
+    chartype critical
+    unit "milliseconds"
+    nominalvalue 50.0
+    upperlimit 75.0
+    lowerlimit 30.0
+    tolerance 5.0
+    controlmethod "Real-time performance monitoring with cycle time measurement"
+    measuringequipment "Oscilloscope with timing analysis software"
+    samplingplan "100% continuous monitoring during operation"
+    inspectionfrequency "Every processing cycle"
+    documentreference "PERC-SPEC-001-v2.3"
+    derivedfrom ref requirement PERF_REQ_010
+    implementedby ref requirement SW_REQ_150
+    meets ref requirement PERF_REQ_010
+    verifiedby ref testcase TEST_PERF_001
+    
+  def characteristic DetectionAccuracy
+    name "Object Detection Accuracy Rate"
+    description "Percentage of correctly detected and classified objects"
+    chartype critical
+    unit "percent"
+    nominalvalue 99.5
+    upperlimit 100.0
+    lowerlimit 98.0
+    tolerance 0.5
+    controlmethod "Statistical validation with test datasets"
+    measuringequipment "ML model validation framework"
+    samplingplan "10,000 test scenarios per validation cycle"
+    inspectionfrequency "Monthly validation runs"
+    documentreference "PERC-VALIDATION-001-v1.5"
+    derivedfrom ref requirement SAFETY_REQ_020
+    meets ref requirement SAFETY_REQ_020
+    verifiedby ref testcase TEST_DETECTION_001
+    
+  def characteristic PowerConsumption
+    name "Module Power Consumption"
+    description "Electrical power consumption under typical operating conditions"
+    chartype significant
+    unit "watts"
+    nominalvalue 45.0
+    upperlimit 60.0
+    lowerlimit 30.0
+    tolerance 5.0
+    controlmethod "Power monitoring during HIL testing"
+    measuringequipment "Precision power analyzer"
+    samplingplan "Sample 5 units per production batch"
+    inspectionfrequency "Per batch during production"
+    documentreference "HW-POWER-SPEC-001"
+    derivedfrom ref requirement HW_REQ_030
+```
+
+---
+
+**Remember:** Each block is in a separate .blk file. Blocks connect via `decomposesto` and `decomposedfrom` relationships. Operations and signals are defined in .ifc files and only referenced in .blk files via `needs` and `provides`. Characteristics define AIAG VDA product quality attributes for manufacturing and testing.

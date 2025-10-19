@@ -1,0 +1,584 @@
+# Sequence Diagrams (.seq) - AI Prompting Guide
+
+## Purpose
+Sequence Diagram files define message flow sequences between blocks or functions using operations and signals. SEQ files capture dynamic communication patterns in MBSE architectures, supporting system design, integration planning, and protocol specification.
+
+## When to Use
+- During system design and integration planning
+- For protocol and interface specification
+- When defining communication patterns between blocks
+- When defining function-to-function interactions
+- For documenting message flows and sequences
+- For integration testing scenario definition
+
+## Key Syntax Elements
+```
+use block [block-ref], [block-ref], ...
+use functionset [functionset-ref], [functionset-ref], ...
+use function [function-ref], [function-ref], ...
+use operation [operation-ref], [operation-ref], ...
+use signal [signal-ref], [signal-ref], ...
+
+hdef sequenceset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
+
+  def sequence [identifier]
+    from ref block [block-ref]
+    to ref block [block-ref]
+    flow ref operation [operation-ref]
+    
+  def sequence [identifier]
+    from ref block [block-ref]
+    to ref block [block-ref]
+    flow ref signal [signal-ref]
+    
+  def sequence [identifier]
+    from ref function [function-ref]
+    to ref function [function-ref]
+    flow ref operation [operation-ref]
+    
+  def fragment [identifier]
+    name [string-literal]
+    description [string-literal]
+    fragmenttype [alt|else|parallel|loop]
+    condition [string-literal]
+    
+    # Nested sequences inside fragment
+    def sequence [identifier]
+      from ref block [block-ref]
+      to ref block [block-ref]
+      flow ref operation [operation-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, sequenceset, functionset, def, sequence, fragment, name, description, 
+owner, tags, level, safetylevel, from, to, flow, fragmenttype, 
+condition, when, ref, block, function, operation, signal
+```
+
+## Fragment Types
+```
+fragmenttype alt      # Alternative flow (if-then)
+fragmenttype else     # Else branch (alternative)
+fragmenttype parallel # Parallel execution (concurrent)
+fragmenttype loop     # Loop iteration (repeated)
+```
+
+## Common Patterns
+
+### Block-to-Block Sequences
+Most common pattern - blocks communicating via operations or signals:
+```
+def sequence SEQ_001
+  from ref block SourceBlock
+  to ref block TargetBlock
+  flow ref operation OperationName
+```
+**IMPORTANT**: Each sequence must use ONLY blocks (from block → to block).
+
+### Function-to-Function Sequences
+Functions communicating via operations:
+```
+def sequence SEQ_001
+  from ref function SourceFunction
+  to ref function TargetFunction
+  flow ref operation OperationName
+```
+**IMPORTANT**: Each sequence must use ONLY functions (from function → to function).
+
+### Constraint: No Mixing
+**You CANNOT mix blocks and functions in the same sequence!**
+- ❌ WRONG: `from ref block` → `to ref function`
+- ❌ WRONG: `from ref function` → `to ref block`
+- ✅ CORRECT: `from ref block` → `to ref block`
+- ✅ CORRECT: `from ref function` → `to ref function`
+
+### Fragments for Control Flow
+Use fragments to group sequences with conditions:
+```
+def fragment ErrorHandling
+  fragmenttype alt
+  condition "Error detected"
+  
+  def sequence SEQ_ERROR_001
+    from ref block ErrorDetector
+    to ref block ErrorHandler
+    flow ref signal ErrorSignal
+```
+
+---
+
+## Example Prompts
+
+### 1. Automotive Brake System Emergency Braking Sequence
+```
+Create comprehensive .seq file for emergency braking system.
+
+Context:
+- System: Electronic Brake Control with AEB
+- Blocks: PerceptionModule, PlanningModule, BrakeControlModule, DriverInterface
+- Operations: EnvironmentUpdate, BrakeCommand, EmergencyBrake
+- Signals: CollisionThreat, BrakeEngagement, DriverAlert
+- Safety Level: ASIL-D
+
+Sequence Set: EmergencyBrakingSequences (ASIL-D)
+- Owner: "Brake System Integration Team"
+- Tags: "AEB", "emergency-braking", "ASIL-D"
+
+Generate 8-10 sequences showing:
+1. Normal operation sequences (4-5 sequences)
+   - Perception → Planning: EnvironmentUpdate operation
+   - Planning → BrakeControl: BrakeCommand operation
+   - BrakeControl → DriverInterface: BrakeStatus signal
+   
+2. Emergency sequences (3-4 sequences)
+   - Perception → Planning: CollisionThreat signal
+   - Planning → BrakeControl: EmergencyBrake operation
+   - BrakeControl → DriverInterface: EmergencyAlert signal
+
+3. Fragments (2-3 fragments)
+   - ErrorHandling fragment (alt)
+     - Communication timeout sequences
+     - Sensor failure sequences
+   - ParallelMonitoring fragment (parallel)
+     - Multiple modules reporting status concurrently
+
+Each sequence must specify:
+- from ref block (source block)
+- to ref block (target block)
+- flow ref operation or flow ref signal
+
+Example sequences:
+
+SEQ_001: Normal environment update
+  - from ref block PerceptionModule
+  - to ref block PlanningModule
+  - flow ref operation EnvironmentModelUpdate
+
+SEQ_002: Normal brake command
+  - from ref block PlanningModule
+  - to ref block BrakeControlModule
+  - flow ref operation BrakeForceCommand
+
+SEQ_003: Emergency collision detection
+  - from ref block PerceptionModule
+  - to ref block PlanningModule
+  - flow ref signal CollisionThreatDetected
+
+SEQ_004: Emergency brake activation
+  - from ref block PlanningModule
+  - to ref block BrakeControlModule
+  - flow ref operation EmergencyBrakeActivation
+
+SEQ_005: Driver emergency alert
+  - from ref block BrakeControlModule
+  - to ref block DriverInterface
+  - flow ref signal EmergencyBrakingActive
+
+Fragment: CommunicationTimeout (alt, "Communication timeout > 100ms")
+  SEQ_ERROR_001: Fallback control
+    - from ref block BrakeControlModule
+    - to ref block FallbackController
+    - flow ref signal CommunicationFailure
+
+Fragment: ParallelHealthMonitoring (parallel, "All modules report concurrently")
+  SEQ_HEALTH_001: Perception status
+    - from ref block PerceptionModule
+    - to ref block HealthMonitor
+    - flow ref signal PerceptionHealthStatus
+  SEQ_HEALTH_002: Planning status
+    - from ref block PlanningModule
+    - to ref block HealthMonitor
+    - flow ref signal PlanningHealthStatus
+
+File: EmergencyBrakingSequences.seq
+References: 
+  use block PerceptionModule, PlanningModule, BrakeControlModule, DriverInterface
+  use operation EnvironmentModelUpdate, BrakeForceCommand, EmergencyBrakeActivation
+  use signal CollisionThreatDetected, EmergencyBrakingActive, CommunicationFailure
+```
+
+### 2. Medical Device Infusion Pump Sequence
+```
+Generate .seq file for ICU infusion pump communication.
+
+System: Intravenous infusion pump
+Blocks: DoseCalculator, FlowController, PumpMechanism, AlarmSystem, DataLogger
+Operations: CalculateDose, SetFlowRate, ActivatePump, LogData
+Signals: DoseReady, PumpRunning, AlarmTriggered, OcclusionDetected
+Safety Level: SIL-3
+
+Sequence Set: InfusionPumpSequences (SIL-3)
+
+Generate 10-12 sequences:
+1. Normal infusion sequences (5-6)
+   - DoseCalculator → FlowController: CalculateDose
+   - FlowController → PumpMechanism: SetFlowRate
+   - PumpMechanism → DataLogger: PumpStatus
+   - DataLogger → Database: LogInfusionData
+
+2. Alarm sequences (3-4)
+   - PumpMechanism → AlarmSystem: OcclusionDetected signal
+   - AlarmSystem → Display: VisualAlarm signal
+   - AlarmSystem → Audio: AudioAlarm signal
+   - AlarmSystem → RemoteNotification: CriticalAlert signal
+
+3. Error handling fragments (2-3)
+   - OcclusionDetection fragment (alt, "Pressure > threshold")
+   - LowBattery fragment (alt, "Battery < 10%")
+   - SystemSelfTest fragment (loop, "Every 60 seconds")
+
+File: InfusionPumpSequences.seq
+```
+
+### 3. Aviation Flight Control Sequence (Function-to-Function)
+```
+Create .seq file for aircraft flight control using functions.
+
+Aircraft: Commercial transport flight control
+Functions: LateralControl, LongitudinalControl, AutopilotControl, ActuatorControl
+Operations: ComputeRollCommand, ComputePitchCommand, ComputeYawCommand, 
+           ExecuteControlSurface, MonitorActuators
+Safety Level: DAL-A (ASIL-D equivalent)
+
+Sequence Set: FlightControlSequences (DAL-A)
+
+Generate function-to-function sequences:
+1. Normal flight control (6-8 sequences)
+   - AutopilotControl → LateralControl: ComputeRollCommand
+   - AutopilotControl → LongitudinalControl: ComputePitchCommand
+   - LateralControl → ActuatorControl: ExecuteAileronCommand
+   - LongitudinalControl → ActuatorControl: ExecuteElevatorCommand
+   - ActuatorControl → AutopilotControl: ActuatorFeedback
+
+2. Emergency sequences (3-4)
+   - FaultDetection → AutopilotControl: SystemFaultDetected
+   - AutopilotControl → ActuatorControl: EmergencyMode
+   - ActuatorControl → PilotInterface: ManualControlRequired
+
+3. Monitoring fragments (2-3)
+   - CrossChannelMonitoring fragment (parallel, "Triple redundancy check")
+   - ActuatorHealthCheck fragment (loop, "Every 100ms")
+
+Example function sequences:
+
+SEQ_FUNC_001:
+  - from ref function AutopilotControl
+  - to ref function LateralControl
+  - flow ref operation ComputeRollCommand
+
+SEQ_FUNC_002:
+  - from ref function LateralControl
+  - to ref function ActuatorControl
+  - flow ref operation ExecuteAileronCommand
+
+SEQ_FUNC_003:
+  - from ref function ActuatorControl
+  - to ref function AutopilotControl
+  - flow ref operation ActuatorPositionFeedback
+
+File: FlightControlSequences.seq
+References:
+  use functionset FlightControlFunctions
+  use function AutopilotControl, LateralControl, LongitudinalControl, ActuatorControl
+  use operation ComputeRollCommand, ExecuteAileronCommand, ActuatorPositionFeedback
+```
+
+### 4. Industrial Robot Safety Sequence
+```
+Generate .seq file for collaborative robot safety system.
+
+System: Cobot safety controller
+Blocks: MotionController, CollisionDetector, SafetyMonitor, EmergencyStop, 
+       ForceController
+Operations: PlanMotion, ExecuteMotion, MonitorForce, MonitorProximity
+Signals: CollisionDetected, EmergencyStopPressed, SafeZoneViolation, ForceExceeded
+Safety Level: SIL-3
+
+Sequence Set: CobotSafetySequences (SIL-3)
+
+Generate 12-15 sequences:
+1. Normal collaborative operation (5-6)
+   - MotionController → ForceController: PlanMotion
+   - ForceController → CollisionDetector: MonitorForce
+   - CollisionDetector → SafetyMonitor: ForceStatus
+   - SafetyMonitor → MotionController: SafetyApproval
+
+2. Safety sequences (4-5)
+   - CollisionDetector → SafetyMonitor: CollisionDetected signal
+   - SafetyMonitor → MotionController: StopMotion operation
+   - EmergencyStop → SafetyMonitor: EmergencyStopPressed signal
+   - SafetyMonitor → AllActuators: ImmediateStop signal
+
+3. Monitoring fragments (3-4)
+   - ProximityMonitoring fragment (parallel)
+   - ForceMonitoring fragment (loop, "Every 10ms")
+   - EmergencyStopCheck fragment (loop, "Every 5ms")
+   - SafeZoneViolation fragment (alt, "Human enters restricted zone")
+
+File: CobotSafetySequences.seq
+```
+
+### 5. Generic Sequence Template
+```
+Create .seq file for {SYSTEM_NAME} message flow sequences.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Blocks: {BLOCK_LIST}
+- Functions: {FUNCTION_LIST} (if function-to-function)
+- Operations: {OPERATION_LIST}
+- Signals: {SIGNAL_LIST}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+
+Sequence Set: {SEQUENCESET_NAME} ({SAFETY_LEVEL})
+- Owner: "{OWNER_NAME}"
+- Tags: {TAG_LIST}
+- Level: {system|subsystem|component}
+
+Generate {NUMBER} sequences showing:
+1. Normal operation sequences ({COUNT})
+   - {SOURCE} → {TARGET}: {OPERATION/SIGNAL}
+   
+2. Error/exception sequences ({COUNT})
+   - {SOURCE} → {TARGET}: {ERROR_SIGNAL}
+   
+3. Fragments ({COUNT})
+   - {FRAGMENT_NAME} (alt|else|parallel|loop): {CONDITION}
+
+For each sequence:
+```
+def sequence {SEQ_ID}
+  from ref block {SOURCE_BLOCK}
+  to ref block {TARGET_BLOCK}
+  flow ref operation {OPERATION_NAME}
+```
+
+or
+
+```
+def sequence {SEQ_ID}
+  from ref function {SOURCE_FUNCTION}
+  to ref function {TARGET_FUNCTION}
+  flow ref operation {OPERATION_NAME}
+```
+
+For each fragment:
+```
+def fragment {FRAGMENT_ID}
+  name "{FRAGMENT_NAME}"
+  description "{FRAGMENT_DESCRIPTION}"
+  fragmenttype {alt|else|parallel|loop}
+  condition "{CONDITION_DESCRIPTION}"
+  
+  def sequence {NESTED_SEQ_ID}
+    from ref block {SOURCE}
+    to ref block {TARGET}
+    flow ref operation {OPERATION}
+```
+
+File: {SYSTEM_NAME}Sequences.seq
+References:
+  use block {BLOCK_REFERENCES}
+  use functionset {FUNCTIONSET_REFERENCES}
+  use operation {OPERATION_REFERENCES}
+  use signal {SIGNAL_REFERENCES}
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef sequenceset` per file
+- [ ] All `use` statements at top (block, functionset, function, operation, signal)
+- [ ] `name`, `description`, `owner`, `tags` at sequenceset level ONLY
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Sequenceset Properties
+- [ ] Sequenceset has unique identifier
+- [ ] `name` is descriptive
+- [ ] `description` explains sequence set purpose
+- [ ] `safetylevel` specified
+- [ ] `owner` identified
+- [ ] `tags` facilitate classification
+
+### Sequence Structure
+- [ ] Each sequence has unique identifier
+- [ ] NO `name`, `description`, `owner` at sequence level (common mistake!)
+- [ ] `from ref block` or `from ref function` specified
+- [ ] `to ref block` or `to ref function` specified
+- [ ] `flow ref operation` or `flow ref signal` specified
+- [ ] **CRITICAL**: Each sequence uses ONLY blocks OR ONLY functions (no mixing!)
+  - [ ] If `from ref block`, then `to ref block` (not function)
+  - [ ] If `from ref function`, then `to ref function` (not block)
+- [ ] All referenced blocks/functions/operations/signals exist
+
+### Fragment Structure
+- [ ] Each fragment has unique identifier
+- [ ] `name` is descriptive
+- [ ] `description` explains fragment purpose
+- [ ] `fragmenttype` specified (alt|else|parallel|loop)
+- [ ] `condition` specified
+- [ ] Nested sequences inside fragment are valid
+
+### Message Flow Logic
+- [ ] Sequences form logical message flow
+- [ ] Source and target blocks/functions are appropriate
+- [ ] Operations and signals are appropriate for flow
+- [ ] Fragments organize related sequences logically
+- [ ] No circular or contradictory flows
+
+### Completeness
+- [ ] All major message flows covered
+- [ ] Error handling sequences included
+- [ ] Alternative flows in fragments
+- [ ] Parallel/concurrent flows identified
+- [ ] Complete communication pattern documented
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Adding `name`, `description`, `owner`, `tags` to `def sequence` (WRONG!)
+- Adding non-existent properties like `sequencetype`, `timing`, `includes`, `extends`
+- **CRITICAL**: Mixing blocks and functions in same sequence (from block → to function is WRONG!)
+- Missing `use` statements for blocks, functions, operations, signals
+- Inconsistent block/function references within a sequence
+- Missing `flow` specification
+- Fragments without nested sequences
+- Overly complex nesting
+
+✅ **Best Practices:**
+- Keep sequences simple: `from`, `to`, `flow` only
+- Properties go on `sequenceset`, not individual sequences
+- Use fragments to group related sequences
+- Clear naming: SEQ_001, SEQ_002, etc. or descriptive names
+- **CRITICAL**: Each sequence uses ONLY blocks OR ONLY functions (NEVER mix!)
+- Use operations for request-response, signals for events/notifications
+- Group error handling in fragments
+- Within a sequenceset, you can have some sequences with blocks and others with functions
+- But each individual sequence must be consistent (block→block OR function→function)
+
+---
+
+## Example Generated Sequence Diagram (Target Quality)
+
+```sylang
+use block PerceptionControlModule
+use block PlanningControlModule
+use block VehicleControlModule
+use block BrakeControlModule
+use block HumanMachineInterface
+use operation EnvironmentModelUpdate
+use operation PathPlanningRequest
+use operation BrakeForceCommand
+use operation EmergencyBrakeActivation
+use signal EmergencyStopSignal
+use signal BrakeEngagementConfirmation
+use signal SystemFailureAlert
+use signal PerceptionHealthStatus
+use signal PlanningHealthStatus
+
+hdef sequenceset AutonomousEmergencyBraking
+  name "Autonomous Emergency Braking Sequence"
+  description """
+    Complete message flow sequences for emergency braking scenario in Level 3 
+    autonomous vehicle. Covers normal operation, emergency activation, error 
+    handling, and parallel health monitoring per ISO 26262 ASIL-D.
+    """
+  owner "Safety Systems Integration Team"
+  tags "emergency-braking", "sequence", "safety-critical", "AEB", "ASIL-D"
+  safetylevel ASIL-D
+  level system
+  
+  // Main emergency braking sequence
+  def sequence SEQ_001
+    from ref block PerceptionControlModule
+    to ref block PlanningControlModule
+    flow ref operation EnvironmentModelUpdate
+    
+  def sequence SEQ_002
+    from ref block PlanningControlModule
+    to ref block VehicleControlModule
+    flow ref operation PathPlanningRequest
+    
+  def sequence SEQ_003
+    from ref block VehicleControlModule
+    to ref block BrakeControlModule
+    flow ref operation BrakeForceCommand
+    
+  def sequence SEQ_004
+    from ref block BrakeControlModule
+    to ref block PerceptionControlModule
+    flow ref signal BrakeEngagementConfirmation
+    
+  // Emergency braking activation
+  def sequence SEQ_EMERGENCY_001
+    from ref block PerceptionControlModule
+    to ref block PlanningControlModule
+    flow ref signal EmergencyStopSignal
+    
+  def sequence SEQ_EMERGENCY_002
+    from ref block PlanningControlModule
+    to ref block BrakeControlModule
+    flow ref operation EmergencyBrakeActivation
+    
+  def sequence SEQ_EMERGENCY_003
+    from ref block BrakeControlModule
+    to ref block HumanMachineInterface
+    flow ref signal EmergencyAlert
+    
+  // Error handling fragment
+  def fragment CommunicationFailure
+    name "Communication Failure Handling"
+    description "Handles communication timeout between modules (>100ms)"
+    fragmenttype alt
+    condition "Communication timeout > 100ms"
+    
+    def sequence SEQ_ERROR_001
+      from ref block VehicleControlModule
+      to ref block FallbackControlModule
+      flow ref signal SystemFailureAlert
+      
+    def sequence SEQ_ERROR_002
+      from ref block FallbackControlModule
+      to ref block BrakeControlModule
+      flow ref operation SafeModeActivation
+      
+  // Parallel status reporting fragment  
+  def fragment StatusReporting
+    name "Parallel Health Monitoring"
+    description "All modules report status concurrently to health monitor"
+    fragmenttype parallel
+    condition "All modules must report status concurrently"
+    
+    def sequence SEQ_HEALTH_001
+      from ref block PerceptionControlModule
+      to ref block SystemHealthMonitor
+      flow ref signal PerceptionHealthStatus
+      
+    def sequence SEQ_HEALTH_002
+      from ref block PlanningControlModule
+      to ref block SystemHealthMonitor
+      flow ref signal PlanningHealthStatus
+      
+    def sequence SEQ_HEALTH_003
+      from ref block VehicleControlModule
+      to ref block SystemHealthMonitor
+      flow ref signal VehicleControlHealthStatus
+```
+
+---
+
+**Remember:** Sequence diagrams show message flows between blocks or functions. Keep sequences simple with just `from`, `to`, and `flow`. Use fragments to group related sequences with control flow (alt, parallel, loop). Properties like `name`, `description`, `owner` go on `sequenceset`, NOT on individual sequences.

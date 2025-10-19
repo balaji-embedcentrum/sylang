@@ -1,0 +1,758 @@
+# Requirements (.req) - AI Prompting Guide
+
+## Purpose
+Requirements files define system requirements with complete bilateral traceability to safety goals, functions, blocks, and tests. They support hierarchical requirement refinement (nested requirements) and ISO 26262/ASPICE compliance with forward and backward traceability chains.
+
+## When to Use
+- After defining safety goals (.sgl) and item definition (.itm)
+- During system design and specification phase
+- When implementing ISO 26262 functional safety requirements
+- For ASPICE-compliant requirements management with bilateral traceability
+- During requirement decomposition (system → subsystem → component)
+- For establishing requirements-based testing strategy
+
+## Key Syntax Elements
+```
+use functionset [functionset-ref]
+use configset [configset-ref]
+use testset [testset-ref]
+use parameter [parameter-ref], [parameter-ref], ...
+
+hdef requirementset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
+  level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
+
+  def requirement [identifier]
+    name [string-literal]
+    description [string-literal]
+    rationale [string-literal]
+    verificationcriteria [string-literal]
+    owner [string-literal]
+    tags [string-literal], [string-literal], ...
+    level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
+    status [draft|review|approved|deprecated|implemented|accepted|rejected|accepted+proposal|notapplicable|unknown]
+    reqtype [functional|nonfunctional|system|software|hardware|interface|safety|stakeholder|process|compliance|quality|IT|manufacturing|supplier|program|others]
+    proposal [string-literal]
+    attach [string-literal]
+    safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+    
+    # Bilateral traceability relationships
+    refinedfrom ref requirement [requirement-ref]
+    derivedfrom ref requirement [requirement-ref], [requirement-ref], ...
+    derivedfrom ref safetygoal [safetygoal-ref], [safetygoal-ref], ...
+    implements ref function [function-ref], [function-ref], ...
+    allocatedto ref block [block-ref], [block-ref], ...
+    testedby ref testcase [testcase-ref], [testcase-ref], ...
+    use testset [testset-ref]
+    when ref config [config-ref]
+    
+    # Nested requirements for hierarchical decomposition
+    def requirement [sub-requirement-id]
+      # Same structure as parent requirement
+```
+
+## Valid Keywords
+```
+use, hdef, requirementset, def, requirement, name, description, owner, 
+tags, level, rationale, verificationcriteria, status, reqtype, safetylevel, 
+refinedfrom, derivedfrom, implements, allocatedto, testedby, when, ref, 
+config, testcase, testset, safetygoal, function, block, parameter, attach, proposal
+```
+
+## Requirement Types
+```
+reqtype functional      # Functional requirement (what system does)
+reqtype nonfunctional   # Non-functional requirement (performance, reliability)
+reqtype interface       # Interface requirement (between components)
+reqtype safety          # Safety requirement (ISO 26262, IEC 61508)
+reqtype system          # System-level requirement
+reqtype software        # Software-specific requirement
+reqtype hardware        # Hardware-specific requirement
+reqtype stakeholder     # Stakeholder requirement
+reqtype process         # Process requirement
+reqtype compliance      # Compliance requirement
+reqtype quality         # Quality requirement
+reqtype IT              # IT requirement
+reqtype manufacturing   # Manufacturing requirement
+reqtype supplier        # Supplier requirement
+reqtype program         # Program requirement
+reqtype others          # Other types of requirements
+```
+
+## Status Values
+```
+status draft             # Draft status (initial)
+status review            # Under review
+status approved          # Approved for implementation
+status deprecated        # Deprecated (no longer valid)
+status implemented       # Implemented in design
+status accepted          # Accepted
+status rejected          # Rejected
+status accepted+proposal # Accepted with proposal
+status notapplicable     # Not applicable
+status unknown           # Unknown status
+```
+
+## Bilateral Traceability (INCOSE/ASPICE Definition)
+
+**Bilateral (Bidirectional) Traceability** is the ability to trace requirements both **forward** and **backward** throughout the development lifecycle:
+
+- **Forward Traceability**: From parent artifacts to child artifacts
+  - Safety Goal → Requirements → Design → Implementation → Tests
+  
+- **Backward Traceability**: From child artifacts back to parent artifacts
+  - Tests → Implementation → Design → Requirements → Safety Goal
+
+**Purpose**: Ensures all safety goals are implemented, verified, and validated, and that all artifacts are justified by requirements. Critical for ISO 26262 compliance and change impact analysis.
+
+### Traceability Chain
+```
+.sgl (Safety Goal)
+  ↓ leadsto (forward)
+  ↑ derivedfrom (backward)
+.req (Requirements)        ← YOU ARE HERE
+  ↓ implements (forward)
+  ↑ implementedby (backward - in .fun)
+.blk/.fun (Architecture)
+  ↓ allocatedto (forward)
+  ↑ allocatedto (backward - in .req)
+.tst (Test Cases)
+  ↑ testedby (backward - in .req)
+```
+
+---
+
+## Example Prompts
+
+### 1. Basic Functional Requirements with Hierarchical Refinement
+```
+Create comprehensive .req file for Autonomous Emergency Braking (AEB) system.
+
+Context:
+- System: Level 3 autonomous vehicle
+- Safety level: ASIL-D
+- References: 
+  - use functionset AutonomousDrivingFunctions
+  - use testset EmergencyBrakingTests
+  - use parameter MaxDetectionRange, BrakeResponseTime
+
+Requirements Set: AEB_Requirements (ASIL-D)
+- Owner: "AEB Safety Engineering Team"
+- Level: system
+
+Generate 1 parent requirement with 4 nested chisld requirements:
+
+Parent: REQ_AEB_001 "Emergency Brake Activation" (system-level)
+  - Description: Complete AEB system behavior
+  - Rationale: Prevents collisions (ISO 26262 ASIL-D)
+  - Verification Criteria: Statistical testing with 10,000 scenarios
+  - Status: approved
+  - Reqtype: functional
+  - Safetylevel: ASIL-D
+  - implements ref function: CollisionThreatAssessment, EmergencyBrakeActuation
+  - allocatedto ref block: BrakeControlModule
+  - testedby ref testcase: TC_AEB_SYSTEM_001
+
+  Child 1: REQ_AEB_001_1 "Collision Detection Accuracy" (subsystem-level)
+    - Description: "SHALL detect obstacles with ≥99.5% accuracy at 5-200m"
+    - refinedfrom ref requirement: REQ_AEB_001
+    - implements ref function: CollisionThreatAssessment
+    - testedby ref testcase: TC_AEB_DETECTION_001
+
+  Child 2: REQ_AEB_001_2 "Brake Response Time" (subsystem-level)
+    - Description: "SHALL apply brakes within 200ms of threat detection"
+    - refinedfrom ref requirement: REQ_AEB_001
+    - implements ref function: EmergencyBrakeActuation
+    - testedby ref testcase: TC_AEB_TIMING_001
+
+  Child 3: REQ_AEB_001_3 "Deceleration Performance" (component-level)
+    - Description: "SHALL achieve ≥8 m/s² deceleration on dry surface"
+    - refinedfrom ref requirement: REQ_AEB_001
+    - implements ref function: BrakeForceCalculation
+    - allocatedto ref block: HydraulicBrakeActuator
+    - testedby ref testcase: TC_AEB_DECEL_001
+
+  Child 4: REQ_AEB_001_4 "False Positive Prevention" (subsystem-level)
+    - Description: "SHALL have zero false activations in 100,000 km testing"
+    - refinedfrom ref requirement: REQ_AEB_001
+    - implements ref function: FalsePositiveFilter
+    - testedby ref testcase: TC_AEB_FALSEPOSITIVES_001
+
+File: AEB_Requirements.req
+```
+
+### 2. Safety Requirements with Complete Bilateral Traceability
+```
+Generate safety requirements for brake-by-wire system with full bilateral traceability:
+
+Context:
+- System: Electronic Brake Control
+- Standards: ISO 26262 Part 4 ASIL-D
+- References:
+  - use functionset BrakeControlFunctions
+  - use testset BrakeControlTests
+  - use parameter MaxBrakingForce, BrakeResponseTime
+
+Requirements Set: BrakeControlSafetyRequirements (ASIL-D)
+
+Create 3 safety requirements derived from safety goal SG_PREVENT_UNINTENDED_BRAKING:
+
+1. REQ_BRAKE_SAFE_001 "Brake Force Monitoring" (safety, ASIL-D)
+   - Description: "SHALL continuously monitor brake force and detect anomalies within 50ms"
+   - Rationale: "Detects unintended braking to prevent rear-end collisions (ISO 26262 Part 4)"
+   - Verification Criteria: "Fault injection testing with 99.9% detection rate"
+   - Status: approved
+   - Bilateral Traceability:
+     - derivedfrom ref safetygoal: SG_PREVENT_UNINTENDED_BRAKING (backward to .sgl)
+     - implements ref function: BrakeForceMonitor, AnomalyDetection (forward to .fun)
+     - allocatedto ref block: BrakeControlECU (forward to .blk)
+     - testedby ref testcase: TC_BRAKE_MONITOR_001, TC_ANOMALY_DETECT_001 (forward to .tst)
+
+2. REQ_BRAKE_SAFE_002 "Redundant Brake Control" (safety, ASIL-D)
+   - Description: "SHALL provide dual-channel redundant brake control with cross-monitoring"
+   - Rationale: "Ensures brake control availability even with single channel failure"
+   - Verification Criteria: "Single channel failure testing, both channels must operate independently"
+   - Status: approved
+   - Bilateral Traceability:
+     - derivedfrom ref safetygoal: SG_PREVENT_UNINTENDED_BRAKING
+     - implements ref function: PrimaryBrakeController, BackupBrakeController
+     - allocatedto ref block: BrakeControlECU, BackupBrakeModule
+     - testedby ref testcase: TC_BRAKE_REDUNDANCY_001
+
+3. REQ_BRAKE_SAFE_003 "Safe State Transition" (safety, ASIL-D)
+   - Description: "SHALL transition to safe state (controlled deceleration) upon fault detection within 100ms"
+   - Rationale: "Prevents uncontrolled vehicle behavior during brake system faults"
+   - Verification Criteria: "Fault injection with timing measurement, safe state verification"
+   - Status: approved
+   - Bilateral Traceability:
+     - derivedfrom ref safetygoal: SG_PREVENT_UNINTENDED_BRAKING
+     - implements ref function: SafeStateController, ControlledDeceleration
+     - allocatedto ref block: BrakeControlECU
+     - testedby ref testcase: TC_SAFE_STATE_001
+
+File: BrakeControlSafetyRequirements.req
+```
+
+### 3. Non-Functional Requirements (Performance)
+```
+Create non-functional requirements for real-time perception system:
+
+System: Sensor fusion for autonomous driving
+File: PerceptionPerformanceRequirements.req
+Safety Level: ASIL-D
+References:
+  - use functionset PerceptionFunctions
+  - use testset PerceptionPerformanceTests
+  - use parameter MaxProcessingLatency, MinFrameRate
+
+Requirements Set: PerceptionPerformanceRequirements (ASIL-D)
+- Level: subsystem
+
+Generate 6 non-functional requirements:
+
+1. REQ_PERF_001 "End-to-End Latency" (non-functional, ASIL-D)
+   - Description: "SHALL process sensor data with ≤50ms end-to-end latency from sensor capture to environmental model output"
+   - Rationale: "Real-time perception critical for collision avoidance at highway speeds (130 km/h = 36 m/s, 50ms = 1.8m travel)"
+   - Verification Criteria: "Timing measurement with oscilloscope, 99.9th percentile ≤50ms"
+   - implements ref function: SensorFusion, EnvironmentModelGeneration
+   - allocatedto ref block: PerceptionControlModule
+   - testedby ref testcase: TC_LATENCY_001
+
+2. REQ_PERF_002 "Sensor Processing Throughput" (non-functional, ASIL-D)
+   - Description: "SHALL process sensor data at ≥30 Hz for all sensors concurrently"
+   - Rationale: "Maintains smooth tracking of dynamic objects"
+   - Verification Criteria: "Frame rate measurement over 1-hour test drive"
+   - implements ref function: CameraProcessing, LidarProcessing, RadarProcessing
+   - testedby ref testcase: TC_THROUGHPUT_001
+
+3. REQ_PERF_003 "Object Detection Accuracy" (non-functional, ASIL-D)
+   - Description: "SHALL detect objects ≥20cm with ≥99.9% accuracy at distances 5-200m"
+   - Rationale: "High accuracy prevents false negatives (missed obstacles) and false positives (phantom braking)"
+   - Verification Criteria: "Statistical validation with 10,000+ labeled test scenarios"
+   - implements ref function: ObjectDetection, ObjectClassification
+   - testedby ref testcase: TC_DETECTION_ACCURACY_001
+
+4. REQ_PERF_004 "System Reliability" (non-functional, ASIL-D)
+   - Description: "SHALL maintain ≥99.999% uptime during operation (max 5 minutes downtime per year)"
+   - Rationale: "Critical for safety-of-life system, must be continuously available"
+   - Verification Criteria: "Long-term reliability testing, MTBF calculation"
+   - implements ref function: HealthMonitoring, FaultRecovery
+   - testedby ref testcase: TC_RELIABILITY_001
+
+5. REQ_PERF_005 "Resource Utilization" (non-functional, ASIL-C)
+   - Description: "SHALL operate within 80% CPU utilization and 4GB RAM under peak load"
+   - Rationale: "Ensures headroom for degraded mode and prevents resource exhaustion"
+   - Verification Criteria: "Resource profiling under worst-case scenarios"
+   - implements ref function: SensorFusion
+   - allocatedto ref block: PerceptionControlModule
+   - testedby ref testcase: TC_RESOURCE_001
+
+6. REQ_PERF_006 "Fail-Safe Behavior" (non-functional, ASIL-D)
+   - Description: "SHALL transition to degraded mode with reduced sensor set within 100ms upon primary sensor failure"
+   - Rationale: "Graceful degradation maintains partial functionality until driver takeover"
+   - Verification Criteria: "Sensor failure injection, timing and functionality verification"
+   - implements ref function: DegradedModeController, SensorFallback
+   - testedby ref testcase: TC_DEGRADED_MODE_001
+
+File: PerceptionPerformanceRequirements.req
+```
+
+### 4. Complete Hierarchical Requirements Decomposition
+```
+Create hierarchical requirement structure for Adaptive Cruise Control with 3 levels:
+
+System Level → Subsystem Level → Component Level
+
+use functionset CruiseControlFunctions
+use testset ACCTests
+use parameter MaxAcceleration, MinDeceleration, TargetFollowingDistance
+
+hdef requirementset ACC_Requirements
+  safetylevel ASIL-B
+  level system
+
+System Level (1 requirement):
+
+REQ_ACC_001 "Adaptive Cruise Control System" (system-level, functional, ASIL-B, approved)
+  - Description: """
+      WHEN ACC is activated by the driver, THE system SHALL maintain the driver-set 
+      speed within ±2 km/h AND maintain safe following distance to lead vehicle 
+      based on time-to-collision analysis with automatic speed adjustment.
+      """
+  - Rationale: "Provides driver assistance for highway driving, reduces driver workload"
+  - Verification Criteria: "Real-world driving tests on highways with various traffic scenarios"
+  - implements ref function: AdaptiveCruiseControl
+  - allocatedto ref block: CruiseControlModule
+  - testedby ref testcase: TC_ACC_SYSTEM_001
+
+Subsystem Level (4 nested requirements under REQ_ACC_001):
+
+  REQ_ACC_001_1 "Speed Control" (subsystem-level, functional, ASIL-B, approved)
+    - Description: "SHALL maintain set speed ±2 km/h when no lead vehicle present"
+    - refinedfrom ref requirement: REQ_ACC_001
+    - implements ref function: SpeedRegulator
+    - testedby ref testcase: TC_ACC_SPEED_001
+
+  REQ_ACC_001_2 "Following Distance Control" (subsystem-level, functional, ASIL-B, approved)
+    - Description: "SHALL maintain minimum 2-second time gap to lead vehicle"
+    - refinedfrom ref requirement: REQ_ACC_001
+    - implements ref function: FollowingDistanceController
+    - testedby ref testcase: TC_ACC_DISTANCE_001
+
+  REQ_ACC_001_3 "Acceleration Limits" (subsystem-level, constraint, ASIL-B, approved)
+    - Description: "SHALL limit acceleration to max +2 m/s² and deceleration to max -3 m/s²"
+    - refinedfrom ref requirement: REQ_ACC_001
+    - implements ref function: AccelerationLimiter
+    - testedby ref testcase: TC_ACC_ACCEL_LIMITS_001
+
+  REQ_ACC_001_4 "Deactivation Conditions" (subsystem-level, functional, ASIL-B, approved)
+    - Description: "SHALL deactivate immediately upon brake pedal press or manual override"
+    - refinedfrom ref requirement: REQ_ACC_001
+    - implements ref function: DeactivationController
+    - testedby ref testcase: TC_ACC_DEACTIVATION_001
+
+Component Level (6 nested requirements under subsystem requirements):
+
+Under REQ_ACC_001_1:
+    REQ_ACC_001_1_1 "Throttle Position Control" (component-level, hardware, ASIL-B, approved)
+      - Description: "SHALL adjust throttle position to achieve target speed within 0.5 seconds"
+      - refinedfrom ref requirement: REQ_ACC_001_1
+      - implements ref function: ThrottleController
+      - allocatedto ref block: ThrottleActuator
+      - testedby ref testcase: TC_THROTTLE_RESPONSE_001
+
+Under REQ_ACC_001_2:
+    REQ_ACC_001_2_1 "Radar Distance Measurement" (component-level, hardware, ASIL-B, approved)
+      - Description: "SHALL measure distance to lead vehicle with ±0.5m accuracy at 5-150m range"
+      - refinedfrom ref requirement: REQ_ACC_001_2
+      - implements ref function: RadarProcessing
+      - allocatedto ref block: FrontRadar
+      - testedby ref testcase: TC_RADAR_ACCURACY_001
+
+    REQ_ACC_001_2_2 "Time-to-Collision Calculation" (component-level, software, ASIL-B, approved)
+      - Description: "SHALL calculate TTC with ±0.1s accuracy updated at 20 Hz"
+      - refinedfrom ref requirement: REQ_ACC_001_2
+      - implements ref function: TTCCalculator
+      - testedby ref testcase: TC_TTC_ACCURACY_001
+
+File: ACC_Requirements.req
+```
+
+### 5. ISO 26262 Requirements from Safety Goals with Complete Traceability
+```
+Generate functional safety requirements derived from safety goal SG_UNINTENDED_ACCELERATION (ASIL-D):
+
+Context:
+- Safety Goal: SG_UNINTENDED_ACCELERATION (from .sgl file)
+- Standards: ISO 26262 Part 4 ASIL-D
+- References:
+  - use functionset ThrottleControlFunctions
+  - use testset ThrottleSafetyTests
+  - use parameter MaxThrottleRate, ThrottlePlausibilityThreshold
+
+Requirements Set: ThrottleSafetyRequirements (ASIL-D)
+- ISO 26262 Part: "Part 4 - Technical Safety Requirements"
+- Owner: "Throttle Safety Engineering Team"
+
+Generate 8 safety requirements with complete bilateral traceability:
+
+1. REQ_THROTTLE_SAFE_001 "Throttle Position Monitoring" (safety, ASIL-D, approved)
+   - Description: """
+       SHALL continuously monitor throttle position sensor with dual-channel 
+       redundancy and detect discrepancies >5% within 50ms.
+       """
+   - Rationale: "Detects sensor failures that could cause unintended acceleration (ISO 26262 Part 4)"
+   - Verification Criteria: "Sensor fault injection, 99.9% detection rate within 50ms"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: ThrottlePositionMonitor, SensorPlausibilityCheck
+   - allocatedto ref block: ThrottleControlECU
+   - testedby ref testcase: TC_THROTTLE_MONITOR_001
+
+2. REQ_THROTTLE_SAFE_002 "Plausibility Checks" (safety, ASIL-D, approved)
+   - Description: "SHALL validate throttle commands against vehicle dynamics limits (max rate 50%/s)"
+   - Rationale: "Prevents physically implausible throttle commands from software errors"
+   - Verification Criteria: "Command validation testing with out-of-range inputs"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: ThrottlePlausibilityChecker, DynamicsValidator
+   - allocatedto ref block: ThrottleControlECU
+   - testedby ref testcase: TC_PLAUSIBILITY_001
+
+3. REQ_THROTTLE_SAFE_003 "Redundant Sensors" (safety, ASIL-D, approved)
+   - Description: "SHALL use dual independent throttle position sensors with cross-comparison"
+   - Rationale: "Provides hardware redundancy for sensor failure detection"
+   - Verification Criteria: "Single sensor failure testing, continued operation verification"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: RedundantSensorProcessing
+   - allocatedto ref block: ThrottleSensorModule
+   - testedby ref testcase: TC_SENSOR_REDUNDANCY_001
+
+4. REQ_THROTTLE_SAFE_004 "Emergency Shutoff Logic" (safety, ASIL-D, approved)
+   - Description: "SHALL disable throttle control and close throttle valve within 100ms upon fault detection"
+   - Rationale: "Immediate fault response prevents prolonged unintended acceleration"
+   - Verification Criteria: "Fault injection with timing measurement, safe state verification"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: EmergencyThrottleShutoff, SafeStateActivation
+   - allocatedto ref block: ThrottleControlECU, ThrottleActuator
+   - testedby ref testcase: TC_EMERGENCY_SHUTOFF_001
+
+5. REQ_THROTTLE_SAFE_005 "Diagnostic Coverage" (safety, ASIL-D, approved)
+   - Description: "SHALL achieve ≥99% diagnostic coverage for throttle system faults per ISO 26262"
+   - Rationale: "High diagnostic coverage ensures fault detection for ASIL-D compliance"
+   - Verification Criteria: "FMEA-based diagnostic testing, coverage calculation"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: ThrottleDiagnostics, FaultDetection
+   - allocatedto ref block: ThrottleControlECU
+   - testedby ref testcase: TC_DIAGNOSTIC_COVERAGE_001
+
+6. REQ_THROTTLE_SAFE_006 "Safe State Transition" (safety, ASIL-D, approved)
+   - Description: "SHALL transition to safe state (throttle closed, limp-home mode) within 150ms upon critical fault"
+   - Rationale: "Ensures vehicle remains controllable during throttle system failure"
+   - Verification Criteria: "Critical fault injection, timing and behavior verification"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: SafeStateController, LimpHomeMode
+   - allocatedto ref block: ThrottleControlECU
+   - testedby ref testcase: TC_SAFE_STATE_TRANSITION_001
+
+7. REQ_THROTTLE_SAFE_007 "Driver Warning" (safety, ASIL-B, approved)
+   - Description: "SHALL activate visual and audible warnings within 200ms upon throttle system degradation"
+   - Rationale: "Alerts driver to take corrective action or assume manual control"
+   - Verification Criteria: "Warning system testing, timing measurement, driver perception validation"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: DriverWarningSystem
+   - allocatedto ref block: HumanMachineInterface
+   - testedby ref testcase: TC_DRIVER_WARNING_001
+
+8. REQ_THROTTLE_SAFE_008 "Fail-Operational Behavior" (safety, ASIL-D, approved)
+   - Description: """
+       SHALL maintain reduced throttle control capability (max 30% throttle) using 
+       backup sensor and controller upon primary channel failure.
+       """
+   - Rationale: "Fail-operational design maintains mobility for safe vehicle maneuvering"
+   - Verification Criteria: "Primary channel failure testing, degraded mode functionality verification"
+   - derivedfrom ref safetygoal: SG_UNINTENDED_ACCELERATION
+   - implements ref function: BackupThrottleController, DegradedModeController
+   - allocatedto ref block: BackupThrottleModule
+   - testedby ref testcase: TC_FAIL_OPERATIONAL_001
+
+Bilateral Traceability Summary:
+- Backward: All 8 requirements link to SG_UNINTENDED_ACCELERATION (.sgl file)
+- Forward: All requirements link to functions (.fun), blocks (.blk), and tests (.tst)
+- Complete chain: .sgl → .req → .fun/.blk → .tst
+
+File: ThrottleSafetyRequirements.req
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Syntax & Structure
+- [ ] Single `hdef requirementset` per file
+- [ ] All `use` statements at top (functionset, testset, parameter, configset)
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Triple quotes `"""` for multiline descriptions
+
+### Content Completeness
+- [ ] Each requirement has unique identifier
+- [ ] `name` is concise and descriptive
+- [ ] `description` is detailed and unambiguous (use SHALL language)
+- [ ] `rationale` explains why requirement exists
+- [ ] `verificationcriteria` includes measurable metrics
+- [ ] `reqtype` is specified
+- [ ] `status` is specified
+- [ ] `safetylevel` specified for safety-critical systems
+- [ ] `level` specified (system|subsystem|component)
+
+### Hierarchical Structure
+- [ ] Nested requirements properly indented
+- [ ] Parent-child relationships use `refinedfrom ref requirement`
+- [ ] No circular dependencies
+- [ ] Logical decomposition (system → subsystem → component)
+- [ ] Child requirements inherit parent's safety level (or higher)
+
+### Bilateral Traceability (ASPICE/ISO 26262)
+- [ ] **Backward**: `derivedfrom ref safetygoal` links to .sgl files
+- [ ] **Backward**: `derivedfrom ref requirement` links to parent requirements
+- [ ] **Forward**: `implements ref function` links to .fun files
+- [ ] **Forward**: `allocatedto ref block` links to .blk files
+- [ ] **Forward**: `testedby ref testcase` links to .tst files
+- [ ] All referenced symbols exist in workspace
+- [ ] Complete traceability chain: .sgl → .req → .fun/.blk → .tst
+
+### Safety & Compliance
+- [ ] ASIL level consistent with parent safety goals
+- [ ] ISO 26262 requirements derive from safety goals
+- [ ] Hazard mitigation is traceable
+- [ ] Diagnostic coverage requirements specified
+- [ ] Safe state and fail-operational requirements included
+
+### Configuration Management
+- [ ] `when ref config` used for variant-specific requirements
+- [ ] Configuration references match .vcf file
+- [ ] `use testset` for test organization
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Vague descriptions ("System shall work properly" - NO!)
+- Missing verification criteria
+- Inconsistent ASIL levels (child lower than parent)
+- Broken traceability links
+- Duplicate identifiers
+- Missing `use` statements
+- Forgetting multiline syntax `"""` for long descriptions
+- Missing bilateral traceability (derivedfrom safetygoal)
+- Flat structure (no nested requirements for decomposition)
+- Missing status and reqtype
+
+✅ **Best Practices:**
+- Use SHALL for mandatory requirements
+- Include quantifiable acceptance criteria (numbers, percentages, times)
+- Link every requirement to at least one test
+- Maintain complete bilateral traceability chain
+- Use hierarchical refinement (nested requirements) for complex requirements
+- Add rationale for all safety-critical requirements
+- Use specific, measurable, testable language
+- Inherit safety levels correctly (child ≥ parent)
+- Include timing requirements (ms) for real-time systems
+
+---
+
+## Example Generated Requirements (Target Quality)
+
+```sylang
+use functionset AutonomousBrakingFunctions
+use testset EmergencyBrakingTests
+use parameter MaxBrakingForce, BrakeResponseTime
+
+hdef requirementset EmergencyBrakingRequirements
+  name "Autonomous Emergency Braking Requirements"
+  description """
+    Complete safety and functional requirements for AEB system per ISO 26262 
+    Part 4. Includes hierarchical decomposition from system to component level 
+    with complete bilateral traceability to safety goals, functions, and tests.
+    """
+  owner "Functional Safety Team"
+  tags "ASIL-D", "AEB", "collision-avoidance", "ISO-26262"
+  safetylevel ASIL-D
+  level system
+
+  def requirement REQ_AEB_001
+    name "Emergency Brake Activation System"
+    description """
+      WHEN the AEB system detects an imminent collision with a stationary 
+      or moving object at speeds between 5 km/h and 80 km/h, THE system 
+      SHALL automatically apply maximum braking force to prevent collision 
+      or minimize impact severity within 200 milliseconds of threat detection.
+      """
+    rationale """
+      Prevents or mitigates front-end collisions which are the most common 
+      severe accidents in urban and highway driving. Critical for achieving 
+      Euro NCAP 5-star rating and ISO 26262 ASIL-D compliance. Addresses 
+      safety goal SG_COLLISION_PREVENTION.
+      """
+    verificationcriteria """
+      1. Collision detection accuracy ≥ 99.5% in 10,000+ test scenarios
+      2. Brake application time ≤ 200ms from threat detection (measured with oscilloscope)
+      3. Deceleration rate ≥ 8 m/s² on dry surface (instrumented testing)
+      4. Zero false positives in 100,000 km real-world testing
+      5. Successful prevention in 95% of NCAP test collision scenarios
+      6. System availability ≥ 99.999% during operation
+      """
+    owner "AEB System Engineer"
+    tags "system-level", "collision-prevention", "critical"
+    level system
+    status approved
+    reqtype functional
+    safetylevel ASIL-D
+    derivedfrom ref safetygoal SG_COLLISION_PREVENTION
+    implements ref function CollisionThreatAssessment, EmergencyBrakeActuation
+    allocatedto ref block BrakeControlModule
+    testedby ref testcase TC_AEB_SYSTEM_001, TC_AEB_INTEGRATION_001
+    when ref config c_AEB_Enabled
+
+    def requirement REQ_AEB_001_1
+      name "Collision Detection Accuracy"
+      description """
+        THE system SHALL detect stationary objects ≥20cm and moving objects 
+        ≥30cm with ≥99.5% accuracy at distances 5-200m under all weather 
+        conditions (day, night, rain, fog with visibility >50m).
+        """
+      rationale """
+        High detection accuracy prevents false negatives (missed collisions) 
+        which are safety-critical. 99.5% accuracy derived from ISO 26262 
+        ASIL-D requirements for perception systems.
+        """
+      verificationcriteria """
+        Statistical validation with 10,000+ labeled scenarios including:
+        - Pedestrians, cyclists, vehicles of various sizes
+        - Day/night conditions, rain, fog
+        - Measured precision, recall, F1-score
+        - False negative rate < 0.5%
+        """
+      owner "Perception Engineer"
+      tags "subsystem-level", "perception", "detection"
+      level subsystem
+      status approved
+      reqtype functional
+      safetylevel ASIL-D
+      refinedfrom ref requirement REQ_AEB_001
+      implements ref function ObjectDetection, ObjectClassification
+      allocatedto ref block PerceptionModule
+      testedby ref testcase TC_AEB_DETECTION_001, TC_PERCEPTION_ACCURACY_001
+
+    def requirement REQ_AEB_001_2
+      name "Brake Application Timing"
+      description """
+        THE system SHALL command emergency braking within 200ms (max) from 
+        collision threat detection, including all processing delays (perception 
+        to decision to actuation).
+        """
+      rationale """
+        At highway speeds (100 km/h = 27.8 m/s), 200ms delay equals 5.6m travel 
+        distance. Minimizing delay maximizes collision prevention effectiveness.
+        """
+      verificationcriteria """
+        Timing measurement with oscilloscope from threat detection signal to 
+        brake command signal. 99.9th percentile ≤ 200ms over 1000+ test runs.
+        """
+      owner "Controls Engineer"
+      tags "subsystem-level", "timing", "real-time"
+      level subsystem
+      status approved
+      reqtype non-functional
+      safetylevel ASIL-D
+      refinedfrom ref requirement REQ_AEB_001
+      implements ref function EmergencyBrakeActuation, BrakeCommandGenerator
+      allocatedto ref block BrakeControlModule
+      testedby ref testcase TC_AEB_TIMING_001
+
+      def requirement REQ_AEB_001_2_1
+        name "Sensor Processing Latency"
+        description "SHALL process sensor data with ≤50ms latency (sensor to environmental model)"
+        rationale "Perception latency is largest component of total delay budget"
+        verificationcriteria "Oscilloscope timing measurement, 99th percentile ≤50ms"
+        level component
+        status approved
+        reqtype non-functional
+        safetylevel ASIL-D
+        refinedfrom ref requirement REQ_AEB_001_2
+        implements ref function SensorFusion
+        allocatedto ref block PerceptionModule
+        testedby ref testcase TC_SENSOR_LATENCY_001
+
+      def requirement REQ_AEB_001_2_2
+        name "Decision Making Latency"
+        description "SHALL make braking decision within ≤50ms (environmental model to brake command)"
+        rationale "Decision latency must be minimized for real-time response"
+        verificationcriteria "Software timing measurement, 99th percentile ≤50ms"
+        level component
+        status approved
+        reqtype non-functional
+        safetylevel ASIL-D
+        refinedfrom ref requirement REQ_AEB_001_2
+        implements ref function CollisionThreatAssessment
+        allocatedto ref block DecisionModule
+        testedby ref testcase TC_DECISION_LATENCY_001
+
+    def requirement REQ_AEB_001_3
+      name "Deceleration Performance"
+      description """
+        THE system SHALL achieve minimum 8 m/s² deceleration on dry asphalt 
+        within 300ms of brake application command (includes hydraulic delay).
+        """
+      rationale "8 m/s² deceleration sufficient for collision prevention in most scenarios"
+      verificationcriteria """
+        Instrumented vehicle testing with accelerometers. Measure deceleration 
+        rate on dry asphalt test track. 100 test runs, all ≥8 m/s².
+        """
+      owner "Brake System Engineer"
+      tags "component-level", "performance", "actuation"
+      level component
+      status approved
+      reqtype non-functional
+      safetylevel ASIL-D
+      refinedfrom ref requirement REQ_AEB_001
+      implements ref function BrakeForceCalculation, HydraulicBrakeControl
+      allocatedto ref block HydraulicBrakeActuator
+      testedby ref testcase TC_AEB_DECEL_001
+
+    def requirement REQ_AEB_001_4
+      name "False Positive Prevention"
+      description """
+        THE system SHALL have zero unintended brake activations (false positives) 
+        in 100,000 km of real-world driving across varied conditions.
+        """
+      rationale """
+        False positives cause driver distrust and potential rear-end collisions. 
+        Zero tolerance for false activations per Euro NCAP requirements.
+        """
+      verificationcriteria """
+        Real-world fleet testing: 10 vehicles × 10,000 km each = 100,000 km total.
+        Log all brake activations, manually verify each activation was justified.
+        Target: zero unjustified activations.
+        """
+      owner "Validation Engineer"
+      tags "subsystem-level", "validation", "safety"
+      level subsystem
+      status approved
+      reqtype functional
+      safetylevel ASIL-D
+      refinedfrom ref requirement REQ_AEB_001
+      implements ref function FalsePositiveFilter, ActivationValidator
+      allocatedto ref block PerceptionModule
+      testedby ref testcase TC_AEB_FALSE_POSITIVES_001
+```
+
+---
+
+**Remember:** Requirements are the foundation of the V-model. Complete bilateral traceability (backward to safety goals, forward to design and tests) is essential for ISO 26262/ASPICE compliance. Use nested requirements for hierarchical decomposition. Every requirement must be testable with measurable verification criteria.

@@ -1,0 +1,579 @@
+# Variant Model (.vml) - AI Prompting Guide
+
+## ⚠️ CRITICAL: AUTO-GENERATED FILE
+**DO NOT CREATE .VML FILES MANUALLY!**
+
+`.vml` files are **AUTO-GENERATED** from `.fml` (Feature Model) files using the command:
+**Right-click `.fml` file → "Generate VML from FML"**
+
+## Purpose
+Variant Model files define **variant selections** from a feature model. VML files capture which features are selected for a specific product variant, supporting systematic product line engineering and configuration management. They are the bridge between feature models (.fml) and configuration files (.vcf).
+
+## When to Use
+- **NEVER create manually** - always generate from `.fml`
+- After defining features in `.fml` file
+- When creating product variants
+- For variant configuration management
+- During product derivation
+- Before generating configuration files (.vcf)
+
+## Generation Workflow
+
+### Step 1: Create Feature Model (.fml)
+First, create your feature model defining all available features:
+
+```sylang
+# AutonomousVehicleFeatures.fml
+use productline AutonomousVehicleProductLine
+
+hdef featureset AutonomousVehicleFeatures
+  name "Autonomous Vehicle Feature Model"
+  description "Complete feature model for L3 autonomous vehicle"
+  owner "Product Line Engineering"
+
+  def feature CoreAutonomousFeatures mandatory
+    name "Core Autonomous Driving Features"
+    description "Essential features required for autonomous operation"
+    
+    def feature PerceptionSystem mandatory
+      name "Perception System"
+      def feature CameraSystem mandatory
+      def feature LidarSystem optional
+      def feature RadarSystem mandatory
+      
+    def feature PlanningSystem mandatory
+      name "Planning System"
+      def feature GlobalPlanning mandatory
+      def feature LocalPlanning mandatory
+```
+
+### Step 2: Generate VML from FML
+**Right-click `AutonomousVehicleFeatures.fml` → "Generate VML from FML"**
+
+This auto-generates:
+```sylang
+# AutonomousVehicleFeatures.vml (AUTO-GENERATED)
+use featureset AutonomousVehicleFeatures
+
+hdef variantset AutonomousVehicleFeaturesVariants
+  name "Autonomous Vehicle Features Variants"
+  description "Auto-generated variant selections"
+  owner "Product Line Engineering"
+  tags "variants", "auto-generated"
+
+  extends ref feature CoreAutonomousFeatures mandatory selected
+    extends ref feature PerceptionSystem mandatory selected
+      extends ref feature CameraSystem mandatory selected
+      extends ref feature LidarSystem optional selected
+      extends ref feature RadarSystem mandatory selected
+    extends ref feature PlanningSystem mandatory selected
+      extends ref feature GlobalPlanning mandatory selected
+      extends ref feature LocalPlanning mandatory selected
+```
+
+### Step 3: Customize Selections
+Edit the auto-generated `.vml` file to create specific variants by adding/removing `selected`:
+
+```sylang
+# Premium variant - keep LiDAR
+extends ref feature LidarSystem optional selected
+
+# Basic variant - remove LiDAR to save cost
+extends ref feature LidarSystem optional  # Remove 'selected'
+```
+
+### Step 4: Generate Configuration (.vcf)
+**Right-click `.vml` → "Generate VCF from VML"**
+
+## Key Syntax Elements
+
+```
+use featureset [featureset-ref]
+
+hdef variantset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+
+  extends ref feature [feature-ref] [mandatory|optional|or|alternative] [selected]
+    extends ref feature [sub-feature] [mandatory|optional|or|alternative] [selected]
+      # Hierarchical structure mirrors .fml
+```
+
+## Valid Keywords
+```
+use, hdef, variantset, name, description, owner, tags, 
+extends, ref, feature, mandatory, optional, or, alternative, selected
+```
+
+## Selection Rules
+
+### Mandatory Features
+```sylang
+extends ref feature CoreSafety mandatory selected
+# Mandatory features MUST be selected
+```
+
+### Optional Features
+```sylang
+extends ref feature LuxuryPackage optional selected     # Can be selected
+extends ref feature TrailerPackage optional             # Can be omitted
+```
+
+### OR Features (At Least One)
+```sylang
+extends ref feature DisplayOptions optional selected
+  extends ref feature Display7Inch or selected          # Selected
+  extends ref feature Display10Inch or                  # Not selected
+  extends ref feature Display12Inch or                  # Not selected
+# At least one OR sibling must be selected
+```
+
+### Alternative Features (Exactly One)
+```sylang
+extends ref feature TransmissionType mandatory selected
+  extends ref feature ManualTransmission alternative    # Not selected
+  extends ref feature AutomaticTransmission alternative selected
+  extends ref feature CVTTransmission alternative       # Not selected
+# Exactly one ALTERNATIVE sibling must be selected
+```
+
+## CRITICAL Constraints
+- ❌ **NO `def` statements** - only `extends ref feature`
+- ❌ **NO manual creation** - always generate from `.fml`
+- ❌ **NO `def feature`** - features are defined in `.fml`, not `.vml`
+- ❌ **NO `def variant`** - variants are selections, not definitions
+- ❌ **NO properties** like `featuretype`, `priority`, `complexity`, `constraints`
+- ❌ **NO relationships** like `parent`, `children`, `requires`, `excludes`
+- ✅ **ONLY `extends ref feature`** with `selected` keyword
+
+---
+
+## Example Prompts
+
+### 1. Automotive Premium Variant Selection
+```
+Given an existing .fml file: AutonomousVehicleFeatures.fml
+
+Step 1: Generate VML from FML
+- Right-click AutonomousVehicleFeatures.fml → "Generate VML from FML"
+- This creates AutonomousVehicleFeatures.vml with ALL features selected by default
+
+Step 2: Edit .vml to create Premium variant
+Save as: AutonomousVehicleFeatures_Premium.vml
+
+Context:
+- Variant: Premium autonomous vehicle with full sensor suite
+- Include: All mandatory features + LiDAR + premium HMI
+- Exclude: Basic/economy options
+
+Selection Strategy:
+1. Keep all mandatory features selected
+2. Select LiDAR (optional but included in Premium)
+3. Select all premium HMI features
+4. Select advanced safety features
+5. Deselect basic/economy alternatives
+
+Edit the auto-generated .vml:
+```sylang
+use featureset AutonomousVehicleFeatures
+
+hdef variantset AutonomousVehicleFeatures_Premium
+  name "Premium Autonomous Vehicle Configuration"
+  description """
+    Premium variant with full sensor suite including LiDAR and 
+    advanced HMI features for luxury autonomous vehicles.
+    """
+  owner "Product Line Engineering"
+  tags "variants", "premium", "full-sensor", "L3-automation"
+
+  extends ref feature CoreAutonomousFeatures mandatory selected
+    extends ref feature PerceptionSystem mandatory selected
+      extends ref feature CameraSystem mandatory selected
+      extends ref feature LidarSystem optional selected  # SELECTED for premium
+      extends ref feature RadarSystem mandatory selected
+    extends ref feature PlanningSystem mandatory selected
+      extends ref feature GlobalPlanning mandatory selected
+      extends ref feature LocalPlanning mandatory selected
+    extends ref feature ControlSystem mandatory selected
+      
+  extends ref feature SafetyMonitoring mandatory selected
+    extends ref feature SystemHealthMonitoring mandatory selected
+    extends ref feature FallbackSystem mandatory selected
+    extends ref feature RedundantSensors optional selected  # SELECTED for premium
+    
+  extends ref feature HumanMachineInterface optional selected
+    extends ref feature TakeoverRequest or selected
+    extends ref feature VoiceInterface or selected  # SELECTED for premium
+    extends ref feature TouchscreenDisplay or selected  # SELECTED for premium
+```
+
+Step 3: Generate configuration
+- Right-click AutonomousVehicleFeatures_Premium.vml → "Generate VCF from VML"
+```
+
+### 2. Automotive Basic/Economy Variant Selection
+```
+Given the same .fml file: AutonomousVehicleFeatures.fml
+
+Step 1: Generate VML from FML
+- Right-click AutonomousVehicleFeatures.fml → "Generate VML from FML"
+
+Step 2: Edit .vml to create Basic variant
+Save as: AutonomousVehicleFeatures_Basic.vml
+
+Context:
+- Variant: Entry-level autonomous vehicle with minimal sensors
+- Include: Only mandatory features + basic HMI
+- Exclude: LiDAR, premium features, advanced options
+
+Selection Strategy:
+1. Keep all mandatory features selected
+2. Deselect LiDAR (too expensive for basic variant)
+3. Deselect redundant sensors
+4. Select minimal HMI (only required features)
+5. Deselect premium/luxury alternatives
+
+Edit the auto-generated .vml:
+```sylang
+use featureset AutonomousVehicleFeatures
+
+hdef variantset AutonomousVehicleFeatures_Basic
+  name "Basic Autonomous Vehicle Configuration"
+  description """
+    Entry-level autonomous configuration with essential sensors only. 
+    Cost-optimized for mass market deployment.
+    """
+  owner "Product Engineering"
+  tags "basic", "entry-level", "cost-optimized", "L3-minimal"
+
+  extends ref feature CoreAutonomousFeatures mandatory selected
+    extends ref feature PerceptionSystem mandatory selected
+      extends ref feature CameraSystem mandatory selected
+      extends ref feature LidarSystem optional  # NOT selected (cost savings)
+      extends ref feature RadarSystem mandatory selected
+    extends ref feature PlanningSystem mandatory selected
+      extends ref feature GlobalPlanning mandatory selected
+      extends ref feature LocalPlanning mandatory selected
+    extends ref feature ControlSystem mandatory selected
+      
+  extends ref feature SafetyMonitoring mandatory selected
+    extends ref feature SystemHealthMonitoring mandatory selected
+    extends ref feature FallbackSystem mandatory selected
+    extends ref feature RedundantSensors optional  # NOT selected (cost savings)
+    
+  extends ref feature HumanMachineInterface optional selected
+    extends ref feature TakeoverRequest or selected  # Minimal required
+    extends ref feature VoiceInterface or  # NOT selected
+    extends ref feature TouchscreenDisplay or  # NOT selected
+```
+```
+
+### 3. Medical Device Variant Selections
+```
+Given .fml file: PatientMonitoringFeatures.fml
+
+Create THREE variants:
+1. Basic Monitor (ICU basic)
+2. Standard Monitor (General ward)
+3. Advanced Monitor (ICU advanced with analytics)
+
+Step 1: Generate VML
+- Right-click PatientMonitoringFeatures.fml → "Generate VML from FML"
+
+Step 2: Create three variant files
+
+--- PatientMonitoringFeatures_ICU_Basic.vml ---
+```sylang
+use featureset PatientMonitoringFeatures
+
+hdef variantset PatientMonitoringFeatures_ICU_Basic
+  name "ICU Basic Patient Monitor Configuration"
+  description "Basic ICU monitoring with essential vital signs"
+  owner "Medical Device Product Management"
+  tags "medical", "ICU", "basic", "IEC-62304"
+
+  extends ref feature CoreMonitoring mandatory selected
+    extends ref feature ECGMonitoring mandatory selected
+    extends ref feature SpO2Monitoring mandatory selected
+    extends ref feature NBPMonitoring mandatory selected
+    extends ref feature TempMonitoring mandatory selected
+    
+  extends ref feature AdvancedMonitoring optional  # NOT selected
+  extends ref feature AnalyticsFeatures optional  # NOT selected
+  extends ref feature CloudConnectivity optional  # NOT selected
+```
+
+--- PatientMonitoringFeatures_Standard.vml ---
+```sylang
+use featureset PatientMonitoringFeatures
+
+hdef variantset PatientMonitoringFeatures_Standard
+  name "Standard Patient Monitor Configuration"
+  description "Standard ward monitoring with additional parameters"
+  owner "Medical Device Product Management"
+  tags "medical", "ward", "standard", "IEC-62304"
+
+  extends ref feature CoreMonitoring mandatory selected
+    extends ref feature ECGMonitoring mandatory selected
+    extends ref feature SpO2Monitoring mandatory selected
+    extends ref feature NBPMonitoring mandatory selected
+    extends ref feature TempMonitoring mandatory selected
+    
+  extends ref feature AdvancedMonitoring optional selected  # SELECTED
+    extends ref feature CO2Monitoring optional selected
+    extends ref feature IBPMonitoring optional selected
+    
+  extends ref feature AnalyticsFeatures optional  # NOT selected (too expensive)
+  extends ref feature CloudConnectivity optional selected  # For data sync
+```
+
+--- PatientMonitoringFeatures_ICU_Advanced.vml ---
+```sylang
+use featureset PatientMonitoringFeatures
+
+hdef variantset PatientMonitoringFeatures_ICU_Advanced
+  name "ICU Advanced Patient Monitor Configuration"
+  description "Advanced ICU monitoring with AI analytics"
+  owner "Medical Device Product Management"
+  tags "medical", "ICU", "advanced", "AI", "IEC-62304"
+
+  extends ref feature CoreMonitoring mandatory selected
+  extends ref feature AdvancedMonitoring optional selected
+  extends ref feature AnalyticsFeatures optional selected  # AI-powered
+    extends ref feature PredictiveAnalytics optional selected
+    extends ref feature TrendAnalysis optional selected
+    extends ref feature EarlyWarningScore optional selected
+  extends ref feature CloudConnectivity optional selected
+```
+```
+
+### 4. Aviation Flight Control Variant Selections
+```
+Given .fml file: FlightControlFeatures.fml
+
+Create regional and wide-body variants
+
+--- FlightControlFeatures_Regional.vml ---
+```sylang
+use featureset FlightControlFeatures
+
+hdef variantset FlightControlFeatures_Regional
+  name "Regional Aircraft Flight Control Configuration"
+  description "Flight control for regional jets (50-100 passengers)"
+  owner "Avionics Engineering"
+  tags "aviation", "regional", "DO-178C", "DAL-A"
+
+  extends ref feature PrimaryFlightControl mandatory selected
+    extends ref feature RollControl mandatory selected
+    extends ref feature PitchControl mandatory selected
+    extends ref feature YawControl mandatory selected
+    
+  extends ref feature Autopilot optional selected  # Basic autopilot
+    extends ref feature LateralAutopilot or selected
+    extends ref feature VerticalAutopilot or selected
+    extends ref feature FullAutopilot or  # NOT selected (not needed)
+    
+  extends ref feature AdvancedFeatures optional  # Minimal advanced features
+    extends ref feature AutolandSystem optional  # NOT selected
+    extends ref feature EnvelopeProtection optional selected  # Basic only
+```
+
+--- FlightControlFeatures_WideBody.vml ---
+```sylang
+use featureset FlightControlFeatures
+
+hdef variantset FlightControlFeatures_WideBody
+  name "Wide-Body Aircraft Flight Control Configuration"
+  description "Advanced flight control for wide-body jets (200+ passengers)"
+  owner "Avionics Engineering"
+  tags "aviation", "wide-body", "DO-178C", "DAL-A"
+
+  extends ref feature PrimaryFlightControl mandatory selected
+  extends ref feature Autopilot optional selected  # Full autopilot
+    extends ref feature LateralAutopilot or  # NOT selected (redundant)
+    extends ref feature VerticalAutopilot or  # NOT selected (redundant)
+    extends ref feature FullAutopilot or selected  # SELECTED (full capability)
+    
+  extends ref feature AdvancedFeatures optional selected  # All advanced
+    extends ref feature AutolandSystem optional selected  # CAT-III capability
+    extends ref feature EnvelopeProtection optional selected  # Full protection
+    extends ref feature WindshearDetection optional selected
+```
+```
+
+### 5. Generic Variant Selection Template
+```
+Given .fml file: {FEATURE_MODEL_NAME}.fml
+
+Step 1: Generate VML
+- Right-click {FEATURE_MODEL_NAME}.fml → "Generate VML from FML"
+
+Step 2: Create variant by editing selections
+Save as: {FEATURE_MODEL_NAME}_{VARIANT_NAME}.vml
+
+Context:
+- Variant Purpose: {VARIANT_DESCRIPTION}
+- Target Market: {MARKET_SEGMENT}
+- Cost Target: {COST_LEVEL}
+- Feature Strategy: {SELECTION_STRATEGY}
+
+Selection Guidelines:
+1. Keep all mandatory features selected (cannot change)
+2. Select optional features based on variant strategy
+3. For OR groups: select at least one
+4. For ALTERNATIVE groups: select exactly one
+5. Document rationale for key selections/deselections
+
+Edit the auto-generated .vml:
+```sylang
+use featureset {FEATURE_MODEL_NAME}
+
+hdef variantset {FEATURE_MODEL_NAME}_{VARIANT_NAME}
+  name "{VARIANT_DISPLAY_NAME}"
+  description """
+    {DETAILED_VARIANT_DESCRIPTION}
+    Target: {TARGET_MARKET}
+    Strategy: {SELECTION_RATIONALE}
+    """
+  owner "{OWNER_NAME}"
+  tags "{TAG1}", "{TAG2}", "{TAG3}"
+
+  extends ref feature {FEATURE_1} mandatory selected
+    extends ref feature {SUB_FEATURE_1_1} mandatory selected
+    extends ref feature {SUB_FEATURE_1_2} optional selected  # SELECTED because...
+    extends ref feature {SUB_FEATURE_1_3} optional          # NOT selected because...
+    
+  extends ref feature {FEATURE_2} optional selected
+    extends ref feature {SUB_FEATURE_2_1} or selected      # At least one
+    extends ref feature {SUB_FEATURE_2_2} or               # NOT selected
+    
+  extends ref feature {FEATURE_3} mandatory selected
+    extends ref feature {SUB_FEATURE_3_1} alternative selected  # Exactly one
+    extends ref feature {SUB_FEATURE_3_2} alternative           # NOT selected
+```
+```
+
+---
+
+## Validation Checklist
+
+After editing auto-generated .vml, verify:
+
+### File Structure
+- [ ] Single `hdef variantset` per file
+- [ ] `use featureset` statement at top (references source `.fml`)
+- [ ] NO `def` statements (features defined in `.fml`, not `.vml`)
+- [ ] Only `extends ref feature` statements
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Variant Properties
+- [ ] Variant has unique identifier
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains variant purpose and strategy
+- [ ] `owner` identified
+- [ ] `tags` facilitate classification
+
+### Feature Selection Rules
+- [ ] All mandatory features have `selected` keyword
+- [ ] Optional features have `selected` or omitted based on variant
+- [ ] OR groups: At least one sibling has `selected`
+- [ ] ALTERNATIVE groups: Exactly one sibling has `selected`
+- [ ] Hierarchical structure mirrors source `.fml`
+- [ ] All referenced features exist in source `.fml`
+
+### Completeness
+- [ ] All feature branches addressed (selected or explicitly not selected)
+- [ ] Variant configuration is valid and complete
+- [ ] Selection rationale is clear from description/tags
+- [ ] Ready to generate `.vcf` configuration file
+
+---
+
+## Common Pitfalls
+
+❌ **AVOID:**
+- Creating `.vml` files manually (ALWAYS generate from `.fml`!)
+- Adding `def feature` statements (features defined in `.fml`)
+- Adding `def variant` statements (doesn't exist)
+- Adding properties: `featuretype`, `priority`, `complexity`, `constraints`, `dependencies`, `conflicts`
+- Adding relationships: `parent`, `children`, `requires`, `excludes`
+- Using `hdef variantmodel` (it's `hdef variantset`)
+- Violating mandatory/optional/or/alternative constraints
+- Forgetting to select mandatory features
+- Selecting multiple alternatives when only one allowed
+- Not selecting any OR feature when at least one required
+
+✅ **BEST PRACTICES:**
+- Always generate from `.fml` using "Generate VML from FML"
+- Edit selections by adding/removing `selected` keyword
+- Document variant strategy in description
+- Use descriptive variant names (e.g., `_Premium`, `_Basic`, `_Regional`)
+- Respect mandatory/optional/or/alternative constraints
+- Validate selections before generating `.vcf`
+- Keep multiple variants in separate files
+- Use consistent naming: `{FeatureModel}_{VariantName}.vml`
+
+---
+
+## Complete Example
+
+### Source: AutonomousVehicleFeatures.fml
+```sylang
+use productline AutonomousVehicleProductLine
+
+hdef featureset AutonomousVehicleFeatures
+  def feature CoreAutonomousFeatures mandatory
+    def feature PerceptionSystem mandatory
+      def feature CameraSystem mandatory
+      def feature LidarSystem optional
+      def feature RadarSystem mandatory
+```
+
+### Generated: AutonomousVehicleFeatures_Premium.vml
+```sylang
+use featureset AutonomousVehicleFeatures
+
+hdef variantset AutonomousVehicleFeatures_Premium
+  name "Premium Autonomous Vehicle Configuration"
+  description """
+    Premium variant with full sensor suite including LiDAR and 
+    advanced HMI features for luxury autonomous vehicles. Targets 
+    luxury market segment with no cost constraints.
+    """
+  owner "Product Line Engineering"
+  tags "variants", "premium", "full-sensor", "L3-automation", "luxury"
+
+  extends ref feature CoreAutonomousFeatures mandatory selected
+    extends ref feature PerceptionSystem mandatory selected
+      extends ref feature CameraSystem mandatory selected
+      extends ref feature LidarSystem optional selected  # PREMIUM includes LiDAR
+      extends ref feature RadarSystem mandatory selected
+```
+
+### Generated: AutonomousVehicleFeatures_Basic.vml
+```sylang
+use featureset AutonomousVehicleFeatures
+
+hdef variantset AutonomousVehicleFeatures_Basic
+  name "Basic Autonomous Vehicle Configuration"
+  description """
+    Entry-level autonomous configuration with essential sensors only. 
+    Cost-optimized for mass market deployment. LiDAR excluded to meet 
+    aggressive cost targets.
+    """
+  owner "Product Engineering"
+  tags "basic", "entry-level", "cost-optimized", "L3-minimal"
+
+  extends ref feature CoreAutonomousFeatures mandatory selected
+    extends ref feature PerceptionSystem mandatory selected
+      extends ref feature CameraSystem mandatory selected
+      extends ref feature LidarSystem optional  # BASIC excludes LiDAR (cost)
+      extends ref feature RadarSystem mandatory selected
+```
+
+---
+
+**Remember:** `.vml` files are **AUTO-GENERATED** from `.fml` files. Never create them manually! Always use "Generate VML from FML" command, then edit the selections by adding/removing the `selected` keyword. Use `hdef variantset` (not `variantmodel`), and only use `extends ref feature` statements (no `def` statements). Respect mandatory/optional/or/alternative constraints. After editing, generate `.vcf` configuration file using "Generate VCF from VML".

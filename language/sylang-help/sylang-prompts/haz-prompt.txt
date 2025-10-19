@@ -1,0 +1,599 @@
+# Hazard Analysis (.haz) - AI Prompting Guide
+
+## Purpose
+Hazard Analysis files define ISO 26262 hazard analysis with ASIL determination. Part of ISO 26262 Part 3 (Concept Phase) compliance. Each hazard has nested situations that represent different operational scenarios, with complete exposure/controllability/severity analysis.
+
+## When to Use
+- During ISO 26262 Part 3 - Concept Phase
+- After item definition (.itm) completion
+- Before safety goals (.sgl) definition
+- During HARA (Hazard Analysis and Risk Assessment) workshops
+- For ASIL determination and safety case development
+
+## Key Syntax Elements
+```
+use itemdefinition [item-ref]
+
+hdef hazardanalysis [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  iso26262part [string-literal]
+  assessmentdate [YYYY-MM-DD]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+
+  def hazard [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    hazardclass [string-literal]
+    severity [S0|S1|S2|S3]
+    exposure [E0|E1|E2|E3|E4|E5]
+    controllability [C0|C1|C2|C3]
+    asil [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
+    malfunctionof ref function [function-ref]
+    affects ref feature [feature-ref]
+    leadsto ref requirement [requirement-ref]
+    
+    def situation [identifier]
+      name [string-literal]
+      description [string-literal]
+      severity [S0|S1|S2|S3]
+      exposure [E0|E1|E2|E3|E4|E5]
+      controllability [C0|C1|C2|C3]
+      asil [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
+      speed [numeric-value or range]
+      environment [string-literal]
+      trafficdensity [low|medium|high]
+      maxacceptabledelay [numeric-value-ms]
+      nominalresponsetime [numeric-value-ms]
+      leadsto ref hazard [hazard-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, hazardanalysis, def, hazard, situation, name, description, owner, 
+tags, level, iso26262part, assessmentdate, hazardclass, severity, exposure, 
+controllability, asil, speed, environment, trafficdensity, maxacceptabledelay, 
+nominalresponsetime, malfunctionof, affects, leadsto, when, ref
+```
+
+## ASIL Determination (ISO 26262 Part 3)
+```
+Severity (S):
+- S0: No injuries
+- S1: Light/moderate injuries
+- S2: Severe/life-threatening injuries (survival probable)
+- S3: Life-threatening/fatal injuries (survival uncertain)
+
+Exposure (E):
+- E0: Incredibly unlikely
+- E1: Very low probability
+- E2: Low probability
+- E3: Medium probability
+- E4: High probability
+- E5: Very high probability
+
+Controllability (C):
+- C0: Controllable in general
+- C1: Simply controllable
+- C2: Normally controllable
+- C3: Difficult to control or uncontrollable
+
+ASIL = f(S, E, C) per ISO 26262 Part 3 Table 4
+```
+
+## Common Patterns
+
+### Hazard Classes
+- **Longitudinal Motion**: Acceleration, braking, speed control
+- **Lateral Motion**: Steering, lane keeping, stability
+- **Collision**: Object detection, obstacle avoidance
+- **Perception**: Sensor failures, environmental detection
+- **Communication**: V2X, internal bus communication
+- **System**: Watchdog, power supply, thermal
+
+### Nested Situations
+Each hazard should have 3-5 situations representing different operational contexts:
+- Urban vs. highway vs. parking
+- Day vs. night vs. adverse weather
+- High vs. low traffic density
+- Different speed ranges
+
+---
+
+## Example Prompts
+
+### 1. Automotive Brake System Hazard Analysis
+```
+Create comprehensive .haz file for electronic brake control system.
+
+Context:
+- System: Electronic Brake Control (EBC) with ABS/ESP
+- Item: use itemdefinition ElectronicBrakeControlItem
+- Standards: ISO 26262 Part 3 ASIL-D
+- Functions: BrakeControl, ABSControl, ESPControl
+- Features: ElectronicBraking, AntiLockBraking
+- Requirements: BrakeControl_Requirements.req
+
+Hazard Analysis: ElectronicBrakeHazards (ASIL-D)
+- ISO 26262 Part: "Part 3 - Hazard Analysis and Risk Assessment"
+- Assessment Date: 2025-10-05
+- Owner: "Brake Systems Safety Team"
+
+Hazard Categories:
+1. UnintendedBraking - Brakes apply without driver command
+2. LossOfBraking - Brakes fail to apply when commanded
+3. InsufficientBraking - Brakes provide inadequate force
+4. UnintendedBrakeRelease - Brakes release during application
+
+For each hazard, define:
+- Hazardclass: "Longitudinal Motion"
+- Overall severity, exposure, controllability, ASIL
+- malfunctionof ref function: Link to affected function
+- affects ref feature: Link to affected feature
+- leadsto ref requirement: Link to derived safety requirement
+
+For each hazard, create 3-4 situations:
+1. HighwayHighSpeed (60-130 km/h, high exposure)
+2. UrbanModerateSpeed (30-60 km/h, medium exposure)
+3. ParkingLowSpeed (0-30 km/h, low exposure)
+4. AdverseWeather (wet/icy conditions, reduced controllability)
+
+Each situation must specify:
+- Speed range with units
+- Environment description
+- Traffic density
+- maxacceptabledelay (fault detection time in ms)
+- nominalresponsetime (expected response time in ms)
+- Situation-specific S, E, C, ASIL
+- leadsto ref hazard (if situation causes other hazards)
+
+Example Hazard:
+
+UnintendedBraking (Hazardclass: "Longitudinal Motion", ASIL-D)
+  - Description: Brakes apply without driver command due to malfunction
+  - Severity: S3 (rear-end collision possible)
+  - Exposure: E3 (medium - occasional software/hardware faults)
+  - Controllability: C2 (driver can attempt to override)
+  - ASIL: ASIL-D
+  - malfunctionof ref function BrakeControl
+  - affects ref feature ElectronicBraking
+  - leadsto ref requirement REQ_BRAKE_UNINTENDED_001
+  
+  Situation: HighwayUnintendedBraking
+    - Speed: "100-130 km/h"
+    - Environment: "Highway, dry conditions, following traffic"
+    - Traffic density: high
+    - maxacceptabledelay: 100ms
+    - nominalresponsetime: 50ms
+    - Severity: S3 (high-speed rear-end collision)
+    - Exposure: E4 (high - frequent highway driving)
+    - Controllability: C3 (very difficult at high speed)
+    - ASIL: ASIL-D
+
+File: ElectronicBrakeHazards.haz
+```
+
+### 2. Medical Device Infusion Pump Hazard Analysis
+```
+Generate .haz file for medical device infusion pump.
+
+System: Intravenous infusion pump for ICU
+Item: use itemdefinition InfusionPumpItem
+Standards: IEC 62304 SIL-3, ISO 14971
+Functions: DosageControl, FlowRateControl, AlarmManagement
+Requirements: InfusionPump_Requirements.req
+
+Hazard Analysis: InfusionPumpHazards (SIL-3)
+- ISO 26262 Part: "Medical Device Risk Analysis per ISO 14971"
+- Assessment Date: 2025-10-05
+- Owner: "Medical Device Safety Team"
+
+Medical-specific considerations:
+- Patient safety paramount (severity S3 for any life-threatening)
+- Continuous monitoring (exposure E5 for always-on systems)
+- Healthcare provider controllability (C1-C2 for hospital setting)
+- Strict alarm requirements (maxacceptabledelay < 500ms)
+
+Hazard Categories:
+1. Overdose - Excessive drug delivery
+2. Underdose - Insufficient drug delivery
+3. OccludedLine - Blocked IV line
+4. AirEmbolism - Air in IV line
+5. BatteryFailure - Power loss
+
+For each hazard:
+- Use medical hazardclasses: "Drug Delivery", "Monitoring", "Alarm", "Power"
+- High severity (S3) for life-threatening scenarios
+- High exposure (E4-E5) for continuous operation
+- Document situation-specific controllability based on care setting
+
+Example Hazard:
+
+Overdose (Hazardclass: "Drug Delivery", SIL-3)
+  - Description: Infusion pump delivers excessive drug dose
+  - Severity: S3 (life-threatening toxicity)
+  - Exposure: E3 (medium - software/hardware faults)
+  - Controllability: C1 (nurse can detect and stop)
+  - ASIL: ASIL-D (equivalent)
+  - malfunctionof ref function DosageControl
+  - affects ref feature InfusionControl
+  - leadsto ref requirement REQ_DOSE_SAFETY_001
+  
+  Situation: ICU_CriticalPatient
+    - Speed: "N/A (infusion rate: 0.1-100 mL/hr)"
+    - Environment: "ICU, continuous monitoring, high-acuity patient"
+    - Traffic density: N/A
+    - maxacceptabledelay: 500ms
+    - nominalresponsetime: 200ms
+    - Severity: S3
+    - Exposure: E5 (continuous operation)
+    - Controllability: C1 (nurse present)
+    - ASIL: ASIL-D
+
+File: InfusionPumpHazards.haz
+```
+
+### 3. Aviation Flight Control Hazard Analysis
+```
+Create .haz file for aircraft flight control system.
+
+Aircraft: Commercial transport (Boeing 737 class)
+Item: use itemdefinition FlightControlItem
+Certification: DO-178C DAL-A, FAR Part 25
+Functions: LateralControl, LongitudinalControl, AutopilotControl
+Requirements: FlightControl_Requirements.req
+
+Hazard Analysis: FlightControlHazards (DAL-A)
+- ISO 26262 Part: "Aviation Safety Analysis per DO-178C"
+- Assessment Date: 2025-10-05
+- Owner: "Flight Control Safety Team"
+
+Aviation-specific considerations:
+- Catastrophic severity for loss of control (S3)
+- Flight phase dependent exposure (takeoff/landing vs. cruise)
+- Pilot controllability varies by flight phase
+- Strict timing requirements (maxacceptabledelay < 50ms)
+
+Hazard Categories:
+1. UncommandedRoll - Aircraft rolls without pilot input
+2. LossOfPitchControl - Cannot control pitch
+3. UncommandedYaw - Aircraft yaws without pilot input
+4. TrimRunaway - Trim moves uncontrollably
+5. AutopilotDisengagement - Unexpected autopilot disconnect
+
+For each hazard:
+- Hazardclass: "Flight Control", "Autopilot", "Trim System"
+- Consider all flight phases (takeoff, cruise, approach, landing)
+- DAL-A equivalent to ASIL-D
+
+Example Hazard:
+
+UncommandedRoll (Hazardclass: "Flight Control", DAL-A)
+  - Description: Aircraft rolls without pilot command
+  - Severity: S3 (catastrophic - loss of control)
+  - Exposure: E2 (low - rare control system fault)
+  - Controllability: C2 (pilot can counteract in cruise)
+  - ASIL: ASIL-D (DAL-A equivalent)
+  - malfunctionof ref function LateralControl
+  - affects ref feature FlightControlSystem
+  - leadsto ref requirement REQ_FLIGHT_ROLL_001
+  
+  Situation: TakeoffUncommandedRoll
+    - Speed: "150-200 knots IAS"
+    - Environment: "Takeoff phase, low altitude, full thrust"
+    - Traffic density: N/A
+    - maxacceptabledelay: 50ms
+    - nominalresponsetime: 20ms
+    - Severity: S3 (catastrophic at low altitude)
+    - Exposure: E3 (medium - every takeoff)
+    - Controllability: C3 (very difficult - low altitude)
+    - ASIL: ASIL-D
+
+File: FlightControlHazards.haz
+```
+
+### 4. Industrial Robot Safety Hazard Analysis
+```
+Generate .haz file for collaborative industrial robot.
+
+System: Collaborative robot (cobot) for manufacturing
+Item: use itemdefinition CollaborativeRobotItem
+Standards: IEC 61508 SIL-3, ISO 10218 (robot safety)
+Functions: MotionControl, CollisionDetection, SafetyMonitoring
+Requirements: Cobot_Requirements.req
+
+Hazard Analysis: CobotHazards (SIL-3)
+- ISO 26262 Part: "Industrial Safety per IEC 61508"
+- Assessment Date: 2025-10-05
+- Owner: "Industrial Safety Team"
+
+Industrial-specific considerations:
+- Human-robot collaboration (operator always in workspace)
+- Collision hazards (severity based on force/speed)
+- Emergency stop requirements (controllability C1 in factory)
+- High exposure (E5 - continuous operation)
+
+Hazard Categories:
+1. UnintendedMotion - Robot moves unexpectedly
+2. ExcessiveForce - Robot applies too much force
+3. CollisionWithOperator - Robot strikes operator
+4. WorkpieceEjection - Robot drops/throws workpiece
+5. SafetyStopFailure - E-stop doesn't work
+
+Example Hazard:
+
+CollisionWithOperator (Hazardclass: "Motion Control", SIL-3)
+  - Description: Robot collides with operator in shared workspace
+  - Severity: S2 (severe injury possible)
+  - Exposure: E5 (very high - continuous collaboration)
+  - Controllability: C1 (operator aware, E-stop available)
+  - ASIL: ASIL-C
+  - malfunctionof ref function CollisionDetection
+  - affects ref feature SafetyMonitoring
+  - leadsto ref requirement REQ_COLLISION_AVOID_001
+  
+  Situation: HighSpeedCollision
+    - Speed: "1.5-2.0 m/s"
+    - Environment: "Manufacturing floor, collaborative workspace"
+    - Traffic density: N/A (operator present)
+    - maxacceptabledelay: 50ms
+    - nominalresponsetime: 20ms
+    - Severity: S3 (high speed, severe injury)
+    - Exposure: E4 (high - fast operations common)
+    - Controllability: C2 (operator may not react in time)
+    - ASIL: ASIL-D
+
+File: CobotHazards.haz
+```
+
+### 5. Generic Hazard Analysis Template
+```
+Create .haz file for {SYSTEM_NAME} hazard analysis.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Item: use itemdefinition {ITEM_NAME}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+- Functions: {FUNCTION_LIST}
+- Features: {FEATURE_LIST}
+- Requirements: {REQUIREMENTS_FILE}.req
+
+Hazard Analysis: {HAZARDANALYSIS_NAME} ({SAFETY_LEVEL})
+- ISO 26262 Part: "{ISO_PART_DESCRIPTION}"
+- Assessment Date: {YYYY-MM-DD}
+- Owner: "{OWNER_NAME}"
+
+For each hazard, specify:
+- Hazardclass: {HAZARD_CLASSIFICATION}
+- Overall S, E, C, ASIL
+- malfunctionof ref function {FUNCTION_REF}
+- affects ref feature {FEATURE_REF}
+- leadsto ref requirement {REQUIREMENT_REF}
+
+For each situation, specify:
+- Speed: "{SPEED_RANGE_WITH_UNITS}"
+- Environment: "{OPERATIONAL_CONTEXT}"
+- Traffic density: {low|medium|high}
+- maxacceptabledelay: {TIME_MS}ms
+- nominalresponsetime: {TIME_MS}ms
+- Situation-specific S, E, C, ASIL
+
+File: {SYSTEM_NAME}Hazards.haz
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef hazardanalysis` per file (NOT `hazardset`)
+- [ ] `use itemdefinition` statement present
+- [ ] Properties: `iso26262part`, `assessmentdate`, `safetylevel`
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Hazard Properties
+- [ ] Each hazard has unique identifier
+- [ ] `hazardclass` specified
+- [ ] `severity`, `exposure`, `controllability` defined (S0-S3, E0-E5, C0-C3)
+- [ ] `asil` calculated correctly per ISO 26262 Table 4
+- [ ] `malfunctionof ref function` links to function
+- [ ] `affects ref feature` links to feature
+- [ ] `leadsto ref requirement` links to requirement
+
+### Situation Properties
+- [ ] Each hazard has 2-5 nested situations
+- [ ] `speed` includes units and range
+- [ ] `environment` describes operational context
+- [ ] `trafficdensity` specified (low/medium/high)
+- [ ] `maxacceptabledelay` specified (ms)
+- [ ] `nominalresponsetime` specified (ms)
+- [ ] Situation-specific S, E, C, ASIL defined
+- [ ] `leadsto ref hazard` for cascading hazards
+
+### ASIL Determination
+- [ ] ASIL levels consistent with S, E, C combination
+- [ ] Higher ASIL for more severe scenarios
+- [ ] ASIL rationale documented in descriptions
+- [ ] Safety case complete with traceability
+
+### Completeness
+- [ ] All major hazards identified
+- [ ] All operational scenarios covered
+- [ ] Edge cases and degraded modes included
+- [ ] Environmental factors considered
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Using `hdef hazardset` instead of `hdef hazardanalysis`
+- Missing `iso26262part` and `assessmentdate`
+- Incorrect ASIL calculation (not per ISO 26262 Table 4)
+- Missing situations (must have 2+ per hazard)
+- Vague speed descriptions ("fast" instead of "100-130 km/h")
+- Missing timing properties (maxacceptabledelay, nominalresponsetime)
+- Inconsistent S, E, C between hazard and situations
+- Missing traceability (malfunctionof, affects, leadsto)
+
+✅ **Best Practices:**
+- Use `hdef hazardanalysis` with ISO 26262 properties
+- Document ASIL rationale in descriptions
+- Include realistic operational situations
+- Specify precise timing requirements
+- Link to affected functions, features, and requirements
+- Consider all operational scenarios (weather, traffic, speed)
+- Validate ASIL against ISO 26262 Part 3 Table 4
+- Use multiline descriptions for detailed hazard explanation
+
+---
+
+## Example Generated Hazard Analysis (Target Quality)
+
+```sylang
+use itemdefinition AutonomousVehicleItem
+
+hdef hazardanalysis AutonomousVehicleHazards
+  name "Autonomous Vehicle Hazard Analysis"
+  description """
+    Complete hazard analysis and risk assessment for L3 autonomous vehicle 
+    per ISO 26262 Part 3. Includes all hazards related to perception, planning, 
+    and control systems with ASIL determination based on operational scenarios.
+    """
+  owner "Functional Safety Team"
+  tags "ISO-26262", "hazard-analysis", "ASIL-assessment", "Part-3"
+  iso26262part "Part 3 - Hazard Analysis and Risk Assessment"
+  assessmentdate "2025-10-05"
+  safetylevel ASIL-D
+
+  def hazard UnintendedAcceleration
+    name "Unintended Vehicle Acceleration"
+    description """
+      Vehicle accelerates without driver command or against driver intention 
+      during autonomous operation. This hazard can occur due to throttle control 
+      system malfunction, sensor misinterpretation (obstacle detected as free space), 
+      or software algorithm errors in path planning.
+      Root causes: Throttle actuator stuck, ECU malfunction, sensor fusion error.
+      """
+    owner "Longitudinal Control Safety Team"
+    tags "acceleration", "throttle-control", "critical-hazard"
+    hazardclass "Longitudinal Motion"
+    severity S3
+    exposure E4
+    controllability C2
+    asil ASIL-D
+    
+    malfunctionof ref function ThrottleControl
+    affects ref feature AutonomousDriving
+    leadsto ref requirement REQ_SAFE_ACCEL_001
+
+    def situation HighwayUnintendedAcceleration
+      name "Unintended Acceleration on Highway"
+      description """
+        Vehicle accelerates unintentionally during highway autonomous operation 
+        at high speed. Rear-end collision risk with slower traffic ahead. 
+        Driver may not be monitoring and reaction time is critical.
+        """
+      speed "80-130 km/h"
+      environment "Highway, dry conditions, moderate traffic"
+      trafficdensity medium
+      maxacceptabledelay 500
+      nominalresponsetime 200
+      severity S3
+      exposure E4
+      controllability C2
+      asil ASIL-D
+
+    def situation UrbanUnintendedAcceleration
+      name "Unintended Acceleration in Urban Area"
+      description """
+        Vehicle accelerates unintentionally in urban environment with pedestrians, 
+        cyclists, and cross-traffic. High collision risk with vulnerable road users.
+        """
+      speed "30-60 km/h"
+      environment "Urban streets, intersections, pedestrian crossings"
+      trafficdensity high
+      maxacceptabledelay 300
+      nominalresponsetime 150
+      severity S3
+      exposure E5
+      controllability C3
+      asil ASIL-D
+
+  def hazard LossOfLateralControl
+    name "Loss of Lateral Vehicle Control"
+    description """
+      Vehicle loses ability to maintain lane position or steer appropriately. 
+      Can result in lane departure, collision with adjacent vehicles, or 
+      leaving roadway entirely. Caused by steering system failure or 
+      lane detection algorithm malfunction.
+      """
+    owner "Lateral Control Safety Team"
+    tags "steering-control", "lane-keeping", "critical-hazard"
+    hazardclass "Lateral Motion"
+    severity S3
+    exposure E4
+    controllability C2
+    asil ASIL-D
+    
+    malfunctionof ref function SteeringControl
+    affects ref feature AutonomousDriving
+    leadsto ref requirement REQ_SAFE_STEER_001
+
+    def situation HighSpeedLaneDepart ure
+      name "Lane Departure at High Speed"
+      description "Loss of lateral control on highway at high speed"
+      speed "100-130 km/h"
+      environment "Highway, curved sections"
+      trafficdensity medium
+      maxacceptabledelay 200
+      nominalresponsetime 100
+      severity S3
+      exposure E4
+      controllability C3
+      asil ASIL-D
+
+  def hazard FailureToStopAtObstacle
+    name "Failure to Stop at Obstacle"
+    description """
+      Vehicle fails to detect obstacle and stop, resulting in collision. 
+      Caused by perception system failure (sensor malfunction, object 
+      misclassification), planning failure (incorrect trajectory), or 
+      brake system malfunction.
+      """
+    owner "Perception and Braking Safety Team"
+    tags "obstacle-detection", "collision-avoidance", "critical-hazard"
+    hazardclass "Longitudinal Motion"
+    severity S3
+    exposure E4
+    controllability C3
+    asil ASIL-D
+    
+    malfunctionof ref function ObjectClassification
+    affects ref feature PerceptionSystem
+    leadsto ref requirement REQ_SAFE_STOP_001
+
+    def situation PedestrianCollision
+      name "Failure to Stop for Pedestrian"
+      description "Vehicle fails to detect and stop for pedestrian crossing"
+      speed "30-50 km/h"
+      environment "Urban, pedestrian crossing, daytime"
+      trafficdensity high
+      maxacceptabledelay 200
+      nominalresponsetime 100
+      severity S3
+      exposure E5
+      controllability C3
+      asil ASIL-D
+```
+
+---
+
+**Remember:** Use `hdef hazardanalysis` (NOT `hazardset`). Include complete ISO 26262 properties (iso26262part, assessmentdate). Each hazard must have nested situations with detailed S, E, C analysis. All hazards must link to functions (malfunctionof), features (affects), and requirements (leadsto) for complete traceability.

@@ -1,0 +1,614 @@
+# Fault Tree Analysis (.fta) - AI Prompting Guide
+
+## Purpose
+Fault Tree Analysis files define quantitative fault tree analysis with hierarchical gate structures. Part of ISO 26262 Part 4 compliance. FTA provides top-down deductive analysis from system-level failures down to component-level faults, supporting quantitative safety assessment and diagnostic coverage requirements.
+
+## When to Use
+- During ISO 26262 Part 4 - Product Development (System Level)
+- After FMEA analysis completion
+- For quantitative safety assessment
+- When determining diagnostic coverage requirements
+- During dependent failure analysis
+- For safety case development and certification
+
+## Key Syntax Elements
+```
+use failureset [failureset-ref], [failureset-ref], ...
+use hazardanalysis [hazardanalysis-ref]
+use safetymechanismset [safetymechanismset-ref]
+
+hdef faulttree [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  topevent ref failuremode [failuremode-ref]
+
+  def gate [identifier]
+    name [string-literal]
+    description [string-literal]
+    gatetype [and|or|xor|inhibit]
+    input ref gate [gate-ref], [gate-ref], ...
+    input ref failuremode [failuremode-ref], [failuremode-ref], ...
+    output ref gate [gate-ref]
+    output ref failuremode [failuremode-ref]
+    allocatedto ref block [block-ref]
+    
+    def gate [sub-gate-id]
+      # Nested gates with same structure
+```
+
+## Valid Keywords
+```
+use, hdef, faulttree, def, gate, name, description, owner, tags, 
+safetylevel, topevent, gatetype, input, output, allocatedto, when, ref
+```
+
+## Gate Types
+```
+gatetype and     # AND gate - All inputs must occur for output
+gatetype or      # OR gate - Any input causes output
+gatetype xor     # XOR gate - Exactly one input causes output
+gatetype inhibit # Inhibit gate - Conditional gate with enabling condition
+```
+
+## Common Patterns
+
+### FTA Hierarchy
+**System Level:**
+- Top event (system-level failure)
+- Major subsystem gates (OR/AND combinations)
+- Component failure inputs
+
+**Block Level:**
+- Module top event
+- Function gates
+- Basic events (component failures)
+
+### Gate Selection Guide
+- **OR gate**: Multiple independent paths to failure (common)
+- **AND gate**: Multiple failures required (redundancy)
+- **XOR gate**: Mutually exclusive failure modes
+- **Inhibit gate**: Conditional failures (rare, use sparingly)
+
+### Quantitative Analysis
+- Each basic event has probability/failure rate
+- Gate probability calculated from inputs
+- Top event probability = system failure probability
+- Compare against safety goal requirements
+
+---
+
+## Example Prompts
+
+### 1. Automotive Brake System FTA
+```
+Create comprehensive .fta file for electronic brake control system.
+
+Context:
+- System: Electronic Brake Control (EBC) with ABS/ESP
+- Top Event: VehicleCollisionDueToBrakeFailure
+- Failure Sets: use failureset BrakeSystemFailures, HydraulicFailures
+- Hazards: use hazardanalysis ElectronicBrakeHazards
+- Safety Mechanisms: use safetymechanismset BrakeSafetyMechanisms
+- Standards: ISO 26262 Part 4 ASIL-D
+
+Fault Tree: BrakeSystemFaultTree (ASIL-D)
+- Top Event: VehicleCollisionDueToBrakeFailure
+- Owner: "Brake System Safety Analysis Team"
+- Assessment Date: 2025-10-05
+
+Top-Level Gate Structure:
+
+SystemBrakeFailure (OR gate)
+├── ECU_CompleteFailure (AND gate - dual redundancy)
+│   ├── PrimaryECU_Failure
+│   └── BackupECU_Failure
+├── HydraulicSystemFailure (OR gate)
+│   ├── MasterCylinderFailure
+│   ├── HydraulicPumpFailure
+│   └── BrakeLineRupture
+├── SensorSystemFailure (AND gate - triple redundancy)
+│   ├── WheelSpeedSensor_FL_Failure
+│   ├── WheelSpeedSensor_FR_Failure
+│   ├── WheelSpeedSensor_RL_Failure
+│   └── WheelSpeedSensor_RR_Failure
+├── PowerSupplyFailure (AND gate - dual power)
+│   ├── PrimaryPowerSupply_Failure
+│   └── BackupPowerSupply_Failure
+└── CommunicationFailure (OR gate)
+    ├── CAN_Bus_Failure
+    └── FlexRay_Bus_Failure
+
+For each gate:
+- gatetype (and|or|xor)
+- input ref gate (for hierarchical gates)
+- input ref failuremode (for basic events)
+- output ref gate or output ref failuremode
+- allocatedto ref block (block responsible)
+- Detailed description of failure logic
+
+For each basic event (failuremode):
+- Link to FMEA failure modes from BrakeSystemFailures
+- Probability/failure rate from FMEA
+- Detection coverage from safety mechanisms
+
+Quantitative Goals:
+- Top event probability < 1E-7 per hour (ASIL-D)
+- Diagnostic coverage > 99% for all failure modes
+- Single point fault metric (SPFM) > 99%
+- Latent fault metric (LFM) > 90%
+
+File: BrakeSystemFaultTree.fta
+```
+
+### 2. Medical Device Infusion Pump FTA
+```
+Generate .fta file for medical device infusion pump.
+
+System: Intravenous infusion pump for ICU
+Top Event: PatientOverdoseDueToInfusionError
+Failure Sets: use failureset InfusionPumpFailures, SensorFailures
+Hazards: use hazardanalysis InfusionPumpHazards
+Safety Mechanisms: use safetymechanismset InfusionPumpSafetyMechanisms
+Standards: IEC 62304 SIL-3, ISO 14971
+
+Fault Tree: InfusionPumpFaultTree (SIL-3)
+- Top Event: PatientOverdoseDueToInfusionError
+- Owner: "Medical Device Safety Team"
+
+Medical-specific considerations:
+- Single point failures unacceptable (AND gates required)
+- Alarm system reliability critical (separate FTA branch)
+- Independent monitoring channel required
+- Battery backup for all critical functions
+
+Top-Level Gate Structure:
+
+PatientOverdose (OR gate)
+├── DosageCalculationError (AND gate - dual check)
+│   ├── PrimaryProcessor_DosageError
+│   └── SecondaryMonitor_Undetected
+├── FlowRateControlFailure (OR gate)
+│   ├── PumpMechanism_Malfunction
+│   ├── ValveStuck_Open
+│   └── PressureSensor_Failure
+├── AlarmSystemFailure (AND gate - all alarms fail)
+│   ├── OcclusionAlarm_Failure
+│   ├── AirDetectorAlarm_Failure
+│   └── DoorOpenAlarm_Failure
+├── UserInterfaceError (XOR gate - mutually exclusive)
+│   ├── DisplayMisleading_Information
+│   ├── KeypadAcceptInvalidInput
+│   └── TouchscreenGhost_Touch
+└── PowerSystemFailure (AND gate - dual power)
+    ├── MainsPower_Loss
+    └── BatteryBackup_Depleted
+
+For each gate:
+- Consider human factors (user interface errors)
+- Include monitoring and alarm failures
+- Model redundancy with AND gates
+- Link to SIL-3 requirements
+
+Quantitative Goals:
+- Top event probability < 1E-8 per hour (SIL-3)
+- Alarm reliability > 99.9%
+- Independent monitoring coverage > 95%
+
+File: InfusionPumpFaultTree.fta
+```
+
+### 3. Aviation Flight Control FTA
+```
+Create .fta file for aircraft flight control system.
+
+Aircraft: Commercial transport (Boeing 737 class)
+Top Event: LossOfAircraftControlAuthority
+Failure Sets: use failureset FlightControlFailures, ActuatorFailures
+Hazards: use hazardanalysis FlightControlHazards
+Safety Mechanisms: use safetymechanismset FlightControlSafetyMechanisms
+Certification: DO-178C DAL-A, FAR Part 25
+
+Fault Tree: FlightControlFaultTree (DAL-A)
+- Top Event: LossOfAircraftControlAuthority
+- Owner: "Flight Control Safety Team"
+
+Aviation-specific considerations:
+- Triple/quadruple redundancy (AND gates with 3-4 inputs)
+- Dissimilar redundancy (different processor types)
+- Cross-channel monitoring required
+- Common mode failures explicitly analyzed
+
+Top-Level Gate Structure:
+
+LossOfControl (AND gate - triple redundancy must fail)
+├── PrimaryFlightComputer_Failure (OR gate)
+│   ├── ProcessorA_Failure
+│   ├── MemoryA_Corruption
+│   └── SoftwareA_Crash
+├── SecondaryFlightComputer_Failure (OR gate)
+│   ├── ProcessorB_Failure
+│   ├── MemoryB_Corruption
+│   └── SoftwareB_Crash
+├── TertiaryFlightComputer_Failure (OR gate)
+│   ├── ProcessorC_Failure
+│   ├── MemoryC_Corruption
+│   └── SoftwareC_Crash
+└── CrossChannelMonitoring_Failure (Inhibit gate)
+    ├── AllChannels_Disagree
+    └── MonitoringLogic_Failure
+
+ActuatorFailures (OR gate)
+├── ElevatorActuator_Failure (AND gate - dual hydraulic)
+│   ├── HydraulicA_Failure
+│   └── HydraulicB_Failure
+├── AileronActuator_Failure (AND gate)
+│   ├── LeftAileron_Failure
+│   └── RightAileron_Failure
+└── RudderActuator_Failure (AND gate)
+    ├── UpperRudder_Failure
+    └── LowerRudder_Failure
+
+For each gate:
+- Model triple redundancy with AND gates
+- Include cross-channel monitoring
+- Consider common mode failures (separate analysis)
+- Link to DO-178C objectives
+
+Quantitative Goals:
+- Top event probability < 1E-9 per flight hour (catastrophic)
+- Independent monitoring coverage > 99.99%
+- Common mode failure probability < 1E-9
+
+File: FlightControlFaultTree.fta
+```
+
+### 4. Industrial Safety PLC FTA
+```
+Generate .fta file for manufacturing safety controller.
+
+Application: Production line safety PLC
+Top Event: UnprotectedMachineOperation
+Failure Sets: use failureset SafetyPLCFailures, IOModuleFailures
+Hazards: use hazardanalysis CobotHazards
+Safety Mechanisms: use safetymechanismset IndustrialSafetyMechanisms
+Standards: IEC 61508 SIL-3, IEC 61511
+
+Fault Tree: SafetyPLCFaultTree (SIL-3)
+- Top Event: UnprotectedMachineOperation
+- Owner: "Industrial Safety Team"
+
+Industrial-specific considerations:
+- Dual-channel architecture (AND gates)
+- Diagnostic coverage > 99% required
+- Proof test intervals considered
+- Safe failure fraction analyzed
+
+Top-Level Gate Structure:
+
+SafetyFunctionLost (AND gate - dual channel)
+├── Channel1_Failure (OR gate)
+│   ├── CPU1_Malfunction
+│   ├── SafetyLogic1_Error
+│   └── OutputDriver1_Failure
+├── Channel2_Failure (OR gate)
+│   ├── CPU2_Malfunction
+│   ├── SafetyLogic2_Error
+│   └── OutputDriver2_Failure
+└── DiagnosticSystem_Undetected (AND gate)
+    ├── SelfTest_Failure
+    └── Comparison Logic_Failure
+
+EmergencyStopFailure (OR gate)
+├── EStopButton_MechanicalFailure
+├── EStopInputCircuit_ShortCircuit
+├── EStopLogic_Bypassed
+└── EStopOutput_NotActivated
+
+For each gate:
+- Model dual-channel architecture
+- Include diagnostic failures
+- Consider dangerous failures vs. safe failures
+- Calculate safe failure fraction (SFF)
+
+Quantitative Goals:
+- Top event probability < 1E-7 per hour (SIL-3)
+- Safe failure fraction (SFF) > 90%
+- Diagnostic coverage (DC) > 99%
+
+File: SafetyPLCFaultTree.fta
+```
+
+### 5. Generic FTA Template
+```
+Create .fta file for {SYSTEM_NAME} fault tree analysis.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Top Event: {TOP_EVENT_DESCRIPTION}
+- Failure Sets: use failureset {FAILURESET_LIST}
+- Hazards: use hazardanalysis {HAZARDANALYSIS_REF}
+- Safety Mechanisms: use safetymechanismset {SAFETYMECHANISMSET_REF}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+
+Fault Tree: {FAULTTREE_NAME} ({SAFETY_LEVEL})
+- Top Event: ref failuremode {TOPEVENT_FAILUREMODE}
+- Owner: "{OWNER_NAME}"
+
+Gate Structure:
+
+{TOP_GATE_NAME} ({gatetype})
+├── {SUBGATE_1} ({gatetype})
+│   ├── {BASIC_EVENT_1}
+│   ├── {BASIC_EVENT_2}
+│   └── {BASIC_EVENT_3}
+├── {SUBGATE_2} ({gatetype})
+│   ├── {BASIC_EVENT_4}
+│   └── {BASIC_EVENT_5}
+└── {SUBGATE_3} ({gatetype})
+    ├── {NESTED_GATE_1} ({gatetype})
+    │   ├── {BASIC_EVENT_6}
+    │   └── {BASIC_EVENT_7}
+    └── {BASIC_EVENT_8}
+
+For each gate:
+- gatetype: {and|or|xor|inhibit}
+- input ref gate: {GATE_REFERENCES}
+- input ref failuremode: {FAILUREMODE_REFERENCES}
+- output ref gate or output ref failuremode
+- allocatedto ref block: {BLOCK_REFERENCE}
+
+Quantitative Goals:
+- Top event probability < {TARGET_PROBABILITY} per hour
+- Diagnostic coverage > {DC_PERCENTAGE}%
+- Single point fault metric > {SPFM_PERCENTAGE}% (if applicable)
+
+File: {SYSTEM_NAME}FaultTree.fta
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef faulttree` per file (NOT `faulttreeset`)
+- [ ] All `use` statements at top (failureset, hazardanalysis, safetymechanismset)
+- [ ] `topevent ref failuremode` specified
+- [ ] Proper indentation for nested gates
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Fault Tree Properties
+- [ ] Faulttree has unique identifier
+- [ ] `name` describes the analysis scope
+- [ ] `description` explains top event and methodology
+- [ ] `safetylevel` specified
+- [ ] `topevent` links to actual failuremode
+
+### Gate Properties
+- [ ] Each gate has unique identifier
+- [ ] `gatetype` specified (and|or|xor|inhibit)
+- [ ] `input ref gate` for hierarchical structure
+- [ ] `input ref failuremode` for basic events
+- [ ] `output ref gate` or `output ref failuremode`
+- [ ] `allocatedto ref block` for responsibility
+- [ ] Nested gates properly indented
+
+### Gate Logic
+- [ ] OR gates for independent failure paths
+- [ ] AND gates for redundancy (all must fail)
+- [ ] XOR gates for mutually exclusive modes
+- [ ] Gate logic reflects actual system architecture
+- [ ] Redundancy modeled correctly
+
+### Completeness
+- [ ] All major failure paths identified
+- [ ] Basic events link to FMEA failure modes
+- [ ] Gate hierarchy complete (no orphan gates)
+- [ ] Top event traces to system-level hazard
+- [ ] Quantitative data available for analysis
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Using `hdef faulttreeset` instead of `hdef faulttree`
+- Missing `topevent ref failuremode`
+- Incorrect gate types (using OR when AND is needed for redundancy)
+- Missing `output` references in gates
+- Circular references (gate referencing itself)
+- Mixing hierarchical levels inappropriately
+- No link to FMEA basic events
+
+✅ **Best Practices:**
+- Use `hdef faulttree` with `topevent`
+- Model redundancy with AND gates (all must fail)
+- Use OR gates for independent failures
+- Link all basic events to FMEA failure modes
+- Include nested gates for hierarchical decomposition
+- Document gate logic in descriptions
+- Allocate gates to responsible blocks
+- Validate gate logic against system architecture
+
+---
+
+## Example Generated Fault Tree (Target Quality)
+
+```sylang
+use failureset PerceptionSystemFailures
+use failureset PlanningSystemFailures
+use failureset ControlSystemFailures
+use hazardanalysis AutonomousVehicleHazards
+use safetymechanismset AutonomousVehicleSafetyMechanisms
+
+hdef faulttree VehicleCollisionFaultTree
+  name "Vehicle Collision Fault Tree Analysis"
+  description """
+    Complete fault tree analysis for vehicle collision scenarios in autonomous 
+    operation per ISO 26262 Part 4. Top event is collision due to system failure. 
+    Analyzes all paths from component failures through subsystem failures to 
+    top-level collision event. Includes quantitative probability analysis and 
+    diagnostic coverage assessment.
+    """
+  owner "Safety Analysis Team"
+  tags "fault-tree", "collision-analysis", "quantitative-fta", "ASIL-D"
+  safetylevel ASIL-D
+  
+  topevent ref failuremode VehicleCollisionEvent
+  
+  def gate SystemLevelFailure
+    name "System-Level Collision Failure"
+    description """
+      Top-level gate analyzing all system failures that can lead to vehicle collision. 
+      OR gate because any one of these major subsystem failures can cause collision.
+      """
+    gatetype or
+    
+    input ref gate PerceptionFailure
+    input ref gate PlanningFailure
+    input ref gate ControlFailure
+    input ref failuremode HumanFactorError
+    
+    output ref failuremode VehicleCollisionEvent
+    allocatedto ref block AutonomousVehicleSystem
+
+  def gate PerceptionFailure
+    name "Perception System Complete Failure"
+    description """
+      Perception system fails to detect obstacles or misclassifies objects. 
+      OR gate because any of these sensor/processing failures causes perception loss.
+      """
+    gatetype or
+    
+    input ref gate SensorFusionFailure
+    input ref gate ObjectDetectionFailure
+    input ref gate ClassificationFailure
+    
+    output ref gate SystemLevelFailure
+    allocatedto ref block PerceptionControlModule
+
+  def gate SensorFusionFailure
+    name "Sensor Fusion Complete Failure"
+    description """
+      All redundant sensors fail simultaneously (worst case). AND gate models 
+      triple sensor redundancy - all three must fail for complete sensor loss.
+      """
+    gatetype and
+    
+    input ref failuremode CameraSystemFailure
+    input ref failuremode LidarSystemFailure
+    input ref failuremode RadarSystemFailure
+    
+    output ref gate PerceptionFailure
+    allocatedto ref block SensorFusionModule
+
+  def gate ObjectDetectionFailure
+    name "Object Detection Algorithm Failure"
+    description """
+      Object detection algorithms fail to identify obstacles. OR gate because 
+      any one of these software failures causes detection loss.
+      """
+    gatetype or
+    
+    input ref failuremode DetectionAlgorithm_Crash
+    input ref failuremode DetectionAlgorithm_Timeout
+    input ref failuremode DetectionAlgorithm_MemoryCorruption
+    
+    output ref gate PerceptionFailure
+    allocatedto ref block ObjectDetectionModule
+
+  def gate ClassificationFailure
+    name "Object Classification Failure"
+    description """
+      Object classification misidentifies obstacle types (e.g., pedestrian as static object). 
+      XOR gate models mutually exclusive classification error modes.
+      """
+    gatetype xor
+    
+    input ref failuremode Classification_FalseNegative
+    input ref failuremode Classification_FalsePositive
+    
+    output ref gate PerceptionFailure
+    allocatedto ref block ClassificationModule
+
+  def gate PlanningFailure
+    name "Path Planning System Failure"
+    description """
+      Path planning fails to generate safe trajectory. OR gate because any 
+      planning failure can lead to unsafe path.
+      """
+    gatetype or
+    
+    input ref failuremode GlobalPlanner_Failure
+    input ref failuremode LocalPlanner_Failure
+    input ref failuremode CollisionChecker_Failure
+    
+    output ref gate SystemLevelFailure
+    allocatedto ref block PlanningControlModule
+
+  def gate ControlFailure
+    name "Vehicle Control System Failure"
+    description """
+      Vehicle control system fails to execute planned trajectory. OR gate 
+      because any control actuator failure causes loss of control.
+      """
+    gatetype or
+    
+    input ref gate SteeringFailure
+    input ref gate BrakingFailure
+    input ref gate ThrottleFailure
+    
+    output ref gate SystemLevelFailure
+    allocatedto ref block VehicleControlModule
+
+  def gate SteeringFailure
+    name "Steering System Complete Failure"
+    description """
+      Steering system completely fails (dual redundancy lost). AND gate models 
+      dual steering actuator redundancy - both must fail for complete loss.
+      """
+    gatetype and
+    
+    input ref failuremode PrimarySteeringActuator_Failure
+    input ref failuremode BackupSteeringActuator_Failure
+    
+    output ref gate ControlFailure
+    allocatedto ref block SteeringControlModule
+
+  def gate BrakingFailure
+    name "Braking System Complete Failure"
+    description """
+      Braking system completely fails (dual redundancy lost). AND gate models 
+      dual brake actuator redundancy - both must fail for complete loss.
+      """
+    gatetype and
+    
+    input ref failuremode PrimaryBrakeActuator_Failure
+    input ref failuremode BackupBrakeActuator_Failure
+    
+    output ref gate ControlFailure
+    allocatedto ref block BrakeControlModule
+
+  def gate ThrottleFailure
+    name "Throttle System Complete Failure"
+    description """
+      Throttle system fails (stuck or unresponsive). OR gate because any 
+      throttle actuator or control failure causes loss of speed control.
+      """
+    gatetype or
+    
+    input ref failuremode ThrottleActuator_Stuck
+    input ref failuremode ThrottleControl_Unresponsive
+    
+    output ref gate ControlFailure
+    allocatedto ref block ThrottleControlModule
+```
+
+---
+
+**Remember:** Use `hdef faulttree` (NOT `faulttreeset`) with `topevent ref failuremode`. Model redundancy with AND gates (all must fail). Use OR gates for independent failure paths. Link all basic events to FMEA failure modes. Include complete hierarchical gate structure with proper `input` and `output` references.

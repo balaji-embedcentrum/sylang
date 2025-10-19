@@ -1,0 +1,800 @@
+# Test Definition (.tst) - AI Prompting Guide
+
+## Purpose
+Test Definition files define validation and verification test cases with complete traceability to requirements. TST files support multiple test methods (MIL, SIL, PIL, HIL, VIL, manual, automated) and test levels (unit, integration, system, acceptance), enabling systematic verification and compliance documentation.
+
+## When to Use
+- After requirements are defined and baselined
+- For V&V (Verification and Validation) planning
+- When creating test suites for safety-critical systems
+- During ISO 26262, IEC 62304, DO-178C compliance activities
+- For test coverage analysis and traceability
+- When planning MIL/SIL/HIL/VIL test campaigns
+- For acceptance testing and validation
+
+## Key Syntax Elements
+```
+use requirementset [requirementset-ref]
+use functionset [functionset-ref]
+use parameter [parameter-ref], [parameter-ref], ...
+
+hdef testset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+
+def testcase [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    tags [string-literal], [string-literal], ...
+    method [MIL|SIL|PIL|HIL|VIL|manual|automated]
+    testlevel [unit|integration|system|acceptance]
+    setup [string-literal]
+    steps [string-literal]
+    expected [string-literal]
+    passcriteria [string-literal]
+    testresult [pass|fail|intest|notrun|blocked]
+    safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+    
+    # Test relationships
+    satisfies ref requirement [requirement-ref], [requirement-ref], ...
+    derivedfrom ref requirement [requirement-ref]
+    refinedfrom ref testcase [testcase-ref]
+    when ref config [config-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, testset, def, testcase, name, description, owner, tags, 
+level, safetylevel, setup, passcriteria, testresult, expected, method, 
+testlevel, steps, satisfies, derivedfrom, refinedfrom, when, ref, config
+```
+
+## Valid Values
+- **method**: `MIL`, `SIL`, `PIL`, `HIL`, `VIL`, `manual`, `automated`
+  - MIL = Model-in-the-Loop
+  - SIL = Software-in-the-Loop  
+  - PIL = Processor-in-the-Loop
+  - HIL = Hardware-in-the-Loop
+  - VIL = Vehicle-in-the-Loop
+  - manual = Manual testing
+  - automated = Automated testing
+
+- **testlevel**: `unit`, `integration`, `system`, `acceptance`
+
+- **testresult**: `pass`, `fail`, `intest`, `notrun`, `blocked`
+
+- **safetylevel**: `ASIL-A`, `ASIL-B`, `ASIL-C`, `ASIL-D`, `QM`
+
+## Common Patterns
+
+### Test Set Structure
+```
+hdef testset PerceptionSystemValidationTests
+  name "Autonomous Perception System Validation Test Suite"
+  description "Comprehensive validation tests for perception system"
+  owner "Perception Test Engineering Team"
+  tags "ISO-26262", "ASIL-D", "perception"
+  safetylevel ASIL-D
+```
+
+### Test Case Structure (with multiline strings)
+```
+def testcase TEST_PERC_001_OBJECT_DETECTION
+  name "Environmental Object Detection Performance Test"
+  description "Validate object detection accuracy and range performance"
+  owner "Object Detection Test Team"
+  tags "detection", "performance", "ASIL-D"
+  method HIL
+  testlevel system
+  setup """
+    Autonomous vehicle perception system in HIL test bench with 
+    radar/camera/LiDAR simulators, calibrated test objects.
+    """
+  steps """
+    1. Initialize perception system and verify all sensors active
+    2. Place calibrated test objects at distances 20m, 50m, 100m
+    3. Execute detection algorithm
+    4. Record detection rates and confidence scores
+    """
+  expected """
+    Objects detected with ≥99.9% accuracy at all test distances.
+    Classification confidence ≥95% for all object types.
+    """
+  passcriteria """
+    Detection accuracy meets specification in ≥98% of test cases.
+    Zero tolerance for missed safety-critical objects.
+    """
+  safetylevel ASIL-D
+  testresult notrun
+  satisfies ref requirement REQ_PERC_001
+```
+
+### Test Traceability
+```
+satisfies ref requirement REQ_PERC_001, REQ_PERC_002
+derivedfrom ref requirement REQ_SYSTEM_001
+refinedfrom ref testcase TEST_SYSTEM_001
+when ref config c_PerceptionEnabled
+```
+
+---
+
+## Example Prompts
+
+### 1. Autonomous Vehicle Perception Test Suite
+```
+Create comprehensive .tst file for autonomous vehicle perception system.
+
+Context:
+- System: Level 3 autonomous driving perception (ISO 26262 ASIL-D)
+- Components: Radar, Camera, LiDAR sensor fusion
+- Requirements: use requirementset AutonomousPerceptionRequirements
+- Functions: use functionset AutonomousPerceptionFunctions
+- Parameters: use parameter MaxDetectionRange, ConfidenceThreshold, ProcessingLatency
+
+Test Set: PerceptionSystemValidationTests (ASIL-D)
+- Owner: "Perception Test Engineering Team"
+- Description: Comprehensive validation tests covering object detection, 
+  classification, tracking, and sensor fusion per ISO 26262 ASIL-D
+- Tags: "ISO-26262", "ASIL-D", "perception", "validation"
+
+Generate 15 test cases covering:
+
+1. Object Detection Tests (5 test cases):
+   - TEST_PERC_001: Environmental Object Detection (HIL, system)
+     * satisfies: REQ_PERC_001
+     * Setup: HIL test bench with radar/camera/LiDAR simulators
+     * Steps: Initialize sensors, place calibrated objects at 20m-200m, execute detection, verify accuracy
+     * Expected: ≥99.9% detection accuracy, ≥95% confidence
+     * Pass Criteria: Meet spec in ≥98% cases, zero safety-critical misses
+     * testresult: notrun
+   
+   - TEST_PERC_002: Adverse Weather Detection (HIL, system)
+     * satisfies: REQ_PERC_002
+     * Test in rain (5mm/h, 10mm/h), fog (visibility 50m, 100m)
+     * Performance degradation <5%
+     * testresult: notrun
+   
+   - TEST_PERC_003: Long Range Detection (HIL, system)
+     * satisfies: REQ_PERC_003
+     * Test objects at 150m-250m range
+     * Verify radar performance at extended range
+     * testresult: notrun
+   
+   - TEST_PERC_004: Night/Low Light Detection (HIL, system)
+     * satisfies: REQ_PERC_004
+     * Test in <1 lux lighting conditions
+     * Verify camera + thermal sensor fusion
+     * testresult: notrun
+   
+   - TEST_PERC_005: Occluded Object Detection (HIL, system)
+     * satisfies: REQ_PERC_005
+     * Test partial occlusion scenarios
+     * Verify sensor fusion handles occlusion
+     * testresult: notrun
+
+2. Classification Tests (3 test cases):
+   - TEST_PERC_006: Object Classification Accuracy (VIL, integration)
+     * satisfies: REQ_PERC_006
+     * Test ML model on 10,000+ object dataset
+     * ≥95% accuracy per class, ≤100ms processing
+     * testresult: notrun
+   
+   - TEST_PERC_007: Pedestrian Classification (VIL, integration)
+     * satisfies: REQ_PERC_007
+     * Test pedestrian detection/classification
+     * Zero tolerance for false negatives
+     * testresult: notrun
+   
+   - TEST_PERC_008: Vehicle Type Classification (VIL, integration)
+     * satisfies: REQ_PERC_008
+     * Classify cars, trucks, motorcycles, bicycles
+     * ≥98% classification accuracy
+     * testresult: notrun
+
+3. Tracking Tests (3 test cases):
+   - TEST_PERC_009: Multi-Object Tracking (SIL, integration)
+     * satisfies: REQ_PERC_009
+     * Track up to 50 simultaneous objects
+     * Maintain tracking through occlusion
+     * testresult: notrun
+   
+   - TEST_PERC_010: Track Prediction (SIL, integration)
+     * satisfies: REQ_PERC_010
+     * Predict object trajectory 3s ahead
+     * Accuracy within ±1m lateral, ±2m longitudinal
+     * testresult: notrun
+   
+   - TEST_PERC_011: Track Handoff (SIL, integration)
+     * satisfies: REQ_PERC_011
+     * Test sensor-to-sensor track handoff
+     * No track ID loss during handoff
+     * testresult: notrun
+
+4. Sensor Fusion Tests (2 test cases):
+   - TEST_PERC_012: Sensor Fusion Accuracy (HIL, system)
+     * satisfies: REQ_PERC_012
+     * Fuse radar + camera + LiDAR
+     * Position accuracy ±10cm
+     * testresult: notrun
+   
+   - TEST_PERC_013: Sensor Degraded Mode (HIL, system)
+     * satisfies: REQ_PERC_013
+     * Test single sensor failure scenarios
+     * Graceful degradation, no system failure
+     * testresult: notrun
+
+5. Performance Tests (2 test cases):
+   - TEST_PERC_014: Processing Latency (SIL, integration)
+     * satisfies: REQ_PERC_014
+     * End-to-end latency ≤100ms
+     * 99th percentile ≤120ms
+     * testresult: notrun
+   
+   - TEST_PERC_015: Computational Load (SIL, integration)
+     * satisfies: REQ_PERC_015
+     * CPU utilization <70%, GPU <80%
+     * No frame drops under load
+     * testresult: notrun
+
+For each test case:
+- Use multiline """ for setup, steps, expected, passcriteria
+- Include specific, measurable pass criteria
+- Link to specific requirements with satisfies ref requirement
+- Specify appropriate method (MIL/SIL/HIL/VIL)
+- Specify testlevel (unit/integration/system)
+- Set testresult to notrun (tests planned but not executed)
+- Include safety level (ASIL-D for critical tests)
+
+File: PerceptionSystemValidationTests.tst
+```
+
+### 2. Medical Device Alarm System Test Suite
+```
+Generate .tst file for medical device alarm management system.
+
+System: ICU patient monitoring alarm system (IEC 62304 Class C, SIL-3)
+Requirements: use requirementset AlarmManagementRequirements
+Functions: use functionset AlarmManagementFunctions
+Parameters: use parameter AlarmResponseTime, EscalationDelay
+
+Test Set: AlarmManagementValidationTests (SIL-3)
+- Owner: "Medical Device Test Engineering Team"
+- Description: Validation tests for alarm generation, prioritization, escalation, 
+  and clinical response per IEC 62304 and IEC 60601-1-8
+- Tags: "IEC-62304", "SIL-3", "alarms", "medical"
+
+Generate 12 test cases covering:
+
+1. Alarm Generation Tests (4 test cases):
+   - TEST_ALARM_001: Critical Alarm Generation (HIL, system)
+     * satisfies: REQ_ALARM_001
+     * Setup: Patient simulator with vital signs monitor
+     * Steps: Simulate critical conditions (cardiac arrest, apnea), verify alarm within 5s
+     * Expected: Critical alarm generated ≤5s, audible >65dB, visual red flashing
+     * Pass Criteria: 100% alarm generation, zero missed critical events
+     * testresult: notrun
+   
+   - TEST_ALARM_002: High Priority Alarm (HIL, system)
+     * satisfies: REQ_ALARM_002
+     * Test high priority alarms (tachycardia, low SpO2)
+     * Response time ≤10s
+     * testresult: notrun
+   
+   - TEST_ALARM_003: Medium Priority Alarm (HIL, system)
+     * satisfies: REQ_ALARM_003
+     * Test medium priority alarms (mild hypertension)
+     * Response time ≤30s
+     * testresult: notrun
+   
+   - TEST_ALARM_004: Low Priority Advisory (HIL, system)
+     * satisfies: REQ_ALARM_004
+     * Test advisory notifications
+     * No audible alarm, visual only
+     * testresult: notrun
+
+2. Alarm Prioritization Tests (2 test cases):
+   - TEST_ALARM_005: Multiple Simultaneous Alarms (HIL, system)
+     * satisfies: REQ_ALARM_005
+     * Trigger 5 alarms simultaneously (mixed priority)
+     * Verify correct priority ordering
+     * testresult: notrun
+   
+   - TEST_ALARM_006: Alarm Priority Override (manual, system)
+     * satisfies: REQ_ALARM_006
+     * Test clinical staff alarm priority adjustment
+     * Verify override logged and displayed
+     * testresult: notrun
+
+3. Alarm Escalation Tests (2 test cases):
+   - TEST_ALARM_007: Unacknowledged Escalation (HIL, system)
+     * satisfies: REQ_ALARM_007
+     * Critical alarm unacknowledged for 30s
+     * Verify escalation to supervisor notification
+     * testresult: notrun
+   
+   - TEST_ALARM_008: Multi-Level Escalation (manual, acceptance)
+     * satisfies: REQ_ALARM_008
+     * Test escalation chain: nurse → charge nurse → physician
+     * Verify all levels notified per protocol
+     * testresult: notrun
+
+4. Alarm Suppression Tests (2 test cases):
+   - TEST_ALARM_009: False Alarm Filtering (SIL, integration)
+     * satisfies: REQ_ALARM_009
+     * Test intelligent alarm filtering
+     * Reduce false alarms by >50% without missing true alarms
+     * testresult: notrun
+   
+   - TEST_ALARM_010: Alarm Suspend Mode (manual, system)
+     * satisfies: REQ_ALARM_010
+     * Test procedural alarm suspension (during patient care)
+     * Auto-resume after timeout, require authentication
+     * testresult: notrun
+
+5. Alarm Performance Tests (2 test cases):
+   - TEST_ALARM_011: Alarm Response Time (automated, integration)
+     * satisfies: REQ_ALARM_011
+     * Measure alarm latency from event detection to notification
+     * Critical: ≤5s, High: ≤10s, Medium: ≤30s
+     * testresult: notrun
+   
+   - TEST_ALARM_012: Alarm Fatigue Mitigation (manual, acceptance)
+     * satisfies: REQ_ALARM_012
+     * Clinical validation with nursing staff
+     * False alarm rate <10%, staff satisfaction >80%
+     * testresult: notrun
+
+File: AlarmManagementValidationTests.tst
+```
+
+### 3. Aviation Flight Control Test Suite
+```
+Create .tst file for commercial aircraft flight control system.
+
+Aircraft: Commercial transport flight control (DO-178C DAL-A)
+Requirements: use requirementset FlightControlRequirements
+Functions: use functionset FlightControlFunctions
+Parameters: use parameter ControlSurfaceDeflection, ResponseTime
+
+Test Set: FlightControlValidationTests (DAL-A)
+- Owner: "Avionics Test Engineering Team"
+- Description: Comprehensive validation tests for primary flight control system 
+  per DO-178C DAL-A and FAR Part 25
+- Tags: "DO-178C", "DAL-A", "flight-control", "certification"
+
+Generate 10 test cases covering:
+
+1. Control Surface Tests (3 test cases):
+   - TEST_FC_001: Aileron Control Authority (HIL, system)
+     * satisfies: REQ_FC_001
+     * Setup: Iron bird test rig with hydraulic actuators
+     * Steps: Command aileron deflection -25° to +25°, measure response time, linearity
+     * Expected: Full deflection in ≤500ms, linearity ±2%, no oscillation
+     * Pass Criteria: Meet all deflection/timing specs, structural load limits not exceeded
+     * testresult: notrun
+   
+   - TEST_FC_002: Elevator Control Authority (HIL, system)
+     * satisfies: REQ_FC_002
+     * Test elevator -15° to +10° deflection
+     * testresult: notrun
+   
+   - TEST_FC_003: Rudder Control Authority (HIL, system)
+     * satisfies: REQ_FC_003
+     * Test rudder ±25° deflection
+     * testresult: notrun
+
+2. Redundancy Tests (3 test cases):
+   - TEST_FC_004: Triple Redundancy Voting (SIL, integration)
+     * satisfies: REQ_FC_004
+     * Test 3-channel voting logic
+     * Single fault tolerance, correct failover
+     * testresult: notrun
+   
+   - TEST_FC_005: Channel Failure Detection (HIL, system)
+     * satisfies: REQ_FC_005
+     * Inject single channel failure
+     * Detection ≤40ms, automatic failover
+     * testresult: notrun
+   
+   - TEST_FC_006: Dual Channel Operation (HIL, system)
+     * satisfies: REQ_FC_006
+     * Test degraded mode (2 channels active)
+     * Maintain control authority, notify crew
+     * testresult: notrun
+
+3. Performance Tests (2 test cases):
+   - TEST_FC_007: Control Loop Latency (PIL, integration)
+     * satisfies: REQ_FC_007
+     * Measure sensor-to-actuator latency
+     * End-to-end ≤20ms, jitter <2ms
+     * testresult: notrun
+   
+   - TEST_FC_008: Load Factor Limiting (HIL, system)
+     * satisfies: REQ_FC_008
+     * Test g-load limiting (-1g to +2.5g)
+     * Hard limits enforced, no overshoot
+     * testresult: notrun
+
+4. Environmental Tests (2 test cases):
+   - TEST_FC_009: Temperature Qualification (HIL, acceptance)
+     * satisfies: REQ_FC_009
+     * Test -55°C to +85°C per DO-160
+     * No performance degradation
+     * testresult: notrun
+   
+   - TEST_FC_010: EMI Susceptibility (HIL, acceptance)
+     * satisfies: REQ_FC_010
+     * Test per DO-160 Category M (severe RF environment)
+     * No functional disruption
+     * testresult: notrun
+
+File: FlightControlValidationTests.tst
+```
+
+### 4. Industrial Safety PLC Test Suite
+```
+Generate .tst file for safety PLC in manufacturing.
+
+Application: Production line safety controller (IEC 61508 SIL-3)
+Requirements: use requirementset SafetyPLCRequirements
+Functions: use functionset SafetyPLCFunctions
+
+Test Set: SafetyPLCValidationTests (SIL-3)
+- Owner: "Industrial Safety Test Team"
+- Description: Safety function validation per IEC 61508 SIL-3 and ISO 13849 PLe
+- Tags: "IEC-61508", "SIL-3", "safety-PLC", "functional-safety"
+
+Generate 8 test cases covering:
+
+1. Emergency Stop Tests (2 test cases):
+   - TEST_SAFE_001: Emergency Stop Response (HIL, system)
+     * satisfies: REQ_SAFE_001
+     * Setup: Safety PLC with emergency stop buttons and contactors
+     * Steps: Trigger E-stop, measure response time, verify all outputs safe state
+     * Expected: Response ≤50ms, all outputs de-energized, safety contactors open
+     * Pass Criteria: 100% E-stop function, response time ≤50ms, safe state verified
+     * testresult: notrun
+   
+   - TEST_SAFE_002: Emergency Stop Redundancy (HIL, system)
+     * satisfies: REQ_SAFE_002
+     * Test dual-channel E-stop monitoring
+     * Single channel failure detected, safe shutdown
+     * testresult: notrun
+
+2. Safety Interlock Tests (2 test cases):
+   - TEST_SAFE_003: Safety Gate Monitoring (HIL, system)
+     * satisfies: REQ_SAFE_003
+     * Test safety gate position monitoring
+     * Gate open = immediate stop, ≤100ms response
+     * testresult: notrun
+   
+   - TEST_SAFE_004: Interlock Bypass Prevention (manual, system)
+     * satisfies: REQ_SAFE_004
+     * Attempt interlock bypass (tampering)
+     * System detects bypass, enters safe state, logs event
+     * testresult: notrun
+
+3. Light Curtain Tests (2 test cases):
+   - TEST_SAFE_005: Light Curtain Detection (HIL, system)
+     * satisfies: REQ_SAFE_005
+     * Test safety light curtain obstruction
+     * Detection ≤50ms, machine stop initiated
+     * testresult: notrun
+   
+   - TEST_SAFE_006: Light Curtain Muting (manual, system)
+     * satisfies: REQ_SAFE_006
+     * Test muting during material pass-through
+     * Muting only during valid conditions, auto-disable
+     * testresult: notrun
+
+4. Diagnostic Tests (2 test cases):
+   - TEST_SAFE_007: Diagnostic Coverage (automated, integration)
+     * satisfies: REQ_SAFE_007
+     * Test self-diagnostics and fault detection
+     * DC ≥99% per IEC 61508 SIL-3
+     * testresult: notrun
+   
+   - TEST_SAFE_008: Proof Test Procedure (manual, acceptance)
+     * satisfies: REQ_SAFE_008
+     * Execute full proof test per maintenance schedule
+     * Document all safety function verification
+     * testresult: notrun
+
+File: SafetyPLCValidationTests.tst
+```
+
+### 5. Generic Test Suite Template
+```
+Create .tst file for {SYSTEM_NAME} validation testing.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Safety Standard: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+- Requirements: use requirementset {REQUIREMENT_SET_NAME}
+- Functions: use functionset {FUNCTION_SET_NAME}
+- Parameters: use parameter {PARAMETER_LIST}
+
+Test Set: {TEST_SET_IDENTIFIER} ({SAFETY_LEVEL})
+- Owner: "{TEST_TEAM_NAME}"
+- Description: {TEST_SET_DESCRIPTION}
+- Tags: "{TAG1}", "{TAG2}", "{TAG3}"
+
+Generate {NUMBER} test cases covering:
+
+1. {TEST_CATEGORY_1} ({NUMBER} test cases):
+   - {TEST_ID_1}: {TEST_NAME_1} ({method}, {testlevel})
+     * satisfies: {REQUIREMENT_REF}
+     * Setup: {TEST_SETUP_DESCRIPTION}
+     * Steps: {DETAILED_TEST_STEPS}
+     * Expected: {EXPECTED_RESULTS}
+     * Pass Criteria: {PASS_CRITERIA}
+     * safetylevel: {SAFETY_LEVEL}
+     * testresult: notrun
+
+2. {TEST_CATEGORY_2} ({NUMBER} test cases):
+   - {TEST_ID_2}: {TEST_NAME_2} ({method}, {testlevel})
+     * satisfies: {REQUIREMENT_REF}
+     * {TEST_DETAILS}
+
+For each test case:
+- Use multiline """ for setup, steps, expected, passcriteria
+- Include specific, measurable, and verifiable pass criteria
+- Link to requirements with satisfies ref requirement
+- Specify appropriate test method (MIL/SIL/PIL/HIL/VIL/manual/automated)
+- Specify test level (unit/integration/system/acceptance)
+- Set testresult to notrun (planned tests)
+- Include safety level for safety-critical tests
+- Add owner and tags for traceability
+
+File: {TEST_SET_NAME}.tst
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef testset` per file
+- [ ] All `use` statements at top (requirementset, functionset, parameter)
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Multiline strings use triple quotes `"""`
+
+### Test Set Properties
+- [ ] Testset has unique identifier
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains test set purpose
+- [ ] `owner` team identified
+- [ ] `tags` facilitate classification
+- [ ] `safetylevel` specified (for safety-critical systems)
+
+### Test Case Properties
+- [ ] Each testcase has unique identifier (e.g., TEST_XXX_001)
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains test purpose
+- [ ] `owner` identified
+- [ ] `method` specified (MIL|SIL|PIL|HIL|VIL|manual|automated)
+- [ ] `testlevel` specified (unit|integration|system|acceptance)
+- [ ] `setup` describes test environment and preconditions
+- [ ] `steps` provides detailed, numbered test procedure
+- [ ] `expected` defines expected results clearly
+- [ ] `passcriteria` defines measurable pass/fail criteria
+- [ ] `testresult` specified (pass|fail|intest|notrun|blocked)
+- [ ] `safetylevel` specified for safety-critical tests
+
+### Traceability
+- [ ] `satisfies ref requirement` links to one or more requirements
+- [ ] All referenced requirements exist
+- [ ] `derivedfrom ref requirement` used where applicable
+- [ ] `refinedfrom ref testcase` used for test refinement
+- [ ] `when ref config` used for conditional tests
+
+### Completeness
+- [ ] All requirements have corresponding test cases
+- [ ] Test coverage is complete for the system
+- [ ] Test methods appropriate for test objectives
+- [ ] Pass criteria are specific, measurable, and verifiable
+- [ ] Edge cases and boundary conditions covered
+- [ ] Failure modes tested
+- [ ] Performance requirements validated
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Vague test descriptions ("test system functionality")
+- Missing setup or steps details
+- Ambiguous pass criteria ("works correctly")
+- Missing requirement traceability (`satisfies` not specified)
+- Incorrect method for test type (e.g., HIL for pure software test)
+- Missing expected results
+- Non-measurable pass criteria
+- Incomplete test steps
+- Missing multiline `"""` for long text
+- Wrong testresult values (must be: pass|fail|intest|notrun|blocked)
+
+✅ **Best Practices:**
+- Use specific, measurable test names
+- Include detailed setup with equipment, configuration, preconditions
+- Provide numbered, step-by-step test procedures
+- Define quantitative pass criteria (e.g., "≥99.9% accuracy", "≤100ms latency")
+- Link all tests to requirements with `satisfies ref requirement`
+- Use appropriate test method for test objective
+- Specify safety level for safety-critical tests
+- Use multiline `"""` for setup, steps, expected, passcriteria
+- Include owner and tags for traceability
+- Cover normal operation, boundary conditions, and failure modes
+- Document expected results precisely
+- Use consistent test ID naming (TEST_XXX_001, TEST_XXX_002, etc.)
+
+---
+
+## Test Method Guidelines
+
+### MIL (Model-in-the-Loop)
+- **Purpose**: Test mathematical models and algorithms
+- **Use When**: Early development, algorithm validation
+- **Example**: Testing control algorithms in Simulink
+
+### SIL (Software-in-the-Loop)
+- **Purpose**: Test compiled software code
+- **Use When**: Software component testing, integration testing
+- **Example**: Testing embedded C code on development PC
+
+### PIL (Processor-in-the-Loop)
+- **Purpose**: Test code on target processor
+- **Use When**: Processor-specific testing, timing validation
+- **Example**: Testing code on actual ECU processor
+
+### HIL (Hardware-in-the-Loop)
+- **Purpose**: Test with real hardware and simulated environment
+- **Use When**: System integration, hardware/software integration
+- **Example**: Testing ECU connected to vehicle simulator
+
+### VIL (Vehicle-in-the-Loop)
+- **Purpose**: Test with real vehicle
+- **Use When**: Final validation, real-world conditions
+- **Example**: Testing on proving ground or public roads
+
+### Manual
+- **Purpose**: Human-executed tests
+- **Use When**: Usability, clinical validation, acceptance testing
+- **Example**: Clinical staff evaluating medical device
+
+### Automated
+- **Purpose**: Automated test execution
+- **Use When**: Regression testing, continuous integration
+- **Example**: Automated unit test suite
+
+---
+
+## Example Generated Test Suite (Target Quality)
+
+```sylang
+use requirementset AutonomousPerceptionRequirements
+use functionset AutonomousPerceptionFunctions
+use parameter MaxDetectionRange, ConfidenceThreshold, ProcessingLatency
+
+hdef testset PerceptionSystemValidationTests
+  name "Autonomous Perception System Validation Test Suite"
+  description """
+    Comprehensive validation tests for autonomous vehicle perception system 
+    covering object detection, classification, tracking, and sensor fusion 
+    per ISO 26262 ASIL-D requirements.
+    """
+  owner "Perception Test Engineering Team"
+  tags "ISO-26262", "ASIL-D", "perception", "validation", "HIL"
+  safetylevel ASIL-D
+
+  def testcase TEST_PERC_001_OBJECT_DETECTION
+    name "Environmental Object Detection Performance Test"
+    description """
+      Validate object detection accuracy, range performance, and confidence 
+      scoring across all sensor modalities (radar, camera, LiDAR) in nominal 
+      environmental conditions per ISO 26262 ASIL-D requirements.
+      """
+    owner "Object Detection Test Team"
+    tags "detection", "performance", "ASIL-D", "HIL"
+    method HIL
+    testlevel system
+    setup """
+      Autonomous vehicle perception system configured in HIL test bench 
+      with radar/camera/LiDAR simulators. Calibrated test objects (vehicles, 
+      pedestrians, cyclists) positioned at specified distances. Environmental 
+      chamber with controlled lighting (1000 lux) and weather simulation inactive.
+      Temperature: 20°C ±2°C. All sensors calibrated and verified operational.
+      """
+    steps """
+      1. Initialize perception system and execute self-diagnostics
+      2. Verify all sensors (3x radar, 6x camera, 4x LiDAR) report active status
+      3. Place calibrated test objects at distances: 20m, 50m, 100m, 150m, 200m
+      4. For each object and distance combination:
+         a. Execute detection algorithm for 100 measurement cycles
+         b. Record detection rate, classification, confidence score, position accuracy
+         c. Verify detection latency ≤100ms per cycle
+         d. Document any detection failures or false positives
+      5. Analyze detection statistics across all test combinations
+      6. Calculate overall detection rate, classification accuracy, position error
+      7. Compare results against specification requirements
+      8. Generate comprehensive test report with statistical analysis
+      """
+    expected """
+      Objects detected with ≥99.9% accuracy at all test distances.
+      Classification confidence ≥95% for all object types.
+      Position accuracy within ±10cm lateral, ±20cm longitudinal at all distances.
+      Detection latency ≤100ms for all measurements.
+      Zero false negatives for safety-critical objects (pedestrians, vehicles).
+      False positive rate <0.1% across all test cycles.
+      """
+    passcriteria """
+      Detection accuracy meets specification (≥99.9%) in ≥98% of test cases.
+      Zero tolerance for false negatives on safety-critical objects.
+      Position accuracy within specified tolerance (±10cm lateral).
+      Detection latency compliant (≤100ms) for 100% of measurements.
+      Classification confidence ≥95% for all object classes.
+      Statistical analysis shows system meets ASIL-D requirements.
+      """
+    safetylevel ASIL-D
+    testresult notrun
+    satisfies ref requirement REQ_PERC_001
+    satisfies ref requirement REQ_PERC_001_1
+    derivedfrom ref requirement REQ_SYSTEM_PERCEPTION_001
+
+  def testcase TEST_PERC_002_ADVERSE_WEATHER
+    name "Adverse Weather Detection Performance Test"
+    description """
+      Validate object detection performance degradation limits in adverse 
+      weather conditions (rain, fog) per ISO 26262 ASIL-D requirements.
+      """
+    owner "Environmental Test Team"
+    tags "weather", "environmental", "ASIL-D", "HIL"
+    method HIL
+    testlevel system
+    setup """
+      HIL test bench with environmental chamber capable of simulating rain 
+      (5mm/h, 10mm/h) and fog (visibility 50m, 100m). Calibrated test objects 
+      at distances 50m, 100m, 150m. All sensors calibrated for baseline performance.
+      """
+    steps """
+      1. Establish baseline detection performance in nominal conditions
+      2. Configure environmental chamber for rain simulation (5mm/h)
+      3. Execute detection algorithm for 100 cycles per object/distance
+      4. Record detection rate, classification accuracy, confidence scores
+      5. Increase rain intensity to 10mm/h and repeat measurements
+      6. Configure fog simulation (visibility 100m) and repeat measurements
+      7. Configure fog simulation (visibility 50m) and repeat measurements
+      8. Analyze performance degradation vs. baseline for each condition
+      9. Verify degradation remains within specification limits
+      10. Generate environmental performance report
+      """
+    expected """
+      Performance degradation <5% in rain (5mm/h).
+      Performance degradation <10% in rain (10mm/h).
+      Performance degradation <15% in fog (visibility 100m).
+      Performance degradation <20% in fog (visibility 50m).
+      Detection rate remains ≥95% in all adverse weather conditions.
+      """
+    passcriteria """
+      Performance degradation within specification limits for all conditions.
+      Detection rate ≥95% maintained in adverse weather.
+      Zero false negatives on safety-critical objects in any weather condition.
+      System provides appropriate degradation warnings to driver.
+      """
+    safetylevel ASIL-D
+    testresult notrun
+    satisfies ref requirement REQ_PERC_002
+    when ref config c_AdverseWeatherTesting
+```
+
+---
+
+**Remember:** Test files establish complete traceability from requirements to validation evidence. Good tests have specific setup, detailed steps, measurable expected results, and quantitative pass criteria. Always link tests to requirements with `satisfies ref requirement`. Use appropriate test methods (MIL/SIL/HIL/VIL) and test levels (unit/integration/system/acceptance). Use multiline `"""` for detailed descriptions.

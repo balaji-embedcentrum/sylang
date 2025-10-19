@@ -1,0 +1,667 @@
+# Interface Definitions (.ifc) - AI Prompting Guide
+
+## Purpose
+Interface files define the communication contracts between system components, specifying data types, operations, signals, and protocols. Interfaces enable loose coupling, reusability, and clear component boundaries in MBSE architectures. They serve as the foundation for component integration and system-level communication design.
+
+## When to Use
+- During system architecture design
+- Before block architecture (.blk) definition
+- When defining component boundaries
+- For API and protocol specification
+- During integration planning
+- When establishing communication standards
+- For component reuse and modularity
+
+## When to Use Operation vs Signal
+
+Use this decision table when defining interfaces:
+
+| If...                                        | Use...      |
+| -------------------------------------------- | ----------- |
+| You *request* something or trigger an action | `operation` |
+| You *observe* or *broadcast* information     | `signal`    |
+| You *need return codes or acknowledgments*   | `operation` |
+| You *need periodic or event updates*         | `signal`    |
+| You're *mimicking RTE_Call_*                 | `operation` |
+| You're *mimicking RTE_Read/Write_*           | `signal`    |
+
+**Quick Examples:**
+- `GetSystemStatus` → **operation** (request with response)
+- `SetMotorSpeed` → **operation** (command with acknowledgment)
+- `SpeedUpdate` → **signal** (periodic broadcast)
+- `EmergencyAlert` → **signal** (event notification)
+- `ReadSensorData` → **operation** (query with return value)
+- `HeartbeatPulse` → **signal** (periodic status update)
+
+## Key Syntax Elements
+```
+use interfaceset [ref], use parameter [ref], use datatype [ref]
+hdef interfaceset [identifier]
+  name [string-literal]
+  description [multiline string]
+  owner [string-literal]
+  tags [comma-separated list]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  
+def operation [identifier]
+  name [string-literal]
+  description [multiline string]
+  owner [string-literal]
+  tags [comma-separated list]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  
+  # Operation properties
+  operationtype [synchronous|asynchronous|event|query]
+  direction [in|out|inout]
+  datatype [data-type-specification]
+  parameters [parameter-list]
+  returntype [return-type-specification]
+  
+  # Interface details
+  protocol [communication-protocol]
+  timing [timing-constraints]
+  reliability [reliability-requirements]
+  security [security-requirements]
+  
+  # Relationships
+  usedby ref block [block-refs]
+  usedby ref function [function-refs]
+  when ref config [config-refs]
+
+def signal [identifier]
+  name [string-literal]
+  description [multiline string]
+  owner [string-literal]
+  tags [comma-separated list]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  
+  # Signal properties
+  signaltype [event|data|control|status]
+  direction [in|out|inout]
+  datatype [data-type-specification]
+  encoding [signal-encoding]
+  
+  # Signal details
+  protocol [communication-protocol]
+  timing [timing-constraints]
+  reliability [reliability-requirements]
+  security [security-requirements]
+  
+  # Relationships
+  usedby ref block [block-refs]
+  usedby ref function [function-refs]
+  when ref config [config-refs]
+```
+
+## Common Patterns
+
+### Interface Types
+- **Functional Interfaces**: Operations and signals for behavior
+- **Data Interfaces**: Data exchange and storage
+- **Control Interfaces**: Control flow and state management
+- **Status Interfaces**: Health monitoring and diagnostics
+
+### Operation Types
+- **Synchronous**: Request-response with immediate return
+- **Asynchronous**: Fire-and-forget with callback
+- **Event**: Notification-based communication
+- **Query**: Data retrieval operations
+
+### Signal Types
+- **Event Signals**: Discrete state changes
+- **Data Signals**: Continuous data streams
+- **Control Signals**: Command and control
+- **Status Signals**: Health and diagnostic information
+
+---
+
+## Example Prompts
+
+### 1. Automotive ADAS Interface Definitions
+```
+Create comprehensive .ifc file for ADAS (Advanced Driver Assistance Systems) interfaces.
+
+Context:
+- System: Level 3 autonomous driving system
+- Components: Perception, Planning, Control, HMI, Vehicle
+- Standards: ISO 26262 ASIL-D, AUTOSAR, CAN/CAN-FD
+- Safety Level: ASIL-D for critical interfaces
+- Requirements: ADAS_Interface_Requirements.req
+
+Top-level Interface Set: ADASInterfaces (ASIL-D)
+
+Interface Categories:
+1. Perception Interfaces (Camera, Radar, Lidar)
+2. Planning Interfaces (Path planning, Decision making)
+3. Control Interfaces (Steering, Braking, Throttle)
+4. HMI Interfaces (Driver interaction, Alerts)
+5. Vehicle Interfaces (CAN bus, Diagnostics)
+
+For each interface, specify:
+- Data types and structures
+- Communication protocols
+- Timing constraints
+- Reliability requirements
+- Safety levels
+- Error handling
+
+Example Interfaces:
+
+1. PerceptionData_Operation (ASIL-D)
+   - Operation Type: Asynchronous
+   - Direction: Out
+   - Data Type: PerceptionDataStructure
+   - Parameters: timestamp, confidence, object_list
+   - Return Type: void
+   - Protocol: CAN-FD, 100Mbps
+   - Timing: 20Hz update rate, <50ms latency
+   - Reliability: 99.9% message delivery
+   - Security: Message authentication, encryption
+   - Description: Provides fused sensor data to planning system
+   - Used By: PlanningControlModule, SafetyMonitor
+
+2. EmergencyBrake_Signal (ASIL-D)
+   - Signal Type: Control
+   - Direction: Out
+   - Data Type: BrakeCommand
+   - Encoding: CAN signal, 8 bytes
+   - Protocol: CAN-FD, 500kbps
+   - Timing: <10ms response time
+   - Reliability: 99.99% delivery guarantee
+   - Security: CRC protection, sequence numbers
+   - Description: Emergency braking command to brake system
+   - Used By: BrakeControlModule, EmergencyStopModule
+
+3. DriverInput_Operation (ASIL-C)
+   - Operation Type: Synchronous
+   - Direction: In
+   - Data Type: DriverInputStructure
+   - Parameters: steering_angle, brake_pedal, accelerator_pedal
+   - Return Type: Acknowledgment
+   - Protocol: CAN, 250kbps
+   - Timing: 100Hz update rate, <10ms latency
+   - Reliability: 99% message delivery
+   - Security: Basic CRC protection
+   - Description: Receives driver input commands
+   - Used By: DriverInputModule, HMI_Controller
+
+File: ADASInterfaces.ifc
+References: use interfaceset VehicleInterfaces, use parameter ADAS_Parameters
+```
+
+### 2. Medical Device Patient Monitoring Interfaces
+```
+Generate .ifc file for ICU patient monitoring system interfaces.
+
+System: Real-time vital signs monitoring
+Components: Sensors, Processing, Display, Alarms, Storage
+Standards: IEC 62304 SIL-3, IEC 60601-1, HL7 FHIR
+Safety Level: SIL-3 for critical interfaces
+Requirements: MedicalDevice_Interface_Requirements.req
+
+Medical-specific considerations:
+- Patient safety paramount
+- Continuous monitoring requirements
+- Data integrity critical
+- Regulatory compliance (FDA, CE)
+- Interoperability with hospital systems
+
+Example Interfaces:
+
+1. VitalSignsData_Operation (SIL-3)
+   - Operation Type: Asynchronous
+   - Direction: Out
+   - Data Type: VitalSignsStructure
+   - Parameters: heart_rate, blood_pressure, spO2, temperature
+   - Return Type: void
+   - Protocol: HL7 FHIR, TCP/IP
+   - Timing: 1Hz update rate, <100ms latency
+   - Reliability: 99.9% message delivery
+   - Security: TLS encryption, digital signatures
+   - Description: Provides real-time vital signs to display and storage
+   - Used By: PatientDisplay, DataLogger, AlarmSystem
+
+2. CriticalAlarm_Signal (SIL-3)
+   - Signal Type: Event
+   - Direction: Out
+   - Data Type: AlarmEvent
+   - Encoding: JSON message, 256 bytes
+   - Protocol: MQTT, TCP/IP
+   - Timing: <1s alarm generation, <5s notification
+   - Reliability: 99.99% delivery guarantee
+   - Security: Message authentication, encryption
+   - Description: Critical patient condition alarm
+   - Used By: NurseStation, MobileAlerts, HospitalSystem
+
+3. SensorHealth_Operation (SIL-2)
+   - Operation Type: Query
+   - Direction: In
+   - Data Type: SensorHealthQuery
+   - Parameters: sensor_id, health_check_type
+   - Return Type: SensorHealthStatus
+   - Protocol: Modbus RTU, RS-485
+   - Timing: 10Hz query rate, <50ms response
+   - Reliability: 99% message delivery
+   - Security: Basic CRC protection
+   - Description: Queries sensor health status
+   - Used By: DiagnosticModule, MaintenanceSystem
+
+File: PatientMonitoringInterfaces.ifc
+```
+
+### 3. Aviation Flight Control Interfaces
+```
+Create .ifc file for aircraft flight control system interfaces.
+
+Aircraft: Commercial transport (Boeing 737 class)
+Components: Flight Control Computer, Actuators, Sensors, Communication
+Certification: DO-178C Level A, ARINC 429, ARINC 664
+Safety Level: DAL-A for critical interfaces
+Requirements: FlightControl_Interface_Requirements.req
+
+Aviation-specific considerations:
+- Deterministic behavior
+- Real-time constraints
+- Redundancy requirements
+- Environmental factors
+- Certification compliance
+
+Example Interfaces:
+
+1. FlightControlCommand_Operation (DAL-A)
+   - Operation Type: Synchronous
+   - Direction: Out
+   - Data Type: FlightControlCommand
+   - Parameters: elevator_cmd, aileron_cmd, rudder_cmd
+   - Return Type: CommandAcknowledgment
+   - Protocol: ARINC 429, 100kbps
+   - Timing: 50Hz update rate, <20ms latency
+   - Reliability: 99.999% message delivery
+   - Security: Message authentication, sequence numbers
+   - Description: Flight control surface commands
+   - Used By: ElevatorActuator, AileronActuator, RudderActuator
+
+2. AttitudeData_Signal (DAL-A)
+   - Signal Type: Data
+   - Direction: In
+   - Data Type: AttitudeData
+   - Encoding: ARINC 429 word, 32 bits
+   - Protocol: ARINC 429, 12.5kbps
+   - Timing: 100Hz update rate, <10ms latency
+   - Reliability: 99.99% delivery guarantee
+   - Security: Parity checking, validity flags
+   - Description: Aircraft attitude and heading data
+   - Used By: FlightControlComputer, NavigationSystem
+
+3. SystemStatus_Operation (DAL-B)
+   - Operation Type: Query
+   - Direction: In
+   - Data Type: SystemStatusQuery
+   - Parameters: system_id, status_type
+   - Return Type: SystemStatusResponse
+   - Protocol: ARINC 664, Ethernet
+   - Timing: 10Hz query rate, <100ms response
+   - Reliability: 99.9% message delivery
+   - Security: Message authentication, encryption
+   - Description: System health and status queries
+   - Used By: MaintenanceSystem, GroundSupport
+
+File: FlightControlInterfaces.ifc
+```
+
+### 4. Industrial Safety PLC Interfaces
+```
+Generate .ifc file for safety PLC in manufacturing automation.
+
+Application: Production line safety controller
+Components: Safety CPU, I/O Modules, Communication, Power Supply
+Standards: IEC 61508 SIL-3, PROFIsafe, Ethernet/IP
+Safety Level: SIL-3 for safety interfaces
+Requirements: SafetyPLC_Interface_Requirements.req
+
+Industrial-specific considerations:
+- Continuous operation (24/7)
+- Harsh environment
+- Real-time safety requirements
+- Maintenance access
+- Production impact
+
+Example Interfaces:
+
+1. EmergencyStop_Signal (SIL-3)
+   - Signal Type: Control
+   - Direction: In
+   - Data Type: EmergencyStopStatus
+   - Encoding: PROFIsafe signal, 1 bit
+   - Protocol: PROFIsafe, 100Mbps
+   - Timing: <10ms response time
+   - Reliability: 99.99% delivery guarantee
+   - Security: CRC protection, sequence numbers
+   - Description: Emergency stop input from safety buttons
+   - Used By: SafetyCPU, EmergencyStopModule
+
+2. SafetyOutput_Operation (SIL-3)
+   - Operation Type: Synchronous
+   - Direction: Out
+   - Data Type: SafetyOutputCommand
+   - Parameters: output_id, command_type, safety_level
+   - Return Type: SafetyOutputStatus
+   - Protocol: PROFIsafe, 100Mbps
+   - Timing: <20ms response time
+   - Reliability: 99.99% delivery guarantee
+   - Security: CRC protection, sequence numbers
+   - Description: Safety output commands to actuators
+   - Used By: SafetyOutputModule, ActuatorController
+
+3. DiagnosticData_Operation (SIL-2)
+   - Operation Type: Asynchronous
+   - Direction: Out
+   - Data Type: DiagnosticData
+   - Parameters: module_id, diagnostic_code, timestamp
+   - Return Type: void
+   - Protocol: Ethernet/IP, TCP/IP
+   - Timing: 1Hz update rate, <1s latency
+   - Reliability: 99% message delivery
+   - Security: Basic authentication
+   - Description: System diagnostic and health data
+   - Used By: MaintenanceSystem, SCADA, HMI
+
+File: SafetyPLCInterfaces.ifc
+```
+
+### 5. Generic Interface Template
+```
+Create .ifc file for {SYSTEM_NAME} interface definitions.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Components: {COMPONENT_LIST}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508|AUTOSAR}
+- Safety Level: {ASIL-D|SIL-3|DAL-A|SIL-2}
+- Requirements: {INTERFACE_REQUIREMENTS_FILE}.req
+
+Interface Categories:
+1. {INTERFACE_CATEGORY_1}
+2. {INTERFACE_CATEGORY_2}
+3. {INTERFACE_CATEGORY_3}
+4. {INTERFACE_CATEGORY_4}
+5. {INTERFACE_CATEGORY_5}
+
+For each interface, specify:
+- Data types and structures
+- Communication protocols
+- Timing constraints
+- Reliability requirements
+- Safety levels
+- Error handling
+
+Example Interfaces:
+
+1. {OPERATION_1_NAME} ({SAFETY_LEVEL})
+   - Operation Type: {synchronous|asynchronous|event|query}
+   - Direction: {in|out|inout}
+   - Data Type: {DATA_TYPE_STRUCTURE}
+   - Parameters: {PARAMETER_LIST}
+   - Return Type: {RETURN_TYPE}
+   - Protocol: {COMMUNICATION_PROTOCOL}
+   - Timing: {TIMING_CONSTRAINTS}
+   - Reliability: {RELIABILITY_REQUIREMENTS}
+   - Security: {SECURITY_REQUIREMENTS}
+   - Description: {INTERFACE_DESCRIPTION}
+   - Used By: {CONSUMER_COMPONENTS}
+
+2. {SIGNAL_1_NAME} ({SAFETY_LEVEL})
+   - Signal Type: {event|data|control|status}
+   - Direction: {in|out|inout}
+   - Data Type: {DATA_TYPE_STRUCTURE}
+   - Encoding: {SIGNAL_ENCODING}
+   - Protocol: {COMMUNICATION_PROTOCOL}
+   - Timing: {TIMING_CONSTRAINTS}
+   - Reliability: {RELIABILITY_REQUIREMENTS}
+   - Security: {SECURITY_REQUIREMENTS}
+   - Description: {SIGNAL_DESCRIPTION}
+   - Used By: {CONSUMER_COMPONENTS}
+
+For each interface:
+- Use specific, measurable descriptions
+- Specify realistic timing constraints
+- Define appropriate safety levels
+- Include error handling
+- Consider domain-specific requirements
+
+File: {SYSTEM_NAME}Interfaces.ifc
+References: use interfaceset {REFERENCE_INTERFACES}, use parameter {PARAMETER_FILE}
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef interfaceset` per file
+- [ ] All `use` statements at top (interfacesets, parameters, datatypes)
+- [ ] Proper indentation for nested elements
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Multiline descriptions use triple quotes `"""`
+
+### Interface Properties
+- [ ] Each interface has unique identifier
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains interface purpose
+- [ ] `owner` team/person identified
+- [ ] `tags` facilitate classification
+- [ ] `safetylevel` specified for critical interfaces
+
+### Operation Properties
+- [ ] `operationtype` specified correctly
+- [ ] `direction` appropriate for operation
+- [ ] `datatype` clearly defined
+- [ ] `parameters` complete and specific
+- [ ] `returntype` specified when applicable
+- [ ] `protocol` realistic and available
+
+### Signal Properties
+- [ ] `signaltype` specified correctly
+- [ ] `direction` appropriate for signal
+- [ ] `datatype` clearly defined
+- [ ] `encoding` specified for signal format
+- [ ] `protocol` realistic and available
+
+### Interface Details
+- [ ] `timing` constraints realistic
+- [ ] `reliability` requirements appropriate
+- [ ] `security` requirements specified
+- [ ] Error handling defined
+- [ ] Domain-specific requirements considered
+
+### Relationships
+- [ ] `usedby ref block` links to consuming blocks
+- [ ] `usedby ref function` links to consuming functions
+- [ ] All references resolve to existing elements
+- [ ] Interface relationships logical
+
+### Completeness
+- [ ] All major interfaces included
+- [ ] No missing interface categories
+- [ ] Edge cases and error interfaces covered
+- [ ] Domain-specific interfaces included
+- [ ] Standard compliance addressed
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Vague interface descriptions ("data interface")
+- Missing timing constraints
+- Unrealistic reliability requirements
+- Incomplete parameter definitions
+- Missing error handling
+- Inconsistent terminology
+- Overlooking domain-specific requirements
+- Missing security considerations
+
+✅ **Best Practices:**
+- Use specific, measurable interface descriptions
+- Specify realistic timing constraints
+- Define appropriate reliability requirements
+- Include complete parameter definitions
+- Specify error handling strategies
+- Use consistent terminology
+- Consider domain-specific factors
+- Include security requirements
+- Document assumptions and limitations
+- Provide clear usage examples
+
+---
+
+## Interface Design Guidelines
+
+### Operation Design
+- **Synchronous**: Use for immediate response required
+- **Asynchronous**: Use for fire-and-forget operations
+- **Event**: Use for notification-based communication
+- **Query**: Use for data retrieval operations
+
+### Signal Design
+- **Event Signals**: Use for discrete state changes
+- **Data Signals**: Use for continuous data streams
+- **Control Signals**: Use for command and control
+- **Status Signals**: Use for health and diagnostic information
+
+### Protocol Selection
+- **CAN/CAN-FD**: Automotive, real-time, deterministic
+- **Ethernet**: High bandwidth, flexible, complex
+- **ARINC 429**: Aviation, deterministic, reliable
+- **PROFIsafe**: Industrial, safety-critical, deterministic
+- **HL7 FHIR**: Medical, interoperable, standardized
+
+---
+
+## Interface Naming Conventions
+
+### Good Interface Names (Specific & Clear)
+- PerceptionData_Operation
+- EmergencyBrake_Signal
+- DriverInput_Operation
+- VitalSignsData_Operation
+- CriticalAlarm_Signal
+- FlightControlCommand_Operation
+- AttitudeData_Signal
+- EmergencyStop_Signal
+
+### Bad Interface Names (Vague)
+- ❌ DataInterface
+- ❌ ControlSignal
+- ❌ CommunicationOperation
+- ❌ StatusInterface
+- ❌ InputSignal
+
+---
+
+## Example Generated Interface (Target Quality)
+
+```sylang
+use interfaceset VehicleInterfaces
+use parameter ADAS_Parameters
+use datatype ADAS_DataTypes
+
+hdef interfaceset ADASInterfaces
+  name "Advanced Driver Assistance Systems Interfaces"
+  description """
+    Comprehensive interface definitions for Level 3 autonomous driving system 
+    per ISO 26262 ASIL-D. Covers all communication interfaces between 
+    perception, planning, control, HMI, and vehicle systems including 
+    data types, protocols, timing constraints, and safety requirements.
+    """
+  owner "ADAS Architecture Team"
+  tags "ISO-26262", "ADAS", "autonomous-driving", "ASIL-D"
+  safetylevel ASIL-D
+
+  def operation PerceptionData_Operation
+    name "Perception Data Interface"
+    description """
+      Asynchronous operation providing fused sensor data from perception 
+      system to planning and control modules. Includes object detection, 
+      tracking, classification, and environmental model data with 
+      confidence levels and timestamps.
+      """
+    owner "Perception Team"
+    tags "perception", "sensor-fusion", "ASIL-D", "data"
+    safetylevel ASIL-D
+    
+    operationtype asynchronous
+    direction out
+    datatype PerceptionDataStructure
+    parameters "timestamp: uint64, confidence: float32, object_list: ObjectList"
+    returntype void
+    protocol "CAN-FD, 100Mbps"
+    timing "20Hz update rate, <50ms latency"
+    reliability "99.9% message delivery"
+    security "Message authentication, encryption"
+    
+    usedby ref block PlanningControlModule
+    usedby ref block SafetyMonitor
+    usedby ref function PathPlanning
+    usedby ref function CollisionAvoidance
+    when ref config c_AutonomousDrivingActive
+
+  def signal EmergencyBrake_Signal
+    name "Emergency Braking Signal"
+    description """
+      High-priority control signal for emergency braking commands. 
+      Triggers immediate brake application when collision threat 
+      is detected. Includes brake force level and emergency type 
+      for appropriate response.
+      """
+    owner "Safety Team"
+    tags "emergency-braking", "ASIL-D", "control", "safety"
+    safetylevel ASIL-D
+    
+    signaltype control
+    direction out
+    datatype BrakeCommand
+    encoding "CAN signal, 8 bytes"
+    protocol "CAN-FD, 500kbps"
+    timing "<10ms response time"
+    reliability "99.99% delivery guarantee"
+    security "CRC protection, sequence numbers"
+    
+    usedby ref block BrakeControlModule
+    usedby ref block EmergencyStopModule
+    usedby ref function EmergencyBraking
+    when ref config c_EmergencyBrakingEnabled
+
+  def operation DriverInput_Operation
+    name "Driver Input Interface"
+    description """
+      Synchronous operation for receiving driver input commands 
+      including steering, braking, and acceleration inputs. 
+      Provides real-time driver intent for system override and 
+      fallback scenarios.
+      """
+    owner "HMI Team"
+    tags "driver-input", "ASIL-C", "control", "HMI"
+    safetylevel ASIL-C
+    
+    operationtype synchronous
+    direction in
+    datatype DriverInputStructure
+    parameters "steering_angle: float32, brake_pedal: float32, accelerator_pedal: float32"
+    returntype Acknowledgment
+    protocol "CAN, 250kbps"
+    timing "100Hz update rate, <10ms latency"
+    reliability "99% message delivery"
+    security "Basic CRC protection"
+    
+    usedby ref block DriverInputModule
+    usedby ref block HMI_Controller
+    usedby ref function DriverOverride
+    when ref config c_DriverInputActive
+```
+
+---
+
+**Remember:** Interface definitions establish clear communication contracts between system components. Good interfaces enable loose coupling, reusability, and maintainable architectures. Interfaces should be designed with clear data types, realistic timing constraints, and appropriate safety levels.

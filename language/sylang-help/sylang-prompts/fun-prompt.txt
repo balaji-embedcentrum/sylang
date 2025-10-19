@@ -1,0 +1,710 @@
+# Function Definition (.fun) - AI Prompting Guide
+
+## Purpose
+Function files define behavioral specifications and system functionality independent of physical architecture. Functions describe WHAT the system must do without specifying WHERE (which block) it will execute. This separation enables function reuse, architecture flexibility, and clear allocation traceability from requirements through implementation.
+
+## When to Use
+- After requirements (.req) are defined
+- Before or alongside block architecture (.blk)
+- For MBSE functional decomposition
+- When separating logical behavior from physical implementation
+- For function allocation and traceability analysis
+- During architectural trade studies (which functions go where)
+
+## Key Syntax Elements
+```
+use interfaceset [ref], use functionset [ref]
+hdef functionset [identifier]
+  name [string-literal]
+  description [multiline string]
+  owner [string-literal]
+  tags [comma-separated list]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  
+def function [identifier]
+  name [string-literal]
+  description [multiline string]
+  owner [string-literal]
+  tags [comma-separated list]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  
+  # Functional interfaces (behavior, not implementation)
+  needs ref operation|signal [refs]      # Functional inputs
+  provides ref operation|signal [refs]   # Functional outputs
+  
+  # Traceability
+  implements ref requirement [refs]      # Which requirements this function satisfies
+  
+  # Nested decomposition
+  def function [nested-function]
+    # ... sub-function properties
+```
+
+## Common Patterns
+
+### Hierarchical Decomposition
+- Top-level system functions
+- Decomposed into sub-functions
+- Leaf functions (no further decomposition)
+
+### Function Types
+- Control functions (decision-making, state management)
+- Processing functions (data transformation, calculations)
+- Monitoring functions (diagnostics, health checks)
+- Communication functions (data exchange, protocols)
+
+### Allocation Strategy
+- Functions allocated to blocks (.blk files)
+- Multiple functions can be allocated to one block
+- One function should not span multiple blocks (decompose it instead)
+
+---
+
+## Example Prompts
+
+### 1. Autonomous Emergency Braking Functions
+```
+Create Sylang .fun file for Autonomous Emergency Braking (AEB) system.
+
+Context:
+- Product: ASIL-D collision avoidance system
+- Requirements: AEB_Requirements.req (15 requirements)
+- Interfaces: ADASInterfaces.ifc
+- Decomposition: System → Processing → Control levels
+
+Top-level Function: AutonomousEmergencyBraking (ASIL-D)
+
+Level 1 Decomposition (Major Functions):
+1. EnvironmentalPerception (ASIL-D)
+   - Needs: RawSensorData (camera, radar, lidar)
+   - Provides: EnvironmentModel, DetectedObjects
+   - Implements: REQ_AEB_001 (environmental detection)
+   - Description: Fuses multi-sensor data to create comprehensive environment model
+
+2. ThreatAssessment (ASIL-D)
+   - Needs: EnvironmentModel, VehicleState, VehicleDynamics
+   - Provides: CollisionThreat, TimeToCollision, CollisionProbability
+   - Implements: REQ_AEB_002 (threat assessment)
+   - Description: Evaluates collision risk based on detected objects and vehicle trajectory
+
+3. BrakingDecision (ASIL-D)
+   - Needs: CollisionThreat, DriverInput, VehicleState
+   - Provides: BrakingCommand, BrakingLevel (partial|full)
+   - Implements: REQ_AEB_003 (braking decision logic)
+   - Description: Decides when and how to apply emergency braking
+
+4. BrakeActuation (ASIL-D)
+   - Needs: BrakingCommand, BrakingLevel
+   - Provides: BrakeForce, ActuatorCommand
+   - Implements: REQ_AEB_004 (brake actuation)
+   - Description: Translates braking commands into actuator-specific commands
+
+5. DriverNotification (ASIL-C)
+   - Needs: CollisionThreat
+   - Provides: VisualAlert, AudibleAlert, HapticAlert
+   - Implements: REQ_AEB_005 (driver warning)
+   - Description: Alerts driver of imminent collision
+
+Level 2 Decomposition (Sub-functions of EnvironmentalPerception):
+- CameraProcessing
+  - Needs: RawCameraFrames
+  - Provides: DetectedLanes, DetectedObjects_Camera
+  - Implements: REQ_AEB_001_1
+  
+- RadarProcessing
+  - Needs: RawRadarReflections
+  - Provides: DetectedObjects_Radar, ObjectVelocity
+  - Implements: REQ_AEB_001_2
+  
+- LidarProcessing
+  - Needs: RawLidarPointCloud
+  - Provides: DetectedObjects_Lidar, ObjectDistance
+  - Implements: REQ_AEB_001_3
+  
+- SensorFusion
+  - Needs: DetectedObjects_Camera, DetectedObjects_Radar, DetectedObjects_Lidar
+  - Provides: FusedObjectList, EnvironmentModel
+  - Implements: REQ_AEB_001_4
+  - ASIL-D (critical fusion logic)
+
+For each function:
+- Specify ASIL level based on safety criticality
+- Define clear interfaces (needs/provides)
+- Link to specific requirements (implements)
+- Include multiline descriptions explaining algorithms
+- Use hierarchical decomposition (2-3 levels max)
+
+File: AEB_Functions.fun
+Reference: use interfaceset ADASInterfaces
+```
+
+### 2. Medical Device Patient Monitoring Functions
+```
+Generate .fun file for ICU patient vital signs monitoring system.
+
+System: Real-time patient monitoring
+Compliance: IEC 62304, ISO 14971, IEC 60601
+Safety: SIL-3
+Requirements: PatientMonitorRequirements.req
+
+Top-level Functionset: PatientMonitoringFunctions (SIL-3)
+
+Core Functions:
+1. SignalAcquisition (SIL-3)
+   - Needs: ECG_RawSignal, SpO2_RawSignal, BP_RawData, Temp_RawData
+   - Provides: AcquiredVitalSigns
+   - Implements: REQ_PM_001 (signal acquisition)
+   - Description: Acquires analog signals from medical sensors with proper isolation
+
+2. SignalProcessing (SIL-3)
+   - Needs: AcquiredVitalSigns
+   - Provides: FilteredSignals, CleanECG, CleanSpO2
+   - Implements: REQ_PM_002 (signal filtering and artifact removal)
+   - Sub-functions:
+     * ECG_Filtering (remove 50/60Hz noise, baseline wander)
+     * SpO2_Filtering (motion artifact removal)
+     * BP_Validation (plausibility checks)
+
+3. VitalSignsCalculation (SIL-3)
+   - Needs: FilteredSignals
+   - Provides: HeartRate, SpO2_Percentage, BloodPressure_Systolic, BloodPressure_Diastolic, Temperature
+   - Implements: REQ_PM_003 (vital signs computation)
+   - Sub-functions:
+     * HeartRateDetection (QRS detection, R-R interval analysis)
+     * SpO2_Calculation (perfusion index, oxygen saturation)
+     * BP_Calculation (systolic/diastolic determination)
+
+4. AlarmGeneration (SIL-3)
+   - Needs: HeartRate, SpO2_Percentage, BloodPressure, Temperature, AlarmThresholds
+   - Provides: AlarmSignals (audible, visual, priority levels)
+   - Implements: REQ_PM_004 (alarm management per IEC 60601-1-8)
+   - Description: Generates prioritized alarms (high, medium, low) with proper escalation
+   - Sub-functions:
+     * ThresholdMonitoring (compare vitals to limits)
+     * AlarmPrioritization (determine urgency)
+     * AlarmSuppressionLogic (avoid alarm fatigue)
+
+5. TrendAnalysis (SIL-2)
+   - Needs: HeartRate, SpO2_Percentage, BloodPressure (historical)
+   - Provides: TrendData, PredictiveAlerts
+   - Implements: REQ_PM_005 (trend monitoring)
+   - Description: Analyzes 7-day trends, detects gradual deterioration
+
+6. DataLogging (SIL-2)
+   - Needs: All vital signs
+   - Provides: StoredPatientData, ReportGeneration
+   - Implements: REQ_PM_006 (data storage and retrieval)
+
+7. SafetyMonitoring (SIL-3)
+   - Needs: All system signals
+   - Provides: SystemHealthStatus, FailureDetection
+   - Implements: REQ_PM_007 (self-diagnostics)
+   - Description: Continuous self-test per IEC 62304, detects sensor failures
+
+For each function:
+- Specify IEC 62304 software safety class
+- Include risk mitigation per ISO 14971
+- Reference medical device standards
+- Emphasize patient safety
+
+File: PatientMonitoringFunctions.fun
+```
+
+### 3. Flight Management System Functions (Aviation)
+```
+Create .fun file for commercial aircraft Flight Management System (FMS).
+
+Certification: DO-178C Level A
+Aircraft: Commercial transport (Boeing 737/Airbus A320 class)
+Requirements: FMS_Requirements.req
+
+Top-level Functionset: FlightManagementFunctions (DAL A)
+
+Navigation Functions:
+1. PositionDetermination (DAL A)
+   - Needs: GPS_Data, IRS_Data, VOR_DME_Data, RadioAltimeter_Data
+   - Provides: BestEstimatePosition, NavigationAccuracy, IntegrityStatus
+   - Implements: REQ_FMS_NAV_001 (position calculation)
+   - Sub-functions:
+     * GPS_Processing (multi-constellation GNSS)
+     * IRS_Integration (inertial reference system)
+     * VOR_DME_Processing (legacy navaids)
+     * SensorFusion (Kalman filtering)
+     * IntegrityMonitoring (RAIM - Receiver Autonomous Integrity Monitoring)
+
+2. FlightPlanManagement (DAL A)
+   - Needs: FlightPlan, WeatherData, NOTAMs, AircraftPerformance
+   - Provides: ActiveFlightPlan, NextWaypoint, RoutePredictions
+   - Implements: REQ_FMS_FP_001 (flight plan processing)
+   - Sub-functions:
+     * WaypointSequencing
+     * AirwayProcessing
+     * ProcedureManagement (SIDs, STARs, approaches)
+     * AlternateRouting
+
+3. LateralGuidance (DAL A)
+   - Needs: BestEstimatePosition, ActiveFlightPlan, DesiredTrack
+   - Provides: LNAV_Command, RollCommand, HeadingCommand
+   - Implements: REQ_FMS_GUID_001 (lateral navigation)
+   - Description: Generates autopilot commands for lateral path following
+
+4. VerticalGuidance (DAL A)
+   - Needs: BestEstimatePosition, ActiveFlightPlan, Altitude, AirSpeed
+   - Provides: VNAV_Command, PitchCommand, ThrustCommand
+   - Implements: REQ_FMS_GUID_002 (vertical navigation)
+   - Sub-functions:
+     * ClimbOptimization
+     * CruiseOptimization
+     * DescentPlanning (top-of-descent calculation)
+     * SpeedControl
+
+5. PerformanceCalculation (DAL B)
+   - Needs: AircraftWeight, Temperature, Pressure, Wind
+   - Provides: V-Speeds (V1, VR, V2), LandingDistance, TakeoffDistance
+   - Implements: REQ_FMS_PERF_001 (performance computations)
+
+6. FuelManagement (DAL B)
+   - Needs: FuelQuantity, FuelFlow, FlightPlan
+   - Provides: FuelPrediction, RangeCalculation, BingoFuel
+   - Implements: REQ_FMS_FUEL_001 (fuel monitoring and prediction)
+
+7. NavigationDatabase Management (DAL B)
+   - Needs: AIRAC_Cycle_Data
+   - Provides: CurrentNavData, DatabaseValidity
+   - Implements: REQ_FMS_DB_001 (navigation database management)
+
+For each function:
+- Specify DO-178C software level
+- Include certification considerations
+- Define deterministic behavior (real-time constraints)
+- Reference ARINC 424 (navigation database standard)
+
+File: FlightManagementFunctions.fun
+```
+
+### 4. Industrial PLC Safety Functions
+```
+Generate .fun file for Safety PLC in manufacturing automation.
+
+Application: Production line safety controller
+Standards: IEC 61508 SIL-3, IEC 61511, ISO 13849
+Requirements: SafetyPLC_Requirements.req
+
+Top-level Functionset: SafetyControlFunctions (SIL-3)
+
+Core Safety Functions:
+1. EmergencyStopProcessing (SIL-3)
+   - Needs: E-Stop_Buttons (multiple stations), WatchdogTimer
+   - Provides: SafeShutdownCommand, E-Stop_Status
+   - Implements: REQ_SAFETY_001 (emergency stop)
+   - Description: Processes redundant E-stop inputs, initiates safe shutdown in <10ms
+
+2. LightCurtainMonitoring (SIL-3)
+   - Needs: LightCurtain_Status, MachineMotion, InterlockStatus
+   - Provides: SafetyZoneViolation, StopCommand
+   - Implements: REQ_SAFETY_002 (perimeter guarding)
+   - Description: Monitors safety light curtains, stops machine if beam broken during operation
+
+3. SafetyInterlockManagement (SIL-3)
+   - Needs: DoorSwitches, GuardSwitches, TwoHandControl
+   - Provides: InterlockStatus, AccessPermission
+   - Implements: REQ_SAFETY_003 (mechanical interlocks)
+   - Sub-functions:
+     * DoorMonitoring (all access points)
+     * GuardVerification (physical barriers)
+     * TwoHandControl (simultaneous activation required)
+
+4. SafeSpeedMonitoring (SIL-3)
+   - Needs: MotorSpeed, EncoderFeedback, OperatingMode
+   - Provides: SpeedLimitViolation, ReducedSpeedCommand
+   - Implements: REQ_SAFETY_004 (safe speed limits)
+   - Description: Enforces speed limits during manual/setup modes
+
+5. SafeTorqueOff (SIL-3)
+   - Needs: SafetyViolationSignal
+   - Provides: MotorPowerDisable, STO_Status
+   - Implements: REQ_SAFETY_005 (safe torque off)
+   - Description: Immediately removes power to motor drives per IEC 61800-5-2
+
+6. DiagnosticTesting (SIL-3)
+   - Needs: All safety inputs/outputs
+   - Provides: DiagnosticCoverage, FaultDetection
+   - Implements: REQ_SAFETY_006 (self-diagnostics)
+   - Sub-functions:
+     * InputChannelTesting (dual-channel comparison)
+     * OutputDriverTesting (test pulses)
+     * ProcessorTesting (watchdog, memory CRC)
+     * CommunicationTesting (PROFIsafe integrity)
+
+7. SafeStateManagement (SIL-3)
+   - Needs: AllSafetySignals, SystemHealthStatus
+   - Provides: SafeStateActive, RestartPermission
+   - Implements: REQ_SAFETY_007 (safe state control)
+   - Description: Maintains safe state until reset conditions met, prevents auto-restart
+
+For each function:
+- Calculate Safety Integrity Level (SIL)
+- Define diagnostic coverage (DC)
+- Specify safe failure fraction (SFF)
+- Include proof test requirements
+
+File: SafetyControlFunctions.fun
+```
+
+### 5. Generic Function Template
+```
+Create Sylang .fun file for {SYSTEM_NAME} with {FUNCTION_COUNT} functions.
+
+Context:
+- Product: {PRODUCT_DESCRIPTION}
+- Domain: {automotive|medical|aviation|industrial|consumer}
+- Safety Standard: {ISO_26262|IEC_62304|DO-178C|IEC_61508|none}
+- Safety Level: {ASIL-D|SIL-3|DAL_A|QM}
+- Requirements: {REQUIREMENTS_FILE}.req
+- Interfaces: {INTERFACE_FILE}.ifc
+
+Top-level Functionset: {FUNCTIONSET_NAME} ({SAFETY_LEVEL})
+
+Function Hierarchy:
+
+1. {PRIMARY_FUNCTION_NAME} ({SAFETY_LEVEL})
+   - Needs: {INPUT_OPERATION_1}, {INPUT_SIGNAL_1}, {INPUT_OPERATION_2}
+   - Provides: {OUTPUT_OPERATION_1}, {OUTPUT_SIGNAL_1}
+   - Implements: {REQ_ID_1}, {REQ_ID_2}
+   - Description: """
+     {DETAILED_DESCRIPTION_OF_WHAT_THIS_FUNCTION_DOES}
+     {ALGORITHMS_OR_LOGIC_USED}
+     {PERFORMANCE_REQUIREMENTS}
+     """
+   - Sub-functions:
+     * {SUB_FUNCTION_1} - {brief description}
+     * {SUB_FUNCTION_2} - {brief description}
+
+2. {SECONDARY_FUNCTION_NAME} ({SAFETY_LEVEL})
+   - Needs: {INPUT_FROM_OTHER_FUNCTIONS}
+   - Provides: {OUTPUT_TO_CONSUMERS}
+   - Implements: {REQ_ID_3}
+   - Description: """
+     {PURPOSE_AND_BEHAVIOR}
+     """
+
+3. {MONITORING_FUNCTION_NAME} ({HIGHER_SAFETY_LEVEL})
+   - Needs: {SIGNALS_TO_MONITOR}
+   - Provides: {HEALTH_STATUS}, {FAULT_DETECTION}
+   - Implements: {REQ_ID_4}
+   - Description: """
+     Safety monitoring function for {DOMAIN}-specific diagnostics.
+     Implements {STANDARD}-required self-tests and fault detection.
+     """
+
+For each function:
+- Define clear functional boundaries (single responsibility)
+- Specify interfaces in terms of behavior (not implementation)
+- Link to requirements for complete traceability
+- Include safety level appropriate for criticality
+- Use multiline descriptions for complex algorithms
+- Decompose into 2-3 levels maximum
+- Ensure names are verb-noun format (CalculateSpeed, MonitorHealth, ProcessSignal)
+
+File: {SYSTEM_NAME}_Functions.fun
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef functionset` per file
+- [ ] All `use` statements at top (interfaces, other functionsets)
+- [ ] Proper indentation for nested functions (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Multiline descriptions use triple quotes `"""`
+
+### Function Properties
+- [ ] Each function has unique identifier
+- [ ] `name` is descriptive and action-oriented (verb + noun)
+- [ ] `description` explains purpose and behavior
+- [ ] `owner` team/person identified
+- [ ] `tags` facilitate classification
+- [ ] `safetylevel` specified for safety-critical functions
+
+### Functional Interfaces
+- [ ] `needs` defines all functional inputs (operations/signals)
+- [ ] `provides` defines all functional outputs (operations/signals)
+- [ ] All referenced operations/signals exist in .ifc files
+- [ ] Interfaces describe behavior, not implementation
+- [ ] No circular function dependencies
+
+### Requirements Traceability
+- [ ] `implements ref requirement` links to .req files
+- [ ] All requirements are covered by functions
+- [ ] No orphan functions (not linked to requirements)
+- [ ] Complete forward traceability (req → fun)
+- [ ] Bidirectional traceability possible
+
+### Functional Decomposition
+- [ ] Logical hierarchy (system → subsystem → component function)
+- [ ] Appropriate decomposition depth (2-3 levels)
+- [ ] Single responsibility principle per function
+- [ ] Clear interfaces between functions
+- [ ] Sub-functions sum to parent function behavior
+
+### Safety & Compliance
+- [ ] Safety levels assigned to critical functions
+- [ ] Safety level appropriate for risk
+- [ ] Redundancy specified where required
+- [ ] Monitoring functions for diagnostics
+- [ ] Safe state behavior documented
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Implementation details in function descriptions (specify HOW, not WHAT)
+- Mixing functional and architectural concerns
+- Functions that span multiple architectural blocks
+- Missing requirements traceability
+- Inconsistent abstraction levels
+- Circular function dependencies
+- Vague function names ("ProcessData", "HandleInput")
+- Over-decomposition (too many trivial sub-functions)
+- Under-decomposition (monolithic functions)
+
+✅ **Best Practices:**
+- Use active verbs in function names (Calculate, Monitor, Process, Control)
+- Define functions by behavior, not by implementation
+- One function should map to one or few blocks
+- Include monitoring/diagnostic functions
+- Decompose complex functions into sub-functions
+- Maintain consistent abstraction levels
+- Document algorithms in descriptions (not implementation)
+- Link every function to at least one requirement
+- Specify safety levels for critical functions
+- Use multiline descriptions for complex behavior
+
+---
+
+## Function Naming Conventions
+
+### Good Function Names (Action-Oriented)
+- CalculateBrakeForce
+- MonitorSensorHealth
+- ProcessCameraFrames
+- DetermineCollisionRisk
+- GenerateAlarmSignal
+- ValidateUserInput
+- FuseSensorData
+- ManageFlightPlan
+- DetectEmergencyStop
+- OptimizeTrajectory
+
+### Bad Function Names (Vague)
+- ❌ BrakeSystem
+- ❌ ProcessData
+- ❌ HandleInput
+- ❌ DoCalculation
+- ❌ MainFunction
+- ❌ Control
+- ❌ Manager
+- ❌ Module
+
+---
+
+## Functional Decomposition Strategies
+
+### By Data Flow
+```
+Input → Processing → Output
+DataAcquisition → DataProcessing → DataPresentation
+```
+
+### By Control Loop
+```
+Sense → Think → Act
+PerceptionFunction → PlanningFunction → ControlFunction
+```
+
+### By Safety Architecture
+```
+Primary Function → Monitoring Function → Safe State Function
+```
+
+### By Temporal Phases
+```
+Initialization → Normal Operation → Degraded Mode → Shutdown
+```
+
+---
+
+## Function vs Block Guidelines
+
+### Functions (.fun) Define:
+- WHAT the system does (behavior)
+- Functional requirements satisfaction
+- Logical decomposition
+- Input/output behavior
+- Algorithm purpose (not code)
+
+### Blocks (.blk) Define:
+- WHERE functions execute (hardware/software)
+- Physical/logical components
+- System topology
+- Communication architecture
+- Resource constraints
+
+### Relationship:
+```
+Function (behavior) --allocated to--> Block (structure)
+
+Example:
+CalculateBrakeForce (function) 
+  ↓ allocatedto
+BrakeControlSoftware (block in BrakeControlECU)
+```
+
+---
+
+## Example Generated Function (Target Quality)
+
+```sylang
+use interfaceset ADASInterfaces
+use interfaceset VehicleInterfaces
+
+hdef functionset AutonomousEmergencyBrakingFunctions
+  name "Autonomous Emergency Braking Function Set"
+  description """
+    Complete functional specification for ASIL-D autonomous emergency braking 
+    system. Implements collision avoidance through sensor fusion, threat assessment, 
+    and automated braking intervention. Covers forward collision scenarios at 
+    speeds 5-80 km/h with stationary and moving objects per Euro NCAP protocols.
+    """
+  owner "ADAS Functions Engineering Team"
+  tags "AEB", "collision-avoidance", "ASIL-D", "autonomous-braking"
+  safetylevel ASIL-D
+
+  def function EnvironmentalPerception
+    name "Multi-Sensor Environmental Perception"
+    description """
+      Fuses data from camera, radar, and lidar sensors to create comprehensive 
+      360-degree environmental model. Detects and classifies objects (vehicles, 
+      pedestrians, cyclists, static obstacles) with position, velocity, and 
+      trajectory prediction. Implements sensor-level plausibility checks and 
+      fault detection per ISO 26262. Updates environment model at 20 Hz.
+      """
+    owner "Perception Team"
+    tags "sensor-fusion", "object-detection", "ASIL-D"
+    safetylevel ASIL-D
+    
+    needs ref operation ReceiveRawCameraFrames
+    needs ref operation ReceiveRadarReflections
+    needs ref operation ReceiveLidarPointCloud
+    needs ref signal SensorHealthStatus
+    
+    provides ref operation EnvironmentModel
+    provides ref operation DetectedObjectList
+    provides ref signal PerceptionConfidence
+    
+    implements ref requirement REQ_AEB_001
+    implements ref requirement REQ_AEB_001_1
+    implements ref requirement REQ_AEB_001_2
+
+    def function CameraProcessing
+      name "Camera-Based Object Detection"
+      description """
+        Processes front-facing camera images using deep learning (YOLO/SSD) 
+        for object detection and classification. Detects lane markings, 
+        traffic signs, vehicles, pedestrians. Provides 2D bounding boxes 
+        and object classification confidence. Runs on GPU at 30 fps.
+        """
+      owner "Computer Vision Team"
+      safetylevel ASIL-D
+      needs ref operation ReceiveRawCameraFrames
+      provides ref operation DetectedObjects_Camera
+      provides ref operation DetectedLanes
+      implements ref requirement REQ_AEB_001_1
+
+    def function RadarProcessing
+      name "Radar-Based Object Tracking"
+      description """
+        Processes 77 GHz FMCW radar returns for object detection and velocity 
+        measurement. Provides range, range-rate (Doppler), and azimuth angle. 
+        All-weather operation (rain, fog, snow). Track-while-scan algorithm 
+        for multiple object tracking. Updates at 50 Hz.
+        """
+      owner "Radar Signal Processing Team"
+      safetylevel ASIL-D
+      needs ref operation ReceiveRadarReflections
+      provides ref operation DetectedObjects_Radar
+      provides ref signal RadarTargets
+      implements ref requirement REQ_AEB_001_2
+
+    def function SensorFusion
+      name "Multi-Sensor Data Fusion"
+      description """
+        Fuses camera, radar, and lidar detections using Extended Kalman Filter 
+        (EKF) to create unified object list. Handles sensor conflicts, data 
+        association, and track management. Provides position, velocity, 
+        acceleration, and trajectory prediction for each object. ASIL-D 
+        implementation with cross-sensor plausibility checks.
+        """
+      owner "Sensor Fusion Team"
+      safetylevel ASIL-D
+      needs ref operation DetectedObjects_Camera
+      needs ref operation DetectedObjects_Radar
+      needs ref operation DetectedObjects_Lidar
+      provides ref operation FusedObjectList
+      provides ref operation EnvironmentModel
+      implements ref requirement REQ_AEB_001_4
+
+  def function ThreatAssessment
+    name "Collision Threat Assessment"
+    description """
+      Evaluates collision risk for all detected objects based on time-to-collision 
+      (TTC), predicted trajectories, and vehicle dynamics. Computes threat level 
+      (none, low, medium, high, critical) and time-to-intervention. Considers 
+      driver inputs (steering, braking) to avoid false positives. Updates at 20 Hz.
+      """
+    owner "Decision Logic Team"
+    tags "threat-assessment", "TTC", "ASIL-D"
+    safetylevel ASIL-D
+    
+    needs ref operation FusedObjectList
+    needs ref operation VehicleState
+    needs ref operation DriverInput
+    provides ref operation CollisionThreat
+    provides ref signal TimeToCollision
+    provides ref signal CollisionProbability
+    
+    implements ref requirement REQ_AEB_002
+    implements ref requirement REQ_AEB_002_1
+
+  def function BrakingDecision
+    name "Emergency Braking Decision Logic"
+    description """
+      Determines when and how to apply emergency braking based on threat level 
+      and driver responsiveness. Three-stage intervention: (1) Driver warning, 
+      (2) Brake pre-fill, (3) Full emergency braking. Considers driver override 
+      (accelerator pedal) to prevent unintended activation. Decision latency <50ms.
+      """
+    owner "Control Logic Team"
+    tags "braking-decision", "ASIL-D", "intervention"
+    safetylevel ASIL-D
+    
+    needs ref operation CollisionThreat
+    needs ref signal TimeToCollision
+    needs ref operation DriverInput
+    needs ref operation VehicleState
+    provides ref operation BrakingCommand
+    provides ref signal BrakingLevel
+    provides ref signal InterventionStage
+    
+    implements ref requirement REQ_AEB_003
+    implements ref requirement REQ_AEB_003_1
+```
+
+---
+
+**Remember:** Functions define WHAT the system does, independent of WHERE it executes. Good functional decomposition enables architecture flexibility, function reuse, and clear traceability from requirements to implementation. Functions are allocated to blocks during architectural design.

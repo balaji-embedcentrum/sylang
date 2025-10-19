@@ -1,0 +1,185 @@
+# Sylang DSL Project - AI Assistant Guide
+
+This is a Model-Based Systems Engineering project using Sylang DSL.
+
+## Overview
+
+Sylang is a first-principles DSL for MBSE (Model-Based Systems Engineering) with:
+- Complete ASPICE bilateral traceability
+- ISO 26262 safety compliance
+- 150+ semantic relations between artifacts
+- Graph-based symbol management
+
+## Language Reference
+
+- **Complete syntax**: `sylang-help/SYLANG_COMPLETE_REFERENCE.md`
+- **Relations matrix**: `sylang-help/relations-matrix-help.md`
+- **Architecture**: `docs/guides/Sylang_Architecture_Guide.md`
+
+## File Types
+
+| Extension | Purpose | Example |
+|-----------|---------|---------|
+| `.ple` | Product Line | Root definition |
+| `.fml` | Features | Hierarchical feature model |
+| `.vml` | Variants | Feature selections |
+| `.vcf` | Configs | Configuration values (0/1) |
+| `.fun` | Functions | Functional architecture |
+| `.blk` | Blocks | Hardware/software blocks |
+| `.ifc` | Interfaces | Operations, signals, datatypes |
+| `.req` | Requirements | System/software requirements |
+| `.tst` | Tests | Test cases |
+| `.flr` | FMEA | Failure modes & effects |
+| `.haz` | Hazards | ISO 26262 hazard analysis |
+| `.sam` | Safety Mechanisms | ISO 26262 safety |
+
+## Relation Syntax
+
+All relations use: `keyword ref targettype TargetIdentifier`
+
+Examples:
+```sylang
+allocatedto ref block VisionModule
+derivedfrom ref requirement REQ_001
+implements ref function PerceptionProcessing
+testedby ref testcase TEST_001
+when ref config c_CameraSystem
+```
+
+## AI Query Commands (Real-Time Symbol Graph Access)
+
+**IMPORTANT**: Use these commands to get accurate, real-time information about the codebase.
+
+### 1. Find Symbol
+```
+Command: Sylang AI: Find Symbol
+Usage: Look up any symbol by name
+Example: "Find symbol PerceptionProcessing"
+Returns: Location, type, properties
+```
+
+### 2. Get Dependencies
+```
+Command: Sylang AI: Get Dependencies
+Usage: Get forward/backward dependencies
+Example: "Get dependencies for PerceptionProcessing"
+Returns: What it depends on (forward) or what depends on it (backward)
+```
+
+### 3. Validate Reference
+```
+Command: Sylang AI: Validate Reference
+Usage: Check if a reference is valid before suggesting it
+Example: "Validate reference block VisionModule"
+Returns: Whether symbol exists, type matches, suggestions if not found
+```
+
+### 4. Query Symbols
+```
+Command: Sylang AI: Query Symbols
+Usage: Search for symbols by type, pattern, properties
+Example: "Query all function symbols"
+Returns: List of matching symbols
+```
+
+### 5. Get Traceability Chain
+```
+Command: Sylang AI: Get Traceability Chain
+Usage: Build complete ASPICE/ISO 26262 traceability
+Example: "Get traceability chain for REQ_PERC_001"
+Returns: Full chain: requirement → function → block → test
+```
+
+### 6. Get Impact Analysis
+```
+Command: Sylang AI: Impact Analysis
+Usage: Analyze impact of changing/deleting a symbol
+Example: "Impact analysis for PerceptionProcessing"
+Returns: Upstream/downstream dependencies, risk level
+```
+
+## When Helping with Sylang Code
+
+1. **Before suggesting references**: Use "Validate Reference" to ensure symbol exists
+2. **When asked about dependencies**: Use "Get Dependencies" for accurate info
+3. **For traceability questions**: Use "Get Traceability Chain"
+4. **Before refactoring**: Use "Impact Analysis" to assess risk
+5. **For discovery**: Use "Query Symbols" to find patterns
+
+## Common Patterns
+
+### ASPICE Bilateral Traceability
+```sylang
+# Feature → Function
+feature performs ref function MyFunction
+function enables ref feature MyFeature
+
+# Function → Block
+function allocatedto ref block MyBlock
+block implements ref function MyFunction
+
+# Requirement → Function → Test
+requirement implements ref function MyFunction
+function derivedfrom ref requirement MyReq
+testcase satisfies ref requirement MyReq
+```
+
+### ISO 26262 Safety
+```sylang
+# Hazard → Safety Goal → Requirement
+hazard leadsto ref requirement SAFE_REQ_001
+requirement derivedfrom ref safetygoal SG_001
+
+# Failure detection
+function detects ref failuremode CameraFailure
+failuremode detectedby ref function MonitoringFunction
+```
+
+### Conditional Visibility
+```sylang
+# Config-based graying
+def function LidarProcessing
+  when ref config c_LidarSystem
+  # Grayed out if c_LidarSystem = 0 in .vcf
+```
+
+## Key Principles
+
+1. **Use AI Query commands** - Don't guess, query the symbol graph
+2. **Validate before suggesting** - Check if symbols exist
+3. **Respect ASPICE** - Maintain bilateral traceability
+4. **Follow ISO 26262** - Preserve safety relations
+5. **Check impact** - Analyze before breaking changes
+
+## ACE (Agentic Context Engineering) Notes
+
+This project follows ACE principles:
+- **Comprehensive context**: Detailed .sylang files (not summaries)
+- **Structured knowledge**: Itemized relations (not monolithic)
+- **Evolving playbook**: Real-time symbol graph access
+- **Domain-specific**: ASPICE/ISO 26262 patterns preserved
+
+Use the AI Query commands to build your own "playbook" of patterns as you work.
+
+## Example Workflow
+
+**User**: "Add a new function for radar processing"
+
+**AI Assistant**:
+1. Query existing patterns: `Sylang AI: Query Symbols` (filter: type=function, pattern="*Perception*")
+2. See pattern: All perception functions allocated to PerceptionControlModule
+3. Validate block exists: `Sylang AI: Validate Reference` (block PerceptionControlModule)
+4. Suggest new function following pattern:
+```sylang
+def function RadarProcessing
+  allocatedto ref block PerceptionControlModule
+  enables ref feature RadarSystem
+  derivedfrom ref requirement REQ_RADAR_001
+```
+
+## Notes
+
+- All AI Query commands return JSON responses
+- Commands log to console (not to Sylang logger)
+- Symbol manager auto-updates on file changes (always fresh data)
+- Can be disabled via: `sylang.aiQuery.enabled: false`

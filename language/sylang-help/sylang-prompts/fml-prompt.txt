@@ -1,0 +1,528 @@
+# Feature Model (.fml) - AI Prompting Guide
+
+## Purpose
+Feature Model files define product line features with hierarchical structure, variability (mandatory/optional/or/alternative), and constraints. Foundation for variant management and configuration-based development.
+
+## When to Use
+- After defining product line (.ple file)
+- During product line engineering and feature analysis
+- When planning product variants and configurations
+- Before generating variant models (.vml) and configurations (.vcf)
+- For managing feature dependencies and constraints
+
+## Key Syntax Elements
+```
+use productline [ref]
+use interfaceset [ref]  # Optional - for needs/provides
+
+hdef featureset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  listedfor ref productline [ref]
+
+  def feature [identifier] [mandatory|optional|or|alternative]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    tags [string-literal], [string-literal], ...
+    safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+    
+    # Functional Mapping
+    performs ref function [function-ref], [function-ref], ...
+    
+    # Interface Definition
+    needs ref operation [operation-ref], [operation-ref], ...
+    needs ref signal [signal-ref], [signal-ref], ...
+    provides ref operation [operation-ref], [operation-ref], ...
+    provides ref signal [signal-ref], [signal-ref], ...
+    
+    # Feature Constraints
+    requires ref feature [feature-ref], [feature-ref], ...
+    excludes ref feature [feature-ref], [feature-ref], ...
+    
+    # Hierarchical nesting
+    def feature [nested-feature] [constraint]
+```
+
+## Common Patterns
+
+### Feature Constraints
+- **mandatory**: Must be included in all variants
+- **optional**: May or may not be included
+- **or**: At least one child feature required
+- **alternative**: Exactly one child feature required (XOR)
+
+### Sibling Rule
+ALL siblings at same level MUST use the same constraint type
+
+### Hierarchical Structure
+- Root features (direct children of featureset)
+- Nested sub-features (unlimited depth)
+- Leaf features (no children)
+
+---
+
+## Example Prompts
+
+### 1. Basic Feature Model from Scratch
+```
+Create a feature model for an Advanced Driver Assistance System (ADAS) product line.
+
+Product line reference: use productline AutomotiveADAS
+Interface reference: use interfaceset ADASInterfaces
+File: ADAS_Features.fml
+
+Root features (mandatory):
+1. BaseSafety (basic safety features - required by law)
+   - Performs: SafetyMonitoring, EmergencyBraking functions
+   - Needs: VehicleSpeed, BrakePressure signals
+   - Provides: EmergencyBrakeCommand operation
+2. ComfortFeatures (optional convenience features)
+   - Performs: CruiseControl, LaneAssist functions
+   - Needs: GetRadarData, GetCameraImage operations
+   - Provides: SetThrottle, SetSteeringTorque operations
+3. AutonomousDriving (optional autonomous features)
+   - Performs: PathPlanning, MotionControl functions
+   - Needs: EnvironmentData, VehicleState operations
+   - Provides: VehicleControls operation
+
+For each root feature, create 3-5 sub-features with appropriate constraints.
+
+Requirements:
+- Use proper constraint types (mandatory, optional, or, alternative)
+- Follow sibling rule (all siblings same constraint)
+- Include safety levels where applicable
+- Add functional mapping with `performs ref function`
+- Add interface definitions with `needs` and `provides`
+- Add detailed descriptions using multiline strings
+- Include tags for feature classification
+```
+
+### 2. Feature Model with Variability
+```
+Generate feature model for electric vehicle powertrain with multiple variants:
+
+Root feature: ElectricPowertrain (mandatory)
+
+Battery Options (alternative - exactly one):
+- LithiumIonBattery
+- SolidStateBattery
+- HydrogenFuelCell
+
+Motor Configuration (or - at least one):
+- FrontMotor
+- RearMotor
+- DualMotor (all-wheel drive)
+
+Charging Systems (or - at least one):
+- AC_Level2_Charging
+- DC_FastCharging
+- WirelessCharging
+- BatterySwap
+
+Range Options (alternative):
+- StandardRange (300km)
+- ExtendedRange (500km)
+- LongRange (700km)
+
+Use proper constraints, include ASIL levels for safety-critical features, 
+add feature dependencies with "requires" and "excludes".
+```
+
+### 3. Feature Model with Complex Constraints
+```
+Create feature model with cross-cutting concerns and functional mapping:
+
+Feature: AdvancedCruiseControl (optional)
+  - Performs: CruiseController, SpeedRegulation functions
+  - Needs: GetLeadVehicleDistance, GetVehicleSpeed operations
+  - Provides: SetThrottle, SetBrake operations
+↓
+Sub-features:
+- AdaptiveCruiseControl (ACC) - mandatory if parent enabled
+  - Performs: DistanceRegulation, SpeedMatching functions
+  - Needs: RadarData signal, LeadVehicleSpeed signal
+  - Provides: ThrottleCommand, BrakeCommand operations
+  - TrafficJamAssist - optional
+    - Performs: StopAndGo, LowSpeedControl functions
+    - Needs: FrontRadarData, FrontCameraData
+    - Provides: StopAndGoControl operation
+  - PredictiveCruiseControl - optional
+    - Performs: PredictiveSpeedAdaptation function
+    - Needs: HDMapData, RouteInformation operations
+    - Provides: OptimalSpeedProfile operation
+- LaneCenteringAssist - mandatory if parent enabled
+  - Performs: LateralControl, LaneCentering functions
+  - Needs: CameraImage signal, LaneMarkers signal
+  - Provides: SteeringCorrection operation
+- AutomaticEmergencyBraking - mandatory (safety-critical, ASIL-D)
+  - Performs: CollisionDetection, EmergencyBraking functions
+  - Needs: ObjectDistance, RelativeVelocity signals
+  - Provides: EmergencyBrakeCommand operation
+
+Add constraints:
+- TrafficJamAssist requires ref feature SensorFusion
+- PredictiveCruiseControl requires ref feature HighDefinitionMaps
+- AutomaticEmergencyBraking excludes ref feature ManualBrakeOverride
+- LaneCenteringAssist requires ref feature LaneDetectionCamera
+
+Include rationale for each constraint in descriptions.
+Include complete functional mapping (performs, needs, provides) for all features.
+```
+
+### 4. Feature Model for Product Line Matrix
+```
+Generate feature model representing product portfolio:
+
+Vehicle Models (alternative):
+- EconomyModel
+- MidRangeModel
+- PremiumModel
+- PerformanceModel
+
+Each model has different feature bundles:
+
+EconomyModel: Basic features only (all mandatory)
+- BasicSafety, ManualClimateControl, StandardInfotainment
+
+MidRangeModel: Basic + comfort (optional comfort)
+- BasicSafety (mandatory)
+- EnhancedSafety (optional)
+- AutomaticClimateControl (optional)
+- PremiumAudio (optional)
+
+PremiumModel: All features (many mandatory)
+- EnhancedSafety (mandatory)
+- PremiumInfotainment (mandatory)
+- AdvancedADAS (optional)
+
+PerformanceModel: Performance + safety (alternative performance modes)
+- SportSuspension (alternative)
+- TrackMode (alternative)
+- ComfortMode (alternative)
+
+Create hierarchical structure with proper constraints and dependencies.
+```
+
+### 5. Safety-Critical Feature Model
+```
+Create feature model for ISO 26262 compliant system:
+
+Feature: FunctionalSafetyFeatures (mandatory, ASIL-D)
+↓
+Safety Mechanisms (or - multiple allowed):
+- RedundantSensors (ASIL-D)
+- PlausibilityChecks (ASIL-D)
+- DiagnosticMonitoring (ASIL-D)
+- FallbackModes (ASIL-D)
+
+Fail-Safe Strategies (alternative - exactly one):
+- FailSafe (immediate shutdown)
+- FailOperational (degraded mode)
+- FailSilent (stop communication)
+
+For each feature:
+- Specify ASIL level
+- Add safety rationale in description
+- Link to applicable standards (ISO 26262 Part X)
+- Include failure mitigation strategies
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef featureset` per file
+- [ ] `use productline` statement present
+- [ ] `listedfor ref productline` in header
+- [ ] Proper indentation for nested features
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Constraint Correctness
+- [ ] **Sibling Rule**: All siblings use same constraint type
+- [ ] Mandatory features: Critical/required functionality
+- [ ] Optional features: Truly optional (not required)
+- [ ] Or constraints: At least one makes sense
+- [ ] Alternative constraints: Exactly one makes sense (XOR)
+
+### Functional Mapping
+- [ ] `performs ref function` links to actual functions
+- [ ] `needs ref operation` / `needs ref signal` define inputs
+- [ ] `provides ref operation` / `provides ref signal` define outputs
+- [ ] Interface references resolve to existing operations/signals
+
+### Feature Dependencies
+- [ ] `requires ref feature` relationships are valid
+- [ ] `excludes ref feature` relationships make sense
+- [ ] No circular dependencies
+- [ ] Dependencies reference existing features
+
+### Content Quality
+- [ ] Feature names are concise and descriptive
+- [ ] Descriptions explain feature purpose
+- [ ] Safety levels assigned to safety-critical features
+- [ ] Tags help with feature classification
+- [ ] Owner specified for critical features
+
+### Product Line Alignment
+- [ ] Features align with product line scope
+- [ ] Variants can be derived from feature combinations
+- [ ] No orphan features (not reachable from root)
+- [ ] Feature granularity is appropriate
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Violating sibling rule (mixing constraint types)
+- Creating too many alternative groups (overcomplicating)
+- Missing `listedfor ref productline` in header
+- Circular feature dependencies
+- Overly generic feature names ("Feature1", "Module2")
+- Missing safety levels for safety-critical features
+- Flat structure (no hierarchy - hard to manage)
+
+✅ **Best Practices:**
+- Group related features hierarchically
+- Use descriptive feature names (verb + noun)
+- Document why features are optional/alternative
+- Limit nesting depth (3-4 levels max for clarity)
+- Use constraints to enforce product rules
+- Add safety levels for automotive/medical systems
+- Test feature combinations (can valid variants be derived?)
+
+---
+
+## Feature Constraint Decision Guide
+
+### When to use MANDATORY
+- Legal/regulatory requirements (safety features)
+- Core functionality (without it, product doesn't work)
+- Base features required by all variants
+
+### When to use OPTIONAL
+- Comfort features (nice-to-have)
+- Premium upgrades
+- Regional-specific features
+- Experimental/beta features
+
+### When to use OR (at least one)
+- Multiple valid implementations (choose 1+)
+- Sensor redundancy (camera OR lidar OR radar OR...)
+- Connectivity options (WiFi OR Cellular OR Bluetooth OR...)
+- Power modes (Eco OR Normal OR Sport OR...)
+
+### When to use ALTERNATIVE (exactly one)
+- Mutually exclusive choices
+- Vehicle trim levels (Economy XOR MidRange XOR Premium)
+- Drive modes (FWD XOR AWD XOR RWD)
+- Battery capacities (Small XOR Medium XOR Large)
+- Autonomous levels (L2 XOR L3 XOR L4 XOR L5)
+
+---
+
+## Example Generated Feature Model (Target Quality)
+
+```sylang
+use productline AutonomousVehicleProductLine
+use interfaceset AVInterfaces
+
+hdef featureset AutonomousVehicleFeatures
+  name "Autonomous Vehicle Feature Set"
+  description """
+    Complete feature model for L3 autonomous vehicle product line covering 
+    perception, planning, control, and human-machine interface features with 
+    functional mapping and interface definitions.
+    """
+  owner "Product Line Engineering Team"
+  tags "autonomous-driving", "L3", "feature-model"
+  listedfor ref productline AutonomousVehicleProductLine
+
+  // MANDATORY: Legal and safety-critical features
+  def feature BaseSafetyFeatures mandatory
+    name "Base Safety Features"
+    description """
+      Legally mandated safety features required in all markets. 
+      Cannot be disabled or removed from any variant.
+      """
+    owner "Safety Engineering"
+    tags "safety", "mandatory", "legal-requirement"
+    safetylevel ASIL-D
+    performs ref function SafetyMonitoring, EmergencyBrakeControl
+
+    def feature AntiLockBraking mandatory
+      name "Anti-Lock Braking System (ABS)"
+      description "Prevents wheel lockup during emergency braking"
+      safetylevel ASIL-D
+      tags "braking", "safety-critical"
+      performs ref function ABSController
+      needs ref signal WheelSpeedSensor, BrakePressure
+      provides ref operation SetBrakePressure
+
+    def feature ElectronicStabilityControl mandatory
+      name "Electronic Stability Control (ESC)"
+      description "Maintains vehicle stability during emergency maneuvers"
+      safetylevel ASIL-D
+      tags "stability", "safety-critical"
+      performs ref function ESCController
+      needs ref signal YawRate, SteeringAngle, WheelSpeedSensor
+      provides ref operation SetBrakePressure, SetSteeringTorque
+
+    def feature AutomaticEmergencyBraking mandatory
+      name "Automatic Emergency Braking (AEB)"
+      description "Autonomous collision avoidance braking"
+      safetylevel ASIL-D
+      tags "collision-avoidance", "safety-critical"
+      performs ref function CollisionDetection, EmergencyBraking
+      needs ref operation GetObjectDistance, GetVehicleSpeed
+      provides ref operation SetEmergencyBrake
+
+  // OR: At least one perception sensor required
+  def feature PerceptionSensors or
+    name "Perception Sensor Suite"
+    description """
+      Multi-modal sensor fusion for environmental perception. 
+      At least one sensor type required; multiple recommended for redundancy.
+      """
+    owner "Perception Engineering"
+    tags "sensors", "perception", "redundancy"
+    safetylevel ASIL-D
+    performs ref function SensorFusion, ObjectDetection
+
+    def feature FrontCamera or
+      name "Front-Facing Camera"
+      description "High-resolution camera for object detection and lane recognition"
+      tags "camera", "vision"
+      safetylevel ASIL-D
+      performs ref function ImageProcessing, LaneDetection
+      provides ref signal CameraImage, DetectedObjects
+
+    def feature FrontLidar or
+      name "Front-Facing Lidar"
+      description "3D Lidar for precise distance and object classification"
+      tags "lidar", "3d-sensing"
+      safetylevel ASIL-C
+      performs ref function PointCloudProcessing, ObjectClassification
+      provides ref signal LidarPointCloud, ObjectDistance
+
+    def feature FrontRadar or
+      name "Front-Facing Radar"
+      description "All-weather radar for velocity and distance measurement"
+      tags "radar", "all-weather"
+      safetylevel ASIL-D
+      performs ref function RadarProcessing, VelocityEstimation
+      provides ref signal RadarObjects, RelativeVelocity
+
+    def feature FrontUltrasonic or
+      name "Front Ultrasonic Sensors"
+      description "Short-range proximity detection for low-speed scenarios"
+      tags "ultrasonic", "parking"
+      performs ref function UltrasonicProcessing
+      provides ref signal ProximityDistance
+
+  // ALTERNATIVE: Exactly one autonomous level (XOR)
+  def feature AutonomyLevel alternative
+    name "Autonomous Driving Level"
+    description """
+      SAE J3016 autonomous driving level. Determines system capabilities 
+      and operational design domain (ODD). Exactly one level per variant.
+      """
+    owner "Autonomous Systems Team"
+    tags "autonomy", "SAE-J3016"
+    safetylevel ASIL-D
+    performs ref function AutonomousDrivingController, PathPlanner
+
+    def feature L2Advanced alternative
+      name "Level 2+ Advanced Driver Assistance"
+      description "Hands-on, eyes-on driver assistance on highways"
+      tags "L2", "driver-assistance"
+      safetylevel ASIL-C
+      performs ref function LateralControl, LongitudinalControl
+      needs ref operation GetSteeringTorque, GetDriverInput
+      provides ref operation SetSteeringAssist, SetCruiseControl
+
+    def feature L3Conditional alternative
+      name "Level 3 Conditional Automation"
+      description "Hands-off, eyes-off in specific conditions (highway, <60 km/h)"
+      tags "L3", "conditional-automation"
+      safetylevel ASIL-D
+      performs ref function FullLateralControl, AdaptiveCruiseControl, TakeoverRequest
+      needs ref operation GetEnvironmentData, GetVehicleState
+      provides ref operation SetSteeringAngle, SetAcceleration, SetBrakePressure
+      provides ref signal TakeoverWarning, AutonomousModeActive
+      requires ref feature HDMap
+
+    def feature L4High alternative
+      name "Level 4 High Automation"
+      description "Full automation in defined operational design domain"
+      tags "L4", "high-automation"
+      safetylevel ASIL-D
+      performs ref function FullAutonomousControl, MinimalRiskCondition
+      needs ref operation GetEnvironmentData, GetV2XData, GetHDMapData
+      provides ref operation SetAllVehicleControls
+      provides ref signal SystemStatus, ODDLimitWarning
+      requires ref feature HDMap
+      requires ref feature V2X_Communication
+
+  // OPTIONAL: Enhanced features (customer choice)
+  def feature ComfortFeatures optional
+    name "Comfort and Convenience Features"
+    description "Optional premium features for enhanced user experience"
+    owner "UX Engineering"
+    tags "comfort", "premium", "optional"
+    performs ref function DriverAssistance
+
+    def feature AdaptiveCruiseControl optional
+      name "Adaptive Cruise Control"
+      description "Maintains set speed and following distance"
+      tags "ACC", "cruise-control"
+      safetylevel ASIL-B
+      performs ref function CruiseControlRegulation
+      needs ref operation GetLeadVehicleDistance, GetVehicleSpeed
+      needs ref signal RadarObjects
+      provides ref operation SetThrottlePosition
+      requires ref feature FrontRadar
+
+    def feature LaneKeepingAssist optional
+      name "Lane Keeping Assist"
+      description "Automatic lane centering and departure prevention"
+      tags "lane-keeping", "LKAS"
+      safetylevel ASIL-B
+      performs ref function LaneCentering, LaneDepartureWarning
+      needs ref signal CameraImage, LaneMarkers
+      provides ref operation SetSteeringCorrection
+      provides ref signal LaneDepartureWarning
+      requires ref feature FrontCamera
+
+    def feature TrafficJamAssist optional
+      name "Traffic Jam Assist"
+      description "Low-speed stop-and-go automation in congested traffic"
+      tags "traffic-jam", "stop-and-go"
+      safetylevel ASIL-C
+      performs ref function StopAndGo, LowSpeedSteering
+      needs ref operation GetLeadVehicleDistance, GetVehicleSpeed
+      needs ref signal CameraImage, RadarObjects
+      provides ref operation SetBrake, SetThrottle, SetSteering
+      requires ref feature AdaptiveCruiseControl
+      requires ref feature LaneKeepingAssist
+```
+
+---
+
+## Feature Model to Variant Workflow
+
+1. **Create Feature Model** (.fml file) - Define all possible features
+2. **Right-click → Generate Variant Model** - Creates .vml file
+3. **Edit Variant Model** - Select features for specific variant
+4. **Right-click → Generate Configuration** - Creates .vcf file
+5. **Use Configuration** - Other files use `when ref config` for conditional content
+
+---
+
+**Remember:** Feature models define "what is possible". Variant models select "what is included". This separation enables systematic product line engineering and configuration management.
