@@ -5,6 +5,11 @@
 
 ---
 
+> 💡 **Ready to try Sylang?** Search **"Sylang"** in your VSCode Extension Marketplace  
+> Available on **Microsoft Marketplace** and **Open VSX** for all VSCode-based editors
+
+---
+
 ## 🚀 From Complexity to Clarity
 
 Imagine designing an autonomous vehicle, a flight control system, or a life-saving medical device. You're juggling requirements documents, architecture diagrams, safety analyses, test specifications, and regulatory compliance—all scattered across proprietary tools that don't talk to each other. Every change ripples through dozens of documents. Traceability is a nightmare. Version control? Forget about it.
@@ -13,7 +18,7 @@ Imagine designing an autonomous vehicle, a flight control system, or a life-savi
 
 ## 💡 Enter Sylang
 
-Sylang is a text-based language designed for the age of AI-assisted systems engineering. It's not another diagramming tool like PlantUML or Mermaid—it's a complete systems engineering language that rivals traditional requirements management and modeling tools, but with a modern, text-first, version-control-friendly approach.
+Sylang is a text-based language designed for the age of AI-assisted systems engineering. It's not just another diagramming tool—while PlantUML and Mermaid are excellent tools for instant diagrams, Sylang is a complete systems engineering language that rivals traditional requirements management and modeling tools, but with a modern, text-first, version-control-friendly approach.
 
 ### The Vision
 
@@ -79,7 +84,7 @@ Sylang isn't just for traditional embedded systems—it's for **anyone building 
 - **API-First Companies** - Microservices architectures requiring interface documentation and traceability
 - **Regulated Software** - Any application requiring audit trails, requirements traceability, and compliance documentation
 
-### Why Web Developers Love Sylang
+### Why Developers Might Love Sylang
 - **CMMI Compliance Made Easy** - Built-in requirements management and traceability for CMMI Levels 2-5
 - **API Documentation** - `.ifc` files define contracts between services with full traceability
 - **Feature Flags on Steroids** - Feature models (`.fml`) manage complex product variants and A/B testing scenarios
@@ -111,31 +116,50 @@ It's not just what Sylang does—it's **how it thinks**:
 - **Standards over Conventions**: ISO 26262, ASPICE, INCOSE—baked into the language
 - **Collaboration over Silos**: Git workflows, code review practices, CI/CD integration
 
+## 📦 Get Started: Download the VSCode Extension
+
+<div align="center">
+
+### 🎯 **Search "Sylang" in your VSCode Extension Marketplace**
+
+Available on:
+- **Microsoft Visual Studio Marketplace** - For VSCode, Cursor, and other VSCode-based editors
+- **Open VSX Registry** - For VSCodium, Gitpod, and open-source VSCode distributions
+
+**Install Now**: Open VSCode → Extensions (Ctrl+Shift+X) → Search "Sylang" → Install
+
+</div>
+
+---
+
 ## ⚠️ Current Status & Roadmap
 
 **Let's be transparent**: Sylang is ambitious, and we're building it iteratively. Here's what's real today and what's coming:
 
 ### ✅ Available Now (v0.9.27)
 - **Language Specification**: Complete syntax for all 23 file extensions
-- **VSCode Extension**: Syntax highlighting, basic validation, and file structure support
+- **VSCode Extension**: Syntax highlighting, validation, and file structure support (Microsoft Marketplace & Open VSX)
 - **Core Features**: Product lines, feature models, requirements, architecture blocks, and test definitions
 - **Documentation**: Comprehensive help files and AI prompting guides
 - **Traceability**: Relationship keywords and cross-file references
-
-### 🚧 In Active Development
 - **Visual Diagrams**: Automatic rendering of use case, sequence, and state machine diagrams from text
 - **Coverage Analysis**: Requirements-to-tests coverage reports and gap analysis
 - **FMEA Generation**: Automated FMEA tables and risk priority calculations
 - **Traceability Matrices**: Interactive, filterable traceability views
 - **Safety Reports**: ISO 26262 compliance documentation generation
 - **Variant Configuration UI**: Visual feature selection and configuration management
+- **Real-time Collaboration**: Multi-user editing with conflict resolution through Git
+- **CI/CD Integration**: Automated validation pipelines and compliance checks
+
+### 🚧 In Active Development
+- **Advanced Analytics**: Complexity metrics, change impact analysis, and risk dashboards
+- **Enhanced Visualizations**: More diagram types and interactive views
+- **Performance Optimization**: Faster parsing and validation for large projects
 
 ### 🔮 On the Roadmap
-- **Real-time Collaboration**: Multi-user editing with conflict resolution
-- **CI/CD Integration**: Automated validation pipelines and compliance checks
 - **Import/Export**: Bidirectional sync with industry-standard requirements management tools
-- **Advanced Analytics**: Complexity metrics, change impact analysis, and risk dashboards
 - **Visual Forge**: Web-based collaborative environment (beyond VSCode)
+- **Plugin Ecosystem**: Community extensions and integrations
 
 ### 💡 The Promise
 
