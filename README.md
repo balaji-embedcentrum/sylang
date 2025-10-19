@@ -13,13 +13,13 @@ Imagine designing an autonomous vehicle, a flight control system, or a life-savi
 
 ## 💡 Enter Sylang
 
-Sylang is the **first language designed from the ground up for the age of AI-assisted systems engineering**. It's not just another modeling tool—it's a complete paradigm shift in how we design, document, and validate complex safety-critical systems.
+Sylang is a text-based language designed for the age of AI-assisted systems engineering. It's not another diagramming tool like PlantUML or Mermaid—it's a complete systems engineering language that rivals traditional requirements management and modeling tools, but with a modern, text-first, version-control-friendly approach.
 
 ### The Vision
 
-What if your entire system—from high-level product features down to individual test cases—lived in **human-readable text files**? What if every requirement automatically knew which tests validated it, which components implemented it, and which safety goals it satisfied? What if AI could help you generate comprehensive FMEA analyses or ISO 26262 documentation in minutes instead of weeks?
+What if your entire system—from high-level product features down to individual test cases—lived in **human-readable text files**? What if every requirement could be linked to the tests that validate it, the components that implement it, and the safety goals it satisfies? What if AI could help you draft FMEA analyses or ISO 26262 documentation, accelerating your workflow?
 
-**That's Sylang.**
+**That's the Sylang vision.**
 
 ### Why Sylang Changes Everything
 
@@ -40,6 +40,9 @@ Native ISO 26262, DO-178, IEC 62304 support. ASIL levels, hazard analysis, fault
 
 🔄 **Variants Made Simple**  
 Feature models automatically generate product variants. One architecture, multiple configurations. From basic to premium, from regional variants to customer-specific builds—all managed declaratively.
+
+📐 **What About Diagrams?**  
+Don't struggle drawing diagrams by hand. Write what you want to see in Sylang, and let the VSCode extension render it for you. Use case diagrams, sequence diagrams, state machines—all generated from your text definitions. Plus: coverage analysis, FMEA reports, traceability matrices, and safety documentation—automatically visualized from your Sylang files.
 
 ### The Problem We're Solving
 
@@ -108,13 +111,47 @@ It's not just what Sylang does—it's **how it thinks**:
 - **Standards over Conventions**: ISO 26262, ASPICE, INCOSE—baked into the language
 - **Collaboration over Silos**: Git workflows, code review practices, CI/CD integration
 
+## ⚠️ Current Status & Roadmap
+
+**Let's be transparent**: Sylang is ambitious, and we're building it iteratively. Here's what's real today and what's coming:
+
+### ✅ Available Now (v0.9.27)
+- **Language Specification**: Complete syntax for all 23 file extensions
+- **VSCode Extension**: Syntax highlighting, basic validation, and file structure support
+- **Core Features**: Product lines, feature models, requirements, architecture blocks, and test definitions
+- **Documentation**: Comprehensive help files and AI prompting guides
+- **Traceability**: Relationship keywords and cross-file references
+
+### 🚧 In Active Development
+- **Visual Diagrams**: Automatic rendering of use case, sequence, and state machine diagrams from text
+- **Coverage Analysis**: Requirements-to-tests coverage reports and gap analysis
+- **FMEA Generation**: Automated FMEA tables and risk priority calculations
+- **Traceability Matrices**: Interactive, filterable traceability views
+- **Safety Reports**: ISO 26262 compliance documentation generation
+- **Variant Configuration UI**: Visual feature selection and configuration management
+
+### 🔮 On the Roadmap
+- **Real-time Collaboration**: Multi-user editing with conflict resolution
+- **CI/CD Integration**: Automated validation pipelines and compliance checks
+- **Import/Export**: Bidirectional sync with industry-standard requirements management tools
+- **Advanced Analytics**: Complexity metrics, change impact analysis, and risk dashboards
+- **Visual Forge**: Web-based collaborative environment (beyond VSCode)
+
+### 💡 The Promise
+
+We're not overpromising—we're **building in public**. The language is stable. The tooling is evolving. Some features you see described here are aspirational, representing where we're headed, not where we are today.
+
+**Why use Sylang now?** Because the core value—text-based, version-controlled, AI-friendly systems engineering—is real and working. The visualizations and advanced analytics are the cherry on top, coming soon.
+
+If you need production-grade tooling for mission-critical projects **today**, evaluate carefully. If you want to be part of shaping the future of systems engineering and can tolerate some rough edges, **welcome aboard**.
+
 ## 🔮 The Future is Readable
 
-In 10 years, we believe all complex systems will be designed in text-based, version-controlled, AI-collaborative languages. Sylang is that future, available today.
+We believe the future of systems engineering is text-based, version-controlled, and AI-collaborative. Sylang is being built to be that future.
 
-Whether you're designing the next generation of autonomous vehicles, building spacecraft that must never fail, or creating medical devices that save lives—Sylang gives you the tools to engineer with confidence, collaborate with ease, and move at the speed of innovation.
+Whether you're designing autonomous vehicles, spacecraft, or medical devices—Sylang aims to give you tools to engineer with confidence, collaborate with ease, and move at the speed of innovation.
 
-**Welcome to the future of systems engineering.**
+**Welcome to the journey.**
 
 ## 🎯 Purpose
 
@@ -336,6 +373,18 @@ Sylang provides complete support for industry standards:
 - **Official Documentation**: [sylang.dev/docs](https://sylang.dev/docs)
 - **VSCode Extension**: Available for syntax highlighting and validation
 - **Visual Forge**: Interactive development environment
+
+## 🙏 Standing on the Shoulders of Giants
+
+Sylang is inspired by and builds upon the ideas of excellent open-source projects:
+
+- **PlantUML** & **Mermaid** - Pioneered text-to-diagram generation, proving that complex visualizations can be created from simple text
+- **Markdown** - Demonstrated that human-readable text formats can be both simple and powerful
+- **YAML** & **TOML** - Showed that indentation-based, declarative formats work beautifully for configuration
+- **Git** - Revolutionized version control and proved that text-based workflows enable true collaboration
+- **Language Server Protocol (LSP)** - Made it possible to build rich editor support across multiple platforms
+
+We're grateful to these communities for showing what's possible when tools are open, text-based, and designed for humans first.
 
 ## 🤝 Contributing
 
