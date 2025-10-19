@@ -5,8 +5,25 @@
 
 ---
 
-> 💡 **Ready to try Sylang?** Search **"Sylang"** in your VSCode Extension Marketplace  
-> Available on **Microsoft Marketplace** and **Open VSX** for all VSCode-based editors
+<table>
+<tr>
+<td>
+
+### Get Started with Sylang
+
+**Install the VSCode Extension:**
+
+Search **"Sylang"** in your VSCode Extensions panel (`Ctrl+Shift+X` or `Cmd+Shift+X`)
+
+**Available on:**
+- Microsoft Visual Studio Marketplace
+- Open VSX Registry
+
+**Compatible with:** VSCode, Cursor, VSCodium, Gitpod, and all VSCode-based editors
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -49,7 +66,7 @@ Feature models automatically generate product variants. One architecture, multip
 📐 **What About Diagrams?**  
 Don't struggle drawing diagrams by hand. Write what you want to see in Sylang, and let the VSCode extension render it for you. Use case diagrams, sequence diagrams, state machines—all generated from your text definitions. Plus: coverage analysis, FMEA reports, traceability matrices, and safety documentation—automatically visualized from your Sylang files.
 
-### The Problem We're Solving
+### The Problem I'm Solving
 
 Traditional systems engineering tools are:
 - **Proprietary black boxes** with vendor lock-in
@@ -104,7 +121,7 @@ Sylang isn't just for traditional embedded systems—it's for **anyone building 
 
 > **"AI creates, humans validate"**
 
-We believe the future of engineering is collaborative intelligence. AI excels at generating structured content, exploring design spaces, and maintaining consistency. Humans excel at judgment, creativity, and validation. Sylang is designed for this partnership.
+I believe the future of engineering is collaborative intelligence. AI excels at generating structured content, exploring design spaces, and maintaining consistency. Humans excel at judgment, creativity, and validation. Sylang is designed for this partnership.
 
 ### What Makes Sylang Different?
 
@@ -116,25 +133,10 @@ It's not just what Sylang does—it's **how it thinks**:
 - **Standards over Conventions**: ISO 26262, ASPICE, INCOSE—baked into the language
 - **Collaboration over Silos**: Git workflows, code review practices, CI/CD integration
 
-## 📦 Get Started: Download the VSCode Extension
-
-<div align="center">
-
-### 🎯 **Search "Sylang" in your VSCode Extension Marketplace**
-
-Available on:
-- **Microsoft Visual Studio Marketplace** - For VSCode, Cursor, and other VSCode-based editors
-- **Open VSX Registry** - For VSCodium, Gitpod, and open-source VSCode distributions
-
-**Install Now**: Open VSCode → Extensions (Ctrl+Shift+X) → Search "Sylang" → Install
-
-</div>
-
----
 
 ## ⚠️ Current Status & Roadmap
 
-**Let's be transparent**: Sylang is ambitious, and we're building it iteratively. Here's what's real today and what's coming:
+**Let's be transparent**: Sylang is ambitious, and I'm building it part-time as a solo developer. Here's what's real today and what's coming:
 
 ### ✅ Available Now (v0.9.27)
 - **Language Specification**: Complete syntax for all 23 file extensions
@@ -163,19 +165,19 @@ Available on:
 
 ### 💡 The Promise
 
-We're not overpromising—we're **building in public**. The language is stable. The tooling is evolving. Some features you see described here are aspirational, representing where we're headed, not where we are today.
+I'm not overpromising—I'm **building in public** as a solo, part-time developer. The language is stable. The tooling is evolving. Some features you see described here are aspirational, representing where I'm headed, not where things are today.
 
-**Why use Sylang now?** Because the core value—text-based, version-controlled, AI-friendly systems engineering—is real and working. The visualizations and advanced analytics are the cherry on top, coming soon.
+**Why use Sylang now?** Because the core value—text-based, version-controlled, AI-friendly systems engineering—is real and working. The visualizations and advanced analytics are the cherry on top, coming as development progresses.
 
-If you need production-grade tooling for mission-critical projects **today**, evaluate carefully. If you want to be part of shaping the future of systems engineering and can tolerate some rough edges, **welcome aboard**.
+**Set your expectations accordingly**: This is a part-time project by one developer. Progress happens, but at a sustainable pace. If you need production-grade tooling for mission-critical projects **today**, evaluate carefully and consider your risk tolerance. If you want to be part of shaping the future of systems engineering and can tolerate rough edges and slower development cycles, **welcome aboard**.
 
 ## 🔮 The Future is Readable
 
-We believe the future of systems engineering is text-based, version-controlled, and AI-collaborative. Sylang is being built to be that future.
+I believe the future of systems engineering is text-based, version-controlled, and AI-collaborative. Sylang is being built to be that future.
 
 Whether you're designing autonomous vehicles, spacecraft, or medical devices—Sylang aims to give you tools to engineer with confidence, collaborate with ease, and move at the speed of innovation.
 
-**Welcome to the journey.**
+**Welcome to the journey.** It's a marathon, not a sprint.
 
 ## 🎯 Purpose
 
@@ -408,7 +410,7 @@ Sylang is inspired by and builds upon the ideas of excellent open-source project
 - **Git** - Revolutionized version control and proved that text-based workflows enable true collaboration
 - **Language Server Protocol (LSP)** - Made it possible to build rich editor support across multiple platforms
 
-We're grateful to these communities for showing what's possible when tools are open, text-based, and designed for humans first.
+I'm grateful to these communities for showing what's possible when tools are open, text-based, and designed for humans first.
 
 ## 🤝 Contributing
 
