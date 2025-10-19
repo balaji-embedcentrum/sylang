@@ -1,0 +1,369 @@
+# Safety Goals (.sgl) - AI Prompting Guide (ISO 26262 Part 3)
+
+## Purpose
+Safety Goals files define ISO 26262 safety goals derived from hazard analysis, specifying safe states, Fault Tolerant Time Intervals (FTTI), and bilateral traceability to hazards and requirements. Critical for Part 3 (Concept Phase) compliance.
+
+## When to Use
+- After completing hazard analysis (.haz files)
+- Before creating functional safety requirements (.req files)
+- During ISO 26262 Part 3 concept phase
+- When establishing safety goals for ASIL-rated hazards
+- For bilateral traceability (hazards ← safety goals → requirements)
+
+## Key Syntax Elements
+```
+use hazardanalysis [ref], use itemdefinition [ref]
+hdef safetygoalset [identifier]
+def safetygoal [identifier]
+  name, description, owner, tags
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  derivedfrom ref hazard|situation [ref]  # Backward traceability
+  mitigates ref hazard [ref]
+  safestate [string-literal]              # ISO 26262 required
+  safecondition [string-literal]
+  faulttoleranttime [milliseconds]        # FTTI
+  emergencyoperationtime [milliseconds]
+  leadsto ref requirement [ref]           # Forward traceability
+  allocatedto ref item [ref]
+  when ref config [ref]
+```
+
+## Common Patterns
+
+### ASIL Inheritance
+- Safety goals inherit ASIL level from source hazards
+- Cannot lower ASIL level (only maintain or increase)
+- QM hazards don't require safety goals
+
+### Safe State Definition
+- Must define achievable safe state for each safety goal
+- Safe condition specifies measurable criteria
+- FTTI defines maximum time to reach safe state
+
+### Bilateral Traceability (INCOSE/ASPICE)
+- **Backward**: derivedfrom ref hazard (from .haz file)
+- **Forward**: leadsto ref requirement (to .req file)
+- Requirements must have derivedfrom ref safetygoal (closing the loop)
+
+---
+
+## Example Prompts
+
+### 1. Basic Safety Goals from Hazard Analysis
+```
+Generate safety goals (.sgl file) from hazard analysis file:
+
+[PASTE HAZARD ANALYSIS CONTENT]
+
+For each ASIL-C and ASIL-D hazard, create a safety goal with:
+- Derived from hazard (backward traceability)
+- ASIL level inherited from hazard
+- Safe state description
+- Safe condition (measurable criteria)
+- FTTI (Fault Tolerant Time Interval) in milliseconds
+- Emergency operation time
+- Forward traceability to requirements (leadsto ref requirement)
+
+File: AutonomousVehicleSafetyGoals.sgl
+Owner: Functional Safety Manager
+```
+
+### 2. Safety Goals with Complete Properties
+```
+Create ISO 26262 Part 3 safety goals for autonomous emergency braking:
+
+Hazards to mitigate:
+1. H_UNINTENDED_BRAKING (ASIL-D)
+2. H_BRAKE_FAILURE (ASIL-D)
+3. H_DELAYED_BRAKING (ASIL-C)
+
+For each hazard, generate safety goal with:
+- Descriptive name using multiline strings
+- Safe state definition (what does "safe" mean?)
+- Safe condition (measurable technical criteria)
+- FTTI: 100-500ms range (depends on criticality)
+- Emergency operation time: 1000-3000ms range
+- Backward traceability: derivedfrom ref hazard
+- Forward traceability: leadsto ref requirement (3-5 requirements per goal)
+- Allocated to: AutonomousVehicleItem
+
+Use proper ISO 26262 terminology and best practices.
+```
+
+### 3. Safety Goals with Situation-Specific Context
+```
+Generate safety goals considering operational situations:
+
+Item: Adaptive Cruise Control (ACC)
+Hazard: H_UNINTENDED_ACCELERATION (ASIL-D)
+Situations:
+- Highway driving (speed > 80 km/h)
+- Urban driving (speed < 50 km/h)
+- Stop-and-go traffic
+
+Create safety goal SG_PREVENT_UNINTENDED_ACCELERATION with:
+- derivedfrom ref hazard UnintendedAcceleration
+- derivedfrom ref situation HighwayDriving (additional context)
+- Safe state: "Vehicle maintains current speed or decelerates"
+- Safe condition: "Throttle command = 0 AND brake pressure ≥ 2 bar"
+- FTTI: 200ms
+- Emergency operation time: 1000ms
+- leadsto ref requirement: REQ_THROTTLE_MONITOR_001, REQ_ACCEL_LIMIT_001
+
+Include detailed description of how safe state is achieved in each situation.
+```
+
+### 4. Safety Goals for System Decomposition
+```
+Create high-level safety goal and decomposed sub-goals:
+
+Top-level Safety Goal:
+SG_VEHICLE_CONTROL_INTEGRITY (ASIL-D)
+"Maintain vehicle controllability at all times"
+
+Decompose into sub-goals for:
+1. Lateral control (steering)
+2. Longitudinal control (acceleration/braking)
+3. Vertical control (suspension - if active)
+
+For each sub-goal:
+- Define specific safe states
+- Specify FTTI based on criticality
+- Link to relevant hazards
+- Forward trace to specific requirements
+- Include fail-operational vs. fail-safe strategies
+```
+
+### 5. Safety Goals with Configuration Variants
+```
+Generate safety goals for product line with variants:
+
+Product Line: Advanced Driver Assistance Systems
+Variants:
+- Basic ADAS (ASIL-B)
+- Advanced ADAS (ASIL-C)
+- Full Autonomous L3 (ASIL-D)
+
+Create safety goals for collision avoidance that:
+- Scale ASIL level based on variant
+- Use "when ref config" for variant-specific goals
+- Share common safe state definitions
+- Vary FTTI based on system capability
+
+Example:
+- Basic: Manual takeover required (FTTI 3000ms)
+- Advanced: Assisted intervention (FTTI 1000ms)
+- Full Autonomous: Automatic control (FTTI 200ms)
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### ISO 26262 Compliance
+- [ ] Single `hdef safetygoalset` per file
+- [ ] Each safety goal derived from at least one hazard
+- [ ] ASIL level matches or exceeds source hazard
+- [ ] Safe state defined for each safety goal
+- [ ] FTTI specified (recommended for ASIL-C/D)
+- [ ] Emergency operation time specified
+
+### Traceability (Bilateral)
+- [ ] Backward traceability: `derivedfrom ref hazard` present
+- [ ] Forward traceability: `leadsto ref requirement` specified
+- [ ] All referenced hazards exist in .haz files
+- [ ] All referenced requirements exist in .req files
+- [ ] Requirements have `derivedfrom ref safetygoal` (close the loop)
+
+### Content Quality
+- [ ] Name is concise and action-oriented ("Prevent...", "Maintain...", "Avoid...")
+- [ ] Description uses multiline strings for detail
+- [ ] Safe state is achievable and measurable
+- [ ] Safe condition has technical criteria
+- [ ] FTTI is realistic for system architecture
+- [ ] Emergency operation time allows driver response
+
+### Technical Correctness
+- [ ] Safe states are truly "safe" (no harm)
+- [ ] FTTI accounts for sensor-to-actuator delays
+- [ ] Emergency operation time considers human factors
+- [ ] Multiple safety goals don't conflict
+- [ ] Fail-safe vs. fail-operational strategy is clear
+
+### Item Allocation
+- [ ] `allocatedto ref item` links to item definition
+- [ ] Item scope matches safety goal scope
+- [ ] Configuration variants properly handled
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Safety goals without hazard traceability
+- Vague safe states ("System shuts down")
+- Unrealistic FTTI (too short for physics)
+- Missing forward traceability to requirements
+- ASIL level lower than source hazard
+- Forgetting bilateral traceability in .req files
+- Safe conditions that aren't measurable
+
+✅ **Best Practices:**
+- Use action verbs ("Prevent", "Maintain", "Ensure")
+- Define safe states from driver/user perspective
+- FTTI should account for worst-case propagation
+- Emergency operation time includes driver reaction time
+- Link each safety goal to 3-5 specific requirements
+- Consider degraded operation modes
+- Document fail-operational vs. fail-safe strategy
+
+---
+
+## FTTI Guidelines
+
+### Typical Ranges
+- **Critical (ASIL-D)**: 50-200 ms
+  - Examples: Brake failure, steering loss
+- **High (ASIL-C)**: 200-500 ms
+  - Examples: ACC malfunction, lane keeping failure
+- **Medium (ASIL-B)**: 500-1000 ms
+  - Examples: Parking assist error
+- **Low (ASIL-A)**: 1000-3000 ms
+  - Examples: Information display error
+
+### Factors Affecting FTTI
+- Sensor detection time
+- Signal processing latency
+- Network communication delays
+- Actuator response time
+- Physical system dynamics
+- Driver takeover time (if applicable)
+
+---
+
+## Example Generated Safety Goal (Target Quality)
+
+```sylang
+use hazardanalysis AutonomousVehicleHazards
+use itemdefinition AutonomousVehicleItem
+
+hdef safetygoalset AutonomousVehicleSafetyGoals
+  name "Autonomous Vehicle Safety Goals"
+  description """
+    Complete set of safety goals derived from hazard analysis for 
+    Level 3 autonomous vehicle system per ISO 26262 Part 3.
+    """
+  owner "Functional Safety Manager"
+  tags "ISO-26262", "safety-goals", "part-3", "ASIL-D"
+  safetylevel ASIL-D
+
+  def safetygoal SG_001_PreventUnintendedAcceleration
+    name "Prevent Unintended Vehicle Acceleration"
+    description """
+      The vehicle SHALL prevent unintended acceleration during autonomous 
+      operation to avoid collisions with other vehicles, pedestrians, or 
+      objects. The system SHALL detect anomalous throttle commands, 
+      plausibility check all acceleration requests, and immediately 
+      transition to a safe state if unintended acceleration is detected.
+      """
+    owner "Chassis Safety Engineer"
+    tags "acceleration", "throttle-control", "collision-avoidance"
+    safetylevel ASIL-D
+    
+    # Backward traceability to hazard analysis
+    derivedfrom ref hazard UnintendedAcceleration
+    derivedfrom ref situation HighwayDriving
+    mitigates ref hazard UnintendedAcceleration
+    
+    # Safe state definition (ISO 26262 required)
+    safestate """
+      Vehicle transitions to neutral throttle with controlled deceleration 
+      using regenerative braking and friction brakes if available. Driver 
+      takeover request issued immediately. If driver does not respond within 
+      emergency operation time, vehicle executes minimal risk maneuver (MRM) 
+      to safe stop.
+      """
+    
+    # Safe condition (measurable criteria)
+    safecondition """
+      Throttle command = 0% AND 
+      Brake pressure ≥ 2 bar AND 
+      Vehicle deceleration ≥ 2 m/s² AND
+      Hazard lights activated AND
+      Driver alert active
+      """
+    
+    # Temporal properties (ISO 26262 Part 3)
+    faulttoleranttime 500          # 500ms max time to detect and react
+    emergencyoperationtime 3000    # 3s emergency operation allowed
+    
+    # Forward traceability to requirements (bilateral traceability)
+    leadsto ref requirement REQ_SAFE_ACCEL_001, REQ_SAFE_ACCEL_002, REQ_THROTTLE_MONITOR_001
+    
+    # Item allocation
+    allocatedto ref item AutonomousVehicleItem
+    
+    # Configuration-based visibility
+    when ref config c_AutonomousDriving
+
+  def safetygoal SG_002_MaintainLateralControl
+    name "Maintain Lateral Vehicle Control"
+    description """
+      The vehicle SHALL maintain lateral control and lane position during 
+      autonomous operation to prevent lane departure, collision with 
+      adjacent vehicles, or loss of vehicle stability. The system SHALL 
+      continuously monitor steering actuator health, detect anomalies, 
+      and transition to safe state if lateral control degradation is detected.
+      """
+    owner "Steering Safety Engineer"
+    tags "steering-control", "lane-keeping", "lateral-stability"
+    safetylevel ASIL-D
+    
+    derivedfrom ref hazard LossOfLateralControl
+    mitigates ref hazard LossOfLateralControl
+    
+    safestate """
+      Vehicle maintains current trajectory with reduced speed. Emergency 
+      steering control activated via redundant steering channel. Driver 
+      takeover request with visual/audible/haptic warnings. Gradual 
+      lane-centered stop if driver unavailable.
+      """
+    
+    safecondition """
+      Steering angle error ≤ 5 degrees AND
+      Lane position error ≤ 0.3 meters AND
+      Yaw rate within limits AND
+      Redundant steering path active
+      """
+    
+    faulttoleranttime 300           # 300ms for steering anomaly detection
+    emergencyoperationtime 2000     # 2s emergency steering available
+    
+    leadsto ref requirement REQ_SAFE_STEER_001, REQ_STEER_REDUNDANCY_001
+    
+    allocatedto ref item AutonomousVehicleItem
+```
+
+---
+
+## ISO 26262 Part 3 Traceability Chain
+
+```
+.itm (Item Definition)
+  ↓
+.haz (Hazard Analysis)
+  ↓ derivedfrom ref hazard (BACKWARD)
+.sgl (Safety Goals) ← YOU ARE HERE
+  ↕ leadsto / derivedfrom (BILATERAL)
+.req (Requirements)
+  ↓
+.blk/.fun (Architecture)
+  ↓
+.tst (Test Cases)
+```
+
+---
+
+**Remember:** Safety goals are the bridge between hazards and requirements. They must be specific, achievable, and completely traceable in both directions for ISO 26262 compliance.

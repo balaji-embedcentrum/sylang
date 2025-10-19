@@ -1,0 +1,672 @@
+# State Machine Diagrams (.smd) - AI Prompting Guide
+
+## Purpose
+State Machine Diagram files define system behavior through states and transitions with behavioral logic. SMD files must have exactly ONE initial state and ONE end state, capturing control flow and state management in MBSE architectures.
+
+## When to Use
+- During system design and behavior specification
+- For control logic and state management design
+- When defining system operational modes
+- For protocol and interface behavior specification
+- During implementation guidance for stateful systems
+
+## Key Syntax Elements
+```
+use functionset [functionset-ref]
+use requirementset [requirementset-ref]
+use block [block-ref]
+
+hdef statemachine [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  status [draft|approved|implemented]
+  allocatedto ref block [block-ref]
+  implements ref requirement [requirement-ref]
+
+  def state [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    status [draft|implemented|verified]
+    initialstate [true|false]
+    endstate [true|false]
+    implements ref requirement [requirement-ref]
+    
+  def transition [identifier]
+    name [string-literal]
+    description [string-literal]
+    from ref state [state-ref]
+    to ref state [state-ref]
+    condition [string-literal]
+    call ref function [function-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, statemachine, def, state, transition, name, description, owner, 
+tags, safetylevel, status, allocatedto, implements, initialstate, endstate, 
+from, to, condition, call, when, ref
+```
+
+## CRITICAL Requirements
+- **Exactly ONE state with `initialstate true`** (entry point)
+- **Exactly ONE state with `endstate true`** (exit/fault state)
+- States cannot have `entry`, `exit`, `do`, `statetype`, `trigger` (these don't exist!)
+- Transitions have `condition` (not `guard`) and `call ref function` (not `action`)
+
+## Common Patterns
+
+### Initial State (Entry Point)
+```
+def state IdleState
+  name "Idle State"
+  description "System idle, waiting for commands"
+  owner "Control Team"
+  status implemented
+  initialstate true
+  implements ref requirement REQ_IDLE_001
+```
+**ONE state must have `initialstate true`**
+
+### End State (Exit/Fault Point)
+```
+def state FaultState
+  name "Fault State"
+  description "System fault requiring intervention"
+  owner "Safety Team"
+  status implemented
+  endstate true
+  implements ref requirement REQ_FAULT_001
+```
+**ONE state must have `endstate true`**
+
+### Normal States
+```
+def state ActiveState
+  name "Active State"
+  description "System actively processing"
+  owner "Operations Team"
+  status implemented
+  implements ref requirement REQ_ACTIVE_001
+```
+**No `initialstate` or `endstate` = normal state**
+
+### Transitions with Conditions
+```
+def transition StartTransition
+  name "Start to Active Transition"
+  description "Transitions when start command received"
+  from ref state IdleState
+  to ref state ActiveState
+  condition "start_command_received AND system_healthy"
+  call ref function ActivateSystem
+```
+
+---
+
+## Example Prompts
+
+### 1. Automotive Electric Parking Brake State Machine
+```
+Create comprehensive .smd file for electric parking brake system.
+
+Context:
+- System: Electric Parking Brake (EPB) for passenger vehicle
+- Standards: ISO 26262 ASIL-D
+- Block: use block EPBControlModule
+- Functions: use functionset EPBFunctions
+- Requirements: use requirementset EPBRequirements
+
+State Machine: ElectricParkingBrakeStateMachine (ASIL-D)
+- Owner: "EPB Safety Team"
+- Status: approved
+- allocatedto ref block: EPBControlModule
+- implements ref requirement: EPB_StateMachineReq_001
+
+Generate 6 states:
+1. Idle (initialstate true)
+   - Name: "Idle State"
+   - Description: "EPB idle, ready for commands"
+   - Owner: "Control Team"
+   - Status: implemented
+   - implements ref requirement: EPB_IdleStateReq_001
+
+2. Engaging
+   - Name: "Engaging State"  
+   - Description: "EPB actively engaging brake mechanism"
+   - Owner: "Actuator Team"
+   - Status: implemented
+   - implements ref requirement: EPB_EngagingReq_001
+
+3. Engaged
+   - Name: "Engaged State"
+   - Description: "EPB fully engaged, holding vehicle"
+   - Owner: "Safety Team"
+   - Status: implemented
+   - implements ref requirement: EPB_EngagedReq_001
+
+4. Releasing
+   - Name: "Releasing State"
+   - Description: "EPB actively releasing brake"
+   - Owner: "Actuator Team"
+   - Status: implemented
+
+5. Released
+   - Name: "Released State"
+   - Description: "EPB fully released, vehicle free to move"
+   - Owner: "Control Team"
+   - Status: implemented
+
+6. Fault (endstate true)
+   - Name: "Fault State"
+   - Description: "EPB fault condition requiring diagnostics"
+   - Owner: "Diagnostics Team"
+   - Status: implemented
+   - implements ref requirement: EPB_FaultHandlingReq_001
+
+Generate 8 transitions:
+1. EngageCommand: Idle → Engaging
+   - Condition: "engage_command_received AND brake_pedal_pressed AND vehicle_stationary"
+   - call ref function: InitiateEngagement
+
+2. EngagementComplete: Engaging → Engaged
+   - Condition: "engagement_confirmed AND motor_current_stable AND position_reached"
+   - call ref function: ConfirmEngagement
+
+3. ReleaseCommand: Engaged → Releasing
+   - Condition: "release_command_received AND brake_pedal_pressed"
+   - call ref function: InitiateRelease
+
+4. ReleaseComplete: Releasing → Released
+   - Condition: "release_confirmed AND motor_current_normal"
+   - call ref function: ConfirmRelease
+
+5. IdleReturn: Released → Idle
+   - Condition: "system_ready AND no_commands_pending"
+   - call ref function: ReturnToIdle
+
+6. EngageFault: Engaging → Fault
+   - Condition: "motor_overcurrent OR position_error OR timeout"
+   - call ref function: HandleEngagementFault
+
+7. ReleaseFault: Releasing → Fault
+   - Condition: "motor_stuck OR sensor_failure OR timeout"
+   - call ref function: HandleReleaseFault
+
+8. SystemFault: Idle → Fault
+   - Condition: "system_diagnostic_failure OR power_loss"
+   - call ref function: HandleSystemFault
+
+File: ElectricParkingBrakeStateMachine.smd
+```
+
+### 2. Medical Device Infusion Pump State Machine
+```
+Generate .smd file for IV infusion pump.
+
+System: Intravenous infusion pump for ICU
+Standards: IEC 62304 SIL-3, ISO 14971
+Block: use block InfusionPumpController
+Functions: use functionset InfusionPumpFunctions
+Requirements: use requirementset InfusionPumpRequirements
+
+State Machine: InfusionPumpStateMachine (SIL-3)
+
+Medical-specific requirements:
+- Patient safety paramount (end state for any critical fault)
+- Continuous infusion monitoring
+- Alarm management states
+- Fail-safe transitions
+
+Generate 7 states:
+1. Off (initialstate true)
+   - System powered off or initializing
+   
+2. Ready
+   - System ready, parameters set, waiting to start infusion
+
+3. Infusing
+   - Active infusion delivery, normal operation
+   - implements ref requirement: INF_InfusingStateReq_001
+
+4. Paused
+   - Infusion temporarily paused by operator
+   - implements ref requirement: INF_PauseReq_001
+
+5. Alarming
+   - Alarm condition detected (occlusion, air bubble, etc.)
+   - implements ref requirement: INF_AlarmReq_001
+
+6. Bolus
+   - Delivering bolus dose (higher flow rate)
+   - implements ref requirement: INF_BolusReq_001
+
+7. Fault (endstate true)
+   - Critical fault requiring service/replacement
+   - implements ref requirement: INF_FaultHandlingReq_001
+
+Generate 12 transitions with conditions:
+- PowerOn: Off → Ready (power_on AND self_test_passed)
+- StartInfusion: Ready → Infusing (start_command AND parameters_valid AND line_connected)
+- PauseInfusion: Infusing → Paused (pause_command)
+- ResumeInfusion: Paused → Infusing (resume_command AND line_patent)
+- StartBolus: Infusing → Bolus (bolus_command AND dose_within_limits)
+- EndBolus: Bolus → Infusing (bolus_complete)
+- OcclusionDetected: Infusing → Alarming (pressure_high OR flow_obstructed)
+- AlarmCleared: Alarming → Paused (alarm_acknowledged AND condition_resolved)
+- CriticalFault: ANY state → Fault (pump_failure OR motor_failure OR sensor_failure)
+
+File: InfusionPumpStateMachine.smd
+```
+
+### 3. Aviation Flight Control Autopilot State Machine
+```
+Create .smd file for aircraft autopilot system.
+
+Aircraft: Commercial transport autopilot
+Standards: DO-178C DAL-A, FAR Part 25
+Block: use block AutopilotController
+Functions: use functionset AutopilotFunctions
+Requirements: use requirementset AutopilotRequirements
+
+State Machine: AutopilotStateMachine (DAL-A)
+
+Aviation-specific requirements:
+- Deterministic state transitions
+- Manual override at any time
+- Fault-tolerant behavior
+- Clear engagement/disengagement logic
+
+Generate 8 states:
+1. Standby (initialstate true)
+   - Autopilot off, manual control
+   
+2. Armed
+   - Autopilot armed, waiting for engagement conditions
+
+3. Engaged
+   - Autopilot controlling aircraft
+
+4. HeadingHold
+   - Maintaining heading only
+
+5. AltitudeHold
+   - Maintaining altitude only
+
+6. Approach
+   - Landing approach mode (ILS/RNAV)
+
+7. Disconnect
+   - Autopilot disconnecting, returning control to pilot
+
+8. Fault (endstate true)
+   - Autopilot fault, immediate manual control required
+
+Generate transitions for:
+- Arming: Standby → Armed (arm_button AND flight_conditions_met AND system_healthy)
+- Engagement: Armed → Engaged (engage_button AND within_flight_envelope)
+- HeadingMode: Engaged → HeadingHold (heading_mode_selected)
+- AltitudeMode: Engaged → AltitudeHold (altitude_mode_selected)
+- ApproachMode: Engaged → Approach (approach_mode_armed AND localizer_captured)
+- ManualDisconnect: ANY → Disconnect (disconnect_button OR stick_force_exceeded)
+- FaultDetection: ANY → Fault (redundancy_loss OR sensor_failure OR computation_error)
+
+File: AutopilotStateMachine.smd
+```
+
+### 4. Industrial Robot Cobot State Machine
+```
+Generate .smd file for collaborative robot safety system.
+
+System: Collaborative robot (cobot) with human interaction
+Standards: IEC 61508 SIL-3, ISO 10218, ISO 15066
+Block: use block CobotSafetyController
+Functions: use functionset CobotSafetyFunctions
+Requirements: use requirementset CobotSafetyRequirements
+
+State Machine: CobotSafetyStateMachine (SIL-3)
+
+Industrial cobot requirements:
+- Human safety paramount
+- Speed and force monitoring
+- Proximity detection
+- Emergency stop handling
+
+Generate 9 states:
+1. PowerOff (initialstate true)
+   - Cobot powered off, no motion possible
+
+2. Ready
+   - System ready, safety checks passed
+
+3. Collaborative
+   - Normal collaborative operation, human in workspace
+   - Speed and force limited per ISO 15066
+
+4. HighSpeed
+   - High-speed operation, human outside safety zone
+
+5. Reduced
+   - Reduced speed operation, human approaching
+
+6. HandGuiding
+   - Operator manually guiding robot
+   - Very low force, enable switch pressed
+
+7. SafeStop
+   - Safety stop activated, motion halted
+
+8. EmergencyStop
+   - Emergency stop pressed, all power removed
+
+9. Fault (endstate true)
+   - Safety system fault, service required
+
+Generate transitions for all state changes with appropriate conditions:
+- Startup, operational mode changes, safety triggers, emergency responses
+
+File: CobotSafetyStateMachine.smd
+```
+
+### 5. Generic State Machine Template
+```
+Create .smd file for {SYSTEM_NAME} state machine.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+- Block: use block {BLOCK_NAME}
+- Functions: use functionset {FUNCTIONSET_NAME}
+- Requirements: use requirementset {REQUIREMENTSET_NAME}
+
+State Machine: {STATEMACHINE_NAME} ({SAFETY_LEVEL})
+- Owner: "{OWNER_NAME}"
+- Status: {draft|approved|implemented}
+- allocatedto ref block: {BLOCK_NAME}
+- implements ref requirement: {REQUIREMENT_REF}
+
+Generate {NUMBER} states (including 1 initial, 1 end):
+1. {STATE_1_NAME} (initialstate true)
+   - name: "{STATE_1_TITLE}"
+   - description: "{STATE_1_DESCRIPTION}"
+   - owner: "{STATE_1_OWNER}"
+   - status: {draft|implemented|verified}
+   - implements ref requirement: {REQUIREMENT_REF}
+
+2. {STATE_2_NAME}
+   - name: "{STATE_2_TITLE}"
+   - description: "{STATE_2_DESCRIPTION}"
+   - owner: "{STATE_2_OWNER}"
+   - status: {STATUS}
+
+... (normal states)
+
+N. {FAULT_STATE_NAME} (endstate true)
+   - name: "{FAULT_STATE_TITLE}"
+   - description: "{FAULT_STATE_DESCRIPTION}"
+   - owner: "{FAULT_STATE_OWNER}"
+   - status: {STATUS}
+
+Generate {NUMBER} transitions:
+1. {TRANSITION_1_NAME}: {SOURCE_STATE} → {TARGET_STATE}
+   - name: "{TRANSITION_TITLE}"
+   - description: "{TRANSITION_DESCRIPTION}"
+   - condition: "{BOOLEAN_CONDITION_EXPRESSION}"
+   - call ref function: {FUNCTION_NAME}
+
+File: {SYSTEM_NAME}StateMachine.smd
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef statemachine` per file
+- [ ] All `use` statements at top (functionset, requirementset, block)
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### State Machine Properties
+- [ ] Statemachine has unique identifier
+- [ ] `name`, `description`, `owner` specified
+- [ ] `safetylevel` specified
+- [ ] `status` specified
+- [ ] `allocatedto ref block` links to owning block
+- [ ] `implements ref requirement` links to requirements
+
+### State Structure - CRITICAL
+- [ ] **Exactly ONE state with `initialstate true`** (entry point)
+- [ ] **Exactly ONE state with `endstate true`** (exit/fault point)
+- [ ] All other states have NO `initialstate` or `endstate` property
+- [ ] Each state has `name`, `description`, `owner`, `status`
+- [ ] NO `statetype`, `entry`, `exit`, `do`, `safetylevel`, `tags` on states (these don't exist!)
+- [ ] States can have `implements ref requirement` (optional)
+
+### Transition Structure
+- [ ] Each transition has unique identifier
+- [ ] `name` and `description` specified
+- [ ] `from ref state` specified (valid state)
+- [ ] `to ref state` specified (valid state)
+- [ ] `condition` specified (Boolean expression as string)
+- [ ] `call ref function` specified (optional but recommended)
+- [ ] All referenced states and functions exist
+
+### State Machine Logic
+- [ ] All states are reachable from initial state
+- [ ] End state is reachable from fault/error conditions
+- [ ] Transition conditions are mutually exclusive or prioritized
+- [ ] No unreachable states (dead states)
+- [ ] Complete state machine (all scenarios covered)
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Missing `initialstate true` (MUST have exactly ONE!)
+- Missing `endstate true` (MUST have exactly ONE!)
+- Multiple initial or end states (only ONE of each!)
+- Adding `statetype`, `entry`, `exit`, `do` to states (DON'T EXIST!)
+- Adding `trigger ref event`, `guard`, `action`, `priority` to transitions (DON'T EXIST!)
+- Adding `contains ref state`, `transitions ref state` (DON'T EXIST!)
+- Adding `safetylevel`, `tags` to individual states (only at statemachine level!)
+- Missing `condition` on transitions
+- Unreachable states
+- Circular state dependencies without exit
+
+✅ **Best Practices:**
+- Keep state structure simple: `name`, `description`, `owner`, `status`, `initialstate/endstate`, `implements`
+- One clear initial state (starting point)
+- One clear end state (fault/exit point)
+- Descriptive transition conditions (Boolean expressions)
+- Link transitions to functions that implement behavior
+- All transitions have conditions
+- Complete state coverage (no missing scenarios)
+- Clear path from initial to end state
+- Consider all fault conditions leading to end state
+
+---
+
+## Example Generated State Machine (Target Quality)
+
+```sylang
+use functionset EPBFunctions
+use requirementset EPBRequirements
+use block EPBControlModule
+
+hdef statemachine ElectricParkingBrakeStateMachine
+  name "Electric Parking Brake State Machine"
+  description """
+    Complete state machine controlling EPB engagement and release operations 
+    per ISO 26262 ASIL-D. Includes normal operation states (idle, engaging, 
+    engaged, releasing), fault handling, and complete transition logic with 
+    safety-critical condition checking.
+    """
+  owner "EPB Safety Systems Team"
+  tags "ISO-26262", "EPB", "state-machine", "ASIL-D"
+  safetylevel ASIL-D
+  status approved
+  allocatedto ref block EPBControlModule
+  implements ref requirement EPB_StateMachineReq_001
+
+  def state Idle
+    name "Idle State"
+    description """
+      EPB system in idle state, ready to receive engage or release commands. 
+      System monitoring is active, diagnostics running, waiting for driver input.
+      """
+    owner "Control Systems Team"
+    status implemented
+    initialstate true
+    implements ref requirement EPB_IdleStateReq_001
+
+  def state Engaging
+    name "Engaging State"
+    description """
+      EPB system actively engaging the brake mechanism. Motor running, 
+      position monitoring active, current monitoring for stall detection. 
+      Typical duration 500-1000ms depending on temperature and load.
+      """
+    owner "Actuator Team"
+    status implemented
+    implements ref requirement EPB_EngagingReq_001
+
+  def state Engaged
+    name "Engaged State"
+    description """
+      EPB fully engaged and holding vehicle. Motor stopped, holding position 
+      confirmed, brake force adequate. Vehicle is parked and secured.
+      """
+    owner "Safety Team"
+    status implemented
+    implements ref requirement EPB_EngagedReq_001
+
+  def state Releasing
+    name "Releasing State"
+    description """
+      EPB system actively releasing the brake mechanism. Motor running in 
+      reverse direction, position monitoring active, ensuring complete release 
+      before returning to idle.
+      """
+    owner "Actuator Team"
+    status implemented
+    implements ref requirement EPB_ReleasingReq_001
+
+  def state Released
+    name "Released State"
+    description """
+      EPB fully released, vehicle free to move. Motor stopped, release position 
+      confirmed, system ready to return to idle or respond to new commands.
+      """
+    owner "Control Team"
+    status implemented
+
+  def state Fault
+    name "Fault State"
+    description """
+      EPB system in fault condition requiring diagnostics and service. Motor 
+      disabled, fault code logged, driver warning active. System cannot operate 
+      until fault is cleared by diagnostic tool.
+      """
+    owner "Diagnostics Team"
+    status implemented
+    endstate true
+    implements ref requirement EPB_FaultHandlingReq_001
+
+  def transition EngageCommand
+    name "Engage Command Transition"
+    description """
+      Transition from idle to engaging when driver engages parking brake. 
+      Requires brake pedal pressed and vehicle stationary for safety.
+      """
+    from ref state Idle
+    to ref state Engaging
+    condition "engage_command_received AND brake_pedal_pressed AND vehicle_stationary AND system_healthy"
+    call ref function InitiateEngagement
+
+  def transition EngagementComplete
+    name "Engagement Complete Transition"
+    description """
+      Transition from engaging to engaged when motor reaches target position 
+      and holding force is confirmed. Current must stabilize indicating 
+      mechanical lock achieved.
+      """
+    from ref state Engaging
+    to ref state Engaged
+    condition "engagement_confirmed AND motor_current_stable AND position_target_reached AND holding_force_adequate"
+    call ref function ConfirmEngagement
+
+  def transition ReleaseCommand
+    name "Release Command Transition"
+    description """
+      Transition from engaged to releasing when driver releases parking brake. 
+      Requires brake pedal pressed to ensure driver control before release.
+      """
+    from ref state Engaged
+    to ref state Releasing
+    condition "release_command_received AND brake_pedal_pressed AND ignition_on"
+    call ref function InitiateRelease
+
+  def transition ReleaseComplete
+    name "Release Complete Transition"
+    description """
+      Transition from releasing to released when motor reaches release position 
+      and brake force is zero. Ensures complete release before vehicle movement.
+      """
+    from ref state Releasing
+    to ref state Released
+    condition "release_confirmed AND motor_current_normal AND position_released AND brake_force_zero"
+    call ref function ConfirmRelease
+
+  def transition ReturnToIdle
+    name "Return to Idle Transition"
+    description "Transition from released back to idle state when system is ready"
+    from ref state Released
+    to ref state Idle
+    condition "system_ready AND no_pending_commands AND diagnostics_passed"
+    call ref function ReturnToIdle
+
+  def transition EngagementFault
+    name "Engagement Fault Transition"
+    description """
+      Transition to fault state if engagement fails. Detects motor overcurrent, 
+      position error, timeout, or sensor failure during engagement.
+      """
+    from ref state Engaging
+    to ref state Fault
+    condition "motor_overcurrent OR position_error OR engagement_timeout OR sensor_failure"
+    call ref function HandleEngagementFault
+
+  def transition ReleaseFault
+    name "Release Fault Transition"
+    description """
+      Transition to fault state if release fails. Detects motor stuck, 
+      mechanical jam, sensor failure, or timeout during release.
+      """
+    from ref state Releasing
+    to ref state Fault
+    condition "motor_stuck OR mechanical_jam OR sensor_failure OR release_timeout"
+    call ref function HandleReleaseFault
+
+  def transition SystemFault
+    name "System Diagnostic Fault Transition"
+    description """
+      Transition to fault state from idle if system diagnostics detect critical 
+      failure. Power loss, ECU fault, communication failure, or sensor failure.
+      """
+    from ref state Idle
+    to ref state Fault
+    condition "system_diagnostic_failure OR power_loss OR ecu_fault OR communication_failure"
+    call ref function HandleSystemFault
+```
+
+---
+
+**Remember:** State machines must have exactly ONE `initialstate true` and ONE `endstate true`. Keep state structure simple with only `name`, `description`, `owner`, `status`, `initialstate/endstate`, and `implements`. Transitions have `condition` (Boolean expression) and `call ref function` (behavior implementation). NO `entry`, `exit`, `do`, `statetype`, `trigger`, `guard`, `action` - these don't exist!

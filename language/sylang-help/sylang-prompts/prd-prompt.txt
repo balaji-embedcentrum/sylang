@@ -1,0 +1,498 @@
+# Product Requirements Document (PRD) - AI Prompting Guide
+
+## Purpose
+A PRD is the foundation document that defines WHAT to build before creating any Sylang files. It captures business goals, user needs, functional requirements, and system context. The PRD drives all downstream Sylang artifacts (.ple, .fml, .req, .blk, etc.).
+
+## When to Use
+- **FIRST STEP** before any Sylang file creation
+- During product conception and planning
+- When defining scope for new features or products
+- Before starting Model-Based Systems Engineering
+- As input for AI-generated Sylang artifacts
+
+## PRD Structure
+A good PRD should include:
+1. **Executive Summary**: High-level product overview
+2. **Problem Statement**: What problem are we solving?
+3. **Goals & Objectives**: Business and technical goals
+4. **Target Users**: Who will use this system?
+5. **Functional Requirements**: WHAT the system must do
+6. **Non-Functional Requirements**: HOW the system must perform
+7. **System Context**: External interfaces and constraints
+8. **Safety & Compliance**: Standards and regulations
+9. **Success Metrics**: How to measure success
+10. **Assumptions & Constraints**: What we're assuming
+11. **Out of Scope**: What we're NOT building
+
+## PRD to Sylang Workflow
+```
+PRD → .ple (Product Line) → .fml (Features) → .blk/.fun (Architecture) 
+    → .req (Requirements) → .tst (Tests) → .haz/.sgl/.flr (Safety)
+```
+
+---
+
+## Example Prompts
+
+### 1. Automotive PRD (Autonomous Vehicle)
+```
+Create a comprehensive Product Requirements Document (PRD) for a Level 3 
+Autonomous Vehicle System for highway driving.
+
+Include:
+1. Executive Summary
+   - Product name, vision, target market
+   - Key differentiators
+
+2. Problem Statement
+   - Current state of autonomous driving
+   - Gap we're addressing
+   - Customer pain points
+
+3. Goals & Objectives
+   - Business goals (market share, revenue)
+   - Technical goals (performance, safety)
+   - Timeline goals (MVP, full release)
+
+4. Functional Requirements (20-30 requirements)
+   - Perception (camera, radar, lidar, sensor fusion)
+   - Planning (path planning, decision making)
+   - Control (steering, throttle, braking)
+   - HMI (driver monitoring, takeover requests)
+   - V2X (vehicle-to-everything communication)
+
+5. Non-Functional Requirements
+   - Performance: Response time, latency, throughput
+   - Reliability: Uptime, MTBF, fail-safe behavior
+   - Safety: ISO 26262 ASIL-D compliance
+   - Security: Cybersecurity requirements
+   - Usability: Driver experience, ease of use
+
+6. System Context
+   - External systems: GPS, HD maps, cloud services
+   - Vehicle integration: CAN bus, ECU network
+   - Environmental constraints: Weather, lighting, terrain
+
+7. Safety & Compliance
+   - ISO 26262 (Functional Safety)
+   - ISO 21448 (SOTIF - Safety of the Intended Functionality)
+   - UN ECE R157 (Automated Lane Keeping Systems)
+   - SAE J3016 (Levels of Driving Automation)
+
+8. Success Metrics
+   - Safety: Zero fatalities, 99.99% hazard mitigation
+   - Performance: 98% highway operation, <100ms latency
+   - User satisfaction: NPS > 70, <5% disengagement rate
+
+9. Assumptions
+   - HD maps available for all operational routes
+   - Driver monitoring system certified
+   - V2X infrastructure available in target regions
+
+10. Out of Scope
+    - Urban driving (future phase)
+    - Parking automation (separate product)
+    - Level 4/5 full autonomy
+
+Format as a professional PRD with clear sections, bullet points, and tables.
+```
+
+### 2. Medical Device PRD (Patient Monitoring)
+```
+Generate a PRD for a Real-Time Patient Vital Signs Monitoring System 
+for hospital ICU environments.
+
+Context:
+- Medical device Class IIb (moderate risk)
+- Compliance: IEC 62304, ISO 13485, ISO 14971
+- Target: Intensive Care Units in hospitals
+- Integration: Existing Hospital Information Systems (HIS)
+
+Requirements:
+1. Vital signs monitored: ECG, SpO2, Blood Pressure, Temperature, Respiration Rate
+2. Real-time monitoring with <1 second latency
+3. Configurable alarm thresholds (audible + visual)
+4. Data logging and export (7-day retention minimum)
+5. Multi-patient monitoring (1 workstation, up to 8 patients)
+6. FDA 510(k) clearance pathway
+
+Safety Requirements:
+- IEC 60601-1 electrical safety
+- Risk management per ISO 14971
+- Alarm system per IEC 60601-1-8
+- Cybersecurity per FDA guidance
+
+Include detailed functional requirements, safety analysis approach, 
+and risk mitigation strategies.
+```
+
+### 3. Industrial Automation PRD (Smart Factory)
+```
+Create PRD for an Industrial IoT-based Predictive Maintenance System 
+for manufacturing equipment.
+
+Scope:
+- Monitor 50+ industrial machines (CNC, robots, conveyors, presses)
+- Predict failures 24-48 hours in advance
+- Reduce unplanned downtime by 30%
+- Comply with IEC 61508 SIL-2
+
+Key Features:
+1. Sensor data collection (vibration, temperature, current, pressure)
+2. Edge computing for real-time analysis
+3. Cloud-based machine learning for predictive analytics
+4. Dashboard for maintenance planning
+5. Integration with CMMS (Computerized Maintenance Management System)
+
+Non-Functional:
+- Availability: 99.9% uptime
+- Scalability: Support 500+ machines
+- Security: OT/IT network segmentation, encryption
+- Latency: <100ms sensor-to-edge, <5s edge-to-cloud
+
+Include Industry 4.0 context, OPC UA integration, and cybersecurity requirements.
+```
+
+### 4. Consumer Electronics PRD (Smart Home)
+```
+Generate PRD for a Voice-Controlled Smart Home Hub with AI Assistant.
+
+Product Vision:
+- Central control for smart home devices
+- Natural language voice interaction
+- Privacy-first design (local processing)
+- Integration with major ecosystems (Alexa, Google, HomeKit)
+
+Target Users:
+- Tech-savvy homeowners (early adopters)
+- Families with multiple smart devices
+- Privacy-conscious consumers
+
+Core Features (15-20):
+- Voice assistant (wake word detection, speech recognition)
+- Device control (lights, thermostats, locks, cameras, appliances)
+- Scenes and automation (time-based, location-based, sensor-based)
+- Energy monitoring and optimization
+- Security system integration
+- Multi-user support with voice profiles
+
+Non-Functional:
+- Wake word accuracy: >95%
+- Command response time: <500ms
+- Local processing: 80% of commands (privacy)
+- Battery backup: 4 hours
+
+Compliance:
+- FCC/CE certifications
+- GDPR/CCPA privacy compliance
+- Matter/Thread smart home standards
+
+Include user personas, use cases, and competitive analysis.
+```
+
+### 5. Aviation PRD (Flight Management System)
+```
+Create PRD for Next-Generation Flight Management System (FMS) 
+for commercial aviation.
+
+Context:
+- DO-178C Level A (safety-critical software)
+- DO-254 (hardware)
+- Integration with avionics suite (autopilot, navigation, communication)
+
+Functional Requirements:
+1. Flight Planning
+   - Route optimization (fuel, time, weather)
+   - Performance calculations (takeoff, landing, climb)
+   - Waypoint management (RNAV, RNP)
+
+2. Navigation
+   - GPS/GNSS primary navigation
+   - IRS (Inertial Reference System) backup
+   - VOR/DME legacy support
+   - SBAS/WAAS augmentation
+
+3. Autopilot Integration
+   - Lateral navigation (LNAV)
+   - Vertical navigation (VNAV)
+   - Speed/altitude constraints
+   - Approach procedures (ILS, RNAV, RNP)
+
+4. Performance Monitoring
+   - Fuel prediction vs. actual
+   - Weight and balance
+   - Engine performance
+   - Cost index optimization
+
+Safety Requirements:
+- Probability of failure <10^-9 per flight hour (Level A)
+- Redundant systems (dual FMS)
+- Failure detection and isolation
+- Graceful degradation
+
+Certification:
+- FAA TSO-C115c (FMS)
+- DO-178C Level A software
+- DO-254 Level A hardware
+- RTCA DO-160 environmental
+
+Include certification strategy, verification approach, and traceability plan.
+```
+
+---
+
+## PRD Quality Checklist
+
+### Executive Summary
+- [ ] Clear product name and vision
+- [ ] Target market identified
+- [ ] Key differentiators listed
+- [ ] High-level timeline
+
+### Problem & Solution
+- [ ] Problem statement is specific and measurable
+- [ ] Current alternatives identified
+- [ ] Our solution approach is clear
+- [ ] Success criteria defined
+
+### Requirements
+- [ ] Functional requirements are testable
+- [ ] Non-functional requirements have metrics
+- [ ] Requirements prioritized (must-have, should-have, nice-to-have)
+- [ ] Requirements numbered for traceability
+
+### Safety & Compliance
+- [ ] Applicable standards identified
+- [ ] Safety levels specified (ASIL, SIL, etc.)
+- [ ] Certification requirements clear
+- [ ] Risk management approach defined
+
+### Context & Constraints
+- [ ] System boundaries defined
+- [ ] External interfaces identified
+- [ ] Assumptions documented
+- [ ] Constraints acknowledged
+
+### Metrics & Success
+- [ ] Quantifiable success metrics
+- [ ] Acceptance criteria clear
+- [ ] Performance targets realistic
+- [ ] Timeline milestones defined
+
+---
+
+## PRD to Sylang Translation Guide
+
+### From PRD to Product Line (.ple)
+```
+PRD Section → Sylang .ple Mapping:
+- Product Name → hdef productline [name]
+- Domain → domain [tags]
+- Compliance → compliance [standards]
+- Safety → safetylevel [ASIL/SIL]
+- Timeline → firstrelease [date]
+```
+
+### From PRD to Feature Model (.fml)
+```
+PRD Features → Sylang .fml Mapping:
+- Must-have features → mandatory
+- Optional features → optional
+- Variant features → alternative/or
+- Feature dependencies → requires/excludes
+```
+
+### From PRD to Requirements (.req)
+```
+PRD Requirements → Sylang .req Mapping:
+- Functional requirements → reqtype functional
+- Performance requirements → reqtype non-functional
+- Safety requirements → reqtype safety, safetylevel
+- Each requirement → def requirement [id]
+```
+
+### From PRD to Architecture (.blk, .fun)
+```
+PRD System Components → Sylang .blk:
+- Hardware components → def block [hw]
+- Software components → def block [sw]
+- System modules → def block [system]
+
+PRD Functions → Sylang .fun:
+- System behaviors → def function
+- Algorithms → def function
+```
+
+### From PRD to Safety (.haz, .sgl)
+```
+PRD Safety Concerns → Sylang .haz:
+- Identified hazards → def hazard
+- Operating situations → def situation
+- ASIL assessment → severity, exposure, controllability
+
+PRD Safety Goals → Sylang .sgl:
+- Safety objectives → def safetygoal
+- Safe states → safestate
+- FTTI values → faulttoleranttime
+```
+
+---
+
+## Advanced PRD Prompts
+
+### PRD for Product Line (Multiple Variants)
+```
+Create PRD for a product line (not single product) with multiple variants:
+
+Product Line: Electric Vehicle Platform
+Variants:
+- Economy Model (basic features, low cost)
+- Mid-Range Model (comfort features, moderate cost)
+- Premium Model (all features, high cost)
+- Performance Model (sport features, high performance)
+
+For each variant, define:
+- Included features (mandatory)
+- Optional features (upgrades)
+- Performance targets (range, acceleration, top speed)
+- Price positioning
+
+Create feature matrix showing what's included in each variant.
+Include platform commonality (shared components) and variant-specific components.
+```
+
+### PRD with Regulatory Constraints
+```
+Generate PRD for a system with heavy regulatory constraints:
+
+Domain: Medical Device (implantable pacemaker)
+Regulations:
+- FDA 21 CFR Part 820 (Quality System Regulation)
+- ISO 13485 (Medical Devices Quality Management)
+- IEC 60601-2-47 (Particular requirements for pacemakers)
+- ISO 14708-2 (Active implantable medical devices - cardiac pacemakers)
+
+For each requirement, specify:
+1. Regulatory source (which standard)
+2. Criticality level (critical, major, minor)
+3. Verification method (test, analysis, inspection)
+4. Traceability to standard clause
+
+Include regulatory approval strategy (510(k) vs. PMA pathway).
+```
+
+### PRD for Safety-Critical System
+```
+Create PRD for safety-critical system with formal verification:
+
+System: Fly-by-Wire Flight Control for Commercial Aircraft
+Safety Level: DO-178C Level A (catastrophic)
+
+Requirements:
+- Formal methods for critical algorithms
+- Redundant channels (triple modular redundancy)
+- Byzantine fault tolerance
+- Deterministic real-time response
+- Hardware-software co-verification
+
+For each critical function:
+1. Safety rationale (why it's critical)
+2. Failure modes and effects
+3. Fault detection/isolation/recovery strategy
+4. Verification approach (model checking, theorem proving, testing)
+
+Include preliminary Fault Tree Analysis (FTA) in PRD.
+```
+
+---
+
+## PRD Templates by Domain
+
+### Automotive Template
+- **Section 1**: Vehicle context (platform, powertrain, market segment)
+- **Section 2**: ADAS/Autonomous features (SAE levels)
+- **Section 3**: ISO 26262 compliance (ASIL assessment)
+- **Section 4**: Cybersecurity (ISO 21434)
+- **Section 5**: Connectivity (V2X, OTA updates)
+
+### Medical Template
+- **Section 1**: Clinical context (intended use, patient population)
+- **Section 2**: Risk analysis (ISO 14971)
+- **Section 3**: Essential performance (IEC 60601)
+- **Section 4**: Usability engineering (IEC 62366)
+- **Section 5**: Software lifecycle (IEC 62304)
+
+### Aviation Template
+- **Section 1**: Aircraft type and mission (commercial, business, military)
+- **Section 2**: Certification basis (FAR Part 25, CS-25)
+- **Section 3**: Software level (DO-178C Level A/B/C/D)
+- **Section 4**: Hardware assurance (DO-254)
+- **Section 5**: System safety (ARP4754A, ARP4761)
+
+### Industrial Template
+- **Section 1**: Process/machine context (manufacturing, chemical, oil & gas)
+- **Section 2**: Safety integrity (IEC 61508 SIL levels)
+- **Section 3**: Functional safety (IEC 61511 for process)
+- **Section 4**: Cybersecurity (IEC 62443)
+- **Section 5**: Maintenance strategy (predictive, preventive)
+
+---
+
+## Common PRD Pitfalls
+
+❌ **Avoid:**
+- Solution details instead of requirements (HOW instead of WHAT)
+- Vague requirements ("system shall be fast")
+- Missing success metrics
+- Ignoring non-functional requirements
+- No prioritization (everything is "must-have")
+- Skipping safety/compliance analysis
+- Unrealistic timelines
+- Missing stakeholder buy-in
+
+✅ **Best Practices:**
+- Focus on WHAT, not HOW (leave implementation to design)
+- Every requirement must be testable
+- Include acceptance criteria for each requirement
+- Prioritize ruthlessly (MoSCoW: Must, Should, Could, Won't)
+- Consider failure modes early (safety-critical systems)
+- Involve cross-functional team (engineering, product, safety, regulatory)
+- Review with stakeholders before starting development
+- Maintain traceability from PRD to all Sylang artifacts
+
+---
+
+## From PRD to First Sylang Files
+
+### Step 1: Create Product Line (.ple)
+```prompt
+Using PRD section "Executive Summary" and "Goals & Objectives", 
+create a Sylang .ple file with:
+- Product line name from PRD title
+- Domain from target market
+- Compliance from standards section
+- First release from timeline
+```
+
+### Step 2: Create Feature Model (.fml)
+```prompt
+Using PRD section "Functional Requirements", create Sylang .fml file:
+- Map must-have features to mandatory
+- Map optional features to optional
+- Map variant features to alternative/or
+- Use feature dependencies from requirements
+```
+
+### Step 3: Create Initial Requirements (.req)
+```prompt
+Using PRD sections "Functional Requirements" and "Non-Functional Requirements",
+create Sylang .req file:
+- One requirement per PRD requirement
+- Maintain PRD numbering (e.g., PRD-FR-001 → REQ_FR_001)
+- Include rationale from PRD justification
+- Add verification criteria from acceptance criteria
+```
+
+---
+
+**Remember:** A good PRD is the foundation for successful Sylang-based MBSE. Invest time upfront to create a thorough PRD, and AI can help you rapidly translate it into comprehensive Sylang artifacts with proper traceability.

@@ -1,0 +1,612 @@
+# FMEA Analysis (.flr) - AI Prompting Guide
+
+## Purpose
+FMEA (Failure Mode and Effects Analysis) files define systematic analysis of potential failure modes with AIAG VDA quantitative analysis and temporal properties. FLR files support ISO 26262, IEC 61508, and other functional safety standards with complete traceability and timing constraints.
+
+## When to Use
+- During detailed design phase (ISO 26262 Part 4)
+- After block architecture (.blk) definition
+- For component-level safety analysis with quantitative metrics
+- When developing diagnostic coverage requirements
+- During safety case development
+- For temporal fault analysis (fault detection/tolerance times)
+
+## Key Syntax Elements
+```
+use blockset [ref], use functionset [ref], use requirementset [ref], use testset [ref]
+
+hdef failureset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
+  timingreference [ms|us|s]
+  propagateto ref failureset [failureset-ref]
+  block ref block [block-ref]
+
+  def failuremode [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    tags [string-literal], [string-literal], ...
+    
+    # AIAG VDA Quantitative Analysis
+    failurerate [numeric-value]
+    severity [1-10]
+    occurrence [1-10]
+    detectability [1-10]
+    actionpriority [high|medium|low]
+    rpn [numeric-value]
+    safetylevel [ASIL/SIL]
+    
+    # Temporal Properties (using timingreference from failureset)
+    faultdetectiontime [numeric-value]
+    faulttolerancetime [numeric-value]
+    propagationdelay [numeric-value]
+    recoverytime [numeric-value]
+    
+    # Relationships (MULTIPLE allowed)
+    causedby ref failuremode [failuremode-ref], [failuremode-ref], ... within [time]
+    effects ref failuremode [failuremode-ref], [failuremode-ref], ... within [time]
+    detectedby ref function [function-ref], [function-ref], ... within [time]
+    mitigatedby ref function [function-ref], [function-ref], ... within [time]
+    affects ref block [block-ref], [block-ref], ...
+    allocatedto ref block [block-ref]
+    
+    # Traceability (SINGLE only)
+    testedby ref testcase [testcase-ref]
+    derivedfrom ref requirement [requirement-ref]
+    when ref config [config-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, failureset, def, failuremode, cause, effect, name, description, 
+owner, tags, level, safetylevel, propagateto, block, timingreference, 
+failurerate, severity, detectability, occurrence, actionpriority, 
+allocatedto, affects, probability, rpn, faultdetectiontime, faulttolerancetime, 
+propagationdelay, recoverytime, causedby, effects, detectedby, mitigatedby, 
+testedby, derivedfrom, within, when, ref
+```
+
+## Common Patterns
+
+### AIAG VDA FMEA Scales
+- **Severity (1-10)**: 1=no effect, 10=catastrophic
+- **Occurrence (1-10)**: 1=very low, 10=very high  
+- **Detectability (1-10)**: 1=very high detection, 10=very low detection
+- **RPN = Severity × Occurrence × Detectability** (1-1000 scale)
+
+### Temporal Properties
+- **faultdetectiontime**: Time to detect failure
+- **faulttolerancetime**: Time system can tolerate failure
+- **propagationdelay**: Time to propagate to next failure
+- **recoverytime**: Time required to recover from failure
+- **within**: Temporal constraint for relationships (e.g., `within 50` ms)
+
+### Action Priority
+- **high**: Immediate action required (RPN > 100, Severity > 8)
+- **medium**: Action required in next release (RPN 50-100)
+- **low**: Monitor and improve (RPN < 50)
+
+---
+
+## Example Prompts
+
+### 1. Automotive Brake Control FMEA
+```
+Create comprehensive .flr file for automotive brake control system.
+
+Context:
+- System: Electronic Brake Control (EBC) with ABS/ESP
+- Blocks: BrakeECU, HydraulicModulator, WheelSpeedSensors, BrakePedalSensor
+- Standards: ISO 26262 ASIL-D, FMVSS 135
+- Functions: BrakeControl, EmergencyBraking, ABSControl, DiagnosticMonitoring
+- Requirements: BrakeControl_Requirements.req
+- Tests: BrakeControl_Tests.tst
+
+Failureset: BrakeControlFMEA (ASIL-D)
+- Timing reference: ms (milliseconds)
+- Block reference: BrakeControlSystem
+- Propagate to: VehicleSafetyFailures
+
+For each failure mode, specify:
+- AIAG VDA quantitative analysis (severity, occurrence, detectability, RPN)
+- Temporal properties (detection time, tolerance time, propagation delay, recovery time)
+- Causality chain with timing (causedby → effects with `within` keyword)
+- Detection mechanisms with timing (detectedby with `within` keyword)
+- Mitigation strategies with timing (mitigatedby with `within` keyword)
+- Test and requirement traceability
+
+Example Failure Modes:
+
+1. VoltageRegulatorFailure (ASIL-D)
+   - Name: "Voltage Regulator Complete Failure"
+   - Description: Primary voltage regulator stops providing regulated 5V power to brake ECU
+   - Failurerate: 1.2e-6 failures per million hours
+   - Severity: 9 (very high - loss of brake control)
+   - Occurrence: 4 (low-medium)
+   - Detectability: 3 (high detection)
+   - RPN: 9 × 4 × 3 = 108
+   - Actionpriority: high
+   - Safetylevel: ASIL-D
+   - Faultdetectiontime: 5ms (voltage monitoring detects within 5ms)
+   - Faulttolerancetime: 2ms (system tolerates for 2ms before failure)
+   - Propagationdelay: 10ms (propagates to processor failure in 10ms)
+   - Recoverytime: 500ms (500ms to switch to backup power)
+   - Causedby:
+     * CapacitorDegradation within 200ms
+     * TransistorBurnout within 50ms
+   - Effects:
+     * ProcessorPowerLoss within 10ms
+     * BrakeControlLoss within 20ms
+   - Detectedby:
+     * VoltageSensorMonitoring within 5ms
+     * PowerSupplyDiagnostic within 20ms
+   - Mitigatedby:
+     * RedundantPowerPath within 2ms
+     * PowerFailureSafeMode within 100ms
+   - Affects: BrakeECU, BrakeControlSoftware
+   - Allocatedto: BrakeECU
+   - Derivedfrom: PowerSupplyReq_001
+   - Testedby: VoltageFailureTest
+
+2. ProcessorLockup (ASIL-D)
+   - Name: "Brake ECU Processor Lockup"
+   - Description: Main processor locks up due to software deadlock or hardware fault
+   - Failurerate: 0.8e-6
+   - Severity: 10 (catastrophic - complete loss of brake control)
+   - Occurrence: 3 (low)
+   - Detectability: 2 (very high - watchdog timeout)
+   - RPN: 10 × 3 × 2 = 60
+   - Actionpriority: high
+   - Safetylevel: ASIL-D
+   - Faultdetectiontime: 10ms (watchdog timeout)
+   - Faulttolerancetime: 0ms (immediate failure)
+   - Propagationdelay: 0ms (immediate loss of control)
+   - Recoverytime: 200ms (secondary processor takes over)
+   - Causedby:
+     * SoftwareDeadlock within 5ms
+     * MemoryCorruption within 100ms
+   - Effects:
+     * BrakeControlLoss within 0ms
+     * SystemShutdown within 10ms
+   - Detectedby:
+     * WatchdogTimer within 10ms
+     * HealthMonitoring within 50ms
+   - Mitigatedby:
+     * RedundantProcessor within 10ms
+     * SafeStateActivation within 15ms
+   - Affects: BrakeECU, BrakeControlSoftware
+   - Allocatedto: BrakeECU
+   - Derivedfrom: ProcessorSafetyReq_001
+   - Testedby: ProcessorFailureTest
+
+3. WheelSpeedSensorOpenCircuit (ASIL-C)
+   - Name: "Wheel Speed Sensor Open Circuit"
+   - Description: Wiring break causes complete loss of wheel speed signal
+   - Failurerate: 2.5e-6
+   - Severity: 7 (high - ABS/ESP disabled)
+   - Occurrence: 4 (low-medium - wiring issues)
+   - Detectability: 2 (high - signal validation)
+   - RPN: 7 × 4 × 2 = 56
+   - Actionpriority: medium
+   - Safetylevel: ASIL-C
+   - Faultdetectiontime: 50ms (signal validation check)
+   - Faulttolerancetime: 100ms (ABS can operate briefly)
+   - Propagationdelay: 100ms (ABS/ESP disabled after detection)
+   - Recoverytime: 0ms (requires physical repair)
+   - Causedby:
+     * WireBreakage within 0ms (instant)
+     * ConnectorCorrosion within 5000ms (gradual)
+   - Effects:
+     * ABSDisabled within 100ms
+     * ESPDisabled within 100ms
+   - Detectedby:
+     * SignalValidation within 50ms
+     * SensorPlausibilityCheck within 100ms
+   - Mitigatedby:
+     * FallbackBrakingMode within 150ms
+     * DriverWarning within 200ms
+   - Affects: WheelSpeedSensor, ABSControl
+   - Allocatedto: WheelSpeedSensor
+   - Derivedfrom: SensorReq_003
+   - Testedby: SensorFailureTest
+
+File: BrakeControlFMEA.flr
+References: 
+  use blockset BrakeControlBlocks
+  use functionset BrakeControlFunctions
+  use requirementset BrakeControlRequirements
+  use testset BrakeControlTests
+```
+
+### 2. Medical Device Patient Monitoring FMEA
+```
+Generate .flr file for patient monitoring system.
+
+System: ICU vital signs monitoring
+Blocks: ECG_Amplifier, SpO2_Sensor, BP_Cuff, AlarmSystem
+Standards: IEC 62304 SIL-3, ISO 14971
+Functions: ECGProcessing, AlarmGeneration, DataLogging
+Requirements: MedicalDevice_Requirements.req
+
+Failureset: PatientMonitoringFMEA (SIL-3)
+- Timing reference: ms
+- Block reference: PatientMonitoringSystem
+- Propagate to: HospitalSystemFailures
+
+Medical-specific considerations:
+- Patient safety paramount (severity 9-10 for missed critical events)
+- Continuous monitoring required (fault tolerance < 100ms)
+- Alarm reliability critical (detectability 1-2)
+- Regulatory compliance (FDA, CE marking)
+
+Example Failure Modes:
+
+1. ECG_AmplifierSaturation (SIL-3)
+   - Name: "ECG Amplifier Saturation"
+   - Description: ECG amplifier saturates and clips signal, missing arrhythmia detection
+   - Failurerate: 1.5e-6
+   - Severity: 9 (very high - missed cardiac events, wrong treatment)
+   - Occurrence: 3 (low - occasional)
+   - Detectability: 2 (high - signal range checking)
+   - RPN: 9 × 3 × 2 = 54
+   - Actionpriority: high
+   - Safetylevel: SIL-3
+   - Faultdetectiontime: 100ms (signal validation)
+   - Faulttolerancetime: 1000ms (one cardiac cycle)
+   - Propagationdelay: 5000ms (missed arrhythmia in 5s)
+   - Recoverytime: 2000ms (automatic gain control adjusts)
+   - Causedby:
+     * ExcessiveInputSignal within 10ms
+     * AmplifierDrift within 10000ms
+   - Effects:
+     * ClippedECGSignal within 0ms
+     * MissedArrhythmia within 5000ms
+   - Detectedby:
+     * SignalRangeCheck within 100ms
+     * SignalQualityAnalysis within 500ms
+   - Mitigatedby:
+     * AutomaticGainControl within 2000ms
+     * SignalValidationAlarm within 200ms
+   - Affects: ECG_Amplifier, ECGProcessing
+   - Allocatedto: ECG_Amplifier
+   - Derivedfrom: ECGSignalReq_002
+   - Testedby: AmplifierSaturationTest
+
+File: PatientMonitoringFMEA.flr
+```
+
+### 3. Aviation Flight Control FMEA
+```
+Create .flr file for aircraft flight control system.
+
+Aircraft: Commercial transport (Boeing 737 class)
+Blocks: FlightControlComputer, Actuators, Sensors
+Certification: DO-178C Level A, FAR Part 25
+Functions: FlightControlLaw, ActuatorControl, HealthMonitoring
+Requirements: FlightControl_Requirements.req
+
+Failureset: FlightControlFMEA (DAL-A)
+- Timing reference: ms
+- Block reference: FlightControlSystem
+- Propagate to: AircraftSafetyFailures
+
+Aviation-specific considerations:
+- Triple redundancy (occurrence reduced by redundancy factor)
+- Deterministic real-time (fault detection < 20ms)
+- Environmental qualification (severity includes all flight phases)
+- Certification credit (detectability per DO-178C objectives)
+
+Example Failure Modes:
+
+1. PrimaryProcessorFailure (DAL-A)
+   - Name: "Primary Flight Control Computer Processor Failure"
+   - Description: Primary processor fails, requiring immediate failover to secondary
+   - Failurerate: 0.5e-6
+   - Severity: 10 (catastrophic - loss of control authority)
+   - Occurrence: 2 (very low - triple redundancy)
+   - Detectability: 1 (very high - cross-channel monitoring)
+   - RPN: 10 × 2 × 1 = 20
+   - Actionpriority: high
+   - Safetylevel: DAL-A
+   - Faultdetectiontime: 20ms (cross-channel comparison)
+   - Faulttolerancetime: 50ms (system operates on secondary)
+   - Propagationdelay: 50ms (failover to secondary)
+   - Recoverytime: 100ms (secondary takes full control)
+   - Causedby:
+     * HardwareFault within 0ms
+     * SoftwareCrash within 5ms
+   - Effects:
+     * LossOfPrimaryChannel within 0ms
+     * FailoverToSecondary within 50ms
+   - Detectedby:
+     * CrossChannelMonitoring within 20ms
+     * WatchdogTimer within 30ms
+   - Mitigatedby:
+     * TripleRedundancy within 50ms
+     * AutomaticFailover within 100ms
+   - Affects: FlightControlComputer, FlightControlLaw
+   - Allocatedto: FlightControlComputer
+   - Derivedfrom: ProcessorReq_FC_001
+   - Testedby: ProcessorFailureTest
+
+File: FlightControlFMEA.flr
+```
+
+### 4. Industrial Safety PLC FMEA
+```
+Generate .flr file for manufacturing safety controller.
+
+Application: Production line safety controller
+Blocks: SafetyCPU, IOModules, PowerSupply, Communication
+Standards: IEC 61508 SIL-3, IEC 61511
+Functions: SafetyLogic, DiagnosticsMonitor, EmergencyStop
+Requirements: SafetyPLC_Requirements.req
+
+Failureset: SafetyPLCFMEA (SIL-3)
+- Timing reference: ms
+- Block reference: SafetyControlSystem
+- Propagate to: ProductionLineFailures
+
+Industrial-specific considerations:
+- Continuous operation (severity includes production loss)
+- Dual-channel architecture (occurrence reduced, detectability improved)
+- Operator safety paramount (severity 9-10 for operator hazards)
+- Maintenance accessibility (recoverytime includes manual intervention)
+
+Example Failure Modes:
+
+1. SafetyCPU_MemoryCorruption (SIL-3)
+   - Name: "Safety CPU Memory Corruption"
+   - Description: Memory bit flip causes incorrect safety logic execution
+   - Failurerate: 2.0e-6
+   - Severity: 10 (catastrophic - safety function lost, operator risk)
+   - Occurrence: 4 (low-medium - harsh environment)
+   - Detectability: 1 (very high - CRC checking)
+   - RPN: 10 × 4 × 1 = 40
+   - Actionpriority: high
+   - Safetylevel: SIL-3
+   - Faultdetectiontime: 10ms (CRC check every cycle)
+   - Faulttolerancetime: 0ms (immediate safe state required)
+   - Propagationdelay: 0ms (safety logic immediately affected)
+   - Recoverytime: 5000ms (restart and self-test)
+   - Causedby:
+     * SingleEventUpset within 0ms
+     * MemoryAgingDegradation within 100000ms
+   - Effects:
+     * IncorrectSafetyLogic within 0ms
+     * UnsafeOperation within 10ms
+   - Detectedby:
+     * MemoryCRCCheck within 10ms
+     * DualChannelComparison within 20ms
+   - Mitigatedby:
+     * ECCMemory within 0ms (prevent)
+     * ImmediateSafeState within 15ms
+   - Affects: SafetyCPU, SafetyLogic
+   - Allocatedto: SafetyCPU
+   - Derivedfrom: SafetyLogicReq_001
+   - Testedby: MemoryCorruptionTest
+
+File: SafetyPLCFMEA.flr
+```
+
+### 5. Generic FMEA Template
+```
+Create .flr file for {SYSTEM_NAME} FMEA analysis.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Blocks: {BLOCK_LIST}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+- Functions: {FUNCTION_LIST}
+- Requirements: {REQUIREMENTS_FILE}.req
+- Tests: {TESTS_FILE}.tst
+
+Failureset: {FAILURESET_NAME} ({SAFETY_LEVEL})
+- Timing reference: {ms|us|s}
+- Block reference: {BLOCK_REFERENCE}
+- Propagate to: {PARENT_FAILURESET}
+
+For each failure mode, specify:
+- AIAG VDA quantitative analysis
+- Temporal properties
+- Causality chain with timing
+- Detection and mitigation with timing
+- Traceability
+
+Example Failure Mode:
+
+{FAILURE_MODE_NAME} ({SAFETY_LEVEL})
+   - Name: {FAILURE_MODE_TITLE}
+   - Description: {DETAILED_DESCRIPTION}
+   - Failurerate: {NUMERIC_VALUE} failures per million hours
+   - Severity: {1-10} ({SEVERITY_RATIONALE})
+   - Occurrence: {1-10} ({OCCURRENCE_RATIONALE})
+   - Detectability: {1-10} ({DETECTABILITY_RATIONALE})
+   - RPN: {S × O × D} = {RPN_VALUE}
+   - Actionpriority: {high|medium|low}
+   - Safetylevel: {SAFETY_LEVEL}
+   - Faultdetectiontime: {VALUE}ms
+   - Faulttolerancetime: {VALUE}ms
+   - Propagationdelay: {VALUE}ms
+   - Recoverytime: {VALUE}ms
+   - Causedby:
+     * {ROOT_CAUSE_1} within {TIME}ms
+     * {ROOT_CAUSE_2} within {TIME}ms
+   - Effects:
+     * {EFFECT_1} within {TIME}ms
+     * {EFFECT_2} within {TIME}ms
+   - Detectedby:
+     * {DETECTION_FUNCTION_1} within {TIME}ms
+     * {DETECTION_FUNCTION_2} within {TIME}ms
+   - Mitigatedby:
+     * {MITIGATION_FUNCTION_1} within {TIME}ms
+     * {MITIGATION_FUNCTION_2} within {TIME}ms
+   - Affects: {BLOCK_LIST}
+   - Allocatedto: {BLOCK_REFERENCE}
+   - Derivedfrom: {REQUIREMENT_REFERENCE}
+   - Testedby: {TESTCASE_REFERENCE}
+
+File: {SYSTEM_NAME}FMEA.flr
+References:
+  use blockset {BLOCKSET_REFERENCE}
+  use functionset {FUNCTIONSET_REFERENCE}
+  use requirementset {REQUIREMENTSET_REFERENCE}
+  use testset {TESTSET_REFERENCE}
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef failureset` per file (NOT `hdef fmea`)
+- [ ] All `use` statements at top (blockset, functionset, requirementset, testset)
+- [ ] `timingreference` specified at failureset level
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Multiline descriptions use triple quotes `"""`
+
+### Failureset Properties
+- [ ] Failureset has unique identifier
+- [ ] `name` is descriptive and clear
+- [ ] `description` explains FMEA scope
+- [ ] `safetylevel` specified
+- [ ] `timingreference` defined (ms, us, or s)
+- [ ] `block ref block` links to analyzed block
+- [ ] `propagateto ref failureset` links to parent (if applicable)
+
+### Failure Mode Properties
+- [ ] Each failure mode has unique identifier
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains failure mechanism
+- [ ] AIAG VDA properties complete:
+  - [ ] `failurerate` (failures per million hours)
+  - [ ] `severity` (1-10)
+  - [ ] `occurrence` (1-10)
+  - [ ] `detectability` (1-10)
+  - [ ] `rpn` calculated correctly (S × O × D)
+  - [ ] `actionpriority` (high/medium/low)
+- [ ] Temporal properties defined:
+  - [ ] `faultdetectiontime`
+  - [ ] `faulttolerancetime`
+  - [ ] `propagationdelay`
+  - [ ] `recoverytime`
+
+### Relationships
+- [ ] `causedby ref failuremode` with `within` timing
+- [ ] `effects ref failuremode` with `within` timing
+- [ ] `detectedby ref function` with `within` timing
+- [ ] `mitigatedby ref function` with `within` timing
+- [ ] `affects ref block` links to affected blocks
+- [ ] `allocatedto ref block` links to owning block
+- [ ] `derivedfrom ref requirement` (single reference)
+- [ ] `testedby ref testcase` (single reference)
+- [ ] All references resolve to existing elements
+
+### Completeness
+- [ ] All major failure modes included
+- [ ] Causality chains complete (root causes → effects)
+- [ ] Detection mechanisms specified for all failures
+- [ ] Mitigation strategies defined for high-priority failures
+- [ ] Temporal constraints realistic and consistent
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Using `hdef fmea` instead of `hdef failureset`
+- Missing `timingreference` at failureset level
+- Incorrect RPN calculation (must be S × O × D)
+- Missing `within` timing on causedby/effects/detectedby/mitigatedby
+- Unrealistic temporal values
+- Circular causality (A causes B causes A)
+- Missing detection or mitigation for high-severity failures
+
+✅ **Best Practices:**
+- Use `hdef failureset` with `timingreference`
+- Document rationale for all AIAG VDA ratings
+- Include realistic temporal properties based on system dynamics
+- Use `within` keyword for all temporal relationships
+- Link to detection functions and mitigation strategies
+- Ensure complete traceability (derivedfrom, testedby)
+- Consider cascading failures with propagation delays
+- Validate temporal consistency (detection < tolerance < propagation)
+
+---
+
+## Example Generated FMEA (Target Quality)
+
+```sylang
+use blockset PowerSupplyBlocks
+use functionset PowerSupplyFunctions
+use requirementset SafetyRequirements
+use testset PowerSupplyTests
+
+hdef failureset PowerSupplyFailures
+  name "Power Supply Subsystem FMEA"
+  description "Comprehensive FMEA for automotive ECU power supply per ISO 26262 ASIL-D"
+  owner "Safety Engineering Team"
+  safetylevel ASIL-D
+  timingreference ms
+  propagateto ref failureset VehicleSystemFailures
+  block ref block PowerSupplyBlock
+
+  def failuremode VoltageRegulatorFailure
+    name "Voltage Regulator Complete Failure"
+    description """
+      Primary voltage regulator stops providing regulated 5V power to brake ECU.
+      Causes immediate loss of primary processor power unless backup activates.
+      """
+    owner "Hardware Safety Team"
+    tags "voltage-regulator", "power-supply", "ASIL-D", "critical"
+    
+    // AIAG VDA Quantitative Analysis
+    failurerate 1.2e-6        // Failures per million hours
+    severity 9                // Very high - loss of brake control
+    detectability 3           // High detection via voltage monitoring
+    occurrence 4              // Low-medium - occasional component failure
+    actionpriority high
+    rpn 108                   // 9 × 4 × 3
+    safetylevel ASIL-D
+    
+    // Temporal Properties (in ms)
+    faultdetectiontime 5      // Voltage monitor detects within 5ms
+    faulttolerancetime 2      // System tolerates for 2ms
+    propagationdelay 10       // Propagates to processor failure in 10ms
+    recoverytime 500          // 500ms to switch to backup and stabilize
+    
+    // Failure Causality with Timing
+    causedby ref failuremode TransistorBurnout within 50
+    causedby ref failuremode CapacitorDegradation within 200
+    
+    // Failure Effects with Timing
+    effects ref failuremode ProcessorPowerLoss within 10
+    effects ref failuremode SystemShutdown within 500
+    
+    // Detection Mechanisms
+    detectedby ref function VoltageSensorMonitoring within 5
+    detectedby ref function PowerSupplyDiagnostic within 20
+    
+    // Mitigation Strategies
+    mitigatedby ref function RedundantPowerPath within 2
+    mitigatedby ref function PowerFailureSafeMode within 100
+    
+    // Block and Requirement Traceability
+    affects ref block PowerSupply, BrakeECU
+    allocatedto ref block PowerSupply
+    derivedfrom ref requirement VoltageRegulationReq
+    testedby ref testcase VoltageRegulatorFailureTest
+    when ref config c_PowerSupplyActive
+```
+
+---
+
+**Remember:** Use `hdef failureset` (NOT `hdef fmea`). Include AIAG VDA quantitative analysis (severity, occurrence, detectability, RPN) and temporal properties with `within` keyword for timing constraints. Complete traceability with `derivedfrom` and `testedby` is essential for safety compliance.

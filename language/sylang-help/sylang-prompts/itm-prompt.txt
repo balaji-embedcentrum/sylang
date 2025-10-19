@@ -1,0 +1,642 @@
+# Item Definition (.itm) - AI Prompting Guide
+
+## Purpose
+Item Definition files define the system or item under development per ISO 26262 Part 3. ITM files establish the scope boundaries (what's included/excluded) and operating modes (different operational scenarios) for the safety-relevant item, providing the foundation for hazard analysis and safety goals.
+
+## When to Use
+- During ISO 26262 Part 3 - Concept Phase (Item Definition)
+- Before hazard analysis (.haz) development
+- When defining system boundaries (included/excluded blocks)
+- When defining operational scenarios (operating modes)
+- For establishing safety scope and context
+- For regulatory compliance and safety case development
+
+## Key Syntax Elements
+```
+use featureset [featureset-ref]
+
+hdef itemdefinition [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  iso26262part [string-literal]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+  
+  # Item scope
+  itemscope ref function [function-ref], [function-ref], ...
+  itemscope ref feature [feature-ref], [feature-ref], ...
+
+  def boundary [identifier]
+    name [string-literal]
+    description [string-literal]
+    includes ref block [block-ref], [block-ref], ...
+    excludes ref block [block-ref], [block-ref], ...
+    
+    def boundary [sub-boundary-id]
+      # Nested boundaries for hierarchical decomposition
+      
+  def operatingmode [identifier]
+    name [string-literal]
+    description [string-literal]
+    conditions [string-literal]
+    safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+    
+    def operatingmode [sub-mode-id]
+      # Nested operating modes for detailed scenarios
+```
+
+## Valid Keywords
+```
+use, hdef, itemdefinition, def, boundary, operatingmode, name, description, 
+owner, tags, level, iso26262part, safetylevel, conditions, includes, 
+excludes, itemscope, when, ref
+```
+
+## Common Patterns
+
+### Boundary Definition
+**Purpose**: Define what's inside vs. outside the safety-relevant item
+- `includes ref block` - Blocks that are part of the item
+- `excludes ref block` - Blocks that are NOT part of the item
+- Nested boundaries for hierarchical decomposition
+
+### Operating Mode Definition
+**Purpose**: Define different operational scenarios with varying safety levels
+- `conditions` - Operational conditions (speed, environment, traffic)
+- `safetylevel` - ASIL level specific to this operating mode
+- Nested modes for detailed scenario breakdown
+
+### Item Scope
+**Purpose**: Define functional scope of the item
+- `itemscope ref function` - Functions that are part of the item
+- `itemscope ref feature` - Features that are part of the item
+
+---
+
+## Example Prompts
+
+### 1. Autonomous Vehicle Item Definition
+```
+Create comprehensive .itm file for Level 3 autonomous vehicle system.
+
+Context:
+- Item: SAE Level 3 autonomous driving system
+- Standards: ISO 26262 Part 3 ASIL-D
+- Features: use featureset AutonomousVehicleFeatures
+- Scope: Autonomous driving functions (perception, planning, control)
+
+Item Definition: AutonomousVehicleItem (ASIL-D)
+- ISO 26262 Part: "Part 3 - Item Definition"
+- Owner: "Functional Safety Manager"
+- Assessment Date: 2025-10-05
+
+System Boundaries:
+Define what's included in the autonomous vehicle item:
+1. SystemBoundary (top-level)
+   - Includes: PerceptionControlModule, PlanningControlModule, VehicleControlModule, 
+     HumanMachineInterface, SafetyMonitoringModule
+   - Excludes: InfotainmentSystem, ClimateControlSystem, PassengerComfortSystems
+   
+2. SensorBoundary (nested under SystemBoundary)
+   - Includes: CameraSystem, LidarSystem, RadarSystem, UltrasonicSensors, GPS_IMU
+   - Excludes: ParkingCameras, DashCamera, InteriorCameras
+
+3. ActuationBoundary (nested under SystemBoundary)
+   - Includes: SteeringActuator, BrakeActuator, ThrottleActuator
+   - Excludes: SuspensionActuator, LightingActuator
+
+Operating Modes:
+Define different operational scenarios:
+1. HighwayAutonomous (ASIL-D)
+   - Conditions: "Highway driving, speeds 60-130 km/h, good weather, divided roads"
+   - Description: Full autonomous operation on controlled access highways
+   
+   Nested modes:
+   - HighwayEntry (ASIL-D)
+     - Conditions: "Highway on-ramps, merging zones, acceleration lanes, 40-100 km/h"
+   - HighwayCruise (ASIL-D)
+     - Conditions: "Highway steady-state, lane keeping, adaptive cruise, 80-130 km/h"
+   - HighwayExit (ASIL-D)
+     - Conditions: "Highway off-ramps, lane changes, deceleration zones, 60-80 km/h"
+
+2. UrbanAutonomous (ASIL-C)
+   - Conditions: "City streets, speeds 30-60 km/h, traffic lights, pedestrians, cyclists"
+   - Description: Limited autonomous operation in urban environments
+   
+3. TrafficJamAssist (ASIL-B)
+   - Conditions: "Stop-and-go traffic, speeds 0-30 km/h, high density, frequent stops"
+   - Description: Low-speed autonomous operation in congested traffic
+
+4. ParkingAutonomous (ASIL-B)
+   - Conditions: "Parking lots, speeds 0-15 km/h, tight spaces, pedestrians"
+   - Description: Autonomous parking and maneuvering
+
+5. ManualFallback (QM)
+   - Conditions: "System failure, adverse weather, construction zones, driver takeover"
+   - Description: Fallback to manual control, autonomous system disabled
+
+Item Scope:
+- itemscope ref function: AutonomousPerceptionFunctions, AutonomousPlanningFunctions, 
+  AutonomousControlFunctions, SafetyMonitoringFunctions
+- itemscope ref feature: CoreAutonomousFeatures, AdvancedADAS
+
+File: AutonomousVehicleItem.itm
+```
+
+### 2. Medical Device Infusion Pump Item Definition
+```
+Generate .itm file for medical device infusion pump.
+
+System: Intravenous infusion pump for ICU
+Standards: IEC 62304 SIL-3, ISO 14971, ISO 60601
+Features: use featureset InfusionPumpFeatures
+
+Item Definition: InfusionPumpItem (SIL-3)
+- ISO 26262 Part: "Medical Device Item Definition per ISO 14971"
+- Owner: "Medical Device Safety Manager"
+
+Medical-specific considerations:
+- Clear boundaries between safety-critical and non-critical components
+- Multiple operating modes for different clinical scenarios
+- Alarm system is safety-critical (included in boundary)
+- Data logging is non-critical (excluded from boundary)
+
+System Boundaries:
+1. SafetyBoundary (top-level)
+   - Includes: DosageControlModule, FlowRateController, PumpMechanism, 
+     PressureSensor, AirDetector, AlarmSystem, SafetyMonitor
+   - Excludes: DataLoggingModule, NetworkInterface, DisplayBacklight, 
+     BatteryCharger, EventRecorder
+
+2. FluidPathBoundary (nested)
+   - Includes: IVTubing, PumpChamber, OcclusionDetector, AirDetector, 
+     DropSensor, FlowSensor
+   - Excludes: IV_Bag, IV_Needle, PatientVein
+
+3. AlarmBoundary (nested)
+   - Includes: VisualAlarm, AudibleAlarm, RemoteAlarmTransmitter, 
+     AlarmPriorityLogic
+   - Excludes: RemoteAlarmReceiver, NurseCallSystem
+
+Operating Modes:
+1. NormalInfusion (SIL-3)
+   - Conditions: "Continuous infusion, 0.1-999 mL/hr, stable patient, ICU setting"
+   - Description: Standard continuous infusion delivery
+
+2. BolusDelivery (SIL-3)
+   - Conditions: "Single bolus dose, 0.1-25 mL, ICU setting, nurse-initiated"
+   - Description: Controlled bolus delivery mode
+
+3. PainManagement (SIL-3)
+   - Conditions: "Patient-controlled analgesia (PCA), lockout intervals, dose limits"
+   - Description: PCA mode with patient-initiated doses
+
+4. NeonatalInfusion (SIL-3)
+   - Conditions: "Very low flow rates, 0.1-10 mL/hr, neonatal ICU, high precision"
+   - Description: Ultra-low flow rate mode for neonates
+
+5. AlarmState (SIL-3)
+   - Conditions: "Any alarm condition detected, infusion halted or limited"
+   - Description: Alarm state with safety actions
+
+6. MaintenanceMode (QM)
+   - Conditions: "Service mode, no patient connected, calibration/testing"
+   - Description: Non-operational maintenance and testing mode
+
+Item Scope:
+- itemscope ref function: DosageControl, FlowRateControl, AlarmGeneration, 
+  SafetyMonitoring
+- itemscope ref feature: InfusionControl, AlarmSystem, SafetyFeatures
+
+File: InfusionPumpItem.itm
+```
+
+### 3. Aviation Flight Control Item Definition
+```
+Create .itm file for aircraft flight control system.
+
+Aircraft: Commercial transport (Boeing 737 class)
+Standards: DO-178C DAL-A, FAR Part 25, EASA CS-25
+Features: use featureset FlightControlFeatures
+
+Item Definition: FlightControlItem (DAL-A)
+- ISO 26262 Part: "Aviation Item Definition per DO-178C"
+- Owner: "Flight Control Safety Team"
+
+Aviation-specific considerations:
+- Triple redundancy modeled in boundaries
+- Flight phase determines operating mode safety criticality
+- Separate boundaries for primary, secondary, and tertiary systems
+- Degraded modes with reduced functionality
+
+System Boundaries:
+1. FlightControlSystemBoundary (top-level)
+   - Includes: FlightControlComputer_A, FlightControlComputer_B, 
+     FlightControlComputer_C, ActuatorControlModule, SensorInterface, 
+     CrossChannelMonitoring
+   - Excludes: AutopilotGuidance, FlightManagementSystem, NavigationSystem
+
+2. PrimaryFlightControlBoundary (nested)
+   - Includes: ElevatorControl, AileronControl, RudderControl, 
+     SpoilerControl, TrimControl
+   - Excludes: Flaps, Slats, SpeedBrakes (secondary flight controls)
+
+3. ActuatorBoundary (nested)
+   - Includes: HydraulicActuator_SystemA, HydraulicActuator_SystemB, 
+     ElectricBackupActuator
+   - Excludes: LandingGear, Brakes
+
+4. SensorBoundary (nested)
+   - Includes: AirDataSensor_A, AirDataSensor_B, AirDataSensor_C, 
+     InertialReferenceUnit_A, InertialReferenceUnit_B
+   - Excludes: WeatherRadar, TCAS
+
+Operating Modes:
+1. NormalFlightMode (DAL-A)
+   - Conditions: "All systems operational, all flight phases, normal law active"
+   - Description: Full flight control authority with all protections
+   
+   Nested modes:
+   - Takeoff (DAL-A)
+     - Conditions: "Rotation through 1500 ft AGL, high thrust, low speed"
+   - Climb (DAL-A)
+     - Conditions: "1500 ft to cruise altitude, increasing speed, climb thrust"
+   - Cruise (DAL-A)
+     - Conditions: "Cruise altitude, cruise speed, minimal control inputs"
+   - Descent (DAL-A)
+     - Conditions: "Cruise to 10000 ft, decreasing altitude, idle/descent thrust"
+   - Approach (DAL-A)
+     - Conditions: "10000 ft to 50 ft AGL, landing configuration, approach speed"
+   - Landing (DAL-A)
+     - Conditions: "50 ft AGL to touchdown, flare maneuver, reduced speed"
+
+2. AlternateLawMode (DAL-A)
+   - Conditions: "Single flight control computer failure, reduced protections"
+   - Description: Degraded mode with reduced envelope protection
+
+3. DirectLawMode (DAL-B)
+   - Conditions: "Multiple failures, minimal computer augmentation"
+   - Description: Minimal augmentation, pilot has direct control
+
+4. BackupMode (DAL-B)
+   - Conditions: "All primary computers failed, backup electric control active"
+   - Description: Emergency backup control for safe landing
+
+5. ManualReversion (QM)
+   - Conditions: "All computers failed, mechanical backup, cables only"
+   - Description: Pure mechanical control (if available)
+
+Item Scope:
+- itemscope ref function: LateralControl, LongitudinalControl, AutopilotControl, 
+  EnvelopeProtection, ControlLawComputation
+- itemscope ref feature: FlightControlSystem, AutopilotSystem, ProtectionFeatures
+
+File: FlightControlItem.itm
+```
+
+### 4. Industrial Robot Safety Item Definition
+```
+Generate .itm file for collaborative industrial robot.
+
+System: Collaborative robot (cobot) for manufacturing
+Standards: IEC 61508 SIL-3, ISO 10218, ISO 15066 (collaborative robots)
+Features: use featureset CobotFeatures
+
+Item Definition: CobotItem (SIL-3)
+- ISO 26262 Part: "Industrial Safety Item Definition per IEC 61508"
+- Owner: "Cobot Safety Team"
+
+Industrial cobot-specific considerations:
+- Human-robot collaboration requires safety boundaries
+- Multiple safety functions with different zones
+- Speed and separation monitoring boundaries
+- Power and force limiting boundaries
+
+System Boundaries:
+1. SafetyCobotBoundary (top-level)
+   - Includes: SafetyController_A, SafetyController_B, MotionController, 
+     JointTorqueSensors, LaserScanner, SafetyRatedEncoder, EmergencyStop
+   - Excludes: VisionSystem, GripperController, ToolChanger, WorkpieceFixture
+
+2. MotionControlBoundary (nested)
+   - Includes: PositionController, VelocityController, TorqueController, 
+     CollisionDetection, PathPlanning
+   - Excludes: TeachPendant, ProgramStorage, DataLogger
+
+3. SafetyMonitoringBoundary (nested)
+   - Includes: SpeedMonitor, PositionMonitor, ForceMonitor, ProximityDetector, 
+     SafeZoneMonitor
+   - Excludes: ProductionMonitor, CycleTimer, QualityMetrics
+
+4. HumanInterfaceBoundary (nested)
+   - Includes: EmergencyStopButton, EnableSwitch, SafetyLightCurtain, 
+     HandGuidingInterface
+   - Excludes: HMI_Display, StatusLights, ProductionCounter
+
+Operating Modes:
+1. CollaborativeMode (SIL-3)
+   - Conditions: "Human in workspace, power-force limited, speed ≤ 250 mm/s"
+   - Description: Collaborative operation with human in shared workspace
+   
+   Nested modes:
+   - HandGuidingMode (SIL-3)
+     - Conditions: "Human guides robot, enable switch pressed, very low force"
+   - CollaborativeAssembly (SIL-3)
+     - Conditions: "Human and robot work together, force limits active"
+
+2. FencedAutomaticMode (SIL-2)
+   - Conditions: "Fenced area, no humans present, safety curtain active, full speed"
+   - Description: High-speed automatic operation with safety fencing
+
+3. ReducedSpeedMode (SIL-3)
+   - Conditions: "Human nearby, speed ≤ 500 mm/s, safety-rated speed monitoring"
+   - Description: Reduced speed with human in proximity
+
+4. SafeStopMode (SIL-3)
+   - Conditions: "Safety stop triggered, all motion halted, brakes engaged"
+   - Description: Safety-rated monitored stop (STO)
+
+5. MaintenanceMode (SIL-1)
+   - Conditions: "Key switch, low speed, teach pendant active, single-step"
+   - Description: Maintenance and teaching mode with reduced safety level
+
+6. EmergencyStopMode (SIL-3)
+   - Conditions: "E-stop pressed, all power removed, controlled stop"
+   - Description: Emergency stop with safe power removal
+
+Item Scope:
+- itemscope ref function: MotionControl, CollisionDetection, SafetyMonitoring, 
+  SpeedLimiting, ForceLimiting
+- itemscope ref feature: SafetyFeatures, CollaborativeFeatures, HandGuidingFeatures
+
+File: CobotItem.itm
+```
+
+### 5. Generic Item Definition Template
+```
+Create .itm file for {SYSTEM_NAME} item definition.
+
+Context:
+- Item: {ITEM_DESCRIPTION}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+- Features: use featureset {FEATURESET_NAME}
+
+Item Definition: {ITEM_NAME} ({SAFETY_LEVEL})
+- ISO 26262 Part: "{ISO_PART_DESCRIPTION}"
+- Owner: "{OWNER_NAME}"
+
+System Boundaries:
+Define what's included vs. excluded:
+1. {TOP_BOUNDARY_NAME} (top-level)
+   - Includes: {INCLUDED_BLOCKS}
+   - Excludes: {EXCLUDED_BLOCKS}
+
+2. {SUB_BOUNDARY_1} (nested under {PARENT})
+   - Includes: {INCLUDED_BLOCKS}
+   - Excludes: {EXCLUDED_BLOCKS}
+
+3. {SUB_BOUNDARY_2} (nested under {PARENT})
+   - Includes: {INCLUDED_BLOCKS}
+   - Excludes: {EXCLUDED_BLOCKS}
+
+Operating Modes:
+Define operational scenarios:
+1. {MODE_1_NAME} ({SAFETY_LEVEL})
+   - Conditions: "{OPERATIONAL_CONDITIONS}"
+   - Description: {MODE_DESCRIPTION}
+   
+   Nested modes:
+   - {SUB_MODE_1} ({SAFETY_LEVEL})
+     - Conditions: "{SUB_CONDITIONS}"
+   - {SUB_MODE_2} ({SAFETY_LEVEL})
+     - Conditions: "{SUB_CONDITIONS}"
+
+2. {MODE_2_NAME} ({SAFETY_LEVEL})
+   - Conditions: "{OPERATIONAL_CONDITIONS}"
+   - Description: {MODE_DESCRIPTION}
+
+3. {MODE_3_NAME} ({SAFETY_LEVEL})
+   - Conditions: "{OPERATIONAL_CONDITIONS}"
+   - Description: {MODE_DESCRIPTION}
+
+4. {FALLBACK_MODE} (QM)
+   - Conditions: "Failure, degraded, or manual fallback"
+   - Description: Fallback or safe state mode
+
+Item Scope:
+- itemscope ref function: {FUNCTION_REFERENCES}
+- itemscope ref feature: {FEATURE_REFERENCES}
+
+File: {SYSTEM_NAME}Item.itm
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef itemdefinition` per file (NOT `hdef item`)
+- [ ] All `use` statements at top (featureset references)
+- [ ] Properties: `iso26262part`, `safetylevel`
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Item Definition Properties
+- [ ] Item has unique identifier
+- [ ] `name` is descriptive and specific
+- [ ] `description` explains item purpose and scope
+- [ ] `iso26262part` specified
+- [ ] `safetylevel` appropriate
+- [ ] `owner` identified
+
+### Boundary Definitions
+- [ ] At least one `def boundary` specified
+- [ ] `includes ref block` lists safety-relevant blocks
+- [ ] `excludes ref block` lists non-safety-relevant blocks
+- [ ] Nested boundaries for hierarchical decomposition (if needed)
+- [ ] Clear rationale for inclusion/exclusion
+
+### Operating Mode Definitions
+- [ ] At least 2-5 `def operatingmode` specified
+- [ ] `conditions` clearly describe operational scenario
+- [ ] `safetylevel` appropriate for each mode
+- [ ] Nested modes for detailed scenarios (if needed)
+- [ ] All relevant operational scenarios covered
+
+### Item Scope
+- [ ] `itemscope ref function` links to functions
+- [ ] `itemscope ref feature` links to features
+- [ ] Scope matches boundaries
+
+### Completeness
+- [ ] All safety-relevant blocks included in boundaries
+- [ ] All non-safety-relevant blocks excluded
+- [ ] All operational scenarios covered by modes
+- [ ] Degraded modes and fallbacks included
+- [ ] Clear item boundaries and scope
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Using `def subitem` (doesn't exist! Use `def boundary` and `def operatingmode`)
+- Missing `def boundary` (required!)
+- Missing `def operatingmode` (required!)
+- Vague boundary descriptions ("includes system")
+- Missing `includes ref block` or `excludes ref block`
+- Incomplete operating mode coverage
+- Missing fallback/degraded modes
+- No nested boundaries for complex systems
+- Missing `itemscope` references
+
+✅ **Best Practices:**
+- Use `def boundary` to define system boundaries
+- Use `def operatingmode` to define operational scenarios
+- Clear `includes` and `excludes` for each boundary
+- Specific `conditions` for each operating mode
+- Different ASIL levels for different modes
+- Nested boundaries for hierarchical decomposition
+- Nested modes for detailed scenarios
+- Include fallback and degraded modes
+- Complete `itemscope` references
+
+---
+
+## Example Generated Item Definition (Target Quality)
+
+```sylang
+use featureset AutonomousVehicleFeatures
+
+hdef itemdefinition AutonomousVehicleItem
+  name "Autonomous Vehicle L3 System Item"
+  description """
+    Complete item definition for Level 3 autonomous vehicle system per ISO 26262 
+    Part 3. Defines system boundaries (included/excluded blocks) and operating 
+    modes (highway, urban, parking, fallback) with appropriate ASIL levels for 
+    each operational scenario.
+    """
+  owner "Functional Safety Manager"
+  tags "ISO-26262", "item-definition", "L3-autonomous", "Part-3"
+  iso26262part "Part 3 - Item Definition"
+  safetylevel ASIL-D
+
+  def boundary SystemBoundary
+    name "Autonomous Vehicle System Boundary"
+    description """
+      Physical and functional boundaries of the autonomous vehicle item. 
+      Includes all safety-relevant perception, planning, control, and safety 
+      monitoring modules. Excludes non-safety-relevant comfort and infotainment.
+      """
+    
+    includes ref block PerceptionControlModule
+    includes ref block PlanningControlModule
+    includes ref block VehicleControlModule
+    includes ref block HumanMachineInterface
+    includes ref block SafetyMonitoringModule
+    excludes ref block InfotainmentSystem
+    excludes ref block ClimateControlSystem
+    excludes ref block PassengerComfortSystems
+    
+    def boundary SensorBoundary
+      name "Sensor System Boundary"
+      description """
+        Boundary definition for all perception sensors used for autonomous driving. 
+        Includes safety-relevant sensors, excludes comfort/convenience sensors.
+        """
+      includes ref block CameraSystem
+      includes ref block LidarSystem
+      includes ref block RadarSystem
+      includes ref block UltrasonicSensors
+      includes ref block GPS_IMU
+      excludes ref block ParkingCameras
+      excludes ref block DashCamera
+      excludes ref block InteriorCameras
+      
+    def boundary ActuationBoundary
+      name "Actuation System Boundary"
+      description "Boundary for vehicle control actuators"
+      includes ref block SteeringActuator
+      includes ref block BrakeActuator
+      includes ref block ThrottleActuator
+      excludes ref block SuspensionActuator
+      excludes ref block LightingActuator
+      
+  def operatingmode HighwayAutonomous
+    name "Highway Autonomous Operation"
+    description """
+      Full autonomous operation on controlled access highways with speeds 
+      60-130 km/h in good weather conditions. Highest ASIL-D criticality 
+      due to high speeds and limited driver engagement.
+      """
+    conditions "Highway driving, speeds 60-130 km/h, good weather, divided roads"
+    safetylevel ASIL-D
+    
+    def operatingmode HighwayEntry
+      name "Highway Entry and Merging"
+      description "Autonomous highway entry and merging maneuvers"
+      conditions "Highway on-ramps, merging zones, acceleration lanes, 40-100 km/h"
+      safetylevel ASIL-D
+      
+    def operatingmode HighwayCruise
+      name "Highway Cruise Control"
+      description "Steady-state highway cruising with lane keeping"
+      conditions "Highway steady-state, lane keeping, adaptive cruise, 80-130 km/h"
+      safetylevel ASIL-D
+      
+    def operatingmode HighwayExit
+      name "Highway Exit and Lane Change"
+      description "Autonomous highway exit and lane changing"
+      conditions "Highway off-ramps, lane changes, deceleration zones, 60-80 km/h"
+      safetylevel ASIL-D
+
+  def operatingmode UrbanAutonomous
+    name "Urban Autonomous Operation"
+    description """
+      Limited autonomous operation in urban environments with traffic lights, 
+      pedestrians, and cyclists. Lower speeds but higher complexity requires 
+      ASIL-C level.
+      """
+    conditions "City streets, speeds 30-60 km/h, traffic lights, pedestrians, cyclists"
+    safetylevel ASIL-C
+    
+  def operatingmode TrafficJamAssist
+    name "Traffic Jam Assist Mode"
+    description """
+      Low-speed autonomous operation in stop-and-go traffic with frequent 
+      stops and starts. Lower speeds allow ASIL-B level.
+      """
+    conditions "Stop-and-go traffic, speeds 0-30 km/h, high density, frequent stops"
+    safetylevel ASIL-B
+    
+  def operatingmode ParkingAutonomous
+    name "Autonomous Parking Mode"
+    description "Autonomous parking and low-speed maneuvering"
+    conditions "Parking lots, speeds 0-15 km/h, tight spaces, pedestrians"
+    safetylevel ASIL-B
+
+  def operatingmode ManualFallback
+    name "Manual Control Fallback"
+    description """
+      Driver takeover and manual control operation. Autonomous system disabled 
+      due to system failure, adverse weather, or driver request. QM level as 
+      human driver has control.
+      """
+    conditions "System failure, adverse weather, construction zones, driver takeover"
+    safetylevel QM
+
+  itemscope ref function AutonomousPerceptionFunctions
+  itemscope ref function AutonomousPlanningFunctions
+  itemscope ref function AutonomousControlFunctions
+  itemscope ref function SafetyMonitoringFunctions
+  itemscope ref feature CoreAutonomousFeatures
+  itemscope ref feature AdvancedADAS
+```
+
+---
+
+**Remember:** Use `def boundary` (NOT `def subitem`) to define system boundaries with `includes` and `excludes ref block`. Use `def operatingmode` to define operational scenarios with `conditions` and mode-specific ASIL levels. Complete item scope with `itemscope ref function` and `itemscope ref feature` at the itemdefinition level.

@@ -1,0 +1,5 @@
+# Variant Configuration (.vcf) - AI Prompting Guide
+## Purpose: Configuration values for variant (ALWAYS AUTO-GENERATED)
+## When: Right-click .vml → "Generate Configuration"
+## Key Syntax: hdef config, def config [feature-id] (enabled|disabled)
+## Note: NEVER manually create .vcf files - always use right-click generation command

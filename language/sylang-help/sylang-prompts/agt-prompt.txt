@@ -1,0 +1,486 @@
+# Agent Definition (.agt) - AI Prompting Guide
+
+## Purpose
+Agent Definition files define specialized AI agents with domain expertise for systems engineering tasks. AGT files specify engineering agents with specific roles, specializations, expertise, and context, used for assigning tasks in sprint planning and project management.
+
+## When to Use
+- During team structure definition
+- For sprint planning and task assignment
+- When defining engineering expertise areas
+- During project staffing and resource planning
+- For AI-assisted engineering task distribution
+- When documenting team capabilities
+
+## Key Syntax Elements
+```
+hdef agentset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+
+  def agent [identifier]
+    name [string-literal]
+    description [string-literal]
+    role [string-literal]
+    specialization [string-literal]
+    expertise [string-literal]
+    context [string-literal]
+```
+
+## Valid Keywords
+```
+use, hdef, agentset, def, agent, name, description, owner, role, 
+specialization, expertise, context
+```
+
+## Common Patterns
+
+### Agent Roles
+- **Systems Engineer**: Overall system design and architecture
+- **Safety Engineer**: Functional safety and compliance
+- **Requirements Engineer**: Requirements analysis and management
+- **Software Engineer**: Software design and implementation
+- **Test Engineer**: Testing and validation
+- **Integration Engineer**: System integration
+- **Verification Engineer**: Verification and validation
+
+### Specialization Areas
+- **Autonomous Vehicles**: Self-driving systems, ADAS
+- **Medical Devices**: Healthcare systems, patient monitoring
+- **Aviation Systems**: Flight control, avionics
+- **Industrial Safety**: Manufacturing safety, PLC systems
+- **Functional Safety**: ISO 26262, IEC 61508
+- **Real-Time Systems**: Embedded systems, timing constraints
+
+---
+
+## Example Prompts
+
+### 1. Autonomous Vehicle Engineering Agents
+```
+Create comprehensive .agt file for autonomous vehicle engineering team.
+
+Context:
+- Project: Level 3 autonomous driving system
+- Domain: Automotive systems engineering
+- Standards: ISO 26262 ASIL-D
+- Team: 10+ specialized engineering roles
+
+Agent Categories:
+1. Perception & Sensing Agents
+2. Planning & Control Agents
+3. Safety & Compliance Agents
+4. Integration & Testing Agents
+5. Architecture & Systems Agents
+
+For each agent, specify:
+- Clear role definition
+- Domain specialization
+- Technical expertise areas
+- Application context
+
+Example Agents:
+
+1. PerceptionSystemsAgent
+   - Role: Perception Systems Engineer
+   - Specialization: Autonomous Vehicle Perception
+   - Expertise: 
+     * Sensor fusion algorithms (Kalman filtering, particle filters)
+     * Computer vision and deep learning for object detection
+     * Machine learning model optimization for automotive edge computing
+     * Real-time processing and deterministic system design
+     * Multi-modal sensor integration (camera, LiDAR, radar)
+     * Safety-critical software development per ISO 26262
+   - Context:
+     * Autonomous vehicles and ADAS systems development
+     * Multi-sensor perception systems for safety-critical applications
+     * ASIL-D compliance and functional safety requirements
+     * Object detection and tracking in dynamic environments
+     * Environmental perception for highway and urban driving scenarios
+
+2. FunctionalSafetyAgent
+   - Role: Functional Safety Engineer
+   - Specialization: Automotive Functional Safety
+   - Expertise:
+     * ISO 26262 Parts 2-10 (full lifecycle)
+     * Hazard analysis and risk assessment (HARA)
+     * FMEA and fault tree analysis
+     * ASIL decomposition and safety goal definition
+     * Safety case development and argumentation
+     * Safety requirements derivation and validation
+   - Context:
+     * Automotive functional safety for Level 3 autonomous vehicles
+     * Risk assessment and safety goal definition
+     * Safety mechanisms and diagnostic coverage
+     * Failure analysis and fault detection
+
+3. PathPlanningAgent
+   - Role: Path Planning Engineer
+   - Specialization: Autonomous Navigation and Planning
+   - Expertise:
+     * Motion planning algorithms (A*, RRT, trajectory optimization)
+     * Behavioral planning and decision making
+     * Multi-objective optimization for comfort and safety
+     * Real-time path replanning and obstacle avoidance
+     * Traffic rule compliance and ethical decision making
+   - Context:
+     * Autonomous vehicle path planning for highway and urban scenarios
+     * Real-time trajectory generation and optimization
+     * Dynamic obstacle avoidance and emergency maneuvers
+
+File: AutonomousVehicleAgents.agt
+```
+
+### 2. Medical Device Engineering Agents
+```
+Generate .agt file for medical device engineering team.
+
+Project: ICU patient monitoring system
+Domain: Medical device software engineering
+Standards: IEC 62304 SIL-3, ISO 14971
+Team: Healthcare systems engineers
+
+Example Agents:
+
+1. BiomedicalSignalProcessingAgent
+   - Role: Biomedical Signal Processing Engineer
+   - Specialization: Medical Device Signal Processing
+   - Expertise:
+     * ECG signal processing and arrhythmia detection
+     * SpO2 signal processing and artifact removal
+     * Blood pressure measurement and validation
+     * Digital filtering and noise reduction for physiological signals
+     * Real-time signal quality assessment
+     * IEC 60601 compliance for medical electrical equipment
+   - Context:
+     * ICU patient monitoring systems
+     * Real-time vital signs acquisition and processing
+     * Clinical-grade signal quality and accuracy
+     * Continuous monitoring with alarm generation
+
+2. MedicalDeviceSafetyAgent
+   - Role: Medical Device Safety Engineer
+   - Specialization: Medical Device Functional Safety
+   - Expertise:
+     * IEC 62304 software lifecycle processes
+     * ISO 14971 risk management for medical devices
+     * FDA regulatory compliance and submissions
+     * Hazard analysis and risk assessment for medical devices
+     * Software safety classification (Class A, B, C)
+   - Context:
+     * Patient safety and clinical risk management
+     * Regulatory submissions (FDA 510(k), CE marking)
+     * Medical device software verification and validation
+
+3. ClinicalWorkflowAgent
+   - Role: Clinical Workflow Engineer
+   - Specialization: Healthcare IT and Clinical Systems
+   - Expertise:
+     * HL7 FHIR and healthcare interoperability
+     * Clinical workflow analysis and optimization
+     * Alarm management and clinical decision support
+     * Usability engineering per IEC 62366
+     * Healthcare data privacy (HIPAA compliance)
+   - Context:
+     * ICU clinical workflows and nursing procedures
+     * Hospital system integration and interoperability
+     * Clinical alarm management and alert fatigue reduction
+
+File: MedicalDeviceAgents.agt
+```
+
+### 3. Aviation Flight Control Engineering Agents
+```
+Create .agt file for aviation systems engineering team.
+
+Project: Commercial aircraft flight control system
+Domain: Aviation and aerospace systems
+Standards: DO-178C Level A, DO-254
+Team: Certified aviation engineers
+
+Example Agents:
+
+1. FlightControlSystemsAgent
+   - Role: Flight Control Systems Engineer
+   - Specialization: Aircraft Flight Control
+   - Expertise:
+     * Fly-by-wire control system design
+     * Flight control laws and stability augmentation
+     * Control surface actuation and redundancy management
+     * Flutter suppression and gust load alleviation
+     * Triple-redundant architecture design
+     * DO-178C Level A software development
+   - Context:
+     * Commercial transport aircraft flight control
+     * Primary, secondary, and backup flight control systems
+     * Deterministic real-time control loops
+     * Certification for FAR Part 25
+
+2. AvionicsSoftwareCertificationAgent
+   - Role: Avionics Software Certification Engineer
+   - Specialization: DO-178C Software Certification
+   - Expertise:
+     * DO-178C objectives and planning (Level A-E)
+     * Software requirements and design reviews
+     * Software verification and validation
+     * Structural coverage analysis and MC/DC
+     * Configuration management and quality assurance
+     * Certification liaison with FAA/EASA
+   - Context:
+     * Level A flight-critical software certification
+     * Software lifecycle documentation for certification
+     * Independent verification and validation
+     * Certification credit and re-certification
+
+3. AvionicsSystemsIntegrationAgent
+   - Role: Avionics Systems Integration Engineer
+   - Specialization: Aircraft Systems Integration
+   - Expertise:
+     * ARINC 429 and ARINC 664 communication protocols
+     * Integrated Modular Avionics (IMA) architecture
+     * System integration testing and validation
+     * Hardware-software integration
+     * Environmental testing (temperature, vibration, EMI)
+   - Context:
+     * Commercial aircraft avionics integration
+     * Multi-vendor system integration
+     * Laboratory and flight test integration
+
+File: AviationSystemsAgents.agt
+```
+
+### 4. Industrial Safety Engineering Agents
+```
+Generate .agt file for industrial safety engineering team.
+
+Project: Manufacturing safety controller
+Domain: Industrial automation and safety
+Standards: IEC 61508 SIL-3, IEC 61511
+Team: Industrial safety engineers
+
+Example Agents:
+
+1. SafetyPLCAgent
+   - Role: Safety PLC Engineer
+   - Specialization: Industrial Safety Systems
+   - Expertise:
+     * Safety PLC programming (ladder logic, structured text)
+     * PROFIsafe and Safety-over-EtherCAT protocols
+     * Dual-channel safety architecture
+     * Safety integrity level (SIL) verification
+     * Diagnostic coverage calculation
+     * IEC 61508 functional safety lifecycle
+   - Context:
+     * Manufacturing production line safety systems
+     * Emergency stop and interlock systems
+     * Continuous operation and maintenance requirements
+
+2. ProcessHazardAnalysisAgent
+   - Role: Process Safety Engineer
+   - Specialization: Process Hazard Analysis
+   - Expertise:
+     * HAZOP (Hazard and Operability) studies
+     * Layer of Protection Analysis (LOPA)
+     * Safety Instrumented Systems (SIS) design
+     * IEC 61511 functional safety for process industries
+     * Risk reduction and SIL determination
+   - Context:
+     * Chemical and manufacturing process safety
+     * Risk assessment for hazardous processes
+     * Safety instrumented function (SIF) specification
+
+3. IndustrialNetworkSecurityAgent
+   - Role: Industrial Cybersecurity Engineer
+   - Specialization: OT Security and Network Safety
+   - Expertise:
+     * IEC 62443 industrial cybersecurity
+     * Secure industrial protocols (Modbus, Profinet)
+     * Network segmentation and defense in depth
+     * Security risk assessment for OT systems
+     * Incident response and recovery
+   - Context:
+     * Industrial control system security
+     * Protection against cyber threats to safety systems
+     * Secure remote access for maintenance
+
+File: IndustrialSafetyAgents.agt
+```
+
+### 5. Generic Agent Template
+```
+Create .agt file for {PROJECT_NAME} engineering agents.
+
+Context:
+- Project: {PROJECT_DESCRIPTION}
+- Domain: {ENGINEERING_DOMAIN}
+- Standards: {APPLICABLE_STANDARDS}
+- Team: {TEAM_SIZE} specialized engineers
+
+Agent Categories:
+1. {AGENT_CATEGORY_1}
+2. {AGENT_CATEGORY_2}
+3. {AGENT_CATEGORY_3}
+
+For each agent, specify:
+- Clear role definition
+- Domain specialization
+- Technical expertise areas (bulleted list)
+- Application context (bulleted list)
+
+Example Agents:
+
+1. {AGENT_NAME_1}
+   - Role: {ENGINEERING_ROLE}
+   - Specialization: {DOMAIN_SPECIALIZATION}
+   - Expertise:
+     * {EXPERTISE_AREA_1}
+     * {EXPERTISE_AREA_2}
+     * {EXPERTISE_AREA_3}
+     * {EXPERTISE_AREA_4}
+     * {EXPERTISE_AREA_5}
+   - Context:
+     * {CONTEXT_AREA_1}
+     * {CONTEXT_AREA_2}
+     * {CONTEXT_AREA_3}
+
+2. {AGENT_NAME_2}
+   - Role: {ENGINEERING_ROLE_2}
+   - Specialization: {SPECIALIZATION_2}
+   - Expertise:
+     * {TECHNICAL_SKILL_1}
+     * {TECHNICAL_SKILL_2}
+     * {TECHNICAL_SKILL_3}
+   - Context:
+     * {APPLICATION_CONTEXT_1}
+     * {APPLICATION_CONTEXT_2}
+
+File: {PROJECT_NAME}Agents.agt
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef agentset` per file
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+- [ ] Multiline descriptions use triple quotes `"""`
+
+### Agent Properties
+- [ ] Each agent has unique identifier
+- [ ] `name` is descriptive and professional
+- [ ] `description` explains agent purpose clearly
+- [ ] `role` specifies engineering role
+- [ ] `specialization` defines domain expertise
+- [ ] `expertise` lists specific technical skills
+- [ ] `context` describes application areas
+- [ ] `owner` team identified at agentset level
+
+### Completeness
+- [ ] All major engineering roles covered
+- [ ] No missing specialization areas
+- [ ] Expertise areas are specific and measurable
+- [ ] Context is relevant to project domain
+- [ ] Agent definitions align with project needs
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Vague expertise descriptions ("good at engineering")
+- Missing specialization areas
+- Overlapping agent responsibilities
+- Generic role definitions
+- Missing domain-specific context
+- Incomplete technical skills
+
+✅ **Best Practices:**
+- Use specific, measurable expertise areas
+- Define clear role boundaries
+- Include domain-specific technical skills
+- Specify relevant standards and compliance areas
+- Use professional engineering titles
+- Include both technical and domain expertise
+- Reference agents in .spr files for task assignment
+
+---
+
+## Agent Naming Conventions
+
+### Good Agent Names (Role-Based)
+- PerceptionSystemsAgent
+- FunctionalSafetyAgent
+- PathPlanningAgent
+- SafetyRequirementsAgent
+- BiomedicalSignalProcessingAgent
+- FlightControlSystemsAgent
+- SafetyPLCAgent
+- ProcessHazardAnalysisAgent
+
+### Bad Agent Names (Vague)
+- ❌ Agent1
+- ❌ Engineer
+- ❌ SystemAgent
+- ❌ Developer
+- ❌ Expert
+
+---
+
+## Example Generated Agent (Target Quality)
+
+```sylang
+hdef agentset AutonomousVehicleAgents
+  name "Autonomous Vehicle Engineering Agents"
+  description "Specialized AI agents for autonomous vehicle systems engineering"
+  owner "AI Engineering Team"
+
+  def agent PerceptionSystemsAgent
+    name "Perception Systems Engineering Agent"
+    description """
+      Expert in autonomous vehicle perception systems, sensor fusion, and 
+      computer vision. Specialized in developing safety-critical perception 
+      algorithms for Level 3 autonomous vehicles with deep knowledge of 
+      ISO 26262 compliance.
+      """
+    role "Perception Systems Engineer"
+    specialization "Autonomous Vehicle Perception"
+    expertise """
+      Sensor fusion algorithms including Kalman filtering and particle filters
+      Computer vision and deep learning for object detection
+      Machine learning model optimization for automotive edge computing
+      Real-time processing and deterministic system design
+      Multi-modal sensor integration (camera, LiDAR, radar)
+      Safety-critical software development per ISO 26262
+      """
+    context """
+      Autonomous vehicles and ADAS systems development
+      Multi-sensor perception systems for safety-critical applications
+      ASIL-D compliance and functional safety requirements
+      Object detection and tracking in dynamic environments
+      Environmental perception for highway and urban driving scenarios
+      """
+
+  def agent FunctionalSafetyAgent
+    name "Functional Safety Engineering Agent"
+    description "Specialist in automotive functional safety and ISO 26262"
+    role "Functional Safety Engineer"
+    specialization "Automotive Functional Safety"
+    expertise "ISO 26262", "Hazard analysis", "FMEA", "Fault tree analysis", "ASIL assessment"
+    context "Automotive safety", "Risk assessment", "Safety mechanisms", "Failure analysis"
+
+  def agent SafetyRequirementsAgent
+    name "Safety Requirements Engineering Agent"
+    description "Expert in safety-critical requirements engineering"
+    role "Safety Requirements Engineer"
+    specialization "Safety Requirements Engineering"
+    expertise "Safety requirements", "Requirements traceability", "Verification", "Validation"
+    context "Safety-critical systems", "ASIL requirements", "Requirements validation"
+```
+
+---
+
+**Remember:** Agent Definition files specify engineering experts with specific roles, specializations, and expertise for project task assignment. Agents are referenced in `.spr` files using `assignedto ref agent [agent-ref]` for sprint planning and task allocation.

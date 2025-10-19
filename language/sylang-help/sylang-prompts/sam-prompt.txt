@@ -1,0 +1,637 @@
+# Safety Mechanisms (.sam) - AI Prompting Guide
+
+## Purpose
+Safety Mechanism files define ISO 26262 safety mechanisms with effectiveness metrics, detection/reaction times, and complete traceability. Part of ISO 26262 Part 4 (Product Development) compliance. Safety mechanisms are technical solutions to detect, control, or mitigate hazards and failures.
+
+## When to Use
+- During ISO 26262 Part 4 - Product Development (System Level)
+- After hazard analysis and safety goal definition
+- During safety architecture design
+- For diagnostic coverage calculation
+- When defining safety requirements implementation
+- For certification and safety case development
+
+## Key Syntax Elements
+```
+use hazardanalysis [hazardanalysis-ref]
+use itemdefinition [itemdefinition-ref]
+use failureset [failureset-ref]
+use requirementset [requirementset-ref]
+
+hdef safetymechanismset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  iso26262part [string-literal]
+  safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+
+  def safetymechanism [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    tags [string-literal], [string-literal], ...
+    mechanismtype [Detection|Control|Mitigation]
+    safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
+    safetymechanismeffectiveness [percentage-value]
+    detectiontime [time-value-ms]
+    reactiontime [time-value-ms]
+    
+    # Relationships (multiple allowed)
+    satisfies ref requirement [requirement-ref], [requirement-ref], ...
+    mitigates ref hazard [hazard-ref], [hazard-ref], ...
+    allocatedto ref block [block-ref]
+    implementedby ref function [function-ref], [function-ref], ...
+    detects ref failuremode [failuremode-ref], [failuremode-ref], ...
+    verifiedby ref testcase [testcase-ref], [testcase-ref], ...
+    when ref config [config-ref]
+```
+
+## Valid Keywords
+```
+use, hdef, safetymechanismset, def, safetymechanism, name, description, 
+owner, tags, level, iso26262part, safetylevel, mechanismtype, 
+safetymechanismeffectiveness, detectiontime, reactiontime, satisfies, 
+mitigates, allocatedto, implementedby, detects, verifiedby, when, ref
+```
+
+## Mechanism Types
+```
+mechanismtype Detection    # Fault detection mechanisms (e.g., plausibility checks, CRC)
+mechanismtype Control      # Control mechanisms (e.g., redundancy, fail-safe)
+mechanismtype Mitigation   # Risk mitigation mechanisms (e.g., graceful degradation)
+```
+
+## Common Patterns
+
+### Safety Mechanism Categories
+
+**Detection Mechanisms:**
+- Plausibility checks (range, rate, correlation)
+- Redundancy and comparison (dual/triple modular)
+- CRC and checksum validation
+- Watchdog timers
+- Memory tests (RAM, ROM, EEPROM)
+- Sensor cross-validation
+- Signal monitoring
+
+**Control Mechanisms:**
+- Redundant channels (dual/triple)
+- Independent monitoring (lockstep, comparison)
+- Safe state activation
+- Fault-tolerant design
+- Diagnostic coverage
+- Error detection and correction (ECC)
+
+**Mitigation Mechanisms:**
+- Graceful degradation
+- Fallback modes
+- Emergency operations
+- Driver takeover request
+- Limp-home mode
+- Warning and alerting
+
+### Effectiveness Metrics
+
+**Safety Mechanism Effectiveness:**
+- > 99%: Excellent (ASIL-D compliant)
+- 90-99%: Good (ASIL-C compliant)
+- 60-90%: Moderate (ASIL-B compliant)
+- < 60%: Low (ASIL-A, needs additional mechanisms)
+
+**Timing Requirements:**
+- Detection time: Time to detect fault
+- Reaction time: Time to activate safety mechanism
+- Total latency: Detection + Reaction (must be < fault tolerant time)
+
+---
+
+## Example Prompts
+
+### 1. Automotive Brake System Safety Mechanisms
+```
+Create comprehensive .sam file for electronic brake control system.
+
+Context:
+- System: Electronic Brake Control (EBC) with ABS/ESP
+- Item: use itemdefinition ElectronicBrakeControlItem
+- Hazards: use hazardanalysis ElectronicBrakeHazards
+- Failures: use failureset BrakeSystemFailures
+- Requirements: use requirementset BrakeControlRequirements
+- Standards: ISO 26262 Part 4 ASIL-D
+
+Safety Mechanism Set: BrakeSafetyMechanisms (ASIL-D)
+- ISO 26262 Part: "Part 4 - Safety Mechanisms"
+- Owner: "Brake System Safety Team"
+- Assessment Date: 2025-10-05
+
+Safety Mechanism Categories:
+1. Detection Mechanisms (6-8 mechanisms)
+   - Sensor plausibility checks
+   - ECU self-diagnostics
+   - Communication monitoring
+   - Power supply monitoring
+
+2. Control Mechanisms (4-6 mechanisms)
+   - Redundant processing
+   - Independent monitoring
+   - Safe state activation
+   - Diagnostic coverage
+
+3. Mitigation Mechanisms (3-5 mechanisms)
+   - Graceful degradation
+   - Driver warning
+   - Emergency braking override
+   - Limp-home mode
+
+For each safety mechanism, specify:
+- mechanismtype: Detection|Control|Mitigation
+- safetylevel: ASIL-A|ASIL-B|ASIL-C|ASIL-D
+- safetymechanismeffectiveness: percentage (e.g., "99.5%")
+- detectiontime: ms (e.g., "50ms")
+- reactiontime: ms (e.g., "100ms")
+- satisfies ref requirement: Link to safety requirements
+- mitigates ref hazard: Link to hazards from .haz file
+- allocatedto ref block: Block responsible for implementation
+- implementedby ref function: Functions implementing mechanism
+- detects ref failuremode: Failure modes detected
+- verifiedby ref testcase: Test cases verifying mechanism
+
+Example Safety Mechanism:
+
+RedundantSensorValidation (Detection, ASIL-D)
+  - Name: "Redundant Sensor Cross-Validation"
+  - Description: """
+      Continuous cross-validation of wheel speed sensors using triple modular 
+      redundancy. Compares all four wheel speed sensors for consistency and 
+      detects single sensor failures. Uses majority voting for fault detection.
+      """
+  - mechanismtype: Detection
+  - safetylevel: ASIL-D
+  - safetymechanismeffectiveness: "99.5%"
+  - detectiontime: "50ms"
+  - reactiontime: "100ms"
+  - satisfies ref requirement: REQ_SAFE_SENSOR_001, REQ_DIAGNOSTIC_001
+  - mitigates ref hazard: LossOfBraking, InsufficientBraking
+  - allocatedto ref block: SensorMonitoringModule
+  - implementedby ref function: SensorFusion, PlausibilityCheck
+  - detects ref failuremode: WheelSpeedSensor_OpenCircuit, WheelSpeedSensor_Drift
+  - verifiedby ref testcase: TEST_SENSOR_REDUNDANCY_001
+
+File: BrakeSafetyMechanisms.sam
+```
+
+### 2. Medical Device Infusion Pump Safety Mechanisms
+```
+Generate .sam file for medical device infusion pump.
+
+System: Intravenous infusion pump for ICU
+Item: use itemdefinition InfusionPumpItem
+Hazards: use hazardanalysis InfusionPumpHazards
+Failures: use failureset InfusionPumpFailures
+Requirements: use requirementset InfusionPumpRequirements
+Standards: IEC 62304 SIL-3, ISO 14971
+
+Safety Mechanism Set: InfusionPumpSafetyMechanisms (SIL-3)
+- ISO 26262 Part: "Medical Device Risk Control per ISO 14971"
+- Owner: "Medical Device Safety Team"
+
+Medical-specific considerations:
+- Detection mechanisms must detect 99.9% of faults
+- Alarm system is critical safety mechanism
+- Independent monitoring channel required
+- All critical parameters have plausibility checks
+
+Safety Mechanism Categories:
+1. Detection Mechanisms
+   - Flow rate monitoring and limits
+   - Occlusion detection (pressure sensor)
+   - Air bubble detection (ultrasonic)
+   - Door open detection (mechanical switch)
+   - Battery voltage monitoring
+   - Dosage calculation verification
+
+2. Control Mechanisms
+   - Dual-channel processing
+   - Independent safety monitor
+   - Hardware-enforced flow limits
+   - Watchdog timer reset
+
+3. Mitigation Mechanisms
+   - Immediate pump stop on fault
+   - Multi-level alarms (visual, audible, remote)
+   - Event logging for analysis
+   - Fault recovery procedures
+
+Example Safety Mechanism:
+
+IndependentFlowRateMonitor (Control, SIL-3)
+  - Name: "Independent Flow Rate Monitoring Channel"
+  - Description: """
+      Hardware-based independent monitoring of actual flow rate using secondary 
+      flow sensor. Compares measured flow rate against commanded rate and triggers 
+      alarm if deviation exceeds 5%. Implemented in separate ASIC independent of 
+      main processor.
+      """
+  - mechanismtype: Control
+  - safetylevel: SIL-3
+  - safetymechanismeffectiveness: "99.8%"
+  - detectiontime: "100ms"
+  - reactiontime: "50ms"
+  - satisfies ref requirement: REQ_FLOW_MONITOR_001, REQ_INDEPENDENT_MONITOR_001
+  - mitigates ref hazard: Overdose, Underdose
+  - allocatedto ref block: SafetyMonitoringModule
+  - implementedby ref function: IndependentFlowMonitor, ComparisonLogic
+  - detects ref failuremode: FlowRateControl_Malfunction, PumpMechanism_Failure
+  - verifiedby ref testcase: TEST_FLOW_MONITOR_001
+
+File: InfusionPumpSafetyMechanisms.sam
+```
+
+### 3. Aviation Flight Control Safety Mechanisms
+```
+Create .sam file for aircraft flight control system.
+
+Aircraft: Commercial transport (Boeing 737 class)
+Item: use itemdefinition FlightControlItem
+Hazards: use hazardanalysis FlightControlHazards
+Failures: use failureset FlightControlFailures
+Requirements: use requirementset FlightControlRequirements
+Certification: DO-178C DAL-A, FAR Part 25
+
+Safety Mechanism Set: FlightControlSafetyMechanisms (DAL-A)
+- ISO 26262 Part: "Aviation Safety Mechanisms per DO-178C"
+- Owner: "Flight Control Safety Team"
+
+Aviation-specific considerations:
+- Triple/quadruple redundancy required
+- Cross-channel monitoring mandatory
+- Dissimilar redundancy for common mode fault protection
+- Extremely high effectiveness required (> 99.99%)
+
+Safety Mechanism Categories:
+1. Detection Mechanisms
+   - Triple modular redundancy with voting
+   - Cross-channel comparison
+   - Built-in test equipment (BITE)
+   - Memory scrubbing and ECC
+   - Actuator position feedback monitoring
+
+2. Control Mechanisms
+   - Independent monitoring channels
+   - Dissimilar software redundancy
+   - Hardware lockstep execution
+   - Deterministic scheduling
+
+3. Mitigation Mechanisms
+   - Graceful degradation to backup channels
+   - Pilot alerting and takeover
+   - Automatic reconfiguration
+   - Reversionary modes
+
+Example Safety Mechanism:
+
+TripleModularRedundancy (Control, DAL-A)
+  - Name: "Triple Modular Redundancy with Voting"
+  - Description: """
+      Three independent flight control computers execute identical control laws 
+      using dissimilar processors (Intel, AMD, ARM). Two-out-of-three voting 
+      logic selects majority output. Each channel monitors other channels for 
+      disagreement. Provides tolerance for single channel failure with immediate 
+      detection and reconfiguration.
+      """
+  - mechanismtype: Control
+  - safetylevel: ASIL-D (DAL-A equivalent)
+  - safetymechanismeffectiveness: "99.99%"
+  - detectiontime: "20ms"
+  - reactiontime: "10ms"
+  - satisfies ref requirement: REQ_REDUNDANCY_001, REQ_FAILSAFE_001
+  - mitigates ref hazard: LossOfPitchControl, UncommandedRoll, UncommandedYaw
+  - allocatedto ref block: FlightControlComputer
+  - implementedby ref function: VotingLogic, CrossChannelMonitoring
+  - detects ref failuremode: ProcessorFailure, SoftwareCrash, MemoryCorruption
+  - verifiedby ref testcase: TEST_TMR_VOTING_001, TEST_CHANNEL_FAILURE_001
+
+File: FlightControlSafetyMechanisms.sam
+```
+
+### 4. Industrial Robot Safety Mechanisms
+```
+Generate .sam file for collaborative industrial robot.
+
+System: Collaborative robot (cobot) for manufacturing
+Item: use itemdefinition CollaborativeRobotItem
+Hazards: use hazardanalysis CobotHazards
+Failures: use failureset CobotFailures
+Requirements: use requirementset CobotRequirements
+Standards: IEC 61508 SIL-3, ISO 10218, ISO 15066 (collaborative robots)
+
+Safety Mechanism Set: CobotSafetyMechanisms (SIL-3)
+- ISO 26262 Part: "Industrial Safety per IEC 61508 and ISO 10218"
+- Owner: "Cobot Safety Team"
+
+Industrial cobot-specific considerations:
+- Safe speed and separation monitoring (SSM)
+- Power and force limiting (PFL)
+- Hand guiding mode safety
+- Safety-rated monitored stop
+
+Safety Mechanism Categories:
+1. Detection Mechanisms
+   - Dual-channel position monitoring
+   - Torque sensor monitoring (force limiting)
+   - Safety-rated speed monitoring
+   - Operator proximity detection (laser scanner)
+   - Collision detection algorithms
+
+2. Control Mechanisms
+   - Safe limited speed (SLS)
+   - Safely-limited position (SLP)
+   - Safety-rated soft axis limits
+   - Dual-channel safety controller
+
+3. Mitigation Mechanisms
+   - Safety-rated monitored stop (STO)
+   - Safe operating stop (SOS)
+   - Controlled stop (power removal)
+   - Operator alerting
+
+Example Safety Mechanism:
+
+ForceAndPowerLimiting (Control, SIL-3)
+  - Name: "Power and Force Limiting Safety Mechanism"
+  - Description: """
+      Continuous monitoring of joint torques and calculated contact forces. 
+      Limits robot speed and force to comply with ISO 15066 biomechanical limits 
+      for collaborative operation. Hardware-enforced limits prevent exceeding 
+      maximum force thresholds (80N transient, 150N quasi-static for body contact).
+      """
+  - mechanismtype: Control
+  - safetylevel: SIL-3
+  - safetymechanismeffectiveness: "98.5%"
+  - detectiontime: "10ms"
+  - reactiontime: "20ms"
+  - satisfies ref requirement: REQ_FORCE_LIMIT_001, REQ_ISO15066_001
+  - mitigates ref hazard: CollisionWithOperator, ExcessiveForce
+  - allocatedto ref block: MotionControlModule
+  - implementedby ref function: TorqueMonitoring, ForceLimiting, SpeedReduction
+  - detects ref failuremode: ExcessiveTorque, UnintendedMotion
+  - verifiedby ref testcase: TEST_FORCE_LIMIT_001, TEST_ISO15066_COMPLIANCE_001
+
+File: CobotSafetyMechanisms.sam
+```
+
+### 5. Generic Safety Mechanism Template
+```
+Create .sam file for {SYSTEM_NAME} safety mechanisms.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Item: use itemdefinition {ITEM_NAME}
+- Hazards: use hazardanalysis {HAZARDANALYSIS_NAME}
+- Failures: use failureset {FAILURESET_NAME}
+- Requirements: use requirementset {REQUIREMENTSET_NAME}
+- Standards: {ISO_26262|IEC_62304|DO_178C|IEC_61508}
+- Safety Level: {ASIL-D|SIL-3|DAL-A}
+
+Safety Mechanism Set: {SAFETYMECHANISMSET_NAME} ({SAFETY_LEVEL})
+- ISO 26262 Part: "{ISO_PART_DESCRIPTION}"
+- Owner: "{OWNER_NAME}"
+
+For each safety mechanism, specify:
+- mechanismtype: {Detection|Control|Mitigation}
+- safetylevel: {SAFETY_LEVEL}
+- safetymechanismeffectiveness: "{PERCENTAGE}%"
+- detectiontime: "{TIME_MS}ms"
+- reactiontime: "{TIME_MS}ms"
+- satisfies ref requirement: {REQUIREMENT_REFS}
+- mitigates ref hazard: {HAZARD_REFS}
+- allocatedto ref block: {BLOCK_REF}
+- implementedby ref function: {FUNCTION_REFS}
+- detects ref failuremode: {FAILUREMODE_REFS}
+- verifiedby ref testcase: {TESTCASE_REFS}
+
+Safety Mechanism Categories:
+1. Detection Mechanisms ({COUNT})
+2. Control Mechanisms ({COUNT})
+3. Mitigation Mechanisms ({COUNT})
+
+File: {SYSTEM_NAME}SafetyMechanisms.sam
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef safetymechanismset` per file
+- [ ] All `use` statements at top (hazardanalysis, itemdefinition, failureset, requirementset)
+- [ ] Properties: `iso26262part`, `safetylevel`
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Safety Mechanism Properties
+- [ ] Each mechanism has unique identifier
+- [ ] `name` is descriptive and specific
+- [ ] `description` explains mechanism in detail (how it works)
+- [ ] `mechanismtype` specified (Detection|Control|Mitigation)
+- [ ] `safetylevel` appropriate for hazard coverage
+- [ ] `safetymechanismeffectiveness` specified as percentage
+- [ ] `detectiontime` specified (ms)
+- [ ] `reactiontime` specified (ms)
+- [ ] Total latency (detection + reaction) < fault tolerant time
+
+### Relationships (all multiple allowed)
+- [ ] `satisfies ref requirement` - Links to safety requirements
+- [ ] `mitigates ref hazard` - Links to hazards from .haz file
+- [ ] `allocatedto ref block` - Block responsible for implementation
+- [ ] `implementedby ref function` - Functions implementing mechanism
+- [ ] `detects ref failuremode` - Failure modes detected
+- [ ] `verifiedby ref testcase` - Test cases verifying effectiveness
+- [ ] All references resolve to existing elements
+
+### Effectiveness Metrics
+- [ ] Effectiveness > 99% for ASIL-D/SIL-3 mechanisms
+- [ ] Effectiveness appropriate for safety level
+- [ ] Detection time realistic for technology
+- [ ] Reaction time achievable by system
+- [ ] Total latency meets safety requirements
+
+### Completeness
+- [ ] All hazards have mitigating mechanisms
+- [ ] All failure modes have detecting mechanisms
+- [ ] All safety requirements have implementing mechanisms
+- [ ] Detection, Control, and Mitigation categories covered
+- [ ] Mechanisms form complete safety architecture
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Using `hdef safetymechanismset` without ISO 26262 properties
+- Missing `mechanismtype` specification
+- Unrealistic effectiveness percentages (> 100% or too low)
+- Missing timing properties (detectiontime, reactiontime)
+- No traceability to hazards or requirements
+- Vague descriptions ("monitors the system")
+- Single safety mechanism per hazard (need multiple layers)
+- Missing verification test cases
+
+✅ **Best Practices:**
+- Include ISO 26262 Part reference
+- Use specific mechanismtype (Detection|Control|Mitigation)
+- Provide realistic effectiveness metrics (90-99.9%)
+- Specify precise timing (detection + reaction < fault tolerant time)
+- Link to all related elements (hazards, requirements, failures, tests)
+- Detailed descriptions of how mechanism works
+- Multiple mechanisms per hazard (defense in depth)
+- Complete traceability chain
+
+---
+
+## Example Generated Safety Mechanisms (Target Quality)
+
+```sylang
+use hazardanalysis AutonomousVehicleHazards
+use itemdefinition AutonomousVehicleItem
+use failureset PerceptionSystemFailures
+use requirementset AutonomousVehicleRequirements
+
+hdef safetymechanismset AutonomousVehicleSafetyMechanisms
+  name "Autonomous Vehicle Safety Mechanisms"
+  description """
+    Comprehensive safety mechanisms for autonomous vehicle per ISO 26262 Part 4. 
+    Includes detection mechanisms (fault detection), control mechanisms (redundancy 
+    and fail-safe), and mitigation mechanisms (graceful degradation). All mechanisms 
+    traceable to hazards, requirements, and test cases.
+    """
+  owner "Safety Mechanisms Team"
+  tags "ISO-26262", "safety-mechanisms", "fault-tolerance", "Part-4"
+  iso26262part "Part 4 - Product Development (System Level)"
+  safetylevel ASIL-D
+
+  def safetymechanism RedundantSensorValidation
+    name "Redundant Sensor Cross-Validation"
+    description """
+      Continuous cross-validation of perception sensors (camera, lidar, radar) to 
+      detect sensor failures. Uses triple modular redundancy with majority voting. 
+      Compares sensor outputs for consistency and detects discrepancies within 50ms. 
+      If single sensor fails, system continues with remaining sensors. If two sensors 
+      fail, transitions to safe state and requests driver takeover.
+      """
+    owner "Perception Safety Team"
+    tags "sensor-validation", "redundancy", "fault-detection"
+    mechanismtype Detection
+    safetylevel ASIL-D
+    safetymechanismeffectiveness "99.5%"
+    detectiontime 50
+    reactiontime 100
+    
+    satisfies ref requirement REQ_SAFE_SENSOR_001, REQ_DIAGNOSTIC_SENSOR_001
+    mitigates ref hazard FailureToStopAtObstacle, LossOfPerception
+    allocatedto ref block PerceptionControlModule
+    implementedby ref function SensorFusion, SensorPlausibilityCheck
+    detects ref failuremode CameraSystemFailure, LidarSystemFailure, RadarSystemFailure
+    verifiedby ref testcase TEST_SENSOR_REDUNDANCY_001, TEST_SENSOR_CROSS_VALIDATION_001
+
+  def safetymechanism EmergencyBrakingOverride
+    name "Emergency Braking Override System"
+    description """
+      Independent emergency braking system that can override autonomous control. 
+      Hardware-based safety mechanism with dedicated brake pressure sensor and 
+      actuator. Monitors obstacle distance continuously and activates emergency 
+      braking if collision imminent (time-to-collision < 0.8s). Detection time 
+      20ms, brake application within 80ms total.
+      """
+    owner "Braking Safety Team"
+    tags "emergency-braking", "hardware-override", "collision-avoidance"
+    mechanismtype Control
+    safetylevel ASIL-D
+    safetymechanismeffectiveness "99.9%"
+    detectiontime 20
+    reactiontime 80
+    
+    satisfies ref requirement REQ_EMERGENCY_BRAKE_001, REQ_COLLISION_AVOIDANCE_001
+    mitigates ref hazard UnintendedAcceleration, FailureToStopAtObstacle
+    allocatedto ref block VehicleControlModule
+    implementedby ref function EmergencyBrakeActivation, CollisionDetection
+    detects ref failuremode BrakeSystemFailure, ThrottleStuck
+    verifiedby ref testcase TEST_EMERGENCY_BRAKE_001, TEST_COLLISION_OVERRIDE_001
+
+  def safetymechanism SteeringAnglePlausibilityCheck
+    name "Steering Angle Plausibility Monitoring"
+    description """
+      Continuous monitoring of steering commands for plausibility based on vehicle 
+      dynamics model. Checks steering angle rate (max 180°/s), correlation with 
+      vehicle speed, and consistency with planned trajectory. Rejects implausible 
+      commands and triggers safe state if commanded steering exceeds physical limits 
+      or violates dynamics constraints.
+      """
+    owner "Steering Safety Team"
+    tags "plausibility-check", "steering-validation", "dynamics-model"
+    mechanismtype Detection
+    safetylevel ASIL-D
+    safetymechanismeffectiveness "98.7%"
+    detectiontime 10
+    reactiontime 50
+    
+    satisfies ref requirement REQ_STEERING_PLAUSIBILITY_001, REQ_VEHICLE_DYNAMICS_001
+    mitigates ref hazard LossOfLateralControl, UnintendedSteering
+    allocatedto ref block VehicleControlModule
+    implementedby ref function SteeringPlausibilityCheck, VehicleDynamicsModel
+    detects ref failuremode SteeringSystemFailure, SteeringActuatorStuck
+    verifiedby ref testcase TEST_STEERING_PLAUSIBILITY_001
+
+  def safetymechanism DriverTakeoverRequest
+    name "Driver Takeover Request System"
+    description """
+      Multi-modal alert system to request driver takeover when autonomous system 
+      reaches operational limits or detects critical fault. Visual (dashboard display), 
+      audible (escalating tones), and haptic (seat vibration, steering wheel pulse) 
+      warnings. Provides minimum 10 seconds warning before safe stop. If driver 
+      does not respond, system executes minimal risk maneuver (controlled stop).
+      """
+    owner "HMI Safety Team"
+    tags "takeover-request", "driver-alert", "mitigation"
+    mechanismtype Mitigation
+    safetylevel ASIL-B
+    safetymechanismeffectiveness "95.0%"
+    detectiontime 100
+    reactiontime 3000
+    
+    satisfies ref requirement REQ_TAKEOVER_REQUEST_001, REQ_DRIVER_ALERT_001
+    mitigates ref hazard LossOfLateralControl, SystemLimitsExceeded
+    allocatedto ref block HumanMachineInterface
+    implementedby ref function TakeoverRequest, DriverMonitoring
+    verifiedby ref testcase TEST_TAKEOVER_REQUEST_001, TEST_DRIVER_RESPONSE_001
+
+  def safetymechanism WatchdogTimer
+    name "Independent Watchdog Timer Monitoring"
+    description """
+      Hardware-based independent watchdog timer monitors main processor execution. 
+      Main processor must reset watchdog every 100ms. If watchdog expires (processor 
+      lockup, software crash), triggers immediate safe state activation. Watchdog 
+      implemented in separate ASIC independent of main processor.
+      """
+    owner "System Architecture Safety Team"
+    tags "watchdog", "processor-monitoring", "lockup-detection"
+    mechanismtype Detection
+    safetylevel ASIL-D
+    safetymechanismeffectiveness "99.8%"
+    detectiontime 100
+    reactiontime 10
+    
+    satisfies ref requirement REQ_WATCHDOG_001, REQ_PROCESSOR_MONITORING_001
+    mitigates ref hazard ProcessorLockup, SoftwareCrash
+    allocatedto ref block VehicleControlModule
+    implementedby ref function WatchdogMonitoring, SafeStateActivation
+    detects ref failuremode ProcessorLockup, SoftwareDeadlock
+    verifiedby ref testcase TEST_WATCHDOG_TIMEOUT_001
+```
+
+---
+
+**Remember:** Use `hdef safetymechanismset` with ISO 26262 properties. Include complete mechanismtype (Detection|Control|Mitigation), effectiveness metrics, and timing properties. All relationships (satisfies, mitigates, allocatedto, implementedby, detects, verifiedby) allow multiple references. Complete traceability from hazards through mechanisms to requirements and tests is essential for safety case.

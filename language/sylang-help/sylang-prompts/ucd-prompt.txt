@@ -1,0 +1,775 @@
+# Use Case Diagram (.ucd) - AI Prompting Guide
+
+## Purpose
+Use Case Diagram files define actors and their interactions with system functions using clean flat syntax. UCD files capture how users (actors) interact with system capabilities (functions) and how functions include other functions, providing a clear view of system usage and functional relationships.
+
+## When to Use
+- During requirements analysis phase
+- When defining actor-function interactions
+- For system boundary and scope definition
+- During stakeholder communication
+- When mapping user interactions to system functions
+- For functional requirement validation
+
+## Key Syntax Elements
+```
+use functionset [functionset-ref]
+
+hdef usecaseset [identifier]
+  name [string-literal]
+  description [string-literal]
+  owner [string-literal]
+  tags [string-literal], [string-literal], ...
+  level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
+
+  def actor [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    actortype [primary|secondary]
+    
+  def usecase [identifier]
+    name [string-literal]
+    description [string-literal]
+    owner [string-literal]
+    from ref actor [actor-ref]  OR  from ref function [function-ref]
+    to ref function [function-ref]
+    connection [associated|includes]
+```
+
+## Valid Keywords
+```
+use, hdef, usecaseset, def, actor, usecase, name, description, owner, 
+tags, level, actortype, from, to, connection, associated, includes, when, ref
+```
+
+## Valid Values
+- **actortype**: `primary`, `secondary`
+  - primary = Initiates use cases, must be in `from` position
+  - secondary = Provides services, must be in `to` position
+
+- **connection**: `associated`, `includes`
+  - associated = Actor ↔ Function association
+  - includes = Function → Function inclusion
+
+- **level**: `system`, `subsystem`, `component`
+
+## CRITICAL Structure Rules
+- `hdef usecaseset` (consistent with requirementset, functionset, etc.)
+- Actors and use cases are defined flat under `hdef usecaseset`
+- Each `def usecase` contains its own `from/to/connection` relationships INSIDE the block
+- Actor-to-Function: `from ref actor` → `to ref function` → `connection associated`
+- Function-to-Function: `from ref function` → `to ref function` → `connection includes`
+- Primary actors MUST be in `from` position
+- Secondary actors MUST be in `to` position
+
+## Common Patterns
+
+### Actor Definition (Primary)
+```
+def actor ChairUser
+  name "Chair User"
+  description "Primary user who interacts with adjustment features"
+  owner "User Experience Team"
+  actortype primary
+```
+
+### Actor Definition (Secondary)
+```
+def actor ChairControlSystem
+  name "Chair Control System"
+  description "Electronic control system managing chair functions"
+  owner "Control Systems Team"
+  actortype secondary
+```
+
+### Use Case: Actor → Function (Associated)
+```
+def usecase UC_001
+  name "Initiate Chair System"
+  description "User initiates chair system operation"
+  owner "System Team"
+  from ref actor ChairUser
+  to ref function InitializeChairSystem
+  connection associated
+```
+
+### Use Case: Function → Function (Includes)
+```
+def usecase UC_003
+  name "Monitor Pneumatic Pressure"
+  description "System monitors gas cylinder pressure during adjustment"
+  owner "Control Team"
+  from ref function ExecutePneumaticHeightAdjustment
+  to ref function MonitorGasCylinderPressure
+  connection includes
+```
+
+---
+
+## Example Prompts
+
+### 1. Autonomous Vehicle Use Case Model
+```
+Create comprehensive .ucd file for Level 3 autonomous driving system.
+
+Context:
+- System: SAE Level 3 autonomous passenger vehicle
+- Functions: use functionset AutonomousDrivingFunctions
+- Actors: Driver (primary), VehicleControlSystem (secondary), TrafficSystem (secondary)
+- Level: system
+
+Use Case Set: AutonomousVehicleUseCases
+- Owner: "Requirements Team"
+- Description: Actor interactions with autonomous driving functions
+- Tags: "ISO-26262", "autonomous-vehicle", "use-cases"
+- Level: system
+
+Generate 15-20 use cases covering:
+
+ACTORS (Define 4 actors):
+1. Driver (primary)
+   - Description: Primary user who monitors system and takes control when needed
+   - Owner: "User Experience Team"
+
+2. Passenger (primary)
+   - Description: Vehicle passenger who may interact with comfort features
+   - Owner: "User Experience Team"
+
+3. VehicleControlSystem (secondary)
+   - Description: Internal control system managing vehicle functions
+   - Owner: "Control Systems Team"
+
+4. TrafficSystem (secondary)
+   - Description: External traffic management and V2X communication
+   - Owner: "Communication Team"
+
+USE CASES (Define 15-20 use cases):
+
+Actor → Function Interactions (10 use cases):
+1. UC_001: Initiate Autonomous Driving
+   - from ref actor: Driver
+   - to ref function: InitializeAutonomousDriving
+   - connection: associated
+   - Description: Driver initiates autonomous driving mode
+
+2. UC_002: Monitor Environment
+   - from ref actor: VehicleControlSystem
+   - to ref function: MonitorEnvironment
+   - connection: associated
+   - Description: System monitors surrounding environment
+
+3. UC_003: Plan Route
+   - from ref actor: Driver
+   - to ref function: PlanRoute
+   - connection: associated
+   - Description: Driver initiates route planning
+
+4. UC_004: Control Vehicle
+   - from ref actor: VehicleControlSystem
+   - to ref function: ControlVehicle
+   - connection: associated
+   - Description: System controls vehicle operation
+
+5. UC_005: Request Takeover
+   - from ref actor: VehicleControlSystem
+   - to ref function: RequestDriverTakeover
+   - connection: associated
+   - Description: System requests driver to take control
+
+6. UC_006: Execute Takeover
+   - from ref actor: Driver
+   - to ref function: ExecuteDriverTakeover
+   - connection: associated
+   - Description: Driver takes control of vehicle
+
+7. UC_007: Detect Collision Threat
+   - from ref actor: VehicleControlSystem
+   - to ref function: DetectCollisionThreat
+   - connection: associated
+   - Description: System detects potential collision
+
+8. UC_008: Apply Emergency Brake
+   - from ref actor: VehicleControlSystem
+   - to ref function: ApplyEmergencyBrake
+   - connection: associated
+   - Description: System applies emergency braking
+
+9. UC_009: Communicate with Traffic
+   - from ref actor: TrafficSystem
+   - to ref function: ExchangeTrafficData
+   - connection: associated
+   - Description: Exchange data with traffic management system
+
+10. UC_010: Adjust Vehicle Settings
+    - from ref actor: Passenger
+    - to ref function: AdjustComfortSettings
+    - connection: associated
+    - Description: Passenger adjusts comfort features
+
+Function → Function Inclusions (5-10 use cases):
+11. UC_011: Sensor Fusion Process
+    - from ref function: MonitorEnvironment
+    - to ref function: FuseSensorData
+    - connection: includes
+    - Description: Environment monitoring includes sensor fusion
+
+12. UC_012: Object Detection Process
+    - from ref function: MonitorEnvironment
+    - to ref function: DetectObjects
+    - connection: includes
+    - Description: Environment monitoring includes object detection
+
+13. UC_013: Path Planning Process
+    - from ref function: ControlVehicle
+    - to ref function: PlanPath
+    - connection: includes
+    - Description: Vehicle control includes path planning
+
+14. UC_014: Actuator Control Process
+    - from ref function: ControlVehicle
+    - to ref function: ControlActuators
+    - connection: includes
+    - Description: Vehicle control includes actuator control
+
+15. UC_015: Threat Assessment Process
+    - from ref function: DetectCollisionThreat
+    - to ref function: AssessThreatLevel
+    - connection: includes
+    - Description: Collision detection includes threat assessment
+
+File: AutonomousVehicleUseCases.ucd
+```
+
+### 2. Medical Device Use Case Model
+```
+Generate .ucd file for ICU patient monitoring system.
+
+System: Real-time vital signs monitoring (IEC 62304 Class C)
+Functions: use functionset PatientMonitoringFunctions
+Actors: Nurse (primary), Doctor (primary), MonitoringSystem (secondary)
+Level: system
+
+Use Case Set: PatientMonitoringUseCases
+- Owner: "Medical Device Team"
+- Description: Clinical staff interactions with patient monitoring functions
+- Tags: "IEC-62304", "medical-device", "patient-monitoring"
+- Level: system
+
+Generate 12 use cases:
+
+ACTORS (3 actors):
+1. Nurse (primary)
+   - Description: Primary clinical user monitoring patients
+   
+2. Doctor (primary)
+   - Description: Physician reviewing patient data and alarms
+
+3. MonitoringSystem (secondary)
+   - Description: Automated monitoring and alarm system
+
+USE CASES:
+
+Actor → Function (8 use cases):
+1. UC_001: Start Patient Monitoring
+   - from ref actor: Nurse
+   - to ref function: StartPatientMonitoring
+   - connection: associated
+
+2. UC_002: Configure Alarm Thresholds
+   - from ref actor: Nurse
+   - to ref function: ConfigureAlarmThresholds
+   - connection: associated
+
+3. UC_003: Monitor Vital Signs
+   - from ref actor: MonitoringSystem
+   - to ref function: MonitorVitalSigns
+   - connection: associated
+
+4. UC_004: Generate Alarm
+   - from ref actor: MonitoringSystem
+   - to ref function: GenerateAlarm
+   - connection: associated
+
+5. UC_005: Acknowledge Alarm
+   - from ref actor: Nurse
+   - to ref function: AcknowledgeAlarm
+   - connection: associated
+
+6. UC_006: Review Patient Data
+   - from ref actor: Doctor
+   - to ref function: ReviewPatientData
+   - connection: associated
+
+7. UC_007: Export Patient Data
+   - from ref actor: Doctor
+   - to ref function: ExportPatientData
+   - connection: associated
+
+8. UC_008: Perform System Maintenance
+   - from ref actor: Nurse
+   - to ref function: PerformSystemMaintenance
+   - connection: associated
+
+Function → Function (4 use cases):
+9. UC_009: Data Acquisition Process
+   - from ref function: MonitorVitalSigns
+   - to ref function: AcquireVitalSignData
+   - connection: includes
+
+10. UC_010: Alarm Evaluation Process
+    - from ref function: GenerateAlarm
+    - to ref function: EvaluateAlarmThresholds
+    - connection: includes
+
+11. UC_011: Staff Notification Process
+    - from ref function: GenerateAlarm
+    - to ref function: NotifyClinicalStaff
+    - connection: includes
+
+12. UC_012: Data Storage Process
+    - from ref function: MonitorVitalSigns
+    - to ref function: StorePatientData
+    - connection: includes
+
+File: PatientMonitoringUseCases.ucd
+```
+
+### 3. Aviation Flight Management Use Case Model
+```
+Create .ucd file for aircraft flight management system.
+
+Aircraft: Commercial transport flight management (DO-178C DAL-A)
+Functions: use functionset FlightManagementFunctions
+Actors: Pilot (primary), Co-pilot (primary), FlightManagementSystem (secondary), AirTrafficControl (secondary)
+Level: system
+
+Use Case Set: FlightManagementUseCases
+- Owner: "Avionics Team"
+- Description: Flight crew interactions with flight management functions
+- Tags: "DO-178C", "avionics", "flight-management"
+- Level: system
+
+Generate 12 use cases:
+
+ACTORS (4 actors):
+1. Pilot (primary)
+   - Description: Pilot in command operating flight management system
+
+2. Co-pilot (primary)
+   - Description: First officer assisting with flight management
+
+3. FlightManagementSystem (secondary)
+   - Description: Automated flight management computer
+
+4. AirTrafficControl (secondary)
+   - Description: External air traffic control providing clearances
+
+USE CASES:
+
+Actor → Function (8 use cases):
+1. UC_001: Enter Flight Plan
+   - from ref actor: Pilot
+   - to ref function: EnterFlightPlan
+   - connection: associated
+
+2. UC_002: Calculate Flight Path
+   - from ref actor: FlightManagementSystem
+   - to ref function: CalculateFlightPath
+   - connection: associated
+
+3. UC_003: Monitor Navigation
+   - from ref actor: FlightManagementSystem
+   - to ref function: MonitorNavigation
+   - connection: associated
+
+4. UC_004: Request ATC Clearance
+   - from ref actor: Pilot
+   - to ref function: RequestATCClearance
+   - connection: associated
+
+5. UC_005: Receive ATC Instructions
+   - from ref actor: AirTrafficControl
+   - to ref function: ProcessATCInstructions
+   - connection: associated
+
+6. UC_006: Modify Flight Plan
+   - from ref actor: Co-pilot
+   - to ref function: ModifyFlightPlan
+   - connection: associated
+
+7. UC_007: Monitor Fuel Management
+   - from ref actor: FlightManagementSystem
+   - to ref function: MonitorFuelManagement
+   - connection: associated
+
+8. UC_008: Display Navigation Data
+   - from ref actor: FlightManagementSystem
+   - to ref function: DisplayNavigationData
+   - connection: associated
+
+Function → Function (4 use cases):
+9. UC_009: Route Optimization Process
+   - from ref function: CalculateFlightPath
+   - to ref function: OptimizeRoute
+   - connection: includes
+
+10. UC_010: Position Calculation Process
+    - from ref function: MonitorNavigation
+    - to ref function: CalculatePosition
+    - connection: includes
+
+11. UC_011: Fuel Calculation Process
+    - from ref function: MonitorFuelManagement
+    - to ref function: CalculateFuelConsumption
+    - connection: includes
+
+12. UC_012: Deviation Monitoring Process
+    - from ref function: MonitorNavigation
+    - to ref function: DetectDeviationFromRoute
+    - connection: includes
+
+File: FlightManagementUseCases.ucd
+```
+
+### 4. Industrial Safety PLC Use Case Model
+```
+Generate .ucd file for safety PLC in manufacturing.
+
+Application: Production line safety controller (IEC 61508 SIL-3)
+Functions: use functionset SafetyPLCFunctions
+Actors: Operator (primary), MaintenanceTechnician (primary), SafetyController (secondary)
+Level: system
+
+Use Case Set: SafetyPLCUseCases
+- Owner: "Industrial Automation Team"
+- Description: Operator interactions with safety control functions
+- Tags: "IEC-61508", "safety-PLC", "industrial-automation"
+- Level: system
+
+Generate 10 use cases:
+
+ACTORS (3 actors):
+1. Operator (primary)
+   - Description: Machine operator working with production line
+
+2. MaintenanceTechnician (primary)
+   - Description: Technician performing maintenance and diagnostics
+
+3. SafetyController (secondary)
+   - Description: Automated safety monitoring and control system
+
+USE CASES:
+
+Actor → Function (7 use cases):
+1. UC_001: Start Machine
+   - from ref actor: Operator
+   - to ref function: StartMachine
+   - connection: associated
+
+2. UC_002: Emergency Stop
+   - from ref actor: Operator
+   - to ref function: EmergencyStop
+   - connection: associated
+
+3. UC_003: Monitor Safety Inputs
+   - from ref actor: SafetyController
+   - to ref function: MonitorSafetyInputs
+   - connection: associated
+
+4. UC_004: Control Safety Outputs
+   - from ref actor: SafetyController
+   - to ref function: ControlSafetyOutputs
+   - connection: associated
+
+5. UC_005: Reset Safety System
+   - from ref actor: Operator
+   - to ref function: ResetSafetySystem
+   - connection: associated
+
+6. UC_006: Run Diagnostics
+   - from ref actor: MaintenanceTechnician
+   - to ref function: RunDiagnostics
+   - connection: associated
+
+7. UC_007: Configure Safety Parameters
+   - from ref actor: MaintenanceTechnician
+   - to ref function: ConfigureSafetyParameters
+   - connection: associated
+
+Function → Function (3 use cases):
+8. UC_008: Safety Logic Evaluation
+   - from ref function: MonitorSafetyInputs
+   - to ref function: EvaluateSafetyLogic
+   - connection: includes
+
+9. UC_009: Fault Detection Process
+   - from ref function: RunDiagnostics
+   - to ref function: DetectFaults
+   - connection: includes
+
+10. UC_010: Safe State Management
+    - from ref function: EmergencyStop
+    - to ref function: EnterSafeState
+    - connection: includes
+
+File: SafetyPLCUseCases.ucd
+```
+
+### 5. Generic Use Case Model Template
+```
+Create .ucd file for {SYSTEM_NAME} use case model.
+
+Context:
+- System: {SYSTEM_DESCRIPTION}
+- Functions: use functionset {FUNCTIONSET_NAME}
+- Actors: {ACTOR_LIST}
+- Level: {system|subsystem|component}
+
+Use Case Set: {USECASESET_IDENTIFIER}
+- Owner: "{OWNER_NAME}"
+- Description: {DESCRIPTION}
+- Tags: "{TAG1}", "{TAG2}", "{TAG3}"
+- Level: {LEVEL}
+
+Generate {NUMBER} use cases:
+
+ACTORS (Define {NUMBER} actors):
+1. {ACTOR_1_NAME} ({primary|secondary})
+   - name: "{ACTOR_1_TITLE}"
+   - description: "{ACTOR_1_DESCRIPTION}"
+   - owner: "{ACTOR_1_OWNER}"
+   - actortype: {primary|secondary}
+
+2. {ACTOR_2_NAME} ({primary|secondary})
+   - name: "{ACTOR_2_TITLE}"
+   - description: "{ACTOR_2_DESCRIPTION}"
+   - owner: "{ACTOR_2_OWNER}"
+   - actortype: {primary|secondary}
+
+USE CASES:
+
+Actor → Function Interactions ({NUMBER} use cases):
+1. {UC_ID_1}: {USE_CASE_NAME_1}
+   - name: "{USE_CASE_TITLE}"
+   - description: "{USE_CASE_DESCRIPTION}"
+   - owner: "{USE_CASE_OWNER}"
+   - from ref actor: {ACTOR_NAME}
+   - to ref function: {FUNCTION_NAME}
+   - connection: associated
+
+Function → Function Inclusions ({NUMBER} use cases):
+N. {UC_ID_N}: {USE_CASE_NAME_N}
+   - name: "{USE_CASE_TITLE}"
+   - description: "{USE_CASE_DESCRIPTION}"
+   - owner: "{USE_CASE_OWNER}"
+   - from ref function: {SOURCE_FUNCTION}
+   - to ref function: {TARGET_FUNCTION}
+   - connection: includes
+
+File: {SYSTEM_NAME}UseCases.ucd
+```
+
+---
+
+## Validation Checklist
+
+After AI generation, verify:
+
+### Structure & Syntax
+- [ ] Single `hdef usecaseset` per file (consistent with requirementset, functionset, etc.)
+- [ ] `use functionset` statement at top
+- [ ] All `def actor` and `def usecase` are flat under `hdef usecaseset`
+- [ ] Each `def usecase` contains `from/to/connection` INSIDE the block
+- [ ] Proper indentation (2 spaces per level)
+- [ ] No syntax errors (check VSCode diagnostics)
+
+### Use Case Model Properties
+- [ ] Model has unique identifier
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains model purpose
+- [ ] `owner` identified
+- [ ] `tags` facilitate classification
+- [ ] `level` specified (system|subsystem|component)
+
+### Actor Properties
+- [ ] Each actor has unique identifier
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains actor role
+- [ ] `owner` identified
+- [ ] `actortype` specified (primary|secondary)
+- [ ] Primary actors initiate interactions (in `from` position)
+- [ ] Secondary actors provide services (in `to` position)
+
+### Use Case Properties
+- [ ] Each use case has unique identifier (e.g., UC_001, UC_002, ...)
+- [ ] `name` is specific and descriptive
+- [ ] `description` explains interaction
+- [ ] `owner` identified
+- [ ] `from ref actor` OR `from ref function` specified
+- [ ] `to ref function` specified
+- [ ] `connection` specified (associated|includes)
+- [ ] Actor-to-Function uses `connection associated`
+- [ ] Function-to-Function uses `connection includes`
+
+### Relationships
+- [ ] All referenced actors exist
+- [ ] All referenced functions exist (in functionset)
+- [ ] Primary actors only in `from` position
+- [ ] Secondary actors only in `to` position
+- [ ] `connection associated` only for actor ↔ function
+- [ ] `connection includes` only for function → function
+
+### Completeness
+- [ ] All major actors included
+- [ ] All major actor-function interactions covered
+- [ ] Function inclusions documented
+- [ ] No missing use case categories
+
+---
+
+## Common Pitfalls
+
+❌ **Avoid:**
+- Using `hdef usecasediagram` or `hdef usecase` (it's `hdef usecaseset`!)
+- Adding properties that don't exist: `safetylevel`, `priority`, `complexity`, `preconditions`, `postconditions`, `role`, `responsibilities`
+- Adding relations that don't exist: `interacts`, `extends`, `generalizes`, `implements`
+- Placing `from/to/connection` outside `def usecase` blocks
+- Using `to ref usecase` instead of `to ref function`
+- Mixing actor types (primary in `to` position, secondary in `from` position)
+- Using `connection associated` for function-to-function
+- Using `connection includes` for actor-to-function
+- Nesting actors or use cases incorrectly
+
+✅ **Best Practices:**
+- Use `hdef usecaseset` (consistent with other file types!)
+- Define actors and use cases flat under `hdef usecaseset`
+- Put `from/to/connection` INSIDE each `def usecase` block
+- Primary actors initiate (use `from ref actor`)
+- Secondary actors provide services
+- Actor-to-Function: `connection associated`
+- Function-to-Function: `connection includes`
+- Reference functions from functionset (use `use functionset`)
+- Use descriptive actor and use case names
+- Clear owner assignments for traceability
+
+---
+
+## Example Generated Use Case Model (Target Quality)
+
+```sylang
+use functionset ChairSystemFunctions
+
+hdef usecaseset ChairSystemUseCases
+  name "Height Adjustable Chair Use Cases"
+  description """
+    Use case model describing user interactions with height adjustable 
+    chair system. Covers pneumatic and electric adjustment mechanisms, 
+    safety monitoring, and system control functions.
+    """
+  owner "Systems Engineering Team"
+  tags "chair-system", "height-adjustment", "user-interaction"
+  level system
+
+  def actor ChairUser
+    name "Chair User"
+    description "Primary user who interacts with chair adjustment features"
+    owner "User Experience Team"
+    actortype primary
+
+  def actor MaintenanceTechnician
+    name "Maintenance Technician"
+    description "Technician performing chair maintenance and calibration"
+    owner "Maintenance Team"
+    actortype primary
+
+  def actor ChairControlSystem
+    name "Chair Control System"
+    description "Electronic control system managing chair functions"
+    owner "Control Systems Team"
+    actortype secondary
+
+  def usecase UC_001
+    name "Initiate Chair System"
+    description "User initiates chair system operation by powering on control system"
+    owner "System Team"
+    from ref actor ChairUser
+    to ref function InitializeChairSystem
+    connection associated
+
+  def usecase UC_002
+    name "Execute Pneumatic Height Adjustment"
+    description "User performs height adjustment using pneumatic lever mechanism"
+    owner "Adjustment Team"
+    from ref actor ChairUser
+    to ref function ExecutePneumaticHeightAdjustment
+    connection associated
+
+  def usecase UC_003
+    name "Monitor Pneumatic Pressure"
+    description "System monitors gas cylinder pressure during pneumatic adjustment"
+    owner "Control Team"
+    from ref function ExecutePneumaticHeightAdjustment
+    to ref function MonitorGasCylinderPressure
+    connection includes
+
+  def usecase UC_004
+    name "Verify Position Limits"
+    description "System verifies height is within allowable position limits"
+    owner "Safety Team"
+    from ref function ExecutePneumaticHeightAdjustment
+    to ref function VerifyHeightLimits
+    connection includes
+
+  def usecase UC_005
+    name "Execute Electric Height Adjustment"
+    description "User performs height adjustment using electric motor control"
+    owner "Adjustment Team"
+    from ref actor ChairUser
+    to ref function ExecuteElectricHeightAdjustment
+    connection associated
+
+  def usecase UC_006
+    name "Control Adjustment Motor"
+    description "Electric adjustment includes motor control for height positioning"
+    owner "Control Team"
+    from ref function ExecuteElectricHeightAdjustment
+    to ref function ControlHeightAdjustmentMotor
+    connection includes
+
+  def usecase UC_007
+    name "Monitor Motor Current"
+    description "System monitors motor current during electric adjustment"
+    owner "Control Team"
+    from ref function ExecuteElectricHeightAdjustment
+    to ref function MonitorMotorCurrent
+    connection includes
+
+  def usecase UC_008
+    name "Detect Safety Hazards"
+    description "Control system continuously monitors for safety hazards"
+    owner "Safety Team"
+    from ref actor ChairControlSystem
+    to ref function DetectSafetyHazards
+    connection associated
+
+  def usecase UC_009
+    name "Perform System Maintenance"
+    description "Technician performs scheduled maintenance and calibration"
+    owner "Maintenance Team"
+    from ref actor MaintenanceTechnician
+    to ref function PerformSystemMaintenance
+    connection associated
+
+  def usecase UC_010
+    name "Calibrate Position Sensors"
+    description "Maintenance includes calibration of height position sensors"
+    owner "Maintenance Team"
+    from ref function PerformSystemMaintenance
+    to ref function CalibrateHeightSensors
+    connection includes
+```
+
+---
+
+**Remember:** Use Case files show actor-function interactions and function inclusions. Structure is `hdef usecaseset` with flat `def actor` and `def usecase` definitions. Each `def usecase` contains `from/to/connection` relationships inside the block. Actor-to-Function uses `connection associated`, Function-to-Function uses `connection includes`. Primary actors initiate (from), secondary actors provide services (to).

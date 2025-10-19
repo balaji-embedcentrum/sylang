@@ -1,0 +1,447 @@
+# Dashboard (.dash) - AI Prompting Guide
+
+## Purpose
+Dashboard files create interactive, real-time dashboards with metrics, charts, and tables. They provide visual insights into project status, requirements coverage, test results, safety analysis, and sprint progress using grid-based layouts and Chart.js visualizations.
+
+## When to Use
+- Project status dashboards
+- Requirements coverage tracking
+- Test results monitoring
+- Safety analysis dashboards
+- Sprint/Kanban boards
+- Failure mode analysis
+- Traceability metrics
+- Executive summaries
+- Real-time project insights
+
+## Key Syntax Elements
+```
+use requirementset [requirementset-ref]
+use testset [testset-ref]
+
+hdef dashboard [identifier]
+  name [string-literal]
+  owner [string-literal]
+  version [string-literal]
+  grid [rows]x[cols]    # Required, e.g., grid 3x4
+
+  def metric [identifier]
+    name [string-literal]
+    type [count|percentage|sum|avg|min|max|gauge|trend]
+    property [property-name]    # For sum, avg, min, max
+    span [rows]x[cols]
+    source ref [nodetype] [identifier]
+    where [filter-clause]
+  
+  def chart [identifier]
+    name [string-literal]
+    type [bar|line|pie|scatter|gauge]
+    xaxis [string-literal]
+    yaxis [string-literal]
+    span [rows]x[cols]
+    source ref [nodetype] [identifier]
+    groupby [property]    # Required for charts
+    where [filter-clause]
+  
+  def table [identifier]
+    name [string-literal]
+    span [rows]x[cols]
+    source ref [nodetype] [identifier]
+    where [filter-clause]
+    columns [property], [property], ...
+```
+
+## Metric Types
+- **count**: Count items (e.g., total requirements)
+- **percentage**: Percentage of filtered vs total
+- **sum**: Sum numeric property (requires `property`)
+- **avg**: Average numeric property (requires `property`)
+- **min**: Minimum value (requires `property`)
+- **max**: Maximum value (requires `property`)
+- **gauge**: Display as gauge (0-100)
+- **trend**: Show trend over time
+
+## Chart Types
+- **bar**: Bar chart (requires `groupby`)
+- **line**: Line chart (requires `groupby`)
+- **pie**: Pie chart (requires `groupby`)
+- **scatter**: Scatter plot
+- **gauge**: Gauge visualization
+
+## Grid Layout
+- Define grid: `grid 3x4` (3 rows, 4 columns = 12 cells)
+- Widgets placed left-to-right, top-to-bottom
+- Use `span` to make widgets larger: `span 1x2`, `span 2x2`
+
+## AI Generation Guidelines
+
+### 1. Project Status Dashboard
+Key metrics at top, charts in middle, tables at bottom:
+- Total counts (requirements, tests, functions)
+- Approval/completion percentages
+- Status distribution charts
+- Detailed tables for drill-down
+
+Example prompt:
+"Create project status dashboard with total requirements, approved percentage, test pass rate, requirements by type chart, and active issues table"
+
+### 2. Safety Dashboard
+Focus on safety-critical items:
+- ASIL-D requirement count
+- Critical failure modes count
+- Average RPN metric
+- Failure modes by severity chart
+- High-risk failures table
+
+Example prompt:
+"Generate safety dashboard showing ASIL-D requirements, critical failures (severity S2/S3), RPN distribution chart, and high-risk items table"
+
+### 3. Test Coverage Dashboard
+Track testing progress:
+- Total tests count
+- Pass/fail percentages
+- Test results chart (pie or bar)
+- Failed tests table
+- Coverage by test level
+
+Example prompt:
+"Create test dashboard with total tests, pass percentage, results by test level chart, and failed tests table"
+
+### 4. Sprint Dashboard
+Agile/Scrum metrics:
+- Total story points
+- Completed points
+- In-progress count
+- Burndown chart
+- Tasks by status table
+
+Example prompt:
+"Generate sprint dashboard with story points metrics, burndown chart, tasks by priority, and active tasks table"
+
+## Best Practices for AI
+
+1. **Plan Grid Size**: Choose grid based on number of widgets (3x4 or 4x4 common)
+2. **Metrics First**: Place key metrics at top
+3. **Visualize Trends**: Use charts for distributions and trends
+4. **Tables for Details**: Use tables for drill-down data
+5. **Span Strategically**: Span important widgets for emphasis
+6. **Filter Appropriately**: Show only relevant data
+7. **Group for Insights**: Use groupby for categorization
+8. **Consistent Naming**: Use clear, descriptive names
+9. **Logical Layout**: Organize widgets logically
+10. **Export-Ready**: Structure for sharing and presentations
+
+## Common Patterns
+
+### Pattern 1: Executive Dashboard
+```
+grid 2x4
+
+# Top row: Key metrics
+def metric TotalReqs
+  type count
+  source requirementset SystemReqs
+
+def metric ApprovedReqs
+  type count
+  source requirementset SystemReqs
+  where status = approved
+
+def metric TestsPassed
+  type count
+  source testcaseset SystemTests
+  where testresult = pass
+
+def metric Coverage
+  type percentage
+  source testcaseset SystemTests
+  where testresult = pass
+
+# Bottom row: Charts
+def chart ReqsByType
+  type pie
+  span 1x2
+  source requirementset SystemReqs
+  groupby reqtype
+
+def chart TestResults
+  type bar
+  span 1x2
+  source testcaseset SystemTests
+  groupby testresult
+```
+
+### Pattern 2: Safety Dashboard
+```
+grid 3x3
+
+# Metrics
+def metric ASILDCount
+  type count
+  source requirementset SystemReqs
+  where safetylevel = ASIL-D
+
+def metric CriticalFailures
+  type count
+  source failuremodeset SystemFailures
+  where severity = S3
+
+def metric AvgRPN
+  type avg
+  property rpn
+  source failuremodeset SystemFailures
+
+# Charts
+def chart FailuresBySeverity
+  type bar
+  span 1x2
+  groupby severity
+  source failuremodeset SystemFailures
+
+def chart SafetyReqsStatus
+  type pie
+  span 1x2
+  groupby status
+  source requirementset SystemReqs
+  where safetylevel in [ASIL-C, ASIL-D]
+
+# Table
+def table HighRiskFailures
+  span 1x3
+  source failuremodeset SystemFailures
+  where rpn > 100
+  orderby rpn desc
+  columns identifier, name, severity, rpn, mitigatedby
+```
+
+### Pattern 3: Test Coverage Dashboard
+```
+grid 3x4
+
+# Metrics
+def metric TotalTests
+  type count
+  source testcaseset SystemTests
+
+def metric PassedTests
+  type count
+  source testcaseset SystemTests
+  where testresult = pass
+
+def metric FailedTests
+  type count
+  source testcaseset SystemTests
+  where testresult = fail
+
+def metric PassRate
+  type percentage
+  source testcaseset SystemTests
+  where testresult = pass
+
+# Charts
+def chart ResultsByLevel
+  type bar
+  span 1x2
+  xaxis "Test Level"
+  yaxis "Count"
+  source testcaseset SystemTests
+  groupby testlevel
+
+def chart ResultsDistribution
+  type pie
+  span 1x2
+  source testcaseset SystemTests
+  groupby testresult
+
+# Tables
+def table FailedTests
+  span 1x2
+  source testcaseset SystemTests
+  where testresult = fail
+  columns identifier, name, testlevel, method
+
+def table InTestTests
+  span 1x2
+  source testcaseset SystemTests
+  where testresult = intest
+  columns identifier, name, testlevel, satisfies
+```
+
+### Pattern 4: Sprint Dashboard
+```
+grid 3x4
+
+# Metrics
+def metric TotalPoints
+  type sum
+  property points
+  source sprintset CurrentSprint
+
+def metric CompletedPoints
+  type sum
+  property points
+  source sprintset CurrentSprint
+  where issuestatus = done
+
+def metric InProgress
+  type count
+  source sprintset CurrentSprint
+  where issuestatus = inprogress
+
+def metric Blocked
+  type count
+  source sprintset CurrentSprint
+  where issuestatus = blocked
+
+# Charts
+def chart BurndownChart
+  type line
+  span 1x2
+  xaxis "Day"
+  yaxis "Points"
+  source sprintset CurrentSprint
+  groupby issuestatus
+
+def chart TasksByPriority
+  type pie
+  span 1x2
+  source sprintset CurrentSprint
+  groupby priority
+
+# Tables
+def table ActiveTasks
+  span 1x2
+  source sprintset CurrentSprint
+  where issuestatus in [open, inprogress]
+  orderby priority desc
+  columns identifier, name, issuestatus, priority, assignedto
+
+def table CompletedTasks
+  span 1x2
+  source sprintset CurrentSprint
+  where issuestatus = done
+  orderby identifier asc
+  columns identifier, name, points, assignedto
+```
+
+## Validation Rules
+- Must have `hdef dashboard`
+- Must have `grid` definition
+- Metric `type` must be valid (count, percentage, sum, avg, min, max, gauge, trend)
+- Chart `type` must be valid (bar, line, pie, scatter, gauge)
+- Charts must have `groupby`
+- sum/avg/min/max metrics must have `property`
+- `source` must specify valid nodetype and identifier
+- `span` format must be `[rows]x[cols]`
+
+## Output Format
+- Renders as interactive dashboard
+- Grid-based layout
+- Chart.js visualizations
+- Responsive design
+- Real-time data updates
+- Export to HTML
+
+## Tips for AI Code Generation
+1. Always include `use` statements
+2. Calculate grid size: rows × cols ≥ number of widgets
+3. Place metrics at top (first row)
+4. Use charts for visualization (middle rows)
+5. Use tables for details (bottom rows)
+6. Span important widgets (1x2 or 2x2)
+7. Use meaningful identifiers
+8. Add xaxis/yaxis labels for charts
+9. Filter data appropriately
+10. Group data for insights
+11. Sort tables for readability
+12. Include relevant columns
+13. Use percentage metrics for KPIs
+14. Use gauge for progress indicators
+15. Use pie charts for distributions
+
+## Widget Placement Strategy
+```
+Grid 3x4 (12 cells):
+Row 1: [Metric1] [Metric2] [Metric3] [Metric4]
+Row 2: [Chart1 (span 1x2)] [Chart2 (span 1x2)]
+Row 3: [Table1 (span 1x2)] [Table2 (span 1x2)]
+
+Grid 4x4 (16 cells):
+Row 1: [M1] [M2] [M3] [M4]
+Row 2: [M5] [M6] [Chart1 (span 2x2)]
+Row 3: [M7] [M8] [continues]
+Row 4: [Table1 (span 1x4)]
+```
+
+## Example Complete Dashboard
+```
+use requirementset VehicleRequirements
+use testcaseset VehicleTests
+use failuremodeset VehicleFailures
+
+hdef dashboard VehicleProjectDashboard
+  name "Vehicle Project Dashboard"
+  description "Real-time project status and metrics"
+  owner "Project Management"
+  version "1.0"
+  grid 3x4
+
+  # Row 1: Key Metrics
+  def metric TotalReqs
+    name "Total Requirements"
+    type count
+    source requirementset VehicleRequirements
+  
+  def metric ApprovedReqs
+    name "Approved"
+    type count
+    source requirementset VehicleRequirements
+    where status = approved
+  
+  def metric TestsPassed
+    name "Tests Passed"
+    type count
+    source testcaseset VehicleTests
+    where testresult = pass
+  
+  def metric TestCoverage
+    name "Coverage %"
+    type percentage
+    source testcaseset VehicleTests
+    where testresult = pass
+
+  # Row 2: Charts
+  def chart ReqsByType
+    name "Requirements by Type"
+    type pie
+    span 1x2
+    source requirementset VehicleRequirements
+    groupby reqtype
+  
+  def chart TestResults
+    name "Test Results"
+    type bar
+    xaxis "Result"
+    yaxis "Count"
+    span 1x2
+    source testcaseset VehicleTests
+    groupby testresult
+
+  # Row 3: Tables
+  def table CriticalFailures
+    name "Critical Failure Modes"
+    span 1x2
+    source failuremodeset VehicleFailures
+    where severity in [S2, S3]
+    orderby rpn desc
+    columns identifier, name, severity, rpn
+  
+  def table FailedTests
+    name "Failed Tests"
+    span 1x2
+    source testcaseset VehicleTests
+    where testresult = fail
+    orderby identifier asc
+    columns identifier, name, testlevel, method
+```
+
