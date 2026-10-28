@@ -1,5 +1,7 @@
 # Function Definition (.fun) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Function files define behavioral specifications and system functionality independent of physical architecture. Functions describe WHAT the system must do without specifying WHERE (which block) it will execute. This separation enables function reuse, architecture flexibility, and clear allocation traceability from requirements through implementation.
 
@@ -30,10 +32,12 @@ def function [identifier]
   
   # Functional interfaces (behavior, not implementation)
   needs ref operation|signal [refs]      # Functional inputs
+  needs ref operation|signal [ref] [left|right]  # Optional: control port placement (default: needs → left)
   provides ref operation|signal [refs]   # Functional outputs
+  provides ref operation|signal [ref] [left|right]  # Optional: control port placement (default: provides → right)
   
   # Traceability
-  implements ref requirement [refs]      # Which requirements this function satisfies
+  implementedby ref requirement [refs]      # Which requirements this function satisfies
   
   # Nested decomposition
   def function [nested-function]
@@ -574,19 +578,19 @@ use interfaceset ADASInterfaces
 use interfaceset VehicleInterfaces
 
 hdef functionset AutonomousEmergencyBrakingFunctions
-  name "Autonomous Emergency Braking Function Set"
+  name """Autonomous Emergency Braking Function Set"""
   description """
     Complete functional specification for ASIL-D autonomous emergency braking 
     system. Implements collision avoidance through sensor fusion, threat assessment, 
     and automated braking intervention. Covers forward collision scenarios at 
     speeds 5-80 km/h with stationary and moving objects per Euro NCAP protocols.
     """
-  owner "ADAS Functions Engineering Team"
-  tags "AEB", "collision-avoidance", "ASIL-D", "autonomous-braking"
+  owner """ADAS Functions Engineering Team"""
+  tags """AEB""", """collision-avoidance""", """ASIL-D""", """autonomous-braking"""
   safetylevel ASIL-D
 
   def function EnvironmentalPerception
-    name "Multi-Sensor Environmental Perception"
+    name """Multi-Sensor Environmental Perception"""
     description """
       Fuses data from camera, radar, and lidar sensors to create comprehensive 
       360-degree environmental model. Detects and classifies objects (vehicles, 
@@ -594,8 +598,8 @@ hdef functionset AutonomousEmergencyBrakingFunctions
       trajectory prediction. Implements sensor-level plausibility checks and 
       fault detection per ISO 26262. Updates environment model at 20 Hz.
       """
-    owner "Perception Team"
-    tags "sensor-fusion", "object-detection", "ASIL-D"
+    owner """Perception Team"""
+    tags """sensor-fusion""", """object-detection""", """ASIL-D"""
     safetylevel ASIL-D
     
     needs ref operation ReceiveRawCameraFrames
@@ -607,42 +611,42 @@ hdef functionset AutonomousEmergencyBrakingFunctions
     provides ref operation DetectedObjectList
     provides ref signal PerceptionConfidence
     
-    implements ref requirement REQ_AEB_001
-    implements ref requirement REQ_AEB_001_1
-    implements ref requirement REQ_AEB_001_2
+    implementedby ref requirement REQ_AEB_001
+    implementedby ref requirement REQ_AEB_001_1
+    implementedby ref requirement REQ_AEB_001_2
 
     def function CameraProcessing
-      name "Camera-Based Object Detection"
+      name """Camera-Based Object Detection"""
       description """
         Processes front-facing camera images using deep learning (YOLO/SSD) 
         for object detection and classification. Detects lane markings, 
         traffic signs, vehicles, pedestrians. Provides 2D bounding boxes 
         and object classification confidence. Runs on GPU at 30 fps.
         """
-      owner "Computer Vision Team"
+      owner """Computer Vision Team"""
       safetylevel ASIL-D
       needs ref operation ReceiveRawCameraFrames
       provides ref operation DetectedObjects_Camera
       provides ref operation DetectedLanes
-      implements ref requirement REQ_AEB_001_1
+      implementedby ref requirement REQ_AEB_001_1
 
     def function RadarProcessing
-      name "Radar-Based Object Tracking"
+      name """Radar-Based Object Tracking"""
       description """
         Processes 77 GHz FMCW radar returns for object detection and velocity 
         measurement. Provides range, range-rate (Doppler), and azimuth angle. 
         All-weather operation (rain, fog, snow). Track-while-scan algorithm 
         for multiple object tracking. Updates at 50 Hz.
         """
-      owner "Radar Signal Processing Team"
+      owner """Radar Signal Processing Team"""
       safetylevel ASIL-D
       needs ref operation ReceiveRadarReflections
       provides ref operation DetectedObjects_Radar
       provides ref signal RadarTargets
-      implements ref requirement REQ_AEB_001_2
+      implementedby ref requirement REQ_AEB_001_2
 
     def function SensorFusion
-      name "Multi-Sensor Data Fusion"
+      name """Multi-Sensor Data Fusion"""
       description """
         Fuses camera, radar, and lidar detections using Extended Kalman Filter 
         (EKF) to create unified object list. Handles sensor conflicts, data 
@@ -650,25 +654,25 @@ hdef functionset AutonomousEmergencyBrakingFunctions
         acceleration, and trajectory prediction for each object. ASIL-D 
         implementation with cross-sensor plausibility checks.
         """
-      owner "Sensor Fusion Team"
+      owner """Sensor Fusion Team"""
       safetylevel ASIL-D
       needs ref operation DetectedObjects_Camera
       needs ref operation DetectedObjects_Radar
       needs ref operation DetectedObjects_Lidar
       provides ref operation FusedObjectList
       provides ref operation EnvironmentModel
-      implements ref requirement REQ_AEB_001_4
+      implementedby ref requirement REQ_AEB_001_4
 
   def function ThreatAssessment
-    name "Collision Threat Assessment"
+    name """Collision Threat Assessment"""
     description """
       Evaluates collision risk for all detected objects based on time-to-collision 
       (TTC), predicted trajectories, and vehicle dynamics. Computes threat level 
       (none, low, medium, high, critical) and time-to-intervention. Considers 
       driver inputs (steering, braking) to avoid false positives. Updates at 20 Hz.
       """
-    owner "Decision Logic Team"
-    tags "threat-assessment", "TTC", "ASIL-D"
+    owner """Decision Logic Team"""
+    tags """threat-assessment""", """TTC""", """ASIL-D"""
     safetylevel ASIL-D
     
     needs ref operation FusedObjectList
@@ -678,19 +682,19 @@ hdef functionset AutonomousEmergencyBrakingFunctions
     provides ref signal TimeToCollision
     provides ref signal CollisionProbability
     
-    implements ref requirement REQ_AEB_002
-    implements ref requirement REQ_AEB_002_1
+    implementedby ref requirement REQ_AEB_002
+    implementedby ref requirement REQ_AEB_002_1
 
   def function BrakingDecision
-    name "Emergency Braking Decision Logic"
+    name """Emergency Braking Decision Logic"""
     description """
       Determines when and how to apply emergency braking based on threat level 
       and driver responsiveness. Three-stage intervention: (1) Driver warning, 
       (2) Brake pre-fill, (3) Full emergency braking. Considers driver override 
       (accelerator pedal) to prevent unintended activation. Decision latency <50ms.
       """
-    owner "Control Logic Team"
-    tags "braking-decision", "ASIL-D", "intervention"
+    owner """Control Logic Team"""
+    tags """braking-decision""", """ASIL-D""", """intervention"""
     safetylevel ASIL-D
     
     needs ref operation CollisionThreat
@@ -701,8 +705,8 @@ hdef functionset AutonomousEmergencyBrakingFunctions
     provides ref signal BrakingLevel
     provides ref signal InterventionStage
     
-    implements ref requirement REQ_AEB_003
-    implements ref requirement REQ_AEB_003_1
+    implementedby ref requirement REQ_AEB_003
+    implementedby ref requirement REQ_AEB_003_1
 ```
 
 ---

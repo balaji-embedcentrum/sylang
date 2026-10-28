@@ -1,5 +1,7 @@
 # Fault Tree Analysis (.fta) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Fault Tree Analysis files define quantitative fault tree analysis with hierarchical gate structures. Part of ISO 26262 Part 4 compliance. FTA provides top-down deductive analysis from system-level failures down to component-level faults, supporting quantitative safety assessment and diagnostic coverage requirements.
 
@@ -96,7 +98,7 @@ Context:
 
 Fault Tree: BrakeSystemFaultTree (ASIL-D)
 - Top Event: VehicleCollisionDueToBrakeFailure
-- Owner: "Brake System Safety Analysis Team"
+- Owner: """Brake System Safety Analysis Team"""
 - Assessment Date: 2025-10-05
 
 Top-Level Gate Structure:
@@ -156,7 +158,7 @@ Standards: IEC 62304 SIL-3, ISO 14971
 
 Fault Tree: InfusionPumpFaultTree (SIL-3)
 - Top Event: PatientOverdoseDueToInfusionError
-- Owner: "Medical Device Safety Team"
+- Owner: """Medical Device Safety Team"""
 
 Medical-specific considerations:
 - Single point failures unacceptable (AND gates required)
@@ -213,7 +215,7 @@ Certification: DO-178C DAL-A, FAR Part 25
 
 Fault Tree: FlightControlFaultTree (DAL-A)
 - Top Event: LossOfAircraftControlAuthority
-- Owner: "Flight Control Safety Team"
+- Owner: """Flight Control Safety Team"""
 
 Aviation-specific considerations:
 - Triple/quadruple redundancy (AND gates with 3-4 inputs)
@@ -278,7 +280,7 @@ Standards: IEC 61508 SIL-3, IEC 61511
 
 Fault Tree: SafetyPLCFaultTree (SIL-3)
 - Top Event: UnprotectedMachineOperation
-- Owner: "Industrial Safety Team"
+- Owner: """Industrial Safety Team"""
 
 Industrial-specific considerations:
 - Dual-channel architecture (AND gates)
@@ -336,7 +338,7 @@ Context:
 
 Fault Tree: {FAULTTREE_NAME} ({SAFETY_LEVEL})
 - Top Event: ref failuremode {TOPEVENT_FAILUREMODE}
-- Owner: "{OWNER_NAME}"
+- Owner: """{OWNER_NAME}"""
 
 Gate Structure:
 
@@ -447,7 +449,7 @@ use hazardanalysis AutonomousVehicleHazards
 use safetymechanismset AutonomousVehicleSafetyMechanisms
 
 hdef faulttree VehicleCollisionFaultTree
-  name "Vehicle Collision Fault Tree Analysis"
+  name """Vehicle Collision Fault Tree Analysis"""
   description """
     Complete fault tree analysis for vehicle collision scenarios in autonomous 
     operation per ISO 26262 Part 4. Top event is collision due to system failure. 
@@ -455,14 +457,14 @@ hdef faulttree VehicleCollisionFaultTree
     top-level collision event. Includes quantitative probability analysis and 
     diagnostic coverage assessment.
     """
-  owner "Safety Analysis Team"
-  tags "fault-tree", "collision-analysis", "quantitative-fta", "ASIL-D"
+  owner """Safety Analysis Team"""
+  tags """fault-tree""", """collision-analysis""", """quantitative-fta""", """ASIL-D"""
   safetylevel ASIL-D
   
   topevent ref failuremode VehicleCollisionEvent
   
   def gate SystemLevelFailure
-    name "System-Level Collision Failure"
+    name """System-Level Collision Failure"""
     description """
       Top-level gate analyzing all system failures that can lead to vehicle collision. 
       OR gate because any one of these major subsystem failures can cause collision.
@@ -478,7 +480,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block AutonomousVehicleSystem
 
   def gate PerceptionFailure
-    name "Perception System Complete Failure"
+    name """Perception System Complete Failure"""
     description """
       Perception system fails to detect obstacles or misclassifies objects. 
       OR gate because any of these sensor/processing failures causes perception loss.
@@ -493,7 +495,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block PerceptionControlModule
 
   def gate SensorFusionFailure
-    name "Sensor Fusion Complete Failure"
+    name """Sensor Fusion Complete Failure"""
     description """
       All redundant sensors fail simultaneously (worst case). AND gate models 
       triple sensor redundancy - all three must fail for complete sensor loss.
@@ -508,7 +510,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block SensorFusionModule
 
   def gate ObjectDetectionFailure
-    name "Object Detection Algorithm Failure"
+    name """Object Detection Algorithm Failure"""
     description """
       Object detection algorithms fail to identify obstacles. OR gate because 
       any one of these software failures causes detection loss.
@@ -523,7 +525,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block ObjectDetectionModule
 
   def gate ClassificationFailure
-    name "Object Classification Failure"
+    name """Object Classification Failure"""
     description """
       Object classification misidentifies obstacle types (e.g., pedestrian as static object). 
       XOR gate models mutually exclusive classification error modes.
@@ -537,7 +539,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block ClassificationModule
 
   def gate PlanningFailure
-    name "Path Planning System Failure"
+    name """Path Planning System Failure"""
     description """
       Path planning fails to generate safe trajectory. OR gate because any 
       planning failure can lead to unsafe path.
@@ -552,7 +554,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block PlanningControlModule
 
   def gate ControlFailure
-    name "Vehicle Control System Failure"
+    name """Vehicle Control System Failure"""
     description """
       Vehicle control system fails to execute planned trajectory. OR gate 
       because any control actuator failure causes loss of control.
@@ -567,7 +569,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block VehicleControlModule
 
   def gate SteeringFailure
-    name "Steering System Complete Failure"
+    name """Steering System Complete Failure"""
     description """
       Steering system completely fails (dual redundancy lost). AND gate models 
       dual steering actuator redundancy - both must fail for complete loss.
@@ -581,7 +583,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block SteeringControlModule
 
   def gate BrakingFailure
-    name "Braking System Complete Failure"
+    name """Braking System Complete Failure"""
     description """
       Braking system completely fails (dual redundancy lost). AND gate models 
       dual brake actuator redundancy - both must fail for complete loss.
@@ -595,7 +597,7 @@ hdef faulttree VehicleCollisionFaultTree
     allocatedto ref block BrakeControlModule
 
   def gate ThrottleFailure
-    name "Throttle System Complete Failure"
+    name """Throttle System Complete Failure"""
     description """
       Throttle system fails (stuck or unresponsive). OR gate because any 
       throttle actuator or control failure causes loss of speed control.

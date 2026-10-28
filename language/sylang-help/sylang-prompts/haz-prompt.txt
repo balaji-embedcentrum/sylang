@@ -1,5 +1,7 @@
 # Hazard Analysis (.haz) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Hazard Analysis files define ISO 26262 hazard analysis with ASIL determination. Part of ISO 26262 Part 3 (Concept Phase) compliance. Each hazard has nested situations that represent different operational scenarios, with complete exposure/controllability/severity analysis.
 
@@ -31,7 +33,7 @@ hdef hazardanalysis [identifier]
     severity [S0|S1|S2|S3]
     exposure [E0|E1|E2|E3|E4|E5]
     controllability [C0|C1|C2|C3]
-    asil [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
+    safetylevel [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
     malfunctionof ref function [function-ref]
     affects ref feature [feature-ref]
     leadsto ref requirement [requirement-ref]
@@ -42,7 +44,7 @@ hdef hazardanalysis [identifier]
       severity [S0|S1|S2|S3]
       exposure [E0|E1|E2|E3|E4|E5]
       controllability [C0|C1|C2|C3]
-      asil [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
+      safetylevel [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
       speed [numeric-value or range]
       environment [string-literal]
       trafficdensity [low|medium|high]
@@ -118,9 +120,9 @@ Context:
 - Requirements: BrakeControl_Requirements.req
 
 Hazard Analysis: ElectronicBrakeHazards (ASIL-D)
-- ISO 26262 Part: "Part 3 - Hazard Analysis and Risk Assessment"
+- ISO 26262 Part: """Part 3 - Hazard Analysis and Risk Assessment"""
 - Assessment Date: 2025-10-05
-- Owner: "Brake Systems Safety Team"
+- Owner: """Brake Systems Safety Team"""
 
 Hazard Categories:
 1. UnintendedBraking - Brakes apply without driver command
@@ -129,7 +131,7 @@ Hazard Categories:
 4. UnintendedBrakeRelease - Brakes release during application
 
 For each hazard, define:
-- Hazardclass: "Longitudinal Motion"
+- Hazardclass: """Longitudinal Motion"""
 - Overall severity, exposure, controllability, ASIL
 - malfunctionof ref function: Link to affected function
 - affects ref feature: Link to affected feature
@@ -152,7 +154,7 @@ Each situation must specify:
 
 Example Hazard:
 
-UnintendedBraking (Hazardclass: "Longitudinal Motion", ASIL-D)
+UnintendedBraking (Hazardclass: """Longitudinal Motion""", ASIL-D)
   - Description: Brakes apply without driver command due to malfunction
   - Severity: S3 (rear-end collision possible)
   - Exposure: E3 (medium - occasional software/hardware faults)
@@ -163,8 +165,8 @@ UnintendedBraking (Hazardclass: "Longitudinal Motion", ASIL-D)
   - leadsto ref requirement REQ_BRAKE_UNINTENDED_001
   
   Situation: HighwayUnintendedBraking
-    - Speed: "100-130 km/h"
-    - Environment: "Highway, dry conditions, following traffic"
+    - Speed: """100-130 km/h"""
+    - Environment: """Highway, dry conditions, following traffic"""
     - Traffic density: high
     - maxacceptabledelay: 100ms
     - nominalresponsetime: 50ms
@@ -187,9 +189,9 @@ Functions: DosageControl, FlowRateControl, AlarmManagement
 Requirements: InfusionPump_Requirements.req
 
 Hazard Analysis: InfusionPumpHazards (SIL-3)
-- ISO 26262 Part: "Medical Device Risk Analysis per ISO 14971"
+- ISO 26262 Part: """Medical Device Risk Analysis per ISO 14971"""
 - Assessment Date: 2025-10-05
-- Owner: "Medical Device Safety Team"
+- Owner: """Medical Device Safety Team"""
 
 Medical-specific considerations:
 - Patient safety paramount (severity S3 for any life-threatening)
@@ -205,14 +207,14 @@ Hazard Categories:
 5. BatteryFailure - Power loss
 
 For each hazard:
-- Use medical hazardclasses: "Drug Delivery", "Monitoring", "Alarm", "Power"
+- Use medical hazardclasses: """Drug Delivery""", """Monitoring""", """Alarm""", """Power"""
 - High severity (S3) for life-threatening scenarios
 - High exposure (E4-E5) for continuous operation
 - Document situation-specific controllability based on care setting
 
 Example Hazard:
 
-Overdose (Hazardclass: "Drug Delivery", SIL-3)
+Overdose (Hazardclass: """Drug Delivery""", SIL-3)
   - Description: Infusion pump delivers excessive drug dose
   - Severity: S3 (life-threatening toxicity)
   - Exposure: E3 (medium - software/hardware faults)
@@ -223,8 +225,8 @@ Overdose (Hazardclass: "Drug Delivery", SIL-3)
   - leadsto ref requirement REQ_DOSE_SAFETY_001
   
   Situation: ICU_CriticalPatient
-    - Speed: "N/A (infusion rate: 0.1-100 mL/hr)"
-    - Environment: "ICU, continuous monitoring, high-acuity patient"
+    - Speed: """N/A (infusion rate: 0.1-100 mL/hr)"""
+    - Environment: """ICU, continuous monitoring, high-acuity patient"""
     - Traffic density: N/A
     - maxacceptabledelay: 500ms
     - nominalresponsetime: 200ms
@@ -247,9 +249,9 @@ Functions: LateralControl, LongitudinalControl, AutopilotControl
 Requirements: FlightControl_Requirements.req
 
 Hazard Analysis: FlightControlHazards (DAL-A)
-- ISO 26262 Part: "Aviation Safety Analysis per DO-178C"
+- ISO 26262 Part: """Aviation Safety Analysis per DO-178C"""
 - Assessment Date: 2025-10-05
-- Owner: "Flight Control Safety Team"
+- Owner: """Flight Control Safety Team"""
 
 Aviation-specific considerations:
 - Catastrophic severity for loss of control (S3)
@@ -265,13 +267,13 @@ Hazard Categories:
 5. AutopilotDisengagement - Unexpected autopilot disconnect
 
 For each hazard:
-- Hazardclass: "Flight Control", "Autopilot", "Trim System"
+- Hazardclass: """Flight Control""", """Autopilot""", """Trim System"""
 - Consider all flight phases (takeoff, cruise, approach, landing)
 - DAL-A equivalent to ASIL-D
 
 Example Hazard:
 
-UncommandedRoll (Hazardclass: "Flight Control", DAL-A)
+UncommandedRoll (Hazardclass: """Flight Control""", DAL-A)
   - Description: Aircraft rolls without pilot command
   - Severity: S3 (catastrophic - loss of control)
   - Exposure: E2 (low - rare control system fault)
@@ -282,8 +284,8 @@ UncommandedRoll (Hazardclass: "Flight Control", DAL-A)
   - leadsto ref requirement REQ_FLIGHT_ROLL_001
   
   Situation: TakeoffUncommandedRoll
-    - Speed: "150-200 knots IAS"
-    - Environment: "Takeoff phase, low altitude, full thrust"
+    - Speed: """150-200 knots IAS"""
+    - Environment: """Takeoff phase, low altitude, full thrust"""
     - Traffic density: N/A
     - maxacceptabledelay: 50ms
     - nominalresponsetime: 20ms
@@ -306,9 +308,9 @@ Functions: MotionControl, CollisionDetection, SafetyMonitoring
 Requirements: Cobot_Requirements.req
 
 Hazard Analysis: CobotHazards (SIL-3)
-- ISO 26262 Part: "Industrial Safety per IEC 61508"
+- ISO 26262 Part: """Industrial Safety per IEC 61508"""
 - Assessment Date: 2025-10-05
-- Owner: "Industrial Safety Team"
+- Owner: """Industrial Safety Team"""
 
 Industrial-specific considerations:
 - Human-robot collaboration (operator always in workspace)
@@ -325,7 +327,7 @@ Hazard Categories:
 
 Example Hazard:
 
-CollisionWithOperator (Hazardclass: "Motion Control", SIL-3)
+CollisionWithOperator (Hazardclass: """Motion Control""", SIL-3)
   - Description: Robot collides with operator in shared workspace
   - Severity: S2 (severe injury possible)
   - Exposure: E5 (very high - continuous collaboration)
@@ -336,8 +338,8 @@ CollisionWithOperator (Hazardclass: "Motion Control", SIL-3)
   - leadsto ref requirement REQ_COLLISION_AVOID_001
   
   Situation: HighSpeedCollision
-    - Speed: "1.5-2.0 m/s"
-    - Environment: "Manufacturing floor, collaborative workspace"
+    - Speed: """1.5-2.0 m/s"""
+    - Environment: """Manufacturing floor, collaborative workspace"""
     - Traffic density: N/A (operator present)
     - maxacceptabledelay: 50ms
     - nominalresponsetime: 20ms
@@ -363,9 +365,9 @@ Context:
 - Requirements: {REQUIREMENTS_FILE}.req
 
 Hazard Analysis: {HAZARDANALYSIS_NAME} ({SAFETY_LEVEL})
-- ISO 26262 Part: "{ISO_PART_DESCRIPTION}"
+- ISO 26262 Part: """{ISO_PART_DESCRIPTION}"""
 - Assessment Date: {YYYY-MM-DD}
-- Owner: "{OWNER_NAME}"
+- Owner: """{OWNER_NAME}"""
 
 For each hazard, specify:
 - Hazardclass: {HAZARD_CLASSIFICATION}
@@ -375,8 +377,8 @@ For each hazard, specify:
 - leadsto ref requirement {REQUIREMENT_REF}
 
 For each situation, specify:
-- Speed: "{SPEED_RANGE_WITH_UNITS}"
-- Environment: "{OPERATIONAL_CONTEXT}"
+- Speed: """{SPEED_RANGE_WITH_UNITS}"""
+- Environment: """{OPERATIONAL_CONTEXT}"""
 - Traffic density: {low|medium|high}
 - maxacceptabledelay: {TIME_MS}ms
 - nominalresponsetime: {TIME_MS}ms
@@ -461,20 +463,20 @@ After AI generation, verify:
 use itemdefinition AutonomousVehicleItem
 
 hdef hazardanalysis AutonomousVehicleHazards
-  name "Autonomous Vehicle Hazard Analysis"
+  name """Autonomous Vehicle Hazard Analysis"""
   description """
     Complete hazard analysis and risk assessment for L3 autonomous vehicle 
     per ISO 26262 Part 3. Includes all hazards related to perception, planning, 
     and control systems with ASIL determination based on operational scenarios.
     """
-  owner "Functional Safety Team"
-  tags "ISO-26262", "hazard-analysis", "ASIL-assessment", "Part-3"
-  iso26262part "Part 3 - Hazard Analysis and Risk Assessment"
-  assessmentdate "2025-10-05"
+  owner """Functional Safety Team"""
+  tags """ISO-26262""", """hazard-analysis""", """ASIL-assessment""", """Part-3"""
+  iso26262part """Part 3 - Hazard Analysis and Risk Assessment"""
+  assessmentdate """2025-10-05"""
   safetylevel ASIL-D
 
   def hazard UnintendedAcceleration
-    name "Unintended Vehicle Acceleration"
+    name """Unintended Vehicle Acceleration"""
     description """
       Vehicle accelerates without driver command or against driver intention 
       during autonomous operation. This hazard can occur due to throttle control 
@@ -482,116 +484,116 @@ hdef hazardanalysis AutonomousVehicleHazards
       or software algorithm errors in path planning.
       Root causes: Throttle actuator stuck, ECU malfunction, sensor fusion error.
       """
-    owner "Longitudinal Control Safety Team"
-    tags "acceleration", "throttle-control", "critical-hazard"
-    hazardclass "Longitudinal Motion"
+    owner """Longitudinal Control Safety Team"""
+    tags """acceleration""", """throttle-control""", """critical-hazard"""
+    hazardclass """Longitudinal Motion"""
     severity S3
     exposure E4
     controllability C2
-    asil ASIL-D
+    safetylevel ASIL-D
     
     malfunctionof ref function ThrottleControl
     affects ref feature AutonomousDriving
     leadsto ref requirement REQ_SAFE_ACCEL_001
 
     def situation HighwayUnintendedAcceleration
-      name "Unintended Acceleration on Highway"
+      name """Unintended Acceleration on Highway"""
       description """
         Vehicle accelerates unintentionally during highway autonomous operation 
         at high speed. Rear-end collision risk with slower traffic ahead. 
         Driver may not be monitoring and reaction time is critical.
         """
-      speed "80-130 km/h"
-      environment "Highway, dry conditions, moderate traffic"
+      speed """80-130 km/h"""
+      environment """Highway, dry conditions, moderate traffic"""
       trafficdensity medium
       maxacceptabledelay 500
       nominalresponsetime 200
       severity S3
       exposure E4
       controllability C2
-      asil ASIL-D
+      safetylevel ASIL-D
 
     def situation UrbanUnintendedAcceleration
-      name "Unintended Acceleration in Urban Area"
+      name """Unintended Acceleration in Urban Area"""
       description """
         Vehicle accelerates unintentionally in urban environment with pedestrians, 
         cyclists, and cross-traffic. High collision risk with vulnerable road users.
         """
-      speed "30-60 km/h"
-      environment "Urban streets, intersections, pedestrian crossings"
+      speed """30-60 km/h"""
+      environment """Urban streets, intersections, pedestrian crossings"""
       trafficdensity high
       maxacceptabledelay 300
       nominalresponsetime 150
       severity S3
       exposure E5
       controllability C3
-      asil ASIL-D
+      safetylevel ASIL-D
 
   def hazard LossOfLateralControl
-    name "Loss of Lateral Vehicle Control"
+    name """Loss of Lateral Vehicle Control"""
     description """
       Vehicle loses ability to maintain lane position or steer appropriately. 
       Can result in lane departure, collision with adjacent vehicles, or 
       leaving roadway entirely. Caused by steering system failure or 
       lane detection algorithm malfunction.
       """
-    owner "Lateral Control Safety Team"
-    tags "steering-control", "lane-keeping", "critical-hazard"
-    hazardclass "Lateral Motion"
+    owner """Lateral Control Safety Team"""
+    tags """steering-control""", """lane-keeping""", """critical-hazard"""
+    hazardclass """Lateral Motion"""
     severity S3
     exposure E4
     controllability C2
-    asil ASIL-D
+    safetylevel ASIL-D
     
     malfunctionof ref function SteeringControl
     affects ref feature AutonomousDriving
     leadsto ref requirement REQ_SAFE_STEER_001
 
     def situation HighSpeedLaneDepart ure
-      name "Lane Departure at High Speed"
-      description "Loss of lateral control on highway at high speed"
-      speed "100-130 km/h"
-      environment "Highway, curved sections"
+      name """Lane Departure at High Speed"""
+      description """Loss of lateral control on highway at high speed"""
+      speed """100-130 km/h"""
+      environment """Highway, curved sections"""
       trafficdensity medium
       maxacceptabledelay 200
       nominalresponsetime 100
       severity S3
       exposure E4
       controllability C3
-      asil ASIL-D
+      safetylevel ASIL-D
 
   def hazard FailureToStopAtObstacle
-    name "Failure to Stop at Obstacle"
+    name """Failure to Stop at Obstacle"""
     description """
       Vehicle fails to detect obstacle and stop, resulting in collision. 
       Caused by perception system failure (sensor malfunction, object 
       misclassification), planning failure (incorrect trajectory), or 
       brake system malfunction.
       """
-    owner "Perception and Braking Safety Team"
-    tags "obstacle-detection", "collision-avoidance", "critical-hazard"
-    hazardclass "Longitudinal Motion"
+    owner """Perception and Braking Safety Team"""
+    tags """obstacle-detection""", """collision-avoidance""", """critical-hazard"""
+    hazardclass """Longitudinal Motion"""
     severity S3
     exposure E4
     controllability C3
-    asil ASIL-D
+    safetylevel ASIL-D
     
     malfunctionof ref function ObjectClassification
     affects ref feature PerceptionSystem
     leadsto ref requirement REQ_SAFE_STOP_001
 
     def situation PedestrianCollision
-      name "Failure to Stop for Pedestrian"
-      description "Vehicle fails to detect and stop for pedestrian crossing"
-      speed "30-50 km/h"
-      environment "Urban, pedestrian crossing, daytime"
+      name """Failure to Stop for Pedestrian"""
+      description """Vehicle fails to detect and stop for pedestrian crossing"""
+      speed """30-50 km/h"""
+      environment """Urban, pedestrian crossing, daytime"""
       trafficdensity high
       maxacceptabledelay 200
       nominalresponsetime 100
       severity S3
       exposure E5
       controllability C3
-      asil ASIL-D
+      safetylevel ASIL-D
 ```
 
 ---

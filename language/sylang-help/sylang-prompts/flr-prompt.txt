@@ -1,5 +1,7 @@
 # FMEA Analysis (.flr) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 FMEA (Failure Mode and Effects Analysis) files define systematic analysis of potential failure modes with AIAG VDA quantitative analysis and temporal properties. FLR files support ISO 26262, IEC 61508, and other functional safety standards with complete traceability and timing constraints.
 
@@ -13,7 +15,7 @@ FMEA (Failure Mode and Effects Analysis) files define systematic analysis of pot
 
 ## Key Syntax Elements
 ```
-use blockset [ref], use functionset [ref], use requirementset [ref], use testset [ref]
+use block [ref], use functionset [ref], use requirementset [ref], use testset [ref]
 
 hdef failureset [identifier]
   name [string-literal]
@@ -23,7 +25,7 @@ hdef failureset [identifier]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
   timingreference [ms|us|s]
   propagateto ref failureset [failureset-ref]
-  block ref block [block-ref]
+  occursin ref block [block-ref]
 
   def failuremode [identifier]
     name [string-literal]
@@ -122,7 +124,7 @@ For each failure mode, specify:
 Example Failure Modes:
 
 1. VoltageRegulatorFailure (ASIL-D)
-   - Name: "Voltage Regulator Complete Failure"
+   - Name: """Voltage Regulator Complete Failure"""
    - Description: Primary voltage regulator stops providing regulated 5V power to brake ECU
    - Failurerate: 1.2e-6 failures per million hours
    - Severity: 9 (very high - loss of brake control)
@@ -153,7 +155,7 @@ Example Failure Modes:
    - Testedby: VoltageFailureTest
 
 2. ProcessorLockup (ASIL-D)
-   - Name: "Brake ECU Processor Lockup"
+   - Name: """Brake ECU Processor Lockup"""
    - Description: Main processor locks up due to software deadlock or hardware fault
    - Failurerate: 0.8e-6
    - Severity: 10 (catastrophic - complete loss of brake control)
@@ -184,7 +186,7 @@ Example Failure Modes:
    - Testedby: ProcessorFailureTest
 
 3. WheelSpeedSensorOpenCircuit (ASIL-C)
-   - Name: "Wheel Speed Sensor Open Circuit"
+   - Name: """Wheel Speed Sensor Open Circuit"""
    - Description: Wiring break causes complete loss of wheel speed signal
    - Failurerate: 2.5e-6
    - Severity: 7 (high - ABS/ESP disabled)
@@ -216,7 +218,7 @@ Example Failure Modes:
 
 File: BrakeControlFMEA.flr
 References: 
-  use blockset BrakeControlBlocks
+  use block BrakeControlBlocks
   use functionset BrakeControlFunctions
   use requirementset BrakeControlRequirements
   use testset BrakeControlTests
@@ -246,7 +248,7 @@ Medical-specific considerations:
 Example Failure Modes:
 
 1. ECG_AmplifierSaturation (SIL-3)
-   - Name: "ECG Amplifier Saturation"
+   - Name: """ECG Amplifier Saturation"""
    - Description: ECG amplifier saturates and clips signal, missing arrhythmia detection
    - Failurerate: 1.5e-6
    - Severity: 9 (very high - missed cardiac events, wrong treatment)
@@ -303,7 +305,7 @@ Aviation-specific considerations:
 Example Failure Modes:
 
 1. PrimaryProcessorFailure (DAL-A)
-   - Name: "Primary Flight Control Computer Processor Failure"
+   - Name: """Primary Flight Control Computer Processor Failure"""
    - Description: Primary processor fails, requiring immediate failover to secondary
    - Failurerate: 0.5e-6
    - Severity: 10 (catastrophic - loss of control authority)
@@ -360,7 +362,7 @@ Industrial-specific considerations:
 Example Failure Modes:
 
 1. SafetyCPU_MemoryCorruption (SIL-3)
-   - Name: "Safety CPU Memory Corruption"
+   - Name: """Safety CPU Memory Corruption"""
    - Description: Memory bit flip causes incorrect safety logic execution
    - Failurerate: 2.0e-6
    - Severity: 10 (catastrophic - safety function lost, operator risk)
@@ -453,7 +455,7 @@ Example Failure Mode:
 
 File: {SYSTEM_NAME}FMEA.flr
 References:
-  use blockset {BLOCKSET_REFERENCE}
+  use block {BLOCKSET_REFERENCE}
   use functionset {FUNCTIONSET_REFERENCE}
   use requirementset {REQUIREMENTSET_REFERENCE}
   use testset {TESTSET_REFERENCE}
@@ -479,7 +481,7 @@ After AI generation, verify:
 - [ ] `description` explains FMEA scope
 - [ ] `safetylevel` specified
 - [ ] `timingreference` defined (ms, us, or s)
-- [ ] `block ref block` links to analyzed block
+- [ ] `occursin ref block` links to analyzed block
 - [ ] `propagateto ref failureset` links to parent (if applicable)
 
 ### Failure Mode Properties
@@ -545,28 +547,28 @@ After AI generation, verify:
 ## Example Generated FMEA (Target Quality)
 
 ```sylang
-use blockset PowerSupplyBlocks
+use block PowerSupplyBlocks
 use functionset PowerSupplyFunctions
 use requirementset SafetyRequirements
 use testset PowerSupplyTests
 
 hdef failureset PowerSupplyFailures
-  name "Power Supply Subsystem FMEA"
-  description "Comprehensive FMEA for automotive ECU power supply per ISO 26262 ASIL-D"
-  owner "Safety Engineering Team"
+  name """Power Supply Subsystem FMEA"""
+  description """Comprehensive FMEA for automotive ECU power supply per ISO 26262 ASIL-D"""
+  owner """Safety Engineering Team"""
   safetylevel ASIL-D
   timingreference ms
   propagateto ref failureset VehicleSystemFailures
-  block ref block PowerSupplyBlock
+  occursin ref block PowerSupplyBlock
 
   def failuremode VoltageRegulatorFailure
-    name "Voltage Regulator Complete Failure"
+    name """Voltage Regulator Complete Failure"""
     description """
       Primary voltage regulator stops providing regulated 5V power to brake ECU.
       Causes immediate loss of primary processor power unless backup activates.
       """
-    owner "Hardware Safety Team"
-    tags "voltage-regulator", "power-supply", "ASIL-D", "critical"
+    owner """Hardware Safety Team"""
+    tags """voltage-regulator""", """power-supply""", """ASIL-D""", """critical"""
     
     // AIAG VDA Quantitative Analysis
     failurerate 1.2e-6        // Failures per million hours

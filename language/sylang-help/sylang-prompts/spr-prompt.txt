@@ -1,5 +1,7 @@
 # Sprint Planning (.spr) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Sprint Planning files define agile sprints with hierarchical epics, stories, and tasks, including agent assignments, priorities, and complete traceability. SPR files support project management, team coordination, and progress tracking in MBSE development environments.
 
@@ -76,46 +78,46 @@ hdef sprint
 ### Sprint Structure (Top Level)
 ```
 hdef sprint AutonomousVehicleSprint
-  name "Autonomous Vehicle L3 System Development Sprint"
-  description "Complete autonomous vehicle system design and implementation"
-  owner "Autonomous Systems Program Manager"
-  startdate "2025-09-01"
-  enddate "2025-12-15"
-  comment "This sprint covers the complete development lifecycle for L3 autonomous vehicle system"
+  name """Autonomous Vehicle L3 System Development Sprint"""
+  description """Complete autonomous vehicle system design and implementation"""
+  owner """Autonomous Systems Program Manager"""
+  startdate """2025-09-01"""
+  enddate """2025-12-15"""
+  comment """This sprint covers the complete development lifecycle for L3 autonomous vehicle system"""
 ```
 
 ### Epic (Contains Stories)
 ```
 def epic PerceptionSystemDevelopment
-  name "Perception System Architecture and Implementation"
-  description "Design and implement complete perception system"
+  name """Perception System Architecture and Implementation"""
+  description """Design and implement complete perception system"""
   assignedto ref agent PerceptionSystemsAgent
   issuestatus open
   priority critical
-  comment "Epic focuses on core perception capabilities for autonomous vehicle"
+  comment """Epic focuses on core perception capabilities for autonomous vehicle"""
 ```
 
 ### Story (Contains Tasks, Nested in Epic)
 ```
 def story PerceptionRequirements
-  name "Perception System Requirements Definition"
-  description "Define comprehensive requirements for perception system"
+  name """Perception System Requirements Definition"""
+  description """Define comprehensive requirements for perception system"""
   assignedto ref agent SafetyRequirementsAgent
   issuestatus open
   priority critical
-  points "13"
+  points """13"""
 ```
 
 ### Task (Leaf Level, Nested in Story)
 ```
 def task PerceptionFunctionalRequirements
-  name "Perception Functional Requirements"
-  description "Define functional requirements for object detection and tracking"
+  name """Perception Functional Requirements"""
+  description """Define functional requirements for object detection and tracking"""
   assignedto ref agent PerceptionSystemsAgent
   issuestatus open
   priority critical
-  points "8"
-  outputfile "requirements/PerceptionFunctionalRequirements.req"
+  points """8"""
+  outputfile """requirements/PerceptionFunctionalRequirements.req"""
 ```
 
 ---
@@ -129,7 +131,7 @@ Create comprehensive .spr file for autonomous vehicle L3 development sprint.
 Context:
 - Project: Level 3 autonomous driving system
 - Sprint Duration: 2025-09-01 to 2025-12-15 (3.5 months)
-- Owner: "Autonomous Systems Program Manager"
+- Owner: """Autonomous Systems Program Manager"""
 - Agents: use agentset AutonomousVehicleAgents
 
 Sprint: AutonomousVehicleDevelopmentSprint
@@ -151,13 +153,13 @@ EPIC 1: PerceptionSystemDevelopment (critical)
     TASK 1.1.1: PerceptionFunctionalRequirements (critical, 8 points)
       - assignedto ref agent: PerceptionSystemsAgent
       - issuestatus: open
-      - outputfile: "requirements/PerceptionFunctionalRequirements.req"
+      - outputfile: """requirements/PerceptionFunctionalRequirements.req"""
       - Description: Define functional requirements for object detection and tracking
     
     TASK 1.1.2: PerceptionSafetyRequirements (critical, 13 points)
       - assignedto ref agent: SafetyRequirementsAgent
       - issuestatus: backlog
-      - outputfile: "requirements/PerceptionSafetyRequirements.req"
+      - outputfile: """requirements/PerceptionSafetyRequirements.req"""
       - Description: Define ASIL-D safety requirements for perception system
 
   STORY 1.2: PerceptionArchitecture (high, 21 points)
@@ -167,7 +169,7 @@ EPIC 1: PerceptionSystemDevelopment (critical)
     TASK 1.2.1: SensorFusionArchitecture (high, 13 points)
       - assignedto ref agent: PerceptionSystemsAgent
       - issuestatus: open
-      - outputfile: "architecture/SensorFusionArchitecture.blk"
+      - outputfile: """architecture/SensorFusionArchitecture.blk"""
       - Description: Design sensor fusion architecture with redundancy
 
 EPIC 2: SafetyValidationAndCompliance (critical)
@@ -182,12 +184,12 @@ EPIC 2: SafetyValidationAndCompliance (critical)
     TASK 2.1.1: ItemDefinition (critical, 8 points)
       - assignedto ref agent: SafetyEngineerAgent
       - issuestatus: open
-      - outputfile: "safety/AutonomousVehicleItemDefinition.itm"
+      - outputfile: """safety/AutonomousVehicleItemDefinition.itm"""
     
     TASK 2.1.2: HazardAnalysisAndRiskAssessment (critical, 13 points)
       - assignedto ref agent: SafetyEngineerAgent
       - issuestatus: backlog
-      - outputfile: "safety/AutonomousVehicleHARA.haz"
+      - outputfile: """safety/AutonomousVehicleHARA.haz"""
 
 EPIC 3: PlanningControlDevelopment (high)
 - assignedto ref agent: PlanningControlAgent
@@ -201,7 +203,7 @@ EPIC 3: PlanningControlDevelopment (high)
     TASK 3.1.1: PathPlanningFunctionalRequirements (high, 8 points)
       - assignedto ref agent: PlanningControlAgent
       - issuestatus: backlog
-      - outputfile: "requirements/PathPlanningRequirements.req"
+      - outputfile: """requirements/PathPlanningRequirements.req"""
 
 EPIC 4: TestingValidation (high)
 - assignedto ref agent: ValidationTestAgent
@@ -215,7 +217,7 @@ EPIC 4: TestingValidation (high)
     TASK 4.1.1: TestSpecification (medium, 8 points)
       - assignedto ref agent: ValidationTestAgent
       - issuestatus: backlog
-      - outputfile: "testing/SystemIntegrationTests.tst"
+      - outputfile: """testing/SystemIntegrationTests.tst"""
 
 File: AutonomousVehicleDevelopmentSprint.spr
 ```
@@ -226,7 +228,7 @@ Generate .spr file for medical device ICU monitoring system sprint.
 
 Project: ICU patient monitoring system (IEC 62304 SIL-3)
 Sprint Duration: 2025-06-01 to 2025-08-31 (3 months)
-Owner: "Medical Device Program Manager"
+Owner: """Medical Device Program Manager"""
 Agents: use agentset MedicalDeviceAgents
 
 Sprint: MedicalDeviceMonitoringSprint
@@ -248,13 +250,13 @@ EPIC 1: VitalSignsMonitoring (critical)
     TASK 1.1.1: ECGRequirements (critical, 8 points)
       - assignedto ref agent: MedicalSoftwareAgent
       - issuestatus: open
-      - outputfile: "requirements/ECGMonitoringRequirements.req"
+      - outputfile: """requirements/ECGMonitoringRequirements.req"""
       - Description: Define requirements for ECG monitoring and analysis
     
     TASK 1.1.2: AlarmRequirements (critical, 8 points)
       - assignedto ref agent: SafetyEngineerAgent
       - issuestatus: open
-      - outputfile: "requirements/AlarmManagementRequirements.req"
+      - outputfile: """requirements/AlarmManagementRequirements.req"""
       - Description: Define alarm prioritization and escalation requirements
 
   STORY 1.2: VitalSignsArchitecture (critical, 21 points)
@@ -264,7 +266,7 @@ EPIC 1: VitalSignsMonitoring (critical)
     TASK 1.2.1: DataAcquisitionArchitecture (high, 13 points)
       - assignedto ref agent: MedicalSoftwareAgent
       - issuestatus: backlog
-      - outputfile: "architecture/DataAcquisitionSystem.blk"
+      - outputfile: """architecture/DataAcquisitionSystem.blk"""
 
 EPIC 2: RegulatoryCompliance (critical)
 - assignedto ref agent: RegulatoryAgent
@@ -278,7 +280,7 @@ EPIC 2: RegulatoryCompliance (critical)
     TASK 2.1.1: HazardAnalysis (critical, 13 points)
       - assignedto ref agent: SafetyEngineerAgent
       - issuestatus: open
-      - outputfile: "regulatory/MedicalDeviceHazardAnalysis.haz"
+      - outputfile: """regulatory/MedicalDeviceHazardAnalysis.haz"""
 
 EPIC 3: ClinicalValidation (high)
 - assignedto ref agent: ClinicalValidationAgent
@@ -292,7 +294,7 @@ EPIC 3: ClinicalValidation (high)
     TASK 3.1.1: TestProtocolDevelopment (medium, 8 points)
       - assignedto ref agent: ClinicalValidationAgent
       - issuestatus: backlog
-      - outputfile: "clinical/ClinicalTestProtocol.tst"
+      - outputfile: """clinical/ClinicalTestProtocol.tst"""
 
 File: MedicalDeviceMonitoringSprint.spr
 ```
@@ -303,7 +305,7 @@ Create .spr file for commercial aircraft flight control system sprint.
 
 Aircraft: Commercial transport flight control (DO-178C DAL-A)
 Sprint Duration: 2025-03-01 to 2025-06-30 (4 months)
-Owner: "Avionics Program Manager"
+Owner: """Avionics Program Manager"""
 Agents: use agentset AvionicsAgents
 
 Sprint: FlightControlDevelopmentSprint
@@ -325,13 +327,13 @@ EPIC 1: FlightControlRequirements (critical)
     TASK 1.1.1: RollControlRequirements (critical, 8 points)
       - assignedto ref agent: ControlSystemsAgent
       - issuestatus: open
-      - outputfile: "requirements/RollControlRequirements.req"
+      - outputfile: """requirements/RollControlRequirements.req"""
       - Description: Define roll control requirements per FAR Part 25
     
     TASK 1.1.2: PitchControlRequirements (critical, 8 points)
       - assignedto ref agent: ControlSystemsAgent
       - issuestatus: open
-      - outputfile: "requirements/PitchControlRequirements.req"
+      - outputfile: """requirements/PitchControlRequirements.req"""
 
 EPIC 2: RedundancyManagement (critical)
 - assignedto ref agent: FaultToleranceAgent
@@ -345,7 +347,7 @@ EPIC 2: RedundancyManagement (critical)
     TASK 2.1.1: TripleRedundantArchitecture (critical, 21 points)
       - assignedto ref agent: FaultToleranceAgent
       - issuestatus: open
-      - outputfile: "architecture/TripleRedundantFlightControl.blk"
+      - outputfile: """architecture/TripleRedundantFlightControl.blk"""
       - Description: Design triple redundant flight control computers
 
 EPIC 3: CertificationCompliance (critical)
@@ -360,7 +362,7 @@ EPIC 3: CertificationCompliance (critical)
     TASK 3.1.1: VerificationPlanDevelopment (critical, 13 points)
       - assignedto ref agent: VerificationAgent
       - issuestatus: backlog
-      - outputfile: "certification/SoftwareVerificationPlan.tst"
+      - outputfile: """certification/SoftwareVerificationPlan.tst"""
 
 EPIC 4: EnvironmentalQualification (high)
 - assignedto ref agent: QualificationAgent
@@ -374,7 +376,7 @@ EPIC 4: EnvironmentalQualification (high)
     TASK 4.1.1: TemperatureQualification (medium, 8 points)
       - assignedto ref agent: QualificationAgent
       - issuestatus: backlog
-      - outputfile: "qualification/TemperatureTestPlan.tst"
+      - outputfile: """qualification/TemperatureTestPlan.tst"""
 
 File: FlightControlDevelopmentSprint.spr
 ```
@@ -385,7 +387,7 @@ Generate .spr file for collaborative robot safety system sprint.
 
 System: Collaborative robot safety controller (IEC 61508 SIL-3)
 Sprint Duration: 2025-04-01 to 2025-05-31 (2 months)
-Owner: "Industrial Automation Manager"
+Owner: """Industrial Automation Manager"""
 Agents: use agentset IndustrialAutomationAgents
 
 Sprint: CobotSafetySprint
@@ -407,13 +409,13 @@ EPIC 1: SafetySystemRequirements (critical)
     TASK 1.1.1: ProximityDetectionRequirements (critical, 13 points)
       - assignedto ref agent: SafetyEngineerAgent
       - issuestatus: open
-      - outputfile: "requirements/ProximityDetectionRequirements.req"
+      - outputfile: """requirements/ProximityDetectionRequirements.req"""
       - Description: Define safety-rated proximity detection requirements
     
     TASK 1.1.2: ForceLimitingRequirements (critical, 8 points)
       - assignedto ref agent: SafetyEngineerAgent
       - issuestatus: open
-      - outputfile: "requirements/ForceLimitingRequirements.req"
+      - outputfile: """requirements/ForceLimitingRequirements.req"""
       - Description: Define force and speed limiting per ISO 15066
 
 EPIC 2: SafetyArchitecture (critical)
@@ -428,7 +430,7 @@ EPIC 2: SafetyArchitecture (critical)
     TASK 2.1.1: DualChannelSafetyController (critical, 13 points)
       - assignedto ref agent: FaultToleranceAgent
       - issuestatus: backlog
-      - outputfile: "architecture/DualChannelSafetyController.blk"
+      - outputfile: """architecture/DualChannelSafetyController.blk"""
 
 EPIC 3: SafetyValidation (critical)
 - assignedto ref agent: ValidationTestAgent
@@ -442,7 +444,7 @@ EPIC 3: SafetyValidation (critical)
     TASK 3.1.1: EmergencyStopTesting (critical, 8 points)
       - assignedto ref agent: ValidationTestAgent
       - issuestatus: backlog
-      - outputfile: "testing/EmergencyStopTests.tst"
+      - outputfile: """testing/EmergencyStopTests.tst"""
 
 File: CobotSafetySprint.spr
 ```
@@ -454,7 +456,7 @@ Create .spr file for {PROJECT_NAME} development sprint.
 Context:
 - Project: {PROJECT_DESCRIPTION}
 - Sprint Duration: {START_DATE} to {END_DATE}
-- Owner: "{OWNER_NAME}"
+- Owner: """{OWNER_NAME}"""
 - Agents: use agentset {AGENTSET_NAME}
 
 Sprint: {SPRINT_IDENTIFIER}
@@ -476,7 +478,7 @@ EPIC 1: {EPIC_1_NAME} ({priority})
     TASK 1.1.1: {TASK_1_1_1_NAME} ({priority}, {points} points)
       - assignedto ref agent: {AGENT_NAME}
       - issuestatus: {STATUS}
-      - outputfile: "{OUTPUT_FILE_PATH}"
+      - outputfile: """{OUTPUT_FILE_PATH}"""
       - Description: {TASK_DESCRIPTION}
 
 ... (continue hierarchical structure)
@@ -574,11 +576,11 @@ After AI generation, verify:
 use agentset AutonomousVehicleAgents
 
 hdef sprint AutonomousVehicleDevelopmentSprint
-  name "Autonomous Vehicle L3 System Development Sprint"
-  description "Complete autonomous vehicle system design and implementation"
-  owner "Autonomous Systems Program Manager"
-  startdate "2025-09-01"
-  enddate "2025-12-15"
+  name """Autonomous Vehicle L3 System Development Sprint"""
+  description """Complete autonomous vehicle system design and implementation"""
+  owner """Autonomous Systems Program Manager"""
+  startdate """2025-09-01"""
+  enddate """2025-12-15"""
   comment """
     This sprint covers the complete development lifecycle for L3 autonomous 
     vehicle system. Key focus areas include perception, safety validation, 
@@ -587,8 +589,8 @@ hdef sprint AutonomousVehicleDevelopmentSprint
     """
 
   def epic PerceptionSystemDevelopment
-    name "Perception System Architecture and Implementation"
-    description "Design and implement complete perception system"
+    name """Perception System Architecture and Implementation"""
+    description """Design and implement complete perception system"""
     assignedto ref agent PerceptionSystemsAgent
     issuestatus open
     priority critical
@@ -599,60 +601,60 @@ hdef sprint AutonomousVehicleDevelopmentSprint
       """
 
     def story PerceptionRequirements
-      name "Perception System Requirements Definition"
-      description "Define comprehensive requirements for perception system"
+      name """Perception System Requirements Definition"""
+      description """Define comprehensive requirements for perception system"""
       assignedto ref agent SafetyRequirementsAgent
       issuestatus open
       priority critical
-      points "13"
+      points """13"""
 
       def task PerceptionFunctionalRequirements
-        name "Perception Functional Requirements"
-        description "Define functional requirements for object detection and tracking"
+        name """Perception Functional Requirements"""
+        description """Define functional requirements for object detection and tracking"""
         assignedto ref agent PerceptionSystemsAgent
         issuestatus open
         priority critical
-        points "8"
-        outputfile "requirements/PerceptionFunctionalRequirements.req"
+        points """8"""
+        outputfile """requirements/PerceptionFunctionalRequirements.req"""
 
       def task PerceptionSafetyRequirements
-        name "Perception Safety Requirements"
-        description "Define ASIL-D safety requirements for perception system"
+        name """Perception Safety Requirements"""
+        description """Define ASIL-D safety requirements for perception system"""
         assignedto ref agent SafetyRequirementsAgent
         issuestatus backlog
         priority critical
-        points "13"
-        outputfile "requirements/PerceptionSafetyRequirements.req"
+        points """13"""
+        outputfile """requirements/PerceptionSafetyRequirements.req"""
 
     def story PerceptionArchitecture
-      name "Perception System Architecture Design"
-      description "Design perception system architecture with sensor fusion"
+      name """Perception System Architecture Design"""
+      description """Design perception system architecture with sensor fusion"""
       assignedto ref agent ArchitectureAgent
       issuestatus open
       priority high
-      points "21"
+      points """21"""
 
       def task SensorFusionArchitecture
-        name "Sensor Fusion Architecture"
-        description "Design sensor fusion architecture with redundancy"
+        name """Sensor Fusion Architecture"""
+        description """Design sensor fusion architecture with redundancy"""
         assignedto ref agent PerceptionSystemsAgent
         issuestatus open
         priority high
-        points "13"
-        outputfile "architecture/SensorFusionArchitecture.blk"
+        points """13"""
+        outputfile """architecture/SensorFusionArchitecture.blk"""
 
       def task ObjectDetectionDesign
-        name "Object Detection Module Design"
-        description "Design object detection and classification module"
+        name """Object Detection Module Design"""
+        description """Design object detection and classification module"""
         assignedto ref agent PerceptionSystemsAgent
         issuestatus backlog
         priority high
-        points "8"
-        outputfile "architecture/ObjectDetectionModule.blk"
+        points """8"""
+        outputfile """architecture/ObjectDetectionModule.blk"""
 
   def epic SafetyValidationAndCompliance
-    name "ISO 26262 Safety Validation and Compliance"
-    description "Complete safety validation per ISO 26262 ASIL-D"
+    name """ISO 26262 Safety Validation and Compliance"""
+    description """Complete safety validation per ISO 26262 ASIL-D"""
     assignedto ref agent SafetyAssuranceAgent
     issuestatus open
     priority critical
@@ -662,30 +664,30 @@ hdef sprint AutonomousVehicleDevelopmentSprint
       """
 
     def story HazardAnalysis
-      name "Hazard Analysis and Risk Assessment"
-      description "Conduct complete HARA per ISO 26262 Part 3"
+      name """Hazard Analysis and Risk Assessment"""
+      description """Conduct complete HARA per ISO 26262 Part 3"""
       assignedto ref agent SafetyEngineerAgent
       issuestatus open
       priority critical
-      points "21"
+      points """21"""
 
       def task ItemDefinition
-        name "Item Definition"
-        description "Define item boundaries and operating modes"
+        name """Item Definition"""
+        description """Define item boundaries and operating modes"""
         assignedto ref agent SafetyEngineerAgent
         issuestatus open
         priority critical
-        points "8"
-        outputfile "safety/AutonomousVehicleItemDefinition.itm"
+        points """8"""
+        outputfile """safety/AutonomousVehicleItemDefinition.itm"""
 
       def task HazardAnalysisAndRiskAssessment
-        name "Hazard Analysis and Risk Assessment"
-        description "Conduct HARA with ASIL determination"
+        name """Hazard Analysis and Risk Assessment"""
+        description """Conduct HARA with ASIL determination"""
         assignedto ref agent SafetyEngineerAgent
         issuestatus backlog
         priority critical
-        points "13"
-        outputfile "safety/AutonomousVehicleHARA.haz"
+        points """13"""
+        outputfile """safety/AutonomousVehicleHARA.haz"""
 ```
 
 ---

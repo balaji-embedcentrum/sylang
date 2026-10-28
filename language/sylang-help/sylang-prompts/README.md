@@ -1,3 +1,7 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
 # Sylang AI Prompting Strategy
 
 **Version**: 1.0.0  

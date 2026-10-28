@@ -1,4 +1,6 @@
 # Variant Configuration (.vcf) - AI Prompting Guide
+
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
 ## Purpose: Configuration values for variant (ALWAYS AUTO-GENERATED)
 ## When: Right-click .vml → "Generate Configuration"
 ## Key Syntax: hdef config, def config [feature-id] (enabled|disabled)

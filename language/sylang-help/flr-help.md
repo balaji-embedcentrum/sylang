@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Failure Analysis - FMEA (.flr)
 
 ## Overview
@@ -7,21 +13,22 @@ Defines **Failure Mode and Effects Analysis (FMEA)** with temporal properties an
 - **ONE** `hdef failureset` per file
 - **MULTIPLE** `def failuremode` statements
 - Supports temporal logic with `within` keyword
-- Can `use` blocksets, functionsets, requirementsets, testsets, parameters
+- Can `use` blocks, functionsets, requirementsets, testsets, parameters
 
 ## Valid Keywords
 ```
-use, hdef, failureset, def, failuremode, cause, effect, name, description, 
-owner, tags, level, safetylevel, propagateto, block, timingreference, 
-failurerate, severity, detectability, occurrence, actionpriority, 
-allocatedto, affects, probability, rpn, faultdetectiontime, faulttolerancetime, 
-propagationdelay, recoverytime, causedby, effects, detectedby, mitigatedby, 
-testedby, derivedfrom, within, when, ref
+use, hdef, failureset, name, description, owner, tags, safetylevel, level,
+propagateto, occursin, def, failuremode, failurerate, severity,
+detectability, occurrence, actionpriority, timingreference, allocatedto,
+affects, probability, rpn, faultdetectiontime, faulttolerancetime,
+propagationdelay, recoverytime, causedby, effects, detectedby, mitigatedby,
+testedby, derivedfrom, definedby, within, when, requires, meets, ref, attach,
+errorcode, dtc, analysiseffort, deveffort, testeffort, diagnosticcoverage
 ```
 
 ## Syntax Structure
 ```
-use blockset [blockset-ref]
+use block [block-ref]
 use functionset [functionset-ref]
 use requirementset [requirementset-ref]
 use testset [testset-ref]
@@ -34,7 +41,7 @@ hdef failureset [identifier]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
   timingreference [ms|us|s]
   propagateto ref failureset [failureset-ref]
-  block ref block [block-ref]
+  occursin ref block [block-ref]
 
   def failuremode [identifier]
     name [string-literal]
@@ -71,24 +78,24 @@ hdef failureset [identifier]
 
 ## Complete Example (Flat Syntax - Recommended)
 ```sylang
-use blockset AutomotiveECUBlocks
+use block PowerSupplyBlock
 use functionset PowerSupplyFunctions
 use requirementset SafetyRequirements
 use testset PowerSupplyTests
 
 hdef failureset PowerSupplyFailures
-  name "Power Supply Subsystem FMEA"
-  description "Comprehensive FMEA for automotive ECU power supply"
-  owner "Safety Engineering Team"
+  name """Power Supply Subsystem FMEA"""
+  description """Comprehensive FMEA for automotive ECU power supply"""
+  owner """Safety Engineering Team"""
   safetylevel ASIL-D
   timingreference ms
   propagateto ref failureset VehicleSystemFailures
-  block ref block PowerSupplyBlock
+  occursin ref block PowerSupplyBlock
 
   def failuremode VoltageRegulatorFailure
-    name "Voltage Regulator Complete Failure"
-    description "Primary voltage regulator stops providing regulated 5V power"
-    owner "Hardware Safety Team"
+    name """Voltage Regulator Complete Failure"""
+    description """Primary voltage regulator stops providing regulated 5V power"""
+    owner """Hardware Safety Team"""
     
     // FMEA Quantitative Analysis
     failurerate 1.2e-6        // Failures per million hours
@@ -125,8 +132,8 @@ hdef failureset PowerSupplyFailures
     derivedfrom ref requirement VoltageRegulationReq
 
   def failuremode TransistorBurnout
-    name "Power Transistor Thermal Burnout"
-    description "Power MOSFET failure due to excessive thermal stress"
+    name """Power Transistor Thermal Burnout"""
+    description """Power MOSFET failure due to excessive thermal stress"""
     
     failurerate 0.8e-6
     severity 7

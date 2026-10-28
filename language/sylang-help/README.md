@@ -1,6 +1,14 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Sylang Language Reference
 
 Welcome to the Sylang Model-Based Systems Engineering Language reference documentation. This guide provides comprehensive information about all Sylang file extensions, syntax rules, and best practices.
+
+> **Start here: [Project Guide](project-guide-help.md).** Which files to create for IT and software, automotive, aerospace, medical and industrial projects, how to lay out the folders, which property values fit, and in what order to build the model. AI assistants should read it before creating or extending a project.
 
 ## Quick Navigation
 
@@ -22,7 +30,8 @@ Welcome to the Sylang Model-Based Systems Engineering Language reference documen
 - [**SEQ** - Sequence Diagram](seq-help.md) - Message flow sequences
 - [**SMD** - State Machine Diagram](smd-help.md) - State-based behavior
 
-### Safety & Reliability (ISO 26262)
+### Safety & Reliability
+- [**SGL** - Safety Goals](sgl-help.md) - Safety goals derived from hazards
 - [**FLR** - Failure Analysis (FMEA)](flr-help.md) - Failure modes and effects analysis
 - [**ITM** - Item Definition](itm-help.md) - ISO 26262 item definition
 - [**HAZ** - Hazard Analysis](haz-help.md) - Hazard analysis and ASIL assessment
@@ -31,7 +40,14 @@ Welcome to the Sylang Model-Based Systems Engineering Language reference documen
 
 ### Project Management
 - [**SPR** - Sprint Planning](spr-help.md) - Agile sprint and task management
-- [**AGT** - Agent Definition](agt-help.md) - AI agent specifications
+- [**AGT** - Agent Definition](agt-help.md) - Team members and AI agents
+
+### Documents, Extensions and References
+- [**SPEC** - Specification](spec-help.md) - Documents assembled from the model
+- [**DASH** - Dashboard](dash-help.md) - Metrics, charts and tables
+- [**SYLANGEXTEND** - Extensions](extend-help.md) - Your own properties and enum values
+- [**Relations Matrix**](relations-matrix-help.md) - Every relation keyword and the types it connects
+- [**Complete Reference**](SYLANG_COMPLETE_REFERENCE.md) - All file types in one document
 
 ## Key Concepts
 
@@ -62,9 +78,10 @@ Sylang provides complete bidirectional traceability through relationship keyword
 - **ASPICE**: Automotive SPICE compliance through structured requirements and traceability
 
 ## Language Version
-**Current Version**: 2.26.41
+**Current Version**: 3.0.12
 
 ## Getting Started
+The [Project Guide](project-guide-help.md) gives the file set, folder structure and build order for each kind of project. For a product line with variants:
 1. Start with `.ple` file to define your product line
 2. Create `.fml` file to define features
 3. Generate `.vml` and `.vcf` files using right-click commands

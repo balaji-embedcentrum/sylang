@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Agent Definition (.agt)
 
 ## Overview
@@ -9,7 +15,7 @@ Defines **AI agents** with specialized expertise for systems engineering tasks.
 
 ## Valid Keywords
 ```
-use, hdef, agentset, def, agent, name, description, owner, role, 
+use, hdef, agentset, name, description, owner, level, def, agent, role,
 specialization, expertise, context
 ```
 
@@ -32,20 +38,20 @@ hdef agentset [identifier]
 ## Complete Example
 ```sylang
 hdef agentset AutonomousVehicleAgents
-  name "Autonomous Vehicle Engineering Agents"
-  description "Specialized AI agents for autonomous vehicle systems engineering"
-  owner "AI Engineering Team"
+  name """Autonomous Vehicle Engineering Agents"""
+  description """Specialized AI agents for autonomous vehicle systems engineering"""
+  owner """AI Engineering Team"""
 
   def agent PerceptionSystemsAgent
-    name "Perception Systems Engineering Agent"
+    name """Perception Systems Engineering Agent"""
     description """
       Expert in autonomous vehicle perception systems, sensor fusion, and 
       computer vision. Specialized in developing safety-critical perception 
       algorithms for Level 3 autonomous vehicles with deep knowledge of 
       ISO 26262 compliance.
       """
-    role "Perception Systems Engineer"
-    specialization "Autonomous Vehicle Perception"
+    role """Perception Systems Engineer"""
+    specialization """Autonomous Vehicle Perception"""
     expertise """
       Sensor fusion algorithms including Kalman filtering and particle filters
       Computer vision and deep learning for object detection
@@ -63,20 +69,20 @@ hdef agentset AutonomousVehicleAgents
       """
 
   def agent FunctionalSafetyAgent
-    name "Functional Safety Engineering Agent"
-    description "Specialist in automotive functional safety and ISO 26262"
-    role "Functional Safety Engineer"
-    specialization "Automotive Functional Safety"
-    expertise "ISO 26262", "Hazard analysis", "FMEA", "Fault tree analysis", "ASIL assessment"
-    context "Automotive safety", "Risk assessment", "Safety mechanisms", "Failure analysis"
+    name """Functional Safety Engineering Agent"""
+    description """Specialist in automotive functional safety and ISO 26262"""
+    role """Functional Safety Engineer"""
+    specialization """Automotive Functional Safety"""
+    expertise """ISO 26262""", """Hazard analysis""", """FMEA""", """Fault tree analysis""", """ASIL assessment"""
+    context """Automotive safety""", """Risk assessment""", """Safety mechanisms""", """Failure analysis"""
 
   def agent SafetyRequirementsAgent
-    name "Safety Requirements Engineering Agent"
-    description "Expert in safety-critical requirements engineering"
-    role "Safety Requirements Engineer"
-    specialization "Safety Requirements Engineering"
-    expertise "Safety requirements", "Requirements traceability", "Verification", "Validation"
-    context "Safety-critical systems", "ASIL requirements", "Requirements validation"
+    name """Safety Requirements Engineering Agent"""
+    description """Expert in safety-critical requirements engineering"""
+    role """Safety Requirements Engineer"""
+    specialization """Safety Requirements Engineering"""
+    expertise """Safety requirements""", """Requirements traceability""", """Verification""", """Validation"""
+    context """Safety-critical systems""", """ASIL requirements""", """Requirements validation"""
 ```
 
 ## Agent Properties

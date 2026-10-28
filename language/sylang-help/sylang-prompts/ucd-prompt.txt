@@ -1,5 +1,7 @@
 # Use Case Diagram (.ucd) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Use Case Diagram files define actors and their interactions with system functions using clean flat syntax. UCD files capture how users (actors) interact with system capabilities (functions) and how functions include other functions, providing a clear view of system usage and functional relationships.
 
@@ -68,27 +70,27 @@ tags, level, actortype, from, to, connection, associated, includes, when, ref
 ### Actor Definition (Primary)
 ```
 def actor ChairUser
-  name "Chair User"
-  description "Primary user who interacts with adjustment features"
-  owner "User Experience Team"
+  name """Chair User"""
+  description """Primary user who interacts with adjustment features"""
+  owner """User Experience Team"""
   actortype primary
 ```
 
 ### Actor Definition (Secondary)
 ```
 def actor ChairControlSystem
-  name "Chair Control System"
-  description "Electronic control system managing chair functions"
-  owner "Control Systems Team"
+  name """Chair Control System"""
+  description """Electronic control system managing chair functions"""
+  owner """Control Systems Team"""
   actortype secondary
 ```
 
 ### Use Case: Actor → Function (Associated)
 ```
 def usecase UC_001
-  name "Initiate Chair System"
-  description "User initiates chair system operation"
-  owner "System Team"
+  name """Initiate Chair System"""
+  description """User initiates chair system operation"""
+  owner """System Team"""
   from ref actor ChairUser
   to ref function InitializeChairSystem
   connection associated
@@ -97,9 +99,9 @@ def usecase UC_001
 ### Use Case: Function → Function (Includes)
 ```
 def usecase UC_003
-  name "Monitor Pneumatic Pressure"
-  description "System monitors gas cylinder pressure during adjustment"
-  owner "Control Team"
+  name """Monitor Pneumatic Pressure"""
+  description """System monitors gas cylinder pressure during adjustment"""
+  owner """Control Team"""
   from ref function ExecutePneumaticHeightAdjustment
   to ref function MonitorGasCylinderPressure
   connection includes
@@ -120,9 +122,9 @@ Context:
 - Level: system
 
 Use Case Set: AutonomousVehicleUseCases
-- Owner: "Requirements Team"
+- Owner: """Requirements Team"""
 - Description: Actor interactions with autonomous driving functions
-- Tags: "ISO-26262", "autonomous-vehicle", "use-cases"
+- Tags: """ISO-26262""", """autonomous-vehicle""", """use-cases"""
 - Level: system
 
 Generate 15-20 use cases covering:
@@ -130,19 +132,19 @@ Generate 15-20 use cases covering:
 ACTORS (Define 4 actors):
 1. Driver (primary)
    - Description: Primary user who monitors system and takes control when needed
-   - Owner: "User Experience Team"
+   - Owner: """User Experience Team"""
 
 2. Passenger (primary)
    - Description: Vehicle passenger who may interact with comfort features
-   - Owner: "User Experience Team"
+   - Owner: """User Experience Team"""
 
 3. VehicleControlSystem (secondary)
    - Description: Internal control system managing vehicle functions
-   - Owner: "Control Systems Team"
+   - Owner: """Control Systems Team"""
 
 4. TrafficSystem (secondary)
    - Description: External traffic management and V2X communication
-   - Owner: "Communication Team"
+   - Owner: """Communication Team"""
 
 USE CASES (Define 15-20 use cases):
 
@@ -251,9 +253,9 @@ Actors: Nurse (primary), Doctor (primary), MonitoringSystem (secondary)
 Level: system
 
 Use Case Set: PatientMonitoringUseCases
-- Owner: "Medical Device Team"
+- Owner: """Medical Device Team"""
 - Description: Clinical staff interactions with patient monitoring functions
-- Tags: "IEC-62304", "medical-device", "patient-monitoring"
+- Tags: """IEC-62304""", """medical-device""", """patient-monitoring"""
 - Level: system
 
 Generate 12 use cases:
@@ -345,9 +347,9 @@ Actors: Pilot (primary), Co-pilot (primary), FlightManagementSystem (secondary),
 Level: system
 
 Use Case Set: FlightManagementUseCases
-- Owner: "Avionics Team"
+- Owner: """Avionics Team"""
 - Description: Flight crew interactions with flight management functions
-- Tags: "DO-178C", "avionics", "flight-management"
+- Tags: """DO-178C""", """avionics""", """flight-management"""
 - Level: system
 
 Generate 12 use cases:
@@ -442,9 +444,9 @@ Actors: Operator (primary), MaintenanceTechnician (primary), SafetyController (s
 Level: system
 
 Use Case Set: SafetyPLCUseCases
-- Owner: "Industrial Automation Team"
+- Owner: """Industrial Automation Team"""
 - Description: Operator interactions with safety control functions
-- Tags: "IEC-61508", "safety-PLC", "industrial-automation"
+- Tags: """IEC-61508""", """safety-PLC""", """industrial-automation"""
 - Level: system
 
 Generate 10 use cases:
@@ -527,42 +529,42 @@ Context:
 - Level: {system|subsystem|component}
 
 Use Case Set: {USECASESET_IDENTIFIER}
-- Owner: "{OWNER_NAME}"
+- Owner: """{OWNER_NAME}"""
 - Description: {DESCRIPTION}
-- Tags: "{TAG1}", "{TAG2}", "{TAG3}"
+- Tags: """{TAG1}""", """{TAG2}""", """{TAG3}"""
 - Level: {LEVEL}
 
 Generate {NUMBER} use cases:
 
 ACTORS (Define {NUMBER} actors):
 1. {ACTOR_1_NAME} ({primary|secondary})
-   - name: "{ACTOR_1_TITLE}"
-   - description: "{ACTOR_1_DESCRIPTION}"
-   - owner: "{ACTOR_1_OWNER}"
+   - name: """{ACTOR_1_TITLE}"""
+   - description: """{ACTOR_1_DESCRIPTION}"""
+   - owner: """{ACTOR_1_OWNER}"""
    - actortype: {primary|secondary}
 
 2. {ACTOR_2_NAME} ({primary|secondary})
-   - name: "{ACTOR_2_TITLE}"
-   - description: "{ACTOR_2_DESCRIPTION}"
-   - owner: "{ACTOR_2_OWNER}"
+   - name: """{ACTOR_2_TITLE}"""
+   - description: """{ACTOR_2_DESCRIPTION}"""
+   - owner: """{ACTOR_2_OWNER}"""
    - actortype: {primary|secondary}
 
 USE CASES:
 
 Actor → Function Interactions ({NUMBER} use cases):
 1. {UC_ID_1}: {USE_CASE_NAME_1}
-   - name: "{USE_CASE_TITLE}"
-   - description: "{USE_CASE_DESCRIPTION}"
-   - owner: "{USE_CASE_OWNER}"
+   - name: """{USE_CASE_TITLE}"""
+   - description: """{USE_CASE_DESCRIPTION}"""
+   - owner: """{USE_CASE_OWNER}"""
    - from ref actor: {ACTOR_NAME}
    - to ref function: {FUNCTION_NAME}
    - connection: associated
 
 Function → Function Inclusions ({NUMBER} use cases):
 N. {UC_ID_N}: {USE_CASE_NAME_N}
-   - name: "{USE_CASE_TITLE}"
-   - description: "{USE_CASE_DESCRIPTION}"
-   - owner: "{USE_CASE_OWNER}"
+   - name: """{USE_CASE_TITLE}"""
+   - description: """{USE_CASE_DESCRIPTION}"""
+   - owner: """{USE_CASE_OWNER}"""
    - from ref function: {SOURCE_FUNCTION}
    - to ref function: {TARGET_FUNCTION}
    - connection: includes
@@ -661,110 +663,110 @@ After AI generation, verify:
 use functionset ChairSystemFunctions
 
 hdef usecaseset ChairSystemUseCases
-  name "Height Adjustable Chair Use Cases"
+  name """Height Adjustable Chair Use Cases"""
   description """
     Use case model describing user interactions with height adjustable 
     chair system. Covers pneumatic and electric adjustment mechanisms, 
     safety monitoring, and system control functions.
     """
-  owner "Systems Engineering Team"
-  tags "chair-system", "height-adjustment", "user-interaction"
+  owner """Systems Engineering Team"""
+  tags """chair-system""", """height-adjustment""", """user-interaction"""
   level system
 
   def actor ChairUser
-    name "Chair User"
-    description "Primary user who interacts with chair adjustment features"
-    owner "User Experience Team"
+    name """Chair User"""
+    description """Primary user who interacts with chair adjustment features"""
+    owner """User Experience Team"""
     actortype primary
 
   def actor MaintenanceTechnician
-    name "Maintenance Technician"
-    description "Technician performing chair maintenance and calibration"
-    owner "Maintenance Team"
+    name """Maintenance Technician"""
+    description """Technician performing chair maintenance and calibration"""
+    owner """Maintenance Team"""
     actortype primary
 
   def actor ChairControlSystem
-    name "Chair Control System"
-    description "Electronic control system managing chair functions"
-    owner "Control Systems Team"
+    name """Chair Control System"""
+    description """Electronic control system managing chair functions"""
+    owner """Control Systems Team"""
     actortype secondary
 
   def usecase UC_001
-    name "Initiate Chair System"
-    description "User initiates chair system operation by powering on control system"
-    owner "System Team"
+    name """Initiate Chair System"""
+    description """User initiates chair system operation by powering on control system"""
+    owner """System Team"""
     from ref actor ChairUser
     to ref function InitializeChairSystem
     connection associated
 
   def usecase UC_002
-    name "Execute Pneumatic Height Adjustment"
-    description "User performs height adjustment using pneumatic lever mechanism"
-    owner "Adjustment Team"
+    name """Execute Pneumatic Height Adjustment"""
+    description """User performs height adjustment using pneumatic lever mechanism"""
+    owner """Adjustment Team"""
     from ref actor ChairUser
     to ref function ExecutePneumaticHeightAdjustment
     connection associated
 
   def usecase UC_003
-    name "Monitor Pneumatic Pressure"
-    description "System monitors gas cylinder pressure during pneumatic adjustment"
-    owner "Control Team"
+    name """Monitor Pneumatic Pressure"""
+    description """System monitors gas cylinder pressure during pneumatic adjustment"""
+    owner """Control Team"""
     from ref function ExecutePneumaticHeightAdjustment
     to ref function MonitorGasCylinderPressure
     connection includes
 
   def usecase UC_004
-    name "Verify Position Limits"
-    description "System verifies height is within allowable position limits"
-    owner "Safety Team"
+    name """Verify Position Limits"""
+    description """System verifies height is within allowable position limits"""
+    owner """Safety Team"""
     from ref function ExecutePneumaticHeightAdjustment
     to ref function VerifyHeightLimits
     connection includes
 
   def usecase UC_005
-    name "Execute Electric Height Adjustment"
-    description "User performs height adjustment using electric motor control"
-    owner "Adjustment Team"
+    name """Execute Electric Height Adjustment"""
+    description """User performs height adjustment using electric motor control"""
+    owner """Adjustment Team"""
     from ref actor ChairUser
     to ref function ExecuteElectricHeightAdjustment
     connection associated
 
   def usecase UC_006
-    name "Control Adjustment Motor"
-    description "Electric adjustment includes motor control for height positioning"
-    owner "Control Team"
+    name """Control Adjustment Motor"""
+    description """Electric adjustment includes motor control for height positioning"""
+    owner """Control Team"""
     from ref function ExecuteElectricHeightAdjustment
     to ref function ControlHeightAdjustmentMotor
     connection includes
 
   def usecase UC_007
-    name "Monitor Motor Current"
-    description "System monitors motor current during electric adjustment"
-    owner "Control Team"
+    name """Monitor Motor Current"""
+    description """System monitors motor current during electric adjustment"""
+    owner """Control Team"""
     from ref function ExecuteElectricHeightAdjustment
     to ref function MonitorMotorCurrent
     connection includes
 
   def usecase UC_008
-    name "Detect Safety Hazards"
-    description "Control system continuously monitors for safety hazards"
-    owner "Safety Team"
+    name """Detect Safety Hazards"""
+    description """Control system continuously monitors for safety hazards"""
+    owner """Safety Team"""
     from ref actor ChairControlSystem
     to ref function DetectSafetyHazards
     connection associated
 
   def usecase UC_009
-    name "Perform System Maintenance"
-    description "Technician performs scheduled maintenance and calibration"
-    owner "Maintenance Team"
+    name """Perform System Maintenance"""
+    description """Technician performs scheduled maintenance and calibration"""
+    owner """Maintenance Team"""
     from ref actor MaintenanceTechnician
     to ref function PerformSystemMaintenance
     connection associated
 
   def usecase UC_010
-    name "Calibrate Position Sensors"
-    description "Maintenance includes calibration of height position sensors"
-    owner "Maintenance Team"
+    name """Calibrate Position Sensors"""
+    description """Maintenance includes calibration of height position sensors"""
+    owner """Maintenance Team"""
     from ref function PerformSystemMaintenance
     to ref function CalibrateHeightSensors
     connection includes

@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Item Definition - ISO 26262 (.itm)
 
 ## Overview
@@ -10,9 +16,10 @@ Defines **ISO 26262 item definition** with system boundaries and operating modes
 
 ## Valid Keywords
 ```
-use, hdef, itemdefinition, def, boundary, operatingmode, name, description, 
-owner, tags, level, iso26262part, safetylevel, conditions, includes, 
-excludes, itemscope, when, ref
+use, hdef, itemdefinition, name, description, owner, tags, level,
+iso26262part, safetylevel, conditions, def, boundary, operatingmode,
+includes, excludes, itemscope, when, requires, ref, analysiseffort,
+deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -48,16 +55,16 @@ hdef itemdefinition [identifier]
 use featureset AutonomousVehicleFeatures
 
 hdef itemdefinition AutonomousVehicleItem
-  name "Autonomous Vehicle L3 System Item"
-  description "Complete item definition for Level 3 autonomous vehicle system per ISO 26262"
-  owner "Functional Safety Manager"
-  tags "ISO-26262", "item-definition", "L3-autonomous"
-  iso26262part "Part 3 - Item Definition"
+  name """Autonomous Vehicle L3 System Item"""
+  description """Complete item definition for Level 3 autonomous vehicle system per ISO 26262"""
+  owner """Functional Safety Manager"""
+  tags """ISO-26262""", """item-definition""", """L3-autonomous"""
+  iso26262part """Part 3 - Item Definition"""
   safetylevel ASIL-D
 
   def boundary SystemBoundary
-    name "Autonomous Vehicle System Boundary"
-    description "Physical and functional boundaries of the autonomous vehicle item"
+    name """Autonomous Vehicle System Boundary"""
+    description """Physical and functional boundaries of the autonomous vehicle item"""
     
     includes ref block PerceptionControlModule
     includes ref block PlanningControlModule
@@ -67,40 +74,40 @@ hdef itemdefinition AutonomousVehicleItem
     excludes ref block ClimateControlSystem
     
     def boundary SensorBoundary
-      name "Sensor System Boundary"
-      description "Boundary definition for all perception sensors"
+      name """Sensor System Boundary"""
+      description """Boundary definition for all perception sensors"""
       includes ref block CameraSystem
       includes ref block LidarSystem
       includes ref block RadarSystem
       
   def operatingmode HighwayAutonomous
-    name "Highway Autonomous Operation"
-    description "Autonomous operation on controlled access highways"
-    conditions "Highway driving, speeds 60-130 km/h, good weather"
+    name """Highway Autonomous Operation"""
+    description """Autonomous operation on controlled access highways"""
+    conditions """Highway driving, speeds 60-130 km/h, good weather"""
     safetylevel ASIL-D
     
     def operatingmode HighwayEntry
-      name "Highway Entry and Merging"
-      description "Autonomous highway entry and merging maneuvers"
-      conditions "Highway on-ramps, merging zones, acceleration lanes"
+      name """Highway Entry and Merging"""
+      description """Autonomous highway entry and merging maneuvers"""
+      conditions """Highway on-ramps, merging zones, acceleration lanes"""
       safetylevel ASIL-D
       
     def operatingmode HighwayExit
-      name "Highway Exit and Lane Change"
-      description "Autonomous highway exit and lane changing"
-      conditions "Highway off-ramps, lane changes, deceleration zones"
+      name """Highway Exit and Lane Change"""
+      description """Autonomous highway exit and lane changing"""
+      conditions """Highway off-ramps, lane changes, deceleration zones"""
       safetylevel ASIL-D
 
   def operatingmode UrbanAutonomous
-    name "Urban Autonomous Operation"
-    description "Limited autonomous operation in urban environments"
-    conditions "City streets, speeds 30-60 km/h, traffic lights, pedestrians"
+    name """Urban Autonomous Operation"""
+    description """Limited autonomous operation in urban environments"""
+    conditions """City streets, speeds 30-60 km/h, traffic lights, pedestrians"""
     safetylevel ASIL-C
     
   def operatingmode ManualFallback
-    name "Manual Control Fallback"
-    description "Driver takeover and manual control operation"
-    conditions "System failure, adverse weather, construction zones"
+    name """Manual Control Fallback"""
+    description """Driver takeover and manual control operation"""
+    conditions """System failure, adverse weather, construction zones"""
     safetylevel QM
 
   itemscope ref function AutonomousPerceptionFunctions

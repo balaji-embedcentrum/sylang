@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Product Line Engineering (.ple)
 
 ## Overview
@@ -11,8 +17,8 @@ The `.ple` file is the **root file** of a Sylang project, defining the product l
 
 ## Valid Keywords
 ```
-hdef, productline, name, description, owner, domain, compliance, 
-firstrelease, tags, safetylevel, region
+hdef, productline, name, description, owner, domain, compliance,
+firstrelease, tags, safetylevel, status, region
 ```
 
 ## Syntax Structure
@@ -48,18 +54,18 @@ hdef productline [identifier]
 
 ```sylang
 hdef productline AutonomousVehicleProductLine
-  name "Autonomous Vehicle Platform Product Line"
+  name """Autonomous Vehicle Platform Product Line"""
   description """
     Comprehensive autonomous vehicle system covering ADAS, infotainment, 
     powertrain, and safety systems for Level 3 autonomous driving capabilities.
     """
-  owner "Vehicle Systems Engineering Team"
-  domain "autonomous-vehicles", "automotive-safety", "ADAS", "connected-mobility"
-  compliance "ISO 26262", "ISO 21448", "UN ECE R79", "SAE J3016"
-  firstrelease "2026-03-01"
-  tags "autonomous-driving", "L3-automation", "safety-critical", "connected-vehicle"
+  owner """Vehicle Systems Engineering Team"""
+  domain """autonomous-vehicles""", """automotive-safety""", """ADAS""", """connected-mobility"""
+  compliance """ISO 26262""", """ISO 21448""", """UN ECE R79""", """SAE J3016"""
+  firstrelease """2026-03-01"""
+  tags """autonomous-driving""", """L3-automation""", """safety-critical""", """connected-vehicle"""
   safetylevel ASIL-D
-  region "Global", "North America", "Europe", "Asia-Pacific"
+  region """Global""", """North America""", """Europe""", """Asia-Pacific"""
 ```
 
 ## Best Practices
@@ -77,14 +83,14 @@ description """
 ### 2. Complete Compliance Information
 List all relevant standards:
 ```sylang
-compliance "ISO 26262", "ISO 21448", "SAE J3016", "UN ECE R79"
+compliance """ISO 26262""", """ISO 21448""", """SAE J3016""", """UN ECE R79"""
 ```
 
 ### 3. Accurate Domain Tags
 Use specific, searchable domain terms:
 ```sylang
-domain "autonomous-vehicles", "automotive-safety", "ADAS", "sensor-fusion"
-tags "L3-automation", "safety-critical", "real-time", "AI-enabled"
+domain """autonomous-vehicles""", """automotive-safety""", """ADAS""", """sensor-fusion"""
+tags """L3-automation""", """safety-critical""", """real-time""", """AI-enabled"""
 ```
 
 ### 4. Proper Safety Level
@@ -99,37 +105,37 @@ safetylevel QM      # For non-safety systems
 ### Automotive Product Line
 ```sylang
 hdef productline AdvancedDriverAssistanceProductLine
-  name "Advanced Driver Assistance Systems Product Line"
-  description "ADAS features from basic to Level 3 autonomy"
-  owner "ADAS Engineering Team"
-  domain "automotive-safety", "ADAS", "driver-assistance"
-  compliance "ISO 26262", "UN ECE R79", "UN ECE R157"
+  name """Advanced Driver Assistance Systems Product Line"""
+  description """ADAS features from basic to Level 3 autonomy"""
+  owner """ADAS Engineering Team"""
+  domain """automotive-safety""", """ADAS""", """driver-assistance"""
+  compliance """ISO 26262""", """UN ECE R79""", """UN ECE R157"""
   safetylevel ASIL-D
-  region "Global"
+  region """Global"""
 ```
 
 ### Medical Device Product Line
 ```sylang
 hdef productline MedicalMonitoringProductLine
-  name "Patient Monitoring Systems Product Line"
-  description "Comprehensive patient vital signs monitoring platform"
-  owner "Medical Systems Engineering"
-  domain "medical-devices", "patient-monitoring", "healthcare"
-  compliance "IEC 62304", "ISO 13485", "ISO 14971"
+  name """Patient Monitoring Systems Product Line"""
+  description """Comprehensive patient vital signs monitoring platform"""
+  owner """Medical Systems Engineering"""
+  domain """medical-devices""", """patient-monitoring""", """healthcare"""
+  compliance """IEC 62304""", """ISO 13485""", """ISO 14971"""
   safetylevel SIL-3
-  region "North America", "Europe"
+  region """North America""", """Europe"""
 ```
 
 ### Industrial Automation Product Line
 ```sylang
 hdef productline IndustrialAutomationProductLine
-  name "Smart Factory Automation Product Line"
-  description "Industry 4.0 automation and control systems"
-  owner "Industrial Systems Team"
-  domain "industrial-automation", "IIoT", "smart-manufacturing"
-  compliance "IEC 61508", "ISO 13849"
+  name """Smart Factory Automation Product Line"""
+  description """Industry 4.0 automation and control systems"""
+  owner """Industrial Systems Team"""
+  domain """industrial-automation""", """IIoT""", """smart-manufacturing"""
+  compliance """IEC 61508""", """ISO 13849"""
   safetylevel SIL-2
-  region "Global"
+  region """Global"""
 ```
 
 ## Relationship to Other Files

@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Sprint Planning (.spr)
 
 ## Overview
@@ -10,9 +16,9 @@ Defines **agile sprints, epics, stories, and tasks** with agent assignments and 
 
 ## Valid Keywords
 ```
-use, hdef, sprint, def, epic, story, task, name, description, owner, 
-startdate, enddate, issuestatus, priority, assignedto, points, 
-outputfile, comment, ref, agent
+use, agentset, hdef, sprint, name, description, owner, level, startdate,
+enddate, assignedto, ref, issuestatus, priority, points, outputfile, comment,
+def, epic, story, task
 ```
 
 ## Syntax Structure
@@ -31,7 +37,7 @@ hdef sprint [identifier]
     name [string-literal]
     description [string-literal]
     assignedto ref agent [agent-ref]
-    issuestatus [open|in-progress|closed|blocked]
+    issuestatus [backlog|open|inprogress|blocked|done|canceled]
     priority [critical|high|medium|low]
     comment [string-literal]
     
@@ -39,7 +45,7 @@ hdef sprint [identifier]
       name [string-literal]
       description [string-literal]
       assignedto ref agent [agent-ref]
-      issuestatus [open|in-progress|closed|blocked]
+      issuestatus [backlog|open|inprogress|blocked|done|canceled]
       priority [critical|high|medium|low]
       points [numeric-value]
       
@@ -47,7 +53,7 @@ hdef sprint [identifier]
         name [string-literal]
         description [string-literal]
         assignedto ref agent [agent-ref]
-        issuestatus [open|in-progress|closed|blocked]
+        issuestatus [backlog|open|inprogress|blocked|done|canceled]
         priority [critical|high|medium|low]
         points [numeric-value]
         outputfile [file-path]
@@ -58,11 +64,11 @@ hdef sprint [identifier]
 use agentset AutonomousVehicleAgents
 
 hdef sprint AutonomousVehicleDevelopmentSprint
-  name "Autonomous Vehicle L3 System Development Sprint"
-  description "Complete autonomous vehicle system design and implementation"
-  owner "Autonomous Systems Program Manager"
-  startdate "2025-09-01"
-  enddate "2025-12-15"
+  name """Autonomous Vehicle L3 System Development Sprint"""
+  description """Complete autonomous vehicle system design and implementation"""
+  owner """Autonomous Systems Program Manager"""
+  startdate """2025-09-01"""
+  enddate """2025-12-15"""
   comment """
     This sprint covers the complete development lifecycle for L3 autonomous 
     vehicle system. Key focus areas include perception, safety validation, 
@@ -70,8 +76,8 @@ hdef sprint AutonomousVehicleDevelopmentSprint
     """
 
   def epic PerceptionSystemDevelopment
-    name "Perception System Architecture and Implementation"
-    description "Design and implement complete perception system"
+    name """Perception System Architecture and Implementation"""
+    description """Design and implement complete perception system"""
     assignedto ref agent PerceptionSystemsAgent
     issuestatus open
     priority critical
@@ -82,29 +88,29 @@ hdef sprint AutonomousVehicleDevelopmentSprint
       """
 
     def story PerceptionRequirements
-      name "Perception System Requirements Definition"
-      description "Define comprehensive requirements for perception system"
+      name """Perception System Requirements Definition"""
+      description """Define comprehensive requirements for perception system"""
       assignedto ref agent SafetyRequirementsAgent
       issuestatus open
       priority critical
 
       def task PerceptionFunctionalRequirements
-        name "Perception Functional Requirements"
-        description "Define functional requirements for object detection and tracking"
+        name """Perception Functional Requirements"""
+        description """Define functional requirements for object detection and tracking"""
         assignedto ref agent PerceptionSystemsAgent
         issuestatus open
         priority critical
-        points "13"
-        outputfile "requirements/PerceptionFunctionalRequirements.req"
+        points """13"""
+        outputfile """requirements/PerceptionFunctionalRequirements.req"""
 
       def task PerceptionSafetyRequirements
-        name "Perception Safety Requirements"
-        description "Define ASIL-D safety requirements for perception system"
+        name """Perception Safety Requirements"""
+        description """Define ASIL-D safety requirements for perception system"""
         assignedto ref agent SafetyRequirementsAgent
         issuestatus backlog
         priority critical
-        points "21"
-        outputfile "requirements/PerceptionSafetyRequirements.req"
+        points """21"""
+        outputfile """requirements/PerceptionSafetyRequirements.req"""
 ```
 
 ## Issue Status

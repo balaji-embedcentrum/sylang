@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Safety Goals (.sgl)
 
 ## Overview
@@ -13,10 +19,10 @@ Defines **ISO 26262 Safety Goals** derived from hazard analysis with ASIL classi
 ## Valid Keywords
 
 ```
-use, hdef, safetygoalset, def, safetygoal, name, description, owner, 
-tags, safetylevel, safestate, faulttoleranttime, emergencyoperationtime, 
-derivedfrom, mitigates, leadsto, allocatedto, when, ref, hazard, situation, 
-item, requirement
+use, hdef, safetygoalset, name, description, owner, tags, level, safetylevel,
+def, safetygoal, derivedfrom, mitigates, safestate, safecondition,
+faulttoleranttime, emergencyoperationtime, leadsto, allocatedto, when,
+requires, ref, analysiseffort, deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -66,25 +72,25 @@ use hazardanalysis AutonomousVehicleHazards
 use itemdefinition AutonomousVehicleItem
 
 hdef safetygoalset AutonomousVehicleSafetyGoals
-  name "Autonomous Vehicle Safety Goals"
+  name """Autonomous Vehicle Safety Goals"""
   description """
     Complete set of safety goals derived from hazard analysis for 
     Level 3 autonomous vehicle system per ISO 26262 Part 3.
     """
-  owner "Functional Safety Manager"
-  tags "ISO-26262", "safety-goals", "part-3", "ASIL-D"
+  owner """Functional Safety Manager"""
+  tags """ISO-26262""", """safety-goals""", """part-3""", """ASIL-D"""
   safetylevel ASIL-D
 
   def safetygoal SG_001_PreventUnintendedAcceleration
-    name "Prevent Unintended Vehicle Acceleration"
+    name """Prevent Unintended Vehicle Acceleration"""
     description """
       The vehicle SHALL prevent unintended acceleration during autonomous 
       operation to avoid collision with other vehicles, pedestrians, or 
       obstacles. System must detect acceleration faults and transition 
       to safe state within fault tolerant time interval.
       """
-    owner "Safety Goals Team"
-    tags "acceleration-control", "longitudinal-safety", "collision-avoidance"
+    owner """Safety Goals Team"""
+    tags """acceleration-control""", """longitudinal-safety""", """collision-avoidance"""
     safetylevel ASIL-D
   
     # Backward traceability to hazards
@@ -112,7 +118,7 @@ hdef safetygoalset AutonomousVehicleSafetyGoals
     when ref config c_CoreAutonomousFeatures
 
   def safetygoal SG_002_MaintainLateralControl
-    name "Maintain Lateral Vehicle Control"
+    name """Maintain Lateral Vehicle Control"""
     description """
       The vehicle SHALL maintain lateral control and lane position during 
       autonomous operation. Loss of steering control must be detected and 
@@ -139,7 +145,7 @@ hdef safetygoalset AutonomousVehicleSafetyGoals
     allocatedto ref item AutonomousVehicleItem
 
   def safetygoal SG_003_DetectAndAvoidObstacles
-    name "Detect and Avoid Obstacles"
+    name """Detect and Avoid Obstacles"""
     description """
       The vehicle SHALL detect obstacles in the driving path and execute 
       collision avoidance maneuvers or emergency braking to prevent collision.
@@ -162,7 +168,7 @@ hdef safetygoalset AutonomousVehicleSafetyGoals
     allocatedto ref item AutonomousVehicleItem
 
   def safetygoal SG_004_DiagnoseSensorFailures
-    name "Diagnose Perception Sensor Failures"
+    name """Diagnose Perception Sensor Failures"""
     description """
       The system SHALL continuously diagnose perception sensor health and 
       detect sensor failures with sufficient coverage to maintain safety goals.
@@ -216,7 +222,7 @@ def hazard UnintendedAcceleration
   severity S3
   exposure E4
   controllability C2
-  asil ASIL-D
+  safetylevel ASIL-D
 
 ### In .sgl file:
 def safetygoal SG_001_PreventUnintendedAcceleration
@@ -258,24 +264,23 @@ Safety goals inherit ASIL level from their source hazards:
 ## Safe State Types (Examples)
 
 ```
-1. "Controlled stop in current lane"
-2. "Degraded operation with reduced speed"
-3. "Driver takeover with warning"
-4. "Minimal risk condition with safe stop"
-5. "Emergency operation using redundant systems"
+1. """Controlled stop in current lane"""
+2. """Degraded operation with reduced speed"""
+3. """Driver takeover with warning"""
+4. """Minimal risk condition with safe stop"""
+5. """Emergency operation using redundant systems"""
 ```
 
 ## Validation Rules
 
 ✅ Exactly one `hdef safetygoalset` per file
 ✅ Must `use hazardanalysis` to reference hazards
-✅ Each safety goal must have `derivedfrom ref hazard`
+✅ Each safety goal has `derivedfrom ref hazard` (a goal without one gets a warning)
 ✅ Each safety goal must have `safestate` definition
 ✅ `faulttoleranttime` and `emergencyoperationtime` recommended
-✅ ASIL level must match or be higher than source hazard
+✅ Its ASIL should be at least the ASIL of the hazards it covers (check this in review; the validator does not compare them)
 ✅ `leadsto ref requirement` links to `.req` file (multiple allowed)
-❌ Cannot create safety goals without source hazards
-❌ Cannot lower ASIL level from source hazard
+❌ Do not set a lower ASIL than the source hazard
 
 ## ISO 26262 Compliance Notes
 

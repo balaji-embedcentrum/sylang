@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Variant Configuration (.vcf)
 
 ## Overview
@@ -5,9 +11,9 @@ The `.vcf` file contains **configuration values** (0 or 1) for each feature in a
 
 ## ⚠️ IMPORTANT: AUTO-GENERATED FILE
 **DO NOT CREATE MANUALLY!**  
-Use the command: **Right-click `.vml` file → "Generate VCF from VML"**
+Use the command: **Right-click `.vml` file → "Generate variant config (.vcf)"**
 
-## File Structure Rules (NEW SYNTAX v2.21.85)
+## File Structure Rules
 - **ONE** `hdef configset` statement per file
 - **ONE** `.vcf` file per folder (strict limitation)
 - **MULTIPLE** `def config` statements
@@ -16,8 +22,8 @@ Use the command: **Right-click `.vml` file → "Generate VCF from VML"**
 
 ## Valid Keywords
 ```
-use, hdef, configset, def, config, name, description, owner, tags,
-generatedfrom, generatedat, basedon, ref, feature, featureset, variantset
+use, hdef, configset, generatedfrom, generatedat, name, description, owner,
+tags, status, def, config, basedon, inherits
 ```
 
 ## Syntax Structure
@@ -44,22 +50,22 @@ hdef configset [identifier]
 - `1` - Feature is **enabled** (selected in variant)
 - `0` - Feature is **disabled** (not selected, will be grayed out)
 
-## Complete Example (NEW SYNTAX)
+## Complete Example
 
 ```sylang
 use featureset AutonomousVehicleFeatures
 use variantset AutonomousVehicleVariants_Premium
 
 hdef configset AutonomousVehicleConfig_Premium
-  name "Premium Autonomous Vehicle Configuration"
+  name """Premium Autonomous Vehicle Configuration"""
   description """
     Auto-generated configuration for premium autonomous vehicle variant 
     with full sensor suite and advanced HMI features.
     """
-  owner "Product Engineering"
+  owner """Product Engineering"""
   generatedfrom ref variantset AutonomousVehicleVariants_Premium
-  generatedat "2025-10-01T17:30:45.123Z"
-  tags "variant", "config", "auto-generated", "premium"
+  generatedat """2025-10-01T17:30:45.123Z"""
+  tags """variant""", """config""", """auto-generated""", """premium"""
 
   def config c_CoreAutonomousFeatures 1
     basedon ref feature CoreAutonomousFeatures
@@ -142,9 +148,9 @@ use featureset VehicleFeatures
 use variantset BasicVariant
 
 hdef configset BasicVehicleConfig
-  name "Basic Vehicle Configuration"
+  name """Basic Vehicle Configuration"""
   generatedfrom ref variantset BasicVariant
-  generatedat "2025-10-01T10:00:00.000Z"
+  generatedat """2025-10-01T10:00:00.000Z"""
 
   def config c_CoreFeatures 1
     basedon ref feature CoreFeatures
@@ -165,7 +171,7 @@ use featureset VehicleFeatures
 use variantset PremiumVariant
 
 hdef configset PremiumVehicleConfig
-  name "Premium Vehicle Configuration"
+  name """Premium Vehicle Configuration"""
   
   def config c_CoreFeatures 1
     basedon ref feature CoreFeatures
@@ -187,13 +193,13 @@ hdef configset PremiumVehicleConfig
 ✅ Must include both `use featureset` AND `use variantset`  
 ✅ Config values must be `0` or `1`  
 ✅ Each config must have `basedon ref feature`  
-✅ All features from `.vml` must have corresponding configs  
-✅ Symbol manager validates configs against source `.vml`  
-❌ DO NOT create manually - use "Generate VCF from VML" command  
+✅ Has a config for every feature in the `.vml` (the generator writes them; regenerate after changing the `.vml`)  
+✅ The validator checks configs against the source `.vml`  
+❌ DO NOT create manually - use "Generate variant config (.vcf)" command  
 ❌ Cannot add configs not derived from `.fml` → `.vml` pipeline  
 ❌ Cannot have multiple `.vcf` files in same folder
 
-## NEW SYNTAX Benefits (v2.21.85)
+## Why configs are written this way
 
 ### 1. Clear Traceability
 ```sylang
@@ -221,7 +227,7 @@ def config c_GrandChild 1               # Simple naming
 The `use variantset` reference enables validation:
 - Prevents unauthorized config additions
 - Ensures all configs trace back to `.fml` → `.vml` pipeline
-- Symbol manager validates config legitimacy
+- The validator checks that each config comes from the variant model
 
 ## Generation Workflow
 
@@ -234,7 +240,7 @@ def feature CoreFeatures mandatory
 ```
 
 ### Step 2: Generate Variant
-**Right-click `.fml` → "Generate VML from FML"**
+**Right-click `.fml` → "Create .vml template"**
 ```sylang
 # Features.vml
 extends ref feature CoreFeatures mandatory selected
@@ -243,7 +249,7 @@ extends ref feature CoreFeatures mandatory selected
 ```
 
 ### Step 3: Generate Configuration
-**Right-click `.vml` → "Generate VCF from VML"**
+**Right-click `.vml` → "Generate variant config (.vcf)"**
 ```sylang
 # Features.vcf (auto-generated)
 use featureset Features

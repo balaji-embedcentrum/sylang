@@ -1,7 +1,13 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Use Case Diagram (.ucd)
 
 ## Overview
-Defines **actors and use cases** with clean flat syntax using from/to/connection relationships (NEW SYNTAX v2.21.44).
+Defines **actors and use cases** with a flat syntax using from/to/connection relationships.
 
 ## File Structure
 - **ONE** `hdef usecaseset` per file
@@ -10,8 +16,9 @@ Defines **actors and use cases** with clean flat syntax using from/to/connection
 
 ## Valid Keywords
 ```
-use, hdef, usecaseset, def, actor, usecase, name, description, owner, 
-tags, level, actortype, from, to, connection, associated, includes, when, ref
+use, hdef, usecaseset, name, description, owner, tags, level, def, actor,
+usecase, actortype, from, to, connection, associated, includes, when,
+requires, ref, config
 ```
 
 ## Syntax Structure
@@ -35,14 +42,9 @@ hdef usecaseset [identifier]
     name [string-literal]
     description [string-literal]
     owner [string-literal]
-    
-  from ref actor [actor-ref]
-  to ref function [function-ref]
-  connection [associated|includes]
-  
-  from ref function [function-ref]
-  to ref function [function-ref]
-  connection includes
+    from ref actor [actor-ref] | from ref function [function-ref]
+    to ref function [function-ref]
+    connection [associated|includes]
 ```
 
 ## Actor Types
@@ -69,39 +71,39 @@ connection includes    # Inclusion (function → function)
 use functionset ChairSystemFunctions
 
 hdef usecaseset ChairSystemUseCases
-  name "Height Adjustable Chair Use Cases"
-  description "Use case model describing user interactions with chair system"
-  owner "Systems Engineering Team"
+  name """Height Adjustable Chair Use Cases"""
+  description """Use case model describing user interactions with chair system"""
+  owner """Systems Engineering Team"""
 
   def actor ChairUser
-    name "Chair User"
-    description "Primary user who interacts with adjustment features"
-    owner "User Experience Team"
+    name """Chair User"""
+    description """Primary user who interacts with adjustment features"""
+    owner """User Experience Team"""
     actortype primary
 
   def actor ChairControlSystem
-    name "Chair Control System"
-    description "Electronic control system managing chair functions"
-    owner "Control Systems Team"
+    name """Chair Control System"""
+    description """Electronic control system managing chair functions"""
+    owner """Control Systems Team"""
     actortype secondary
 
   def usecase UC_001
-    name "Initiate Chair System"
-    description "User initiates chair system operation"
+    name """Initiate Chair System"""
+    description """User initiates chair system operation"""
     from ref actor ChairUser
     to ref function InitializeChairSystem
     connection associated
 
   def usecase UC_002
-    name "Execute Pneumatic Height Adjustment"
-    description "User performs height adjustment using pneumatic system"
+    name """Execute Pneumatic Height Adjustment"""
+    description """User performs height adjustment using pneumatic system"""
     from ref actor ChairUser
     to ref function ExecutePneumaticHeightAdjustment
     connection associated
 
   def usecase UC_003
-    name "Monitor Pneumatic Pressure"
-    description "System monitors gas cylinder pressure during adjustment"
+    name """Monitor Pneumatic Pressure"""
+    description """System monitors gas cylinder pressure during adjustment"""
     from ref function ExecutePneumaticHeightAdjustment
     to ref function MonitorGasCylinderPressure
     connection includes

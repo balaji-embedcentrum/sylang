@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Hazard Analysis - ISO 26262 (.haz)
 
 ## Overview
@@ -10,10 +16,12 @@ Defines **ISO 26262 hazard analysis** with ASIL determination. Part of ISO 26262
 
 ## Valid Keywords
 ```
-use, hdef, hazardanalysis, def, hazard, situation, name, description, owner, 
-tags, level, iso26262part, assessmentdate, hazardclass, severity, exposure, 
-controllability, asil, speed, environment, trafficdensity, maxacceptabledelay, 
-nominalresponsetime, malfunctionof, affects, leadsto, when, ref
+use, hdef, hazardanalysis, name, description, owner, tags, level,
+iso26262part, assessmentdate, hazardclass, severity, exposure,
+controllability, safetylevel, speed, environment, trafficdensity,
+maxacceptabledelay, nominalresponsetime, def, hazard, situation,
+malfunctionof, affects, leadsto, when, requires, ref, analysiseffort,
+deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -43,7 +51,7 @@ hdef hazardanalysis [identifier]
       severity [S0|S1|S2|S3]
       exposure [E0|E1|E2|E3|E4|E5]
       controllability [C0|C1|C2|C3]
-      asil [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
+      safetylevel [QM|ASIL-A|ASIL-B|ASIL-C|ASIL-D]
       speed [numeric-value]
       environment [string-literal]
       trafficdensity [low|medium|high]
@@ -57,7 +65,7 @@ hdef hazardanalysis [identifier]
 severity: S0, S1, S2, S3
 exposure: E0, E1, E2, E3, E4, E5
 controllability: C0, C1, C2, C3
-asil: QM, ASIL-A, ASIL-B, ASIL-C, ASIL-D
+safetylevel: QM, ASIL-A, ASIL-B, ASIL-C, ASIL-D
 ```
 
 ## Example
@@ -65,78 +73,78 @@ asil: QM, ASIL-A, ASIL-B, ASIL-C, ASIL-D
 use itemdefinition AutonomousVehicleItem
 
 hdef hazardanalysis AutonomousVehicleHazards
-  name "Autonomous Vehicle Hazard Analysis"
-  description "Complete hazard analysis and risk assessment for L3 autonomous vehicle"
-  owner "Functional Safety Team"
-  tags "ISO-26262", "hazard-analysis", "ASIL-assessment"
-  iso26262part "Part 3 - Hazard Analysis"
-  assessmentdate "2025-08-18"
+  name """Autonomous Vehicle Hazard Analysis"""
+  description """Complete hazard analysis and risk assessment for L3 autonomous vehicle"""
+  owner """Functional Safety Team"""
+  tags """ISO-26262""", """hazard-analysis""", """ASIL-assessment"""
+  iso26262part """Part 3 - Hazard Analysis"""
+  assessmentdate """2025-08-18"""
   safetylevel ASIL-D
 
   def hazard UnintendedAcceleration
-    name "Unintended Vehicle Acceleration"
+    name """Unintended Vehicle Acceleration"""
     description """
       Vehicle accelerates without driver command or against driver intention 
       during autonomous operation. This hazard can occur due to throttle control 
       system malfunction, sensor misinterpretation, or software algorithm errors.
       """
-    hazardclass "Longitudinal Motion"
+    hazardclass """Longitudinal Motion"""
     severity S3
     exposure E4
     controllability C2
-    asil ASIL-D
+    safetylevel ASIL-D
     
     malfunctionof ref function ThrottleControl
     affects ref feature ControlSystem
     leadsto ref requirement REQ_SAFE_ACCEL_001
 
     def situation HighwayUnintendedAcceleration
-      name "Unintended Acceleration on Highway"
-      description "Vehicle accelerates unintentionally during highway autonomous operation"
-      speed "60-130 km/h"
-      environment "Highway, dry conditions"
-      trafficdensity "Medium to high traffic"
-      maxacceptabledelay "500ms"
-      nominalresponsetime "200ms"
+      name """Unintended Acceleration on Highway"""
+      description """Vehicle accelerates unintentionally during highway autonomous operation"""
+      speed """60-130 km/h"""
+      environment """Highway, dry conditions"""
+      trafficdensity """Medium to high traffic"""
+      maxacceptabledelay """500ms"""
+      nominalresponsetime """200ms"""
       severity S3
       exposure E4
       controllability C2
-      asil ASIL-D
+      safetylevel ASIL-D
 
     def situation UrbanUnintendedAcceleration
-      name "Unintended Acceleration in Urban Area"
-      description "Vehicle accelerates unintentionally in urban environment with pedestrians"
-      speed "30-60 km/h"
-      environment "Urban streets, intersections"
-      trafficdensity "High traffic, pedestrians present"
-      maxacceptabledelay "300ms"
-      nominalresponsetime "150ms"
+      name """Unintended Acceleration in Urban Area"""
+      description """Vehicle accelerates unintentionally in urban environment with pedestrians"""
+      speed """30-60 km/h"""
+      environment """Urban streets, intersections"""
+      trafficdensity """High traffic, pedestrians present"""
+      maxacceptabledelay """300ms"""
+      nominalresponsetime """150ms"""
       severity S3
       exposure E5
       controllability C3
-      asil ASIL-D
+      safetylevel ASIL-D
 
   def hazard LossOfLateralControl
-    name "Loss of Lateral Vehicle Control"
-    description "Vehicle loses ability to maintain lane position or steer appropriately"
-    hazardclass "Lateral Motion"
+    name """Loss of Lateral Vehicle Control"""
+    description """Vehicle loses ability to maintain lane position or steer appropriately"""
+    hazardclass """Lateral Motion"""
     severity S3
     exposure E4
     controllability C2
-    asil ASIL-D
+    safetylevel ASIL-D
     
     malfunctionof ref function SteeringControl
     affects ref feature ControlSystem
     leadsto ref requirement REQ_SAFE_STEER_001
 
   def hazard FailureToStopAtObstacle
-    name "Failure to Stop at Obstacle"
-    description "Vehicle fails to detect obstacle and stop, resulting in collision"
-    hazardclass "Longitudinal Motion"
+    name """Failure to Stop at Obstacle"""
+    description """Vehicle fails to detect obstacle and stop, resulting in collision"""
+    hazardclass """Longitudinal Motion"""
     severity S3
     exposure E4
     controllability C3
-    asil ASIL-D
+    safetylevel ASIL-D
     
     malfunctionof ref function ObjectClassification
     affects ref feature PerceptionSystem

@@ -1,5 +1,7 @@
 # Product Line Engineering (.ple) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 The `.ple` file is the ROOT file of a Sylang project, defining the product line with no dependencies. It serves as the foundation for all feature modeling, variant management, and system architecture. This is typically the FIRST Sylang file created after the PRD.
 
@@ -237,7 +239,7 @@ After AI generation, verify:
 
 ```sylang
 hdef productline AutonomousVehicleProductLine
-  name "Autonomous Vehicle Platform Product Line"
+  name """Autonomous Vehicle Platform Product Line"""
   description """
     Comprehensive Level 3 autonomous vehicle system product line covering 
     highway automation, urban assistance, and parking automation for premium 
@@ -247,13 +249,13 @@ hdef productline AutonomousVehicleProductLine
     and ISO 21448 SOTIF standards. Supports multiple vehicle platforms 
     (sedan, SUV, crossover) with configurable sensor suites and autonomy levels.
     """
-  owner "Autonomous Systems Product Line Engineering Team"
-  domain "autonomous-vehicles", "automotive-safety", "ADAS", "connected-mobility", "sensor-fusion", "path-planning", "vehicle-control"
-  compliance "ISO 26262", "ISO 21448", "UN ECE R157", "SAE J3016", "ISO 26262-6", "ISO 21434", "WP.29"
-  firstrelease "2026-06-15"
-  tags "autonomous-driving", "L3-automation", "highway-pilot", "safety-critical", "ASIL-D", "sensor-fusion", "V2X"
+  owner """Autonomous Systems Product Line Engineering Team"""
+  domain """autonomous-vehicles""", """automotive-safety""", """ADAS""", """connected-mobility""", """sensor-fusion""", """path-planning""", """vehicle-control"""
+  compliance """ISO 26262""", """ISO 21448""", """UN ECE R157""", """SAE J3016""", """ISO 26262-6""", """ISO 21434""", """WP.29"""
+  firstrelease """2026-06-15"""
+  tags """autonomous-driving""", """L3-automation""", """highway-pilot""", """safety-critical""", """ASIL-D""", """sensor-fusion""", """V2X"""
   safetylevel ASIL-D
-  region "North America", "Europe", "Asia-Pacific", "China", "Japan"
+  region """North America""", """Europe""", """Asia-Pacific""", """China""", """Japan"""
 ```
 
 ---

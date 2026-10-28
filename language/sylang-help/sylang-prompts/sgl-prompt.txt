@@ -1,5 +1,7 @@
 # Safety Goals (.sgl) - AI Prompting Guide (ISO 26262 Part 3)
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Safety Goals files define ISO 26262 safety goals derived from hazard analysis, specifying safe states, Fault Tolerant Time Intervals (FTTI), and bilateral traceability to hazards and requirements. Critical for Part 3 (Concept Phase) compliance.
 
@@ -79,7 +81,7 @@ Hazards to mitigate:
 
 For each hazard, generate safety goal with:
 - Descriptive name using multiline strings
-- Safe state definition (what does "safe" mean?)
+- Safe state definition (what does """safe""" mean?)
 - Safe condition (measurable technical criteria)
 - FTTI: 100-500ms range (depends on criticality)
 - Emergency operation time: 1000-3000ms range
@@ -104,8 +106,8 @@ Situations:
 Create safety goal SG_PREVENT_UNINTENDED_ACCELERATION with:
 - derivedfrom ref hazard UnintendedAcceleration
 - derivedfrom ref situation HighwayDriving (additional context)
-- Safe state: "Vehicle maintains current speed or decelerates"
-- Safe condition: "Throttle command = 0 AND brake pressure ≥ 2 bar"
+- Safe state: """Vehicle maintains current speed or decelerates"""
+- Safe condition: """Throttle command = 0 AND brake pressure ≥ 2 bar"""
 - FTTI: 200ms
 - Emergency operation time: 1000ms
 - leadsto ref requirement: REQ_THROTTLE_MONITOR_001, REQ_ACCEL_LIMIT_001
@@ -119,7 +121,7 @@ Create high-level safety goal and decomposed sub-goals:
 
 Top-level Safety Goal:
 SG_VEHICLE_CONTROL_INTEGRITY (ASIL-D)
-"Maintain vehicle controllability at all times"
+"""Maintain vehicle controllability at all times"""
 
 Decompose into sub-goals for:
 1. Lateral control (steering)
@@ -146,7 +148,7 @@ Variants:
 
 Create safety goals for collision avoidance that:
 - Scale ASIL level based on variant
-- Use "when ref config" for variant-specific goals
+- Use """when ref config""" for variant-specific goals
 - Share common safe state definitions
 - Vary FTTI based on system capability
 
@@ -250,17 +252,17 @@ use hazardanalysis AutonomousVehicleHazards
 use itemdefinition AutonomousVehicleItem
 
 hdef safetygoalset AutonomousVehicleSafetyGoals
-  name "Autonomous Vehicle Safety Goals"
+  name """Autonomous Vehicle Safety Goals"""
   description """
     Complete set of safety goals derived from hazard analysis for 
     Level 3 autonomous vehicle system per ISO 26262 Part 3.
     """
-  owner "Functional Safety Manager"
-  tags "ISO-26262", "safety-goals", "part-3", "ASIL-D"
+  owner """Functional Safety Manager"""
+  tags """ISO-26262""", """safety-goals""", """part-3""", """ASIL-D"""
   safetylevel ASIL-D
 
   def safetygoal SG_001_PreventUnintendedAcceleration
-    name "Prevent Unintended Vehicle Acceleration"
+    name """Prevent Unintended Vehicle Acceleration"""
     description """
       The vehicle SHALL prevent unintended acceleration during autonomous 
       operation to avoid collisions with other vehicles, pedestrians, or 
@@ -268,8 +270,8 @@ hdef safetygoalset AutonomousVehicleSafetyGoals
       plausibility check all acceleration requests, and immediately 
       transition to a safe state if unintended acceleration is detected.
       """
-    owner "Chassis Safety Engineer"
-    tags "acceleration", "throttle-control", "collision-avoidance"
+    owner """Chassis Safety Engineer"""
+    tags """acceleration""", """throttle-control""", """collision-avoidance"""
     safetylevel ASIL-D
     
     # Backward traceability to hazard analysis
@@ -309,7 +311,7 @@ hdef safetygoalset AutonomousVehicleSafetyGoals
     when ref config c_AutonomousDriving
 
   def safetygoal SG_002_MaintainLateralControl
-    name "Maintain Lateral Vehicle Control"
+    name """Maintain Lateral Vehicle Control"""
     description """
       The vehicle SHALL maintain lateral control and lane position during 
       autonomous operation to prevent lane departure, collision with 
@@ -317,8 +319,8 @@ hdef safetygoalset AutonomousVehicleSafetyGoals
       continuously monitor steering actuator health, detect anomalies, 
       and transition to safe state if lateral control degradation is detected.
       """
-    owner "Steering Safety Engineer"
-    tags "steering-control", "lane-keeping", "lateral-stability"
+    owner """Steering Safety Engineer"""
+    tags """steering-control""", """lane-keeping""", """lateral-stability"""
     safetylevel ASIL-D
     
     derivedfrom ref hazard LossOfLateralControl

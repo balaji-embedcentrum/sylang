@@ -1,5 +1,7 @@
 # Test Definition (.tst) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Test Definition files define validation and verification test cases with complete traceability to requirements. TST files support multiple test methods (MIL, SIL, PIL, HIL, VIL, manual, automated) and test levels (unit, integration, system, acceptance), enabling systematic verification and compliance documentation.
 
@@ -74,20 +76,20 @@ testlevel, steps, satisfies, derivedfrom, refinedfrom, when, ref, config
 ### Test Set Structure
 ```
 hdef testset PerceptionSystemValidationTests
-  name "Autonomous Perception System Validation Test Suite"
-  description "Comprehensive validation tests for perception system"
-  owner "Perception Test Engineering Team"
-  tags "ISO-26262", "ASIL-D", "perception"
+  name """Autonomous Perception System Validation Test Suite"""
+  description """Comprehensive validation tests for perception system"""
+  owner """Perception Test Engineering Team"""
+  tags """ISO-26262""", """ASIL-D""", """perception"""
   safetylevel ASIL-D
 ```
 
 ### Test Case Structure (with multiline strings)
 ```
 def testcase TEST_PERC_001_OBJECT_DETECTION
-  name "Environmental Object Detection Performance Test"
-  description "Validate object detection accuracy and range performance"
-  owner "Object Detection Test Team"
-  tags "detection", "performance", "ASIL-D"
+  name """Environmental Object Detection Performance Test"""
+  description """Validate object detection accuracy and range performance"""
+  owner """Object Detection Test Team"""
+  tags """detection""", """performance""", """ASIL-D"""
   method HIL
   testlevel system
   setup """
@@ -137,10 +139,10 @@ Context:
 - Parameters: use parameter MaxDetectionRange, ConfidenceThreshold, ProcessingLatency
 
 Test Set: PerceptionSystemValidationTests (ASIL-D)
-- Owner: "Perception Test Engineering Team"
+- Owner: """Perception Test Engineering Team"""
 - Description: Comprehensive validation tests covering object detection, 
   classification, tracking, and sensor fusion per ISO 26262 ASIL-D
-- Tags: "ISO-26262", "ASIL-D", "perception", "validation"
+- Tags: """ISO-26262""", """ASIL-D""", """perception""", """validation"""
 
 Generate 15 test cases covering:
 
@@ -263,10 +265,10 @@ Functions: use functionset AlarmManagementFunctions
 Parameters: use parameter AlarmResponseTime, EscalationDelay
 
 Test Set: AlarmManagementValidationTests (SIL-3)
-- Owner: "Medical Device Test Engineering Team"
+- Owner: """Medical Device Test Engineering Team"""
 - Description: Validation tests for alarm generation, prioritization, escalation, 
   and clinical response per IEC 62304 and IEC 60601-1-8
-- Tags: "IEC-62304", "SIL-3", "alarms", "medical"
+- Tags: """IEC-62304""", """SIL-3""", """alarms""", """medical"""
 
 Generate 12 test cases covering:
 
@@ -362,10 +364,10 @@ Functions: use functionset FlightControlFunctions
 Parameters: use parameter ControlSurfaceDeflection, ResponseTime
 
 Test Set: FlightControlValidationTests (DAL-A)
-- Owner: "Avionics Test Engineering Team"
+- Owner: """Avionics Test Engineering Team"""
 - Description: Comprehensive validation tests for primary flight control system 
   per DO-178C DAL-A and FAR Part 25
-- Tags: "DO-178C", "DAL-A", "flight-control", "certification"
+- Tags: """DO-178C""", """DAL-A""", """flight-control""", """certification"""
 
 Generate 10 test cases covering:
 
@@ -445,9 +447,9 @@ Requirements: use requirementset SafetyPLCRequirements
 Functions: use functionset SafetyPLCFunctions
 
 Test Set: SafetyPLCValidationTests (SIL-3)
-- Owner: "Industrial Safety Test Team"
+- Owner: """Industrial Safety Test Team"""
 - Description: Safety function validation per IEC 61508 SIL-3 and ISO 13849 PLe
-- Tags: "IEC-61508", "SIL-3", "safety-PLC", "functional-safety"
+- Tags: """IEC-61508""", """SIL-3""", """safety-PLC""", """functional-safety"""
 
 Generate 8 test cases covering:
 
@@ -521,9 +523,9 @@ Context:
 - Parameters: use parameter {PARAMETER_LIST}
 
 Test Set: {TEST_SET_IDENTIFIER} ({SAFETY_LEVEL})
-- Owner: "{TEST_TEAM_NAME}"
+- Owner: """{TEST_TEAM_NAME}"""
 - Description: {TEST_SET_DESCRIPTION}
-- Tags: "{TAG1}", "{TAG2}", "{TAG3}"
+- Tags: """{TAG1}""", """{TAG2}""", """{TAG3}"""
 
 Generate {NUMBER} test cases covering:
 
@@ -685,25 +687,25 @@ use functionset AutonomousPerceptionFunctions
 use parameter MaxDetectionRange, ConfidenceThreshold, ProcessingLatency
 
 hdef testset PerceptionSystemValidationTests
-  name "Autonomous Perception System Validation Test Suite"
+  name """Autonomous Perception System Validation Test Suite"""
   description """
     Comprehensive validation tests for autonomous vehicle perception system 
     covering object detection, classification, tracking, and sensor fusion 
     per ISO 26262 ASIL-D requirements.
     """
-  owner "Perception Test Engineering Team"
-  tags "ISO-26262", "ASIL-D", "perception", "validation", "HIL"
+  owner """Perception Test Engineering Team"""
+  tags """ISO-26262""", """ASIL-D""", """perception""", """validation""", """HIL"""
   safetylevel ASIL-D
 
   def testcase TEST_PERC_001_OBJECT_DETECTION
-    name "Environmental Object Detection Performance Test"
+    name """Environmental Object Detection Performance Test"""
     description """
       Validate object detection accuracy, range performance, and confidence 
       scoring across all sensor modalities (radar, camera, LiDAR) in nominal 
       environmental conditions per ISO 26262 ASIL-D requirements.
       """
-    owner "Object Detection Test Team"
-    tags "detection", "performance", "ASIL-D", "HIL"
+    owner """Object Detection Test Team"""
+    tags """detection""", """performance""", """ASIL-D""", """HIL"""
     method HIL
     testlevel system
     setup """
@@ -750,13 +752,13 @@ hdef testset PerceptionSystemValidationTests
     derivedfrom ref requirement REQ_SYSTEM_PERCEPTION_001
 
   def testcase TEST_PERC_002_ADVERSE_WEATHER
-    name "Adverse Weather Detection Performance Test"
+    name """Adverse Weather Detection Performance Test"""
     description """
       Validate object detection performance degradation limits in adverse 
       weather conditions (rain, fog) per ISO 26262 ASIL-D requirements.
       """
-    owner "Environmental Test Team"
-    tags "weather", "environmental", "ASIL-D", "HIL"
+    owner """Environmental Test Team"""
+    tags """weather""", """environmental""", """ASIL-D""", """HIL"""
     method HIL
     testlevel system
     setup """

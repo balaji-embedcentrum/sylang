@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Test Definition (.tst)
 
 ## Overview
@@ -10,9 +16,10 @@ Defines **validation and verification tests** with complete traceability to requ
 
 ## Valid Keywords
 ```
-use, hdef, testset, def, testcase, name, description, owner, tags, 
-level, safetylevel, setup, passcriteria, testresult, expected, method, 
-testlevel, steps, satisfies, derivedfrom, refinedfrom, when, ref, config
+use, hdef, testset, name, description, owner, tags, level, safetylevel,
+status, def, testcase, refinedfrom, derivedfrom, satisfies, ref, config,
+when, requires, meets, expected, passcriteria, testresult, steps, method,
+testlevel, setup, attach, analysiseffort, deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -39,7 +46,7 @@ hdef testset [identifier]
     steps [string-literal]
     expected [string-literal]
     passcriteria [string-literal]
-    testresult [pass|fail|not-run|blocked]
+    testresult [pass|fail|intest|notrun|blocked]
     safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
     
     # Test relationships
@@ -56,13 +63,13 @@ use functionset AutonomousPerceptionFunctions
 use parameter MaxDetectionRange, ConfidenceThreshold
 
 hdef testset PerceptionSystemValidationTests
-  name "Autonomous Perception System Validation Test Suite"
-  description "Comprehensive validation tests for perception system"
-  owner "Perception Test Engineering Team"
+  name """Autonomous Perception System Validation Test Suite"""
+  description """Comprehensive validation tests for perception system"""
+  owner """Perception Test Engineering Team"""
 
   def testcase TEST_PERC_001_OBJECT_DETECTION
-    name "Environmental Object Detection Performance Test"
-    description "Validate object detection accuracy and range performance"
+    name """Environmental Object Detection Performance Test"""
+    description """Validate object detection accuracy and range performance"""
     satisfies ref requirement REQ_PERC_001
     method HIL
     testlevel system
@@ -93,14 +100,14 @@ hdef testset PerceptionSystemValidationTests
       """
     safetylevel ASIL-D
     testresult notrun
-    owner "Object Detection Test Team"
+    owner """Object Detection Test Team"""
 
   def testcase TEST_PERC_001_1_CLASSIFICATION_ACCURACY
-    name "Object Classification Accuracy Validation"
+    name """Object Classification Accuracy Validation"""
     satisfies ref requirement REQ_PERC_001_1
     method VIL
     testlevel integration
-    setup "Perception ML model in virtual environment with annotated dataset"
+    setup """Perception ML model in virtual environment with annotated dataset"""
     steps """
       1. Load pre-trained classification model
       2. Execute classification on test dataset (10,000+ objects)
@@ -108,8 +115,8 @@ hdef testset PerceptionSystemValidationTests
       4. Verify processing time ≤100ms per classification
       5. Generate confusion matrix and performance metrics
       """
-    expected "Classification accuracy ≥95% per object class, processing time ≤100ms"
-    passcriteria "Accuracy specification met for all object classes"
+    expected """Classification accuracy ≥95% per object class, processing time ≤100ms"""
+    passcriteria """Accuracy specification met for all object classes"""
     safetylevel ASIL-D
     testresult notrun
 ```

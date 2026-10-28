@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Requirement Definition (.req)
 
 ## Overview
@@ -10,10 +16,12 @@ Defines **system requirements** with complete traceability to functions, blocks,
 
 ## Valid Keywords
 ```
-use, hdef, requirementset, def, requirement, name, description, owner, 
-tags, level, rationale, verificationcriteria, status, reqtype, safetylevel, 
-refinedfrom, derivedfrom, implements, allocatedto, testedby, when, ref, 
-config, testcase, safetygoal, attach, proposal
+use, hdef, requirementset, name, description, owner, tags, level,
+safetylevel, def, requirement, infotype, headinglevel, refinedfrom,
+derivedfrom, implements, allocatedto, testedby, ref, config, when, requires,
+meets, rationale, verificationcriteria, status, reqtype, attach, proposal,
+object, feature, nonengineeringfeature, analysiseffort, deveffort,
+testeffort
 ```
 
 ## Syntax Structure
@@ -65,13 +73,13 @@ use configset AutonomousVehicleConfig
 use parameter MaxDetectionRange, ConfidenceThreshold
 
 hdef requirementset AutonomousPerceptionRequirements
-  name "Autonomous Vehicle Perception System Requirements"
-  description "Safety and functional requirements for perception system"
-  owner "Perception Safety Engineering Team"
+  name """Autonomous Vehicle Perception System Requirements"""
+  description """Safety and functional requirements for perception system"""
+  owner """Perception Safety Engineering Team"""
   safetylevel ASIL-D
 
   def requirement REQ_PERC_001
-    name "Environmental Detection Performance"
+    name """Environmental Detection Performance"""
     description """
       WHEN the perception system is active THE system SHALL detect 
       stationary objects ≥20cm at distances up to 200m with ≥99.9% accuracy.
@@ -90,10 +98,10 @@ hdef requirementset AutonomousPerceptionRequirements
     implements ref function ObjectClassification
 
     def requirement REQ_PERC_001_1
-      name "Object Classification Accuracy"
-      description "THE system SHALL classify detected objects with ≥95% accuracy within 100ms"
-      rationale "Accurate classification enables appropriate collision avoidance responses"
-      verificationcriteria "ML model validation with annotated test datasets"
+      name """Object Classification Accuracy"""
+      description """THE system SHALL classify detected objects with ≥95% accuracy within 100ms"""
+      rationale """Accurate classification enables appropriate collision avoidance responses"""
+      verificationcriteria """ML model validation with annotated test datasets"""
       status approved
       reqtype functional
       safetylevel ASIL-D
@@ -101,10 +109,10 @@ hdef requirementset AutonomousPerceptionRequirements
       implements ref function ObjectClassification
 
   def requirement REQ_PERC_002
-    name "Sensor Fusion Latency"
-    description "Fusion algorithm SHALL output environmental model within 50ms"
+    name """Sensor Fusion Latency"""
+    description """Fusion algorithm SHALL output environmental model within 50ms"""
     status approved
-    reqtype performance
+    reqtype nonfunctional
     safetylevel ASIL-D
     implements ref function SensorFusion
 ```
@@ -112,7 +120,7 @@ hdef requirementset AutonomousPerceptionRequirements
 ## Requirement Types
 ```
 reqtype functional      # Functional requirement
-reqtype non-functional  # Non-functional requirement
+reqtype nonfunctional   # Non-functional requirement
 reqtype system          # System requirement
 reqtype software        # Software requirement
 reqtype hardware        # Hardware requirement

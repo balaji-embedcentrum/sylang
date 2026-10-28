@@ -1,31 +1,45 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Sylang Dashboard (.dash) - Complete Reference
 
 ## Overview
 
-Sylang Dashboards provide **real-time, interactive visualizations** of your system data. Create custom dashboards with metrics, charts, and tables that automatically query your Sylang files using the Symbol Manager.
+Sylang Dashboards provide **real-time, interactive visualizations** of your system data. Create custom dashboards with metrics, charts, and tables that query your Sylang model and update as you edit it.
 
 **Key Features:**
 - 📊 **Grid-based layout** - Flexible rows × columns configuration
 - 📈 **Interactive widgets** - Metrics, charts, and tables
 - 🔍 **Powerful queries** - Simple, complex, and very complex query support
 - 🔗 **Relationship analysis** - Track broken links, orphans, and coverage
-- 🎨 **Professional UI** - Modern, responsive design with Chart.js
+- 🎨 **Sylang Studio** - Opens as a dashboard in VS Code, in Claude's colours or your VS Code theme; charts are bar, line, pie (donut) and gauge
 
 ---
 
+## Valid Keywords
+```
+use, hdef, dashboard, name, description, owner, version, grid, def, metric,
+chart, table, type, property, xaxis, yaxis, span, source, where, groupby,
+orderby, correlate, analyze, calculate, columns
+```
+
 ## File Structure
 
-```sylang
+```text
 hdef dashboard <identifier>
-  name "Dashboard Name"
-  owner "Owner Name"
-  version "1.0"
+  name """Dashboard Name"""
+  owner """Owner Name"""
+  version """1.0"""
   grid <rows>x<columns>
 
 def metric|chart|table <identifier>
-  name "Widget Name"
+  name """Widget Name"""
   type <type>
-  source type <nodetype> [where <conditions>]
+  sourcetype <nodetype> [where <conditions>]
+  [source <file-patterns>]
   [correlate type <nodetype> via <relationship>]
   [analyze <status>]
   [groupby <property>]
@@ -39,11 +53,11 @@ def metric|chart|table <identifier>
 ## Header Definition
 
 ### Syntax
-```sylang
+```text
 hdef dashboard <identifier>
-  name "Dashboard Name"
-  owner "Owner Name"
-  version "1.0"
+  name """Dashboard Name"""
+  owner """Owner Name"""
+  version """1.0"""
   grid <rows>x<columns>
 ```
 
@@ -58,9 +72,9 @@ hdef dashboard <identifier>
 ### Example
 ```sylang
 hdef dashboard EPB_METRICS
-  name "EPB System Dashboard"
-  owner "Systems Engineering Team"
-  version "1.0"
+  name """EPB System Dashboard"""
+  owner """Systems Engineering Team"""
+  version """1.0"""
   grid 3x4
 ```
 
@@ -75,9 +89,10 @@ Display a single numeric value with optional unit.
 **Syntax:**
 ```sylang
 def metric <identifier>
-  name "Metric Name"
+  name """Metric Name"""
   type count|percentage|sum|avg|min|max|gauge
-  source type <nodetype> [where <conditions>]
+  sourcetype <nodetype> [where <conditions>]
+  [source <file-patterns>]
   [property <property_name>]
   [span <rows>x<columns>]
 ```
@@ -95,28 +110,28 @@ def metric <identifier>
 ```sylang
 # Simple count
 def metric TOTAL_REQUIREMENTS
-  name "Total Requirements"
+  name """Total Requirements"""
   type count
-  source type requirement
+  sourcetype requirement
 
 # Count with filter
 def metric APPROVED_REQUIREMENTS
-  name "Approved Requirements"
+  name """Approved Requirements"""
   type count
-  source type requirement where status = approved
+  sourcetype requirement where status = approved
 
 # Coverage percentage
 def metric TEST_COVERAGE
-  name "Test Coverage"
+  name """Test Coverage"""
   type percentage
-  source type requirement where status = approved
+  sourcetype requirement where status = approved
   correlate type testcase via satisfies
 
 # Average (requires property)
 def metric AVG_PRIORITY
-  name "Average Priority"
+  name """Average Priority"""
   type avg
-  source type requirement
+  sourcetype requirement
   property priority
 ```
 
@@ -129,15 +144,16 @@ Visualize data with various chart types.
 **Syntax:**
 ```sylang
 def chart <identifier>
-  name "Chart Name"
+  name """Chart Name"""
   type bar|line|pie|scatter|gauge|sankey
-  source type <nodetype> [where <conditions>]
+  sourcetype <nodetype> [where <conditions>]
+  [source <file-patterns>]
   [correlate type <nodetype> via <relationship>]
   [analyze <status>]
   [groupby <property>]
   [orderby <property> [asc|desc]]
-  [xaxis "Label"]
-  [yaxis "Label"]
+  [xaxis """Label"""]
+  [yaxis """Label"""]
   [span <rows>x<columns>]
 ```
 
@@ -153,24 +169,24 @@ def chart <identifier>
 ```sylang
 # Pie chart with groupby
 def chart REQ_BY_STATUS
-  name "Requirements by Status"
+  name """Requirements by Status"""
   type pie
-  source type requirement
+  sourcetype requirement
   groupby status
 
 # Bar chart with filter and sort
 def chart REQ_BY_LEVEL
-  name "Requirements by Safety Level"
+  name """Requirements by Safety Level"""
   type bar
-  source type requirement where reqtype = functional
+  sourcetype requirement where reqtype = functional
   groupby safetylevel
   orderby safetylevel desc
 
 # Sankey flow (traceability)
 def chart TRACEABILITY_FLOW
-  name "Traceability Flow"
+  name """Traceability Flow"""
   type sankey
-  source type requirement
+  sourcetype requirement
   correlate type function via implements
   correlate type testcase via satisfies
   span 2x2
@@ -185,9 +201,9 @@ Display data in tabular format.
 **Syntax:**
 ```sylang
 def table <identifier>
-  name "Table Name"
-  description "Table description"
-  source type <nodetype> [where <conditions>]
+  name """Table Name"""
+  description """Table description"""
+  sourcetype <nodetype> [where <conditions>]
   [groupby <property>]
   [orderby <property> [asc|desc]]
   columns <prop1>, <prop2>, <prop3>, ...
@@ -198,16 +214,16 @@ def table <identifier>
 ```sylang
 # Simple table
 def table APPROVED_REQS
-  name "Approved Requirements"
-  source type requirement where status = approved
+  name """Approved Requirements"""
+  sourcetype requirement where status = approved
   orderby name asc
   columns name, reqtype, safetylevel, owner
 
 # Table with analysis
 def table ISOLATED_SYMBOLS
-  name "Isolated Symbols"
-  description "Symbols with no relationships"
-  source type all
+  name """Isolated Symbols"""
+  description """Symbols with no relationships"""
+  sourcetype all
   analyze isolated
   columns symbolName, symbolType, status
   span 2x2
@@ -223,7 +239,7 @@ Specify the primary data source.
 
 **Syntax:**
 ```sylang
-source type <nodetype> [where <conditions>]
+sourcetype <nodetype> [where <conditions>]
 ```
 
 **Node Types:**
@@ -234,10 +250,70 @@ source type <nodetype> [where <conditions>]
 
 **Examples:**
 ```sylang
-source type requirement
-source type requirement where status = approved
-source type all
+sourcetype requirement
+sourcetype requirement where status = approved
+sourcetype all
 ```
+
+Use `source` to limit which files are queried. It takes file names or glob patterns, relative to the dashboard.
+
+---
+
+### Limiting the files: `source`
+
+Limit which files are searched when querying symbols.
+
+**Syntax:**
+```sylang
+source <pattern>                                # Single pattern
+source <pattern1>, <pattern2>, <pattern3>       # Multiple patterns
+source <settype> <SetName>                      # One set, e.g. source requirementset BrakeRequirements
+```
+
+**Supported Patterns:**
+- Single file: `"EPB_Requirements.req"`
+- Multiple files: `"file1.req", "file2.req"`
+- Folder glob: `"*.req"`, `"../safety/*.req"`
+- Workspace-wide: `"**/*.req"`
+
+**Examples:**
+```sylang
+# Limit to specific file
+def metric TOTAL_EPB_REQUIREMENTS
+  name """Total EPB Requirements"""
+  type count
+  sourcetype requirement
+  source "EPB_Requirements.req"
+
+# Limit to folder
+def metric SAFETY_REQUIREMENTS
+  name """Safety Requirements Count"""
+  type count
+  sourcetype requirement
+  source "../safety/*.req"
+  where safetylevel = ASIL-D
+
+# Workspace-wide with pattern
+def chart ASIL_D_BY_STATUS
+  name """ASIL-D Requirements by Status"""
+  type pie
+  sourcetype requirement
+  source "**/*.req"
+  where safetylevel = ASIL-D
+  groupby status
+
+# Multiple files
+def table MODULE_REQUIREMENTS
+  name """Module Requirements"""
+  sourcetype requirement
+  source "EPB_Requirements.req", "Brake_Requirements.req", "Safety_Requirements.req"
+  columns name, reqtype, status, owner
+```
+
+**Use Cases:**
+- **Project-specific dashboards** - Show metrics for specific modules
+- **Folder-based filtering** - Analyze specific directories
+- **Multi-project workspaces** - Filter by project folder
 
 ---
 
@@ -254,21 +330,46 @@ where <complex_expression>
 **Operators:**
 | Operator | Description | Example |
 |----------|-------------|---------|
-| `=` | Equal | `status = approved` |
-| `!=` | Not equal | `status != rejected` |
-| `in` | In list | `status in (approved, draft)` |
-| `contains` | String contains | `tags contains safety` |
+| `=` | Equal (supports wildcards) | `status = approved` |
+| `!=` | Not equal (supports wildcards) | `status != rejected` |
+| `in` | In list (exact match) | `status in (approved, draft)` |
+| `contains` | String contains (supports comma-separated OR) | `tags contains safety` or `tags contains safety, interface` |
+| `matches` / `like` | Pattern matching | `tags matches category.*` |
 | `and` | Logical AND | `status = approved and reqtype = functional` |
 | `or` | Logical OR | `safetylevel = ASIL-D or safetylevel = ASIL-C` |
 | `()` | Grouping | `(A or B) and C` |
 
+**Wildcard Patterns:**
+- `*` - Matches any characters (zero or more)
+- `?` - Matches single character
+
 **Examples:**
 ```sylang
+# Exact match
 where status = approved
 where reqtype != non-functional
+
+# List matching
 where status in (approved, draft, review)
+
+# String contains (single value)
 where tags contains safety
+
+# String contains (multiple values - OR logic)
+where tags contains safety, interface, blahblah    # Matches if ANY value is found
+
+# Wildcard patterns (automatic with = operator)
+where tags = category.*              # Matches category.safety, category.security, etc.
+where name = EPB_REQ_*               # Matches EPB_REQ_001, EPB_REQ_002, etc.
+where owner = test_?_engineer        # Matches test_1_engineer, test_a_engineer, etc.
+
+# Explicit pattern matching
+where tags matches category.*
+where name like EPB_*
+
+# Complex expressions
 where status = approved and reqtype = functional
+where tags = category.* and status = approved
 where (safetylevel = ASIL-D or safetylevel = ASIL-C) and status = approved
 ```
 
@@ -292,11 +393,11 @@ correlate type <nodetype> via <relationship>
 **Examples:**
 ```sylang
 # Single hop
-source type requirement
+sourcetype requirement
 correlate type testcase via satisfies
 
 # Multi-hop (traceability chain)
-source type requirement
+sourcetype requirement
 correlate type function via implements
 correlate type testcase via satisfies
 ```
@@ -327,23 +428,23 @@ analyze <status>
 ```sylang
 # Count broken links
 def metric BROKEN_LINKS
-  name "Broken Links"
+  name """Broken Links"""
   type count
-  source type all
+  sourcetype all
   analyze broken
 
 # Broken links by node type
 def chart BROKEN_BY_TYPE
-  name "Broken Links by Type"
+  name """Broken Links by Type"""
   type bar
-  source type all
+  sourcetype all
   analyze broken
   groupby nodetype
 
 # Orphaned requirements
 def table ORPHANED_REQS
-  name "Orphaned Requirements"
-  source type requirement
+  name """Orphaned Requirements"""
+  sourcetype requirement
   analyze orphan
   columns symbolName, symbolType, outgoingCount
 ```
@@ -417,7 +518,7 @@ span 2x1  # Tall widget
 
 **Example:**
 ```sylang
-source type requirement where status = approved
+sourcetype requirement where status = approved
 groupby reqtype
 ```
 
@@ -431,11 +532,11 @@ groupby reqtype
 **Examples:**
 ```sylang
 # Correlation
-source type requirement
+sourcetype requirement
 correlate type testcase via satisfies
 
 # Aggregate analysis
-source type all
+sourcetype all
 analyze broken
 groupby nodetype
 ```
@@ -450,16 +551,16 @@ groupby nodetype
 **Examples:**
 ```sylang
 # Multi-source comparison
-source type requirement where domain = safety
-source type requirement where domain = security
+sourcetype requirement where domain = safety
+sourcetype requirement where domain = security
 
 # Custom calculate
-source type requirement
+sourcetype requirement
 correlate type testcase via satisfies
 calculate (count(req) * 100) / count(all)
 
 # Reverse lookup
-source type requirement
+sourcetype requirement
 correlate type testcase via satisfies reverse
 ```
 
@@ -484,11 +585,11 @@ correlate type <nodetype> via <relationship> reverse
 **Examples:**
 ```sylang
 # Forward: Find tests that satisfy requirements
-source type requirement
+sourcetype requirement
 correlate type testcase via satisfies forward  # or just 'forward' (default)
 
 # Reverse: Find requirements that ARE satisfied by tests
-source type testcase
+sourcetype testcase
 correlate type requirement via satisfies reverse
 ```
 
@@ -502,9 +603,9 @@ Compare or merge data from multiple sources.
 
 **Syntax:**
 ```sylang
-source type <nodetype1> [where <conditions>]
-source type <nodetype2> [where <conditions>]
-source type <nodetype3> [where <conditions>]
+sourcetype <nodetype1> [where <conditions>]
+sourcetype <nodetype2> [where <conditions>]
+sourcetype <nodetype3> [where <conditions>]
 ```
 
 **Use Cases:**
@@ -516,18 +617,18 @@ source type <nodetype3> [where <conditions>]
 ```sylang
 # Compare safety vs security requirements
 def chart DOMAIN_COMPARISON
-  name "Requirements by Domain"
+  name """Requirements by Domain"""
   type bar
-  source type requirement where domain = safety
-  source type requirement where domain = security
+  sourcetype requirement where domain = safety
+  sourcetype requirement where domain = security
   groupby status
 
 # Multi-source count
 def metric TOTAL_CRITICAL
-  name "Total Critical Items"
+  name """Total Critical Items"""
   type count
-  source type requirement where safetylevel = ASIL-D
-  source type hazard where severity = catastrophic
+  sourcetype requirement where safetylevel = ASIL-D
+  sourcetype hazard where severity = catastrophic
 ```
 
 ---
@@ -555,18 +656,18 @@ calculate <expression>
 ```sylang
 # Traceability score (0-100%)
 def metric TRACEABILITY_SCORE
-  name "Traceability Score"
+  name """Traceability Score"""
   type gauge
-  source type requirement
+  sourcetype requirement
   correlate type function via implements
   correlate type testcase via satisfies
   calculate (count(req) * 100) / count(all)
 
 # Weighted coverage
 def metric WEIGHTED_COVERAGE
-  name "Weighted Coverage"
+  name """Weighted Coverage"""
   type percentage
-  source type requirement where status = approved
+  sourcetype requirement where status = approved
   correlate type testcase via satisfies
   calculate (count(req) * 2 + count(test)) / (count(req) * 3)
 ```
@@ -579,65 +680,65 @@ def metric WEIGHTED_COVERAGE
 
 ```sylang
 hdef dashboard EPB_SYSTEM_METRICS
-  name "EPB System Metrics Dashboard"
-  owner "Systems Engineering Team"
-  version "1.0"
+  name """EPB System Metrics Dashboard"""
+  owner """Systems Engineering Team"""
+  version """1.0"""
   grid 3x4
 
-# Row 1: Key Metrics
-def metric TOTAL_REQUIREMENTS
-  name "Total Requirements"
-  type count
-  source type requirement
+  # Row 1: Key Metrics
+  def metric TOTAL_REQUIREMENTS
+    name """Total Requirements"""
+    type count
+    sourcetype requirement
 
-def metric APPROVED_REQUIREMENTS
-  name "Approved Requirements"
-  type count
-  source type requirement where status = approved
+  def metric APPROVED_REQUIREMENTS
+    name """Approved Requirements"""
+    type count
+    sourcetype requirement where status = approved
 
-def metric TEST_COVERAGE
-  name "Test Coverage"
-  type percentage
-  source type requirement where status = approved
-  correlate type testcase via satisfies
+  def metric TEST_COVERAGE
+    name """Test Coverage"""
+    type percentage
+    sourcetype requirement where status = approved
+    correlate type testcase via satisfies
 
-def metric BROKEN_LINKS
-  name "Broken Links"
-  type count
-  source type all
-  analyze broken
+  def metric BROKEN_LINKS
+    name """Broken Links"""
+    type count
+    sourcetype all
+    analyze broken
 
-# Row 2: Charts
-def chart REQ_BY_STATUS
-  name "Requirements by Status"
-  type pie
-  source type requirement
-  groupby status
-  span 1x2
+  # Row 2: Charts
+  def chart REQ_BY_STATUS
+    name """Requirements by Status"""
+    type pie
+    sourcetype requirement
+    groupby status
+    span 1x2
 
-def chart REQ_BY_LEVEL
-  name "Requirements by Safety Level"
-  type bar
-  source type requirement where reqtype = functional
-  groupby safetylevel
-  orderby safetylevel desc
-  span 1x2
+  def chart REQ_BY_LEVEL
+    name """Requirements by Safety Level"""
+    type bar
+    sourcetype requirement where reqtype = functional
+    groupby safetylevel
+    orderby safetylevel desc
+    span 1x2
 
-# Row 3: Traceability
-def chart TRACEABILITY_FLOW
-  name "Traceability Flow"
-  type sankey
-  source type requirement
-  correlate type function via implements
-  correlate type testcase via satisfies
-  span 2x2
+  # Row 3: Traceability
+  def chart TRACEABILITY_FLOW
+    name """Traceability Flow"""
+    type sankey
+    sourcetype requirement
+    correlate type function via implements
+    correlate type testcase via satisfies
+    span 2x2
 
-def table ORPHANED_REQS
-  name "Orphaned Requirements"
-  source type requirement
-  analyze orphan
-  columns symbolName, symbolType, outgoingCount, incomingCount
-  span 2x2
+  def table ORPHANED_REQS
+    name """Orphaned Requirements"""
+    sourcetype requirement
+    analyze orphan
+    columns symbolName, symbolType, outgoingCount, incomingCount
+    span 2x2
 ```
 
 ---
@@ -651,7 +752,7 @@ def table ORPHANED_REQS
 
 2. **Query Optimization**
    - Use `where` clauses to filter early
-   - Avoid overly broad queries (`source type all`)
+   - Avoid overly broad queries (`sourcetype all`)
    - Use specific node types when possible
 
 3. **Widget Naming**
@@ -708,9 +809,9 @@ Recommendation: Use either analyze OR correlate, not both
 ```sylang
 # Requirements with tests
 def metric REQ_WITH_TESTS
-  name "Requirements with Tests"
+  name """Requirements with Tests"""
   type percentage
-  source type requirement
+  sourcetype requirement
   correlate type testcase via satisfies
 ```
 
@@ -718,9 +819,9 @@ def metric REQ_WITH_TESTS
 ```sylang
 # ASIL-D requirements
 def chart ASIL_D_REQS
-  name "ASIL-D Requirements"
+  name """ASIL-D Requirements"""
   type bar
-  source type requirement where safetylevel = ASIL-D
+  sourcetype requirement where safetylevel = ASIL-D
   groupby status
 ```
 
@@ -728,8 +829,8 @@ def chart ASIL_D_REQS
 ```sylang
 # Orphaned requirements (no tests)
 def table ORPHANED_REQS
-  name "Requirements Without Tests"
-  source type requirement
+  name """Requirements Without Tests"""
+  sourcetype requirement
   analyze orphan
   columns name, reqtype, owner
 ```
@@ -738,9 +839,9 @@ def table ORPHANED_REQS
 ```sylang
 # Req → Func → Test flow
 def chart FULL_TRACEABILITY
-  name "Full Traceability Chain"
+  name """Full Traceability Chain"""
   type sankey
-  source type requirement
+  sourcetype requirement
   correlate type function via implements
   correlate type testcase via satisfies
   span 2x2
@@ -756,5 +857,5 @@ def chart FULL_TRACEABILITY
 
 ---
 
-**Version:** 2.28.38  
-**Last Updated:** 2025-10-19
+**Version:** 2.29.39  
+**Last Updated:** 2025-10-27

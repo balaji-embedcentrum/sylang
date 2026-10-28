@@ -1,5 +1,7 @@
 # Sequence Diagrams (.seq) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Sequence Diagram files define message flow sequences between blocks or functions using operations and signals. SEQ files capture dynamic communication patterns in MBSE architectures, supporting system design, integration planning, and protocol specification.
 
@@ -104,7 +106,7 @@ Use fragments to group sequences with conditions:
 ```
 def fragment ErrorHandling
   fragmenttype alt
-  condition "Error detected"
+  condition """Error detected"""
   
   def sequence SEQ_ERROR_001
     from ref block ErrorDetector
@@ -128,8 +130,8 @@ Context:
 - Safety Level: ASIL-D
 
 Sequence Set: EmergencyBrakingSequences (ASIL-D)
-- Owner: "Brake System Integration Team"
-- Tags: "AEB", "emergency-braking", "ASIL-D"
+- Owner: """Brake System Integration Team"""
+- Tags: """AEB""", """emergency-braking""", """ASIL-D"""
 
 Generate 8-10 sequences showing:
 1. Normal operation sequences (4-5 sequences)
@@ -181,13 +183,13 @@ SEQ_005: Driver emergency alert
   - to ref block DriverInterface
   - flow ref signal EmergencyBrakingActive
 
-Fragment: CommunicationTimeout (alt, "Communication timeout > 100ms")
+Fragment: CommunicationTimeout (alt, """Communication timeout > 100ms""")
   SEQ_ERROR_001: Fallback control
     - from ref block BrakeControlModule
     - to ref block FallbackController
     - flow ref signal CommunicationFailure
 
-Fragment: ParallelHealthMonitoring (parallel, "All modules report concurrently")
+Fragment: ParallelHealthMonitoring (parallel, """All modules report concurrently""")
   SEQ_HEALTH_001: Perception status
     - from ref block PerceptionModule
     - to ref block HealthMonitor
@@ -230,9 +232,9 @@ Generate 10-12 sequences:
    - AlarmSystem → RemoteNotification: CriticalAlert signal
 
 3. Error handling fragments (2-3)
-   - OcclusionDetection fragment (alt, "Pressure > threshold")
-   - LowBattery fragment (alt, "Battery < 10%")
-   - SystemSelfTest fragment (loop, "Every 60 seconds")
+   - OcclusionDetection fragment (alt, """Pressure > threshold""")
+   - LowBattery fragment (alt, """Battery < 10%""")
+   - SystemSelfTest fragment (loop, """Every 60 seconds""")
 
 File: InfusionPumpSequences.seq
 ```
@@ -263,8 +265,8 @@ Generate function-to-function sequences:
    - ActuatorControl → PilotInterface: ManualControlRequired
 
 3. Monitoring fragments (2-3)
-   - CrossChannelMonitoring fragment (parallel, "Triple redundancy check")
-   - ActuatorHealthCheck fragment (loop, "Every 100ms")
+   - CrossChannelMonitoring fragment (parallel, """Triple redundancy check""")
+   - ActuatorHealthCheck fragment (loop, """Every 100ms""")
 
 Example function sequences:
 
@@ -318,9 +320,9 @@ Generate 12-15 sequences:
 
 3. Monitoring fragments (3-4)
    - ProximityMonitoring fragment (parallel)
-   - ForceMonitoring fragment (loop, "Every 10ms")
-   - EmergencyStopCheck fragment (loop, "Every 5ms")
-   - SafeZoneViolation fragment (alt, "Human enters restricted zone")
+   - ForceMonitoring fragment (loop, """Every 10ms""")
+   - EmergencyStopCheck fragment (loop, """Every 5ms""")
+   - SafeZoneViolation fragment (alt, """Human enters restricted zone""")
 
 File: CobotSafetySequences.seq
 ```
@@ -338,7 +340,7 @@ Context:
 - Safety Level: {ASIL-D|SIL-3|DAL-A}
 
 Sequence Set: {SEQUENCESET_NAME} ({SAFETY_LEVEL})
-- Owner: "{OWNER_NAME}"
+- Owner: """{OWNER_NAME}"""
 - Tags: {TAG_LIST}
 - Level: {system|subsystem|component}
 
@@ -491,14 +493,14 @@ use signal PerceptionHealthStatus
 use signal PlanningHealthStatus
 
 hdef sequenceset AutonomousEmergencyBraking
-  name "Autonomous Emergency Braking Sequence"
+  name """Autonomous Emergency Braking Sequence"""
   description """
     Complete message flow sequences for emergency braking scenario in Level 3 
     autonomous vehicle. Covers normal operation, emergency activation, error 
     handling, and parallel health monitoring per ISO 26262 ASIL-D.
     """
-  owner "Safety Systems Integration Team"
-  tags "emergency-braking", "sequence", "safety-critical", "AEB", "ASIL-D"
+  owner """Safety Systems Integration Team"""
+  tags """emergency-braking""", """sequence""", """safety-critical""", """AEB""", """ASIL-D"""
   safetylevel ASIL-D
   level system
   
@@ -541,10 +543,10 @@ hdef sequenceset AutonomousEmergencyBraking
     
   // Error handling fragment
   def fragment CommunicationFailure
-    name "Communication Failure Handling"
-    description "Handles communication timeout between modules (>100ms)"
+    name """Communication Failure Handling"""
+    description """Handles communication timeout between modules (>100ms)"""
     fragmenttype alt
-    condition "Communication timeout > 100ms"
+    condition """Communication timeout > 100ms"""
     
     def sequence SEQ_ERROR_001
       from ref block VehicleControlModule
@@ -558,10 +560,10 @@ hdef sequenceset AutonomousEmergencyBraking
       
   // Parallel status reporting fragment  
   def fragment StatusReporting
-    name "Parallel Health Monitoring"
-    description "All modules report status concurrently to health monitor"
+    name """Parallel Health Monitoring"""
+    description """All modules report status concurrently to health monitor"""
     fragmenttype parallel
-    condition "All modules must report status concurrently"
+    condition """All modules must report status concurrently"""
     
     def sequence SEQ_HEALTH_001
       from ref block PerceptionControlModule

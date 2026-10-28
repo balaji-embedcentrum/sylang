@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # State Machine Diagram (.smd)
 
 ## Overview
@@ -11,9 +17,10 @@ Defines **state machines** with states, transitions, and behavioral logic. Requi
 
 ## Valid Keywords
 ```
-use, hdef, statemachine, def, state, transition, name, description, owner, 
-tags, safetylevel, status, allocatedto, implements, initialstate, endstate, 
-from, to, condition, call, when, ref
+use, hdef, statemachine, name, description, owner, tags, level, safetylevel,
+status, allocatedto, implements, def, state, transition, initialstate,
+endstate, from, to, condition, call, requires, ref, when, config,
+analysiseffort, deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -28,7 +35,7 @@ hdef statemachine [identifier]
   owner [string-literal]
   tags [string-literal], [string-literal], ...
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
-  status [draft|approved|implemented]
+  status [draft|review|approved|implemented|deprecated]
   allocatedto ref block [block-ref]
   implements ref requirement [requirement-ref]
 
@@ -36,7 +43,7 @@ hdef statemachine [identifier]
     name [string-literal]
     description [string-literal]
     owner [string-literal]
-    status [draft|implemented|verified]
+    status [draft|review|approved|implemented|deprecated]
     initialstate [true|false]
     endstate [true|false]
     implements ref requirement [requirement-ref]
@@ -57,79 +64,79 @@ use requirementset EPBRequirements
 use block EPBControlModule
 
 hdef statemachine ElectricParkingBrakeStateMachine
-  name "Electric Parking Brake State Machine"
-  description "Complete state machine controlling EPB engagement and release operations"
-  owner "Safety Systems Team"
+  name """Electric Parking Brake State Machine"""
+  description """Complete state machine controlling EPB engagement and release operations"""
+  owner """Safety Systems Team"""
   safetylevel ASIL-D
   status approved
   allocatedto ref block EPBControlModule
   implements ref requirement EPB_StateMachineReq_001
 
   def state Idle
-    name "Idle State"
-    description "EPB system in idle state, ready to receive commands"
-    owner "Control Systems Team"
+    name """Idle State"""
+    description """EPB system in idle state, ready to receive commands"""
+    owner """Control Systems Team"""
     status implemented
     initialstate true
     implements ref requirement EPB_IdleStateReq_001
 
   def state Engaging
-    name "Engaging State"
-    description "EPB system actively engaging the brake mechanism"
-    owner "Actuator Team"
+    name """Engaging State"""
+    description """EPB system actively engaging the brake mechanism"""
+    owner """Actuator Team"""
     status implemented
 
   def state Engaged
-    name "Engaged State"
-    description "EPB system fully engaged and holding vehicle"
-    owner "Safety Team"
+    name """Engaged State"""
+    description """EPB system fully engaged and holding vehicle"""
+    owner """Safety Team"""
     status implemented
 
   def state Releasing
-    name "Releasing State"
-    description "EPB system actively releasing the brake"
-    owner "Actuator Team"
+    name """Releasing State"""
+    description """EPB system actively releasing the brake"""
+    owner """Actuator Team"""
     status implemented
 
   def state Fault
-    name "Fault State"
-    description "EPB system in fault condition requiring diagnostics"
-    owner "Diagnostics Team"
+    name """Fault State"""
+    description """EPB system in fault condition requiring diagnostics"""
+    owner """Diagnostics Team"""
     status implemented
     endstate true
 
   def transition EngageCommand
-    name "Engage Command Transition"
-    description "Transition from idle to engaging when engage command received"
-    owner "Control Logic Team"
+    name """Engage Command Transition"""
+    description """Transition from idle to engaging when engage command received"""
+    owner """Control Logic Team"""
     status implemented
     from ref state Idle
     to ref state Engaging
-    condition "engage_command_received AND brake_pedal_pressed AND vehicle_stationary"
+    condition """engage_command_received AND brake_pedal_pressed AND vehicle_stationary"""
     call ref function InitiateEngagement
 
   def transition EngagementComplete
-    name "Engagement Complete Transition"
-    description "Transition from engaging to engaged when motor reaches target position"
+    name """Engagement Complete Transition"""
+    description """Transition from engaging to engaged when motor reaches target position"""
     from ref state Engaging
     to ref state Engaged
-    condition "engagement_confirmed AND motor_current_stable"
+    condition """engagement_confirmed AND motor_current_stable"""
     call ref function ConfirmEngagement
 
   def transition ReleaseCommand
-    name "Release Command Transition"
-    description "Transition from engaged to releasing when release command received"
+    name """Release Command Transition"""
+    description """Transition from engaged to releasing when release command received"""
     from ref state Engaged
     to ref state Releasing
-    condition "release_command_received AND brake_pedal_pressed"
+    condition """release_command_received AND brake_pedal_pressed"""
     call ref function InitiateRelease
 
   def transition FaultDetected
-    name "Fault Detection Transition"
-    description "Transition to fault state when diagnostic failure detected"
+    name """Fault Detection Transition"""
+    description """Transition to fault state when diagnostic failure detected"""
     from ref state Idle
     to ref state Fault
-    condition "system_diagnostic_failure OR motor_overcurrent"
+    condition """system_diagnostic_failure OR motor_overcurrent"""
     call ref function HandleFault
 ```
 

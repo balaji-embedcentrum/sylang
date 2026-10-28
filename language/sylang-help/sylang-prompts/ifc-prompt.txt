@@ -1,5 +1,7 @@
 # Interface Definitions (.ifc) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Interface files define the communication contracts between system components, specifying data types, operations, signals, and protocols. Interfaces enable loose coupling, reusability, and clear component boundaries in MBSE architectures. They serve as the foundation for component integration and system-level communication design.
 
@@ -51,21 +53,11 @@ def operation [identifier]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
   
   # Operation properties
-  operationtype [synchronous|asynchronous|event|query]
-  direction [in|out|inout]
   datatype [data-type-specification]
-  parameters [parameter-list]
-  returntype [return-type-specification]
   
   # Interface details
-  protocol [communication-protocol]
-  timing [timing-constraints]
-  reliability [reliability-requirements]
-  security [security-requirements]
   
   # Relationships
-  usedby ref block [block-refs]
-  usedby ref function [function-refs]
   when ref config [config-refs]
 
 def signal [identifier]
@@ -76,20 +68,11 @@ def signal [identifier]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM]
   
   # Signal properties
-  signaltype [event|data|control|status]
-  direction [in|out|inout]
   datatype [data-type-specification]
-  encoding [signal-encoding]
   
   # Signal details
-  protocol [communication-protocol]
-  timing [timing-constraints]
-  reliability [reliability-requirements]
-  security [security-requirements]
   
   # Relationships
-  usedby ref block [block-refs]
-  usedby ref function [function-refs]
   when ref config [config-refs]
 ```
 
@@ -569,96 +552,63 @@ use parameter ADAS_Parameters
 use datatype ADAS_DataTypes
 
 hdef interfaceset ADASInterfaces
-  name "Advanced Driver Assistance Systems Interfaces"
+  name """Advanced Driver Assistance Systems Interfaces"""
   description """
     Comprehensive interface definitions for Level 3 autonomous driving system 
     per ISO 26262 ASIL-D. Covers all communication interfaces between 
     perception, planning, control, HMI, and vehicle systems including 
     data types, protocols, timing constraints, and safety requirements.
     """
-  owner "ADAS Architecture Team"
-  tags "ISO-26262", "ADAS", "autonomous-driving", "ASIL-D"
+  owner """ADAS Architecture Team"""
+  tags """ISO-26262""", """ADAS""", """autonomous-driving""", """ASIL-D"""
   safetylevel ASIL-D
 
   def operation PerceptionData_Operation
-    name "Perception Data Interface"
+    name """Perception Data Interface"""
     description """
       Asynchronous operation providing fused sensor data from perception 
       system to planning and control modules. Includes object detection, 
       tracking, classification, and environmental model data with 
       confidence levels and timestamps.
       """
-    owner "Perception Team"
-    tags "perception", "sensor-fusion", "ASIL-D", "data"
+    owner """Perception Team"""
+    tags """perception""", """sensor-fusion""", """ASIL-D""", """data"""
     safetylevel ASIL-D
     
-    operationtype asynchronous
-    direction out
-    datatype PerceptionDataStructure
-    parameters "timestamp: uint64, confidence: float32, object_list: ObjectList"
-    returntype void
-    protocol "CAN-FD, 100Mbps"
-    timing "20Hz update rate, <50ms latency"
-    reliability "99.9% message delivery"
-    security "Message authentication, encryption"
+    requires ref datatype PerceptionDataStructure
     
-    usedby ref block PlanningControlModule
-    usedby ref block SafetyMonitor
-    usedby ref function PathPlanning
-    usedby ref function CollisionAvoidance
     when ref config c_AutonomousDrivingActive
 
   def signal EmergencyBrake_Signal
-    name "Emergency Braking Signal"
+    name """Emergency Braking Signal"""
     description """
       High-priority control signal for emergency braking commands. 
       Triggers immediate brake application when collision threat 
       is detected. Includes brake force level and emergency type 
       for appropriate response.
       """
-    owner "Safety Team"
-    tags "emergency-braking", "ASIL-D", "control", "safety"
+    owner """Safety Team"""
+    tags """emergency-braking""", """ASIL-D""", """control""", """safety"""
     safetylevel ASIL-D
     
-    signaltype control
-    direction out
-    datatype BrakeCommand
-    encoding "CAN signal, 8 bytes"
-    protocol "CAN-FD, 500kbps"
-    timing "<10ms response time"
-    reliability "99.99% delivery guarantee"
-    security "CRC protection, sequence numbers"
+    requires ref datatype BrakeCommand
     
-    usedby ref block BrakeControlModule
-    usedby ref block EmergencyStopModule
-    usedby ref function EmergencyBraking
     when ref config c_EmergencyBrakingEnabled
 
   def operation DriverInput_Operation
-    name "Driver Input Interface"
+    name """Driver Input Interface"""
     description """
       Synchronous operation for receiving driver input commands 
       including steering, braking, and acceleration inputs. 
       Provides real-time driver intent for system override and 
       fallback scenarios.
       """
-    owner "HMI Team"
-    tags "driver-input", "ASIL-C", "control", "HMI"
+    owner """HMI Team"""
+    tags """driver-input""", """ASIL-C""", """control""", """HMI"""
     safetylevel ASIL-C
     
-    operationtype synchronous
-    direction in
-    datatype DriverInputStructure
-    parameters "steering_angle: float32, brake_pedal: float32, accelerator_pedal: float32"
-    returntype Acknowledgment
-    protocol "CAN, 250kbps"
-    timing "100Hz update rate, <10ms latency"
-    reliability "99% message delivery"
-    security "Basic CRC protection"
+    requires ref datatype DriverInputStructure
     
-    usedby ref block DriverInputModule
-    usedby ref block HMI_Controller
-    usedby ref function DriverOverride
     when ref config c_DriverInputActive
 ```
 

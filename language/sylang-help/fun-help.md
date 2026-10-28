@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Function Definition (.fun)
 
 ## Overview
@@ -13,11 +19,11 @@ Defines **functional behavior** and decomposition. Maps features to executable f
 
 ## Valid Keywords
 ```
-use, hdef, functionset, def, function, name, description, owner, tags, 
-level, safetylevel, functiontype, enables, allocatedto, decomposedfrom,
-decomposesto, derivedfrom, implementedby, detects, needs, provides, meets,
-when, ref, config, feature, function, block, requirement, malfunction, 
-failure, failuremode, operation, signal, interfaceset
+use, hdef, functionset, name, description, owner, tags, level, safetylevel,
+functiontype, status, def, function, enables, decomposesto, decomposedfrom,
+needs, provides, requires, meets, derivedfrom, implementedby, detects,
+allocatedto, ref, config, when, attach, analysiseffort, deveffort,
+testeffort
 ```
 
 ## Syntax Structure
@@ -71,16 +77,16 @@ use configset AutonomousVehicleConfig
 use interfaceset PerceptionInterfaces
 
 hdef functionset AutonomousPerceptionFunctions
-  name "Autonomous Vehicle Perception Functions"
-  description "Core perception functions for environmental awareness"
-  owner "Perception Systems Team"
+  name """Autonomous Vehicle Perception Functions"""
+  description """Core perception functions for environmental awareness"""
+  owner """Perception Systems Team"""
   safetylevel ASIL-D
-  tags "perception", "autonomous", "sensor-fusion"
+  tags """perception""", """autonomous""", """sensor-fusion"""
 
   def function CameraImageProcessing
-    name "Camera Image Processing Function"
-    description "Real-time processing of stereo and mono camera feeds"
-    owner "Computer Vision Team"
+    name """Camera Image Processing Function"""
+    description """Real-time processing of stereo and mono camera feeds"""
+    owner """Computer Vision Team"""
     level subsystem
     safetylevel ASIL-D
     functiontype function
@@ -102,9 +108,9 @@ hdef functionset AutonomousPerceptionFunctions
     when ref config c_CameraSystem
 
   def function LidarPointCloudProcessing
-    name "LiDAR Point Cloud Processing Function"
-    description "3D point cloud processing for precise distance measurement"
-    owner "LiDAR Processing Team"
+    name """LiDAR Point Cloud Processing Function"""
+    description """3D point cloud processing for precise distance measurement"""
+    owner """LiDAR Processing Team"""
     level subsystem
     safetylevel ASIL-C
     functiontype function
@@ -126,9 +132,9 @@ hdef functionset AutonomousPerceptionFunctions
     when ref config c_LidarSystem
 
   def function SensorFusion
-    name "Multi-Sensor Fusion Function"
-    description "Fusion of camera, LiDAR, and radar data"
-    owner "Sensor Fusion Team"
+    name """Multi-Sensor Fusion Function"""
+    description """Fusion of camera, LiDAR, and radar data"""
+    owner """Sensor Fusion Team"""
     level system
     safetylevel ASIL-D
     functiontype solution
@@ -148,7 +154,7 @@ hdef functionset AutonomousPerceptionFunctions
     implementedby ref requirement SW_REQ_100, SW_REQ_101
     detects ref malfunction CameraMalfunction, LidarMalfunction
     detects ref failure SensorDataLoss
-    meets ref requirement SAFETY_REQ_001
+    derivedfrom ref requirement SAFETY_REQ_001
     safetylevel ASIL-D
 ```
 
@@ -167,6 +173,18 @@ functiontype solutionelement  # Solution element function
 
 **Note**: Operations and signals are defined in `.ifc` files and referenced here via `needs` and `provides`.
 
+### Port Side Placement Control
+You can control port placement in decomposition diagrams using `left` or `right` keywords:
+- **Default**: `needs` → left side, `provides` → right side
+- **Override**: Add `left` or `right` after interface name (e.g., `needs ref signal XXXX right`)
+- **Example**: 
+  ```sylang
+  needs ref operation VehicleStateOutput, DriverEPBCommandInput
+  needs ref operation ActuatorFeedbackOutput right
+  needs ref signal VehicleSpeedOutput right, SlopeAngleOutput right
+  provides ref operation ProcessedVehicleState left, ProcessedDriverCommand
+  ```
+
 ## Function Relationships (ASPICE Bilateral Traceability)
 - `enables ref feature` - Enables a feature (multiple allowed)
 - `allocatedto ref block` - Allocated to a block (single block only)
@@ -176,7 +194,7 @@ functiontype solutionelement  # Solution element function
 - `implementedby ref requirement` - Implemented by requirements (ASPICE, multiple allowed)
 - `detects ref malfunction` - Detects safety malfunctions (multiple allowed)
 - `detects ref failure` - Detects failure modes (multiple allowed)
-- `meets ref requirement` - Meets specific requirements (multiple allowed)
+- `meets ref characteristic` - Meets product characteristics or safety goals (multiple allowed)
 - `when ref config` - Conditional visibility
 
 ## Validation Rules

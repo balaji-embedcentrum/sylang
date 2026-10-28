@@ -1,439 +1,144 @@
-# Sylang: Systems Engineering Reimagined
+# Sylang
 
-**Version**: 0.9.27  
-**The Language for Building Tomorrow's Safety-Critical Systems**
+**A text language for systems engineering.** Requirements, architecture, interfaces, safety analyses, variants and tests live in plain text files, with traceability between them. The files diff, branch and merge in git, and AI assistants can read and write them.
 
----
+[![VS Code extension](https://img.shields.io/badge/VS%20Code-Sylang%203.0-c96442.svg)](https://marketplace.visualstudio.com/items?itemName=balaji-embedcentrum.sylang)
+[![Language reference](https://img.shields.io/badge/reference-Apache%202.0-5a6b4f.svg)](LICENSE)
 
-<table>
-<tr>
-<td>
+![Sylang Studio: a requirements file edited as cards, with the inspector on the right](media/screenshots/studio-document.png)
 
-### Get Started with Sylang
+This repository holds the **language reference**: one help file per file type, the complete reference, the relations matrix, a project guide, and prompts for AI assistants. The **Sylang extension for Visual Studio Code** reads the same files, validates them as you type, and shows them in Sylang Studio: editable documents, diagrams, a traceability matrix, coverage, ISO 26262 and Automotive SPICE compliance, an AIAG-VDA FMEA worksheet and a variant matrix.
 
-**Install the VSCode Extension:**
+> Sylang will be fully open-sourced in Q1 2027. The language reference in this repository is published under the Apache License 2.0 now, and the extension is free to use.
 
-Search **"Sylang"** in your VSCode Extensions panel (`Ctrl+Shift+X` or `Cmd+Shift+X`)
+## Install the VS Code extension
 
-**Available on:**
-- Microsoft Visual Studio Marketplace
-- Open VSX Registry
+1. Open Visual Studio Code (1.101 or later).
+2. Open the Extensions view: `Ctrl+Shift+X` (Windows, Linux) or `Cmd+Shift+X` (macOS).
+3. Search for **Sylang**, published by *balaji-embedcentrum*, and choose **Install**.
 
-**Compatible with:** VSCode, Cursor, VSCodium, Gitpod, and all VSCode-based editors
+From a terminal: `code --install-extension balaji-embedcentrum.sylang`.
 
-</td>
-</tr>
-</table>
+To install a downloaded `.vsix` file instead, open the Extensions view, choose **…** at the top, then **Install from VSIX…**. This also works in VS Code-based editors that do not use the Visual Studio Marketplace.
 
----
+## Start a model
 
-## 🚀 From Complexity to Clarity
+1. Open a project folder in VS Code and create a file named `Thermal.req`:
 
-Imagine designing an autonomous vehicle, a flight control system, or a life-saving medical device. You're juggling requirements documents, architecture diagrams, safety analyses, test specifications, and regulatory compliance—all scattered across proprietary tools that don't talk to each other. Every change ripples through dozens of documents. Traceability is a nightmare. Version control? Forget about it.
+   ```sylang
+   hdef requirementset ThermalRequirements
+     name "Thermal Management Requirements"
+     owner "Thermal Engineering Team"
 
-**There has to be a better way.**
+     def requirement TM_REQ_001
+       name "Maximum Junction Temperature"
+       description "SiC MOSFET junction temperature SHALL NOT exceed 175 °C under any operating condition."
+       reqtype safety
+       safetylevel ASIL-B
+       status draft
+   ```
 
-## 💡 Enter Sylang
+2. The file opens in **Sylang Studio**. Edit text in place, choose values from menus, and add links to elements in other files. Every change is written back to the text as the smallest possible edit. `<>` in the title bar opens the plain text beside it.
+3. Files that describe structure (blocks, functions, interfaces, use cases, sequences, state machines, features, variants, fault trees and failure analyses) open on their **diagram**. The **Document | Diagram** switch at the top left changes the view.
+4. Run **Sylang: Home** from the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`) to see the whole project: coverage across the V-model, problems, and the other views.
+5. Run **Sylang: Create Sylang Help** to copy this reference into your project as a `sylang-help` folder. It opens in a Markdown reading view, and AI assistants working in the project can read it too.
 
-Sylang is a text-based language designed for the age of AI-assisted systems engineering. It's not just another diagramming tool—while PlantUML and Mermaid are excellent tools for instant diagrams, Sylang is a complete systems engineering language that rivals traditional requirements management and modeling tools, but with a modern, text-first, version-control-friendly approach.
+Problems appear in the Problems panel and on Studio cards as you type: unknown keywords, invalid values, missing `use` imports, references to elements that do not exist, and relations that point at the wrong kind of element.
 
-### The Vision
+## Which files to create
 
-What if your entire system—from high-level product features down to individual test cases—lived in **human-readable text files**? What if every requirement could be linked to the tests that validate it, the components that implement it, and the safety goals it satisfies? What if AI could help you draft FMEA analyses or ISO 26262 documentation, accelerating your workflow?
+The [Project Guide](language/sylang-help/project-guide-help.md) says which file types to use for IT and software, automotive, aerospace, medical and industrial projects, how to lay out the folders, and in what order to build the model. Start there, or point your AI assistant at it.
 
-**That's the Sylang vision.**
+| Extension | Contains |
+|---|---|
+| `.ple` | Product line |
+| `.fml` | Feature model |
+| `.vml` | Variant model: a selection of features |
+| `.vcf` | Variant configuration, generated from a `.vml` |
+| `.req` | Requirements |
+| `.fun` | Functions |
+| `.blk` | Blocks, their interfaces and product characteristics |
+| `.ifc` | Interfaces: operations, signals, data types, parameters |
+| `.ucd` | Use cases |
+| `.seq` | Sequences |
+| `.smd` | State machines |
+| `.tst` | Test cases |
+| `.itm` | Item definition (ISO 26262) |
+| `.haz` | Hazard analysis and risk assessment (ISO 26262) |
+| `.sgl` | Safety goals (ISO 26262) |
+| `.sam` | Safety mechanisms (ISO 26262) |
+| `.flr` | Failure modes, effects and causes (FMEA) |
+| `.fta` | Fault trees |
+| `.spr` | Sprints, epics, stories and tasks |
+| `.agt` | Agents and team members |
+| `.spec` | Specifications assembled from the model |
+| `.dash` | Dashboards of metrics, charts and tables |
+| `.sylangextend` | Your own properties and enum values |
 
-### Why Sylang Changes Everything
+## The language in brief
 
-🎯 **One Language, Complete Lifecycle**  
-23 specialized file types covering product lines, features, architecture, requirements, tests, safety analysis, and behavioral models. Everything speaks the same language.
+```sylang
+use functionset ThermalFunctions
 
-🔗 **Traceability Without the Pain**  
-Built-in bidirectional relationships mean your requirement knows its tests, your tests know their requirements, and your safety goals know everything that implements them. No manual linking. No broken references.
+hdef requirementset ThermalRequirements
+  name "Thermal Management Requirements"
 
-🤖 **AI as Your Co-Engineer**  
-Sylang's structured syntax is designed for AI collaboration. Generate requirements from safety goals, create test cases from requirements, or build FMEA analyses from architecture—all with AI assistance. You validate, AI accelerates.
-
-📊 **Git for Systems Engineering**  
-Plain text means real version control. Branch your system architecture. Merge safety analyses. Review requirements changes with diffs. Collaborate like software teams do.
-
-🛡️ **Safety by Design**  
-Native ISO 26262, DO-178, IEC 62304 support. ASIL levels, hazard analysis, fault trees, safety mechanisms—all first-class citizens. Compliance isn't bolted on; it's built in.
-
-🔄 **Variants Made Simple**  
-Feature models automatically generate product variants. One architecture, multiple configurations. From basic to premium, from regional variants to customer-specific builds—all managed declaratively.
-
-📐 **What About Diagrams?**  
-Don't struggle drawing diagrams by hand. Write what you want to see in Sylang, and let the VSCode extension render it for you. Use case diagrams, sequence diagrams, state machines—all generated from your text definitions. Plus: coverage analysis, FMEA reports, traceability matrices, and safety documentation—automatically visualized from your Sylang files.
-
-### The Problem I'm Solving
-
-Traditional systems engineering tools are:
-- **Proprietary black boxes** with vendor lock-in
-- **Database-driven** making version control nearly impossible
-- **Disconnected** requiring manual traceability maintenance
-- **AI-resistant** with formats machines can't easily understand
-- **Expensive** with per-seat licensing that limits collaboration
-
-Sylang flips this model entirely:
-- ✅ Open, text-based format anyone can read
-- ✅ Git-native for true version control and branching
-- ✅ Automatic traceability through declarative relationships
-- ✅ AI-friendly syntax for 10x productivity gains
-- ✅ Free and open for unlimited collaboration
-
-## 🌍 Who Can Use Sylang?
-
-Sylang isn't just for traditional embedded systems—it's for **anyone building complex systems** that need structure, traceability, and quality:
-
-### Safety-Critical Industries
-- **Automotive Engineers** - ADAS, autonomous driving, powertrain control (ISO 26262, ASPICE)
-- **Aerospace Teams** - Flight control, avionics, navigation systems (DO-178C, ARP4754A)
-- **Medical Device Companies** - Diagnostic equipment, therapeutic devices, patient monitoring (IEC 62304, ISO 14971)
-- **Industrial Automation** - Safety PLCs, robotic systems, process control (IEC 61508, ISO 13849)
-- **Railway Systems** - Signaling, train control, platform safety (EN 50128, CENELEC)
-
-### Software & Web Development
-- **Enterprise Applications** - Complex business systems requiring CMMI Level 3-5 compliance
-- **Financial Systems** - Trading platforms, payment gateways, banking applications
-- **E-commerce Platforms** - Multi-tenant systems with variant management needs
-- **SaaS Products** - Feature-rich applications with multiple deployment configurations
-- **API-First Companies** - Microservices architectures requiring interface documentation and traceability
-- **Regulated Software** - Any application requiring audit trails, requirements traceability, and compliance documentation
-
-### Why Developers Might Love Sylang
-- **CMMI Compliance Made Easy** - Built-in requirements management and traceability for CMMI Levels 2-5
-- **API Documentation** - `.ifc` files define contracts between services with full traceability
-- **Feature Flags on Steroids** - Feature models (`.fml`) manage complex product variants and A/B testing scenarios
-- **Architecture as Code** - Document microservices, databases, and infrastructure in `.blk` files
-- **Requirements → Tests → Code** - Full traceability from user stories to test cases to implementation
-- **Git-Native Workflow** - Works exactly like your existing development process
-
-### Anyone Who Needs
-- ✅ **Traceability** from requirements to implementation to tests
-- ✅ **Variant Management** for product lines or multi-tenant systems
-- ✅ **Compliance Documentation** for audits and certifications
-- ✅ **Architecture Documentation** that stays in sync with code
-- ✅ **AI-Assisted Development** to accelerate documentation and analysis
-- ✅ **Version Control** for all engineering artifacts, not just code
-
-## 🎨 The Sylang Philosophy
-
-> **"AI creates, humans validate"**
-
-I believe the future of engineering is collaborative intelligence. AI excels at generating structured content, exploring design spaces, and maintaining consistency. Humans excel at judgment, creativity, and validation. Sylang is designed for this partnership.
-
-### What Makes Sylang Different?
-
-It's not just what Sylang does—it's **how it thinks**:
-
-- **Declarative over Imperative**: Describe what your system *is*, not how to build it
-- **Relationships over References**: Connect artifacts through semantic meaning, not manual links
-- **Text over Binary**: Human-readable, diff-able, merge-able, future-proof
-- **Standards over Conventions**: ISO 26262, ASPICE, INCOSE—baked into the language
-- **Collaboration over Silos**: Git workflows, code review practices, CI/CD integration
-
-
-## ⚠️ Current Status & Roadmap
-
-**Let's be transparent**: Sylang is ambitious, and I'm building it part-time as a solo developer. Here's what's real today and what's coming:
-
-### ✅ Available Now (v0.9.27)
-- **Language Specification**: Complete syntax for all 23 file extensions
-- **VSCode Extension**: Syntax highlighting, validation, and file structure support (Microsoft Marketplace & Open VSX)
-- **Core Features**: Product lines, feature models, requirements, architecture blocks, and test definitions
-- **Documentation**: Comprehensive help files and AI prompting guides
-- **Traceability**: Relationship keywords and cross-file references
-- **Visual Diagrams**: Automatic rendering of use case, sequence, and state machine diagrams from text
-- **Coverage Analysis**: Requirements-to-tests coverage reports and gap analysis
-- **FMEA Generation**: Automated FMEA tables and risk priority calculations
-- **Traceability Matrices**: Interactive, filterable traceability views
-- **Safety Reports**: ISO 26262 compliance documentation generation
-- **Variant Configuration UI**: Visual feature selection and configuration management
-- **Real-time Collaboration**: Multi-user editing with conflict resolution through Git
-- **CI/CD Integration**: Automated validation pipelines and compliance checks
-
-### 🚧 In Active Development
-- **Advanced Analytics**: Complexity metrics, change impact analysis, and risk dashboards
-- **Enhanced Visualizations**: More diagram types and interactive views
-- **Performance Optimization**: Faster parsing and validation for large projects
-
-### 🔮 On the Roadmap
-- **Import/Export**: Bidirectional sync with industry-standard requirements management tools
-- **Visual Forge**: Web-based collaborative environment (beyond VSCode)
-- **Plugin Ecosystem**: Community extensions and integrations
-
-### 💡 The Promise
-
-I'm not overpromising—I'm **building in public** as a solo, part-time developer. The language is stable. The tooling is evolving. Some features you see described here are aspirational, representing where I'm headed, not where things are today.
-
-**Why use Sylang now?** Because the core value—text-based, version-controlled, AI-friendly systems engineering—is real and working. The visualizations and advanced analytics are the cherry on top, coming as development progresses.
-
-**Set your expectations accordingly**: This is a part-time project by one developer. Progress happens, but at a sustainable pace. If you need production-grade tooling for mission-critical projects **today**, evaluate carefully and consider your risk tolerance. If you want to be part of shaping the future of systems engineering and can tolerate rough edges and slower development cycles, **welcome aboard**.
-
-## 🔮 The Future is Readable
-
-I believe the future of systems engineering is text-based, version-controlled, and AI-collaborative. Sylang is being built to be that future.
-
-Whether you're designing autonomous vehicles, spacecraft, or medical devices—Sylang aims to give you tools to engineer with confidence, collaborate with ease, and move at the speed of innovation.
-
-**Welcome to the journey.** It's a marathon, not a sprint.
-
-## 🎯 Purpose
-
-This repository provides:
-- **Language Reference**: Complete specification and syntax definitions for Sylang
-- **Extension Help Files**: Detailed guides for all 23 Sylang file extensions
-- **AI Prompting Strategy**: Curated prompts for AI-assisted Sylang development
-- **Examples**: Practical implementations demonstrating Sylang capabilities (coming soon)
-- **Documentation**: Comprehensive guides for language usage and best practices
-
-## 📁 Repository Structure
-
-```
-sylang/
-├── examples/                       # Practical Sylang implementations
-│   ├── automotive/                 # Automotive systems examples
-│   ├── aerospace/                  # Aerospace systems examples
-│   ├── medical/                    # Medical device examples
-│   ├── industrial/                 # Industrial systems examples
-│   ├── web-development/            # Web application examples
-│   └── README.md                   # Examples guide
-├── language/                       # Language specification and reference
-│   ├── SYLANG_COMPLETE_REFERENCE.md    # Complete language reference
-│   └── sylang-help/                # Extension-specific help files
-│       ├── README.md               # Help files overview
-│       ├── ple-help.md             # Product Line Engineering
-│       ├── fml-help.md             # Feature Model
-│       ├── vml-help.md             # Variant Model
-│       ├── vcf-help.md             # Variant Configuration
-│       ├── blk-help.md             # Block Definition
-│       ├── fun-help.md             # Function Definition
-│       ├── ifc-help.md             # Interface Definition
-│       ├── req-help.md             # Requirements
-│       ├── tst-help.md             # Test Definition
-│       ├── ucd-help.md             # Use Case Diagram
-│       ├── seq-help.md             # Sequence Diagram
-│       ├── smd-help.md             # State Machine Diagram
-│       ├── flr-help.md             # Failure Analysis (FMEA)
-│       ├── fta-help.md             # Fault Tree Analysis
-│       ├── itm-help.md             # Item Definition (ISO 26262)
-│       ├── haz-help.md             # Hazard Analysis
-│       ├── sam-help.md             # Safety Mechanisms
-│       ├── sgl-help.md             # Safety Goals
-│       ├── spr-help.md             # Sprint Planning
-│       ├── agt-help.md             # Agent Definition
-│       ├── spec-help.md            # Specification Document
-│       ├── dash-help.md            # Dashboard
-│       ├── relations-matrix-help.md # Traceability matrix
-│       └── sylang-prompts/         # AI prompting templates
-│           ├── README.md           # Prompting strategy guide
-│           └── [23 prompt files]   # Extension-specific prompts
-├── LICENSE                         # Apache License 2.0
-└── README.md                       # This file
+  def requirement TM_REQ_002
+    name "Thermal Derating"
+    description """
+      The inverter SHALL reduce output torque linearly between
+      150 °C and 175 °C junction temperature.
+      """
+    status approved          # comments start with # or //
+    reqtype functional
+    implements ref function ThermalDerating
 ```
 
-## 🔧 Language Overview
+- **One header per file.** `hdef` names the file's container; every `def` is indented under it, two spaces per level.
+- **Relations always say what they point at:** `implements ref function ThermalDerating`, `derivedfrom ref safetygoal SG_01`.
+- **`use` imports another file's header** before you refer to its elements: `use functionset ThermalFunctions`.
+- **Text** goes in `"double quotes"` on one line, or `"""triple quotes"""` across several lines. Values such as `approved` or `ASIL-B` are bare words.
+- **Comments** start with `#` or `//`, on their own line or after a value.
 
-Sylang uses file extensions to differentiate purpose and focus within a project. The language employs **indentation-based structure** (no braces or brackets) and supports both single-line (`//`) and multi-line (`/* */`) comments.
+Each file type's help lists exactly which keywords and values it accepts; those lists are generated from the language, so they match the validator.
 
-### File Extensions (23 Total)
+## See it in Studio
 
-#### 📋 Product Line Management
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.ple` | Product Line Engineering | Only one per project (root file) |
-| `.fml` | Feature Model | Only one per folder |
-| `.vml` | Variant Model | Multiple allowed (auto-generated) |
-| `.vcf` | Variant Configuration | Only one per folder (auto-generated) |
+![Internal block diagram of an 800 V traction inverter](media/screenshots/diagram-ibd.png)
 
-#### 🏗️ Architecture & Design
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.blk` | Block Definition | Multiple allowed (hardware/software blocks) |
-| `.fun` | Function Definition | Multiple allowed (functional behavior) |
-| `.ifc` | Interface Definition | Multiple allowed (operations/signals/datatypes) |
+![Fault tree with AND/OR gates and failure rates](media/screenshots/diagram-fta.png)
 
-#### 📝 Requirements & Testing
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.req` | Requirement Definition | Multiple allowed (with traceability) |
-| `.tst` | Test Definition | Multiple allowed (validation/verification) |
+![Home: coverage across the V-model for the whole workspace](media/screenshots/workspace-home.png)
 
-#### 📊 Behavioral Modeling
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.ucd` | Use Case Diagram | Multiple allowed (actor interactions) |
-| `.seq` | Sequence Diagram | Multiple allowed (message flows) |
-| `.smd` | State Machine Diagram | Multiple allowed (state-based behavior) |
+![Traceability matrix: requirements against functions](media/screenshots/workspace-matrix.png)
 
-#### 🛡️ Safety & Reliability (ISO 26262)
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.flr` | Failure Analysis (FMEA) | Multiple allowed (AIAG VDA FMEA) |
-| `.fta` | Fault Tree Analysis | Multiple allowed (quantitative FTA) |
-| `.itm` | Item Definition | Multiple allowed (ISO 26262 Part 3) |
-| `.haz` | Hazard Analysis | Multiple allowed (HARA with ASIL) |
-| `.sam` | Safety Mechanisms | Multiple allowed (ISO 26262 Part 4) |
-| `.sgl` | Safety Goals | Multiple allowed (derived from hazards) |
+![ISO 26262 compliance computed from the model](media/screenshots/workspace-compliance.png)
 
-#### 📅 Project Management
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.spr` | Sprint Planning | Multiple allowed (Agile/Scrum) |
-| `.agt` | Agent Definition | Multiple allowed (AI agent specs) |
+![AIAG-VDA FMEA worksheet](media/screenshots/workspace-fmea.png)
 
-#### 📄 Documentation & Dashboards
-| Extension | Description | Usage Rule |
-|-----------|-------------|------------|
-| `.spec` | Specification Document | Multiple allowed (technical specs) |
-| `.dash` | Dashboard | Multiple allowed (metrics/KPIs) |
+![Markdown reading view with callouts and live references to model elements](media/screenshots/markdown.png)
 
-## 🚀 Getting Started
+## With AI assistants
 
-### Project Structure
-Sylang projects use a structured directory layout to organize different types of artifacts (architecture, requirements, tests, safety analysis, etc.).
+- **Project Guide and help files.** Ask the assistant to read [`project-guide-help.md`](language/sylang-help/project-guide-help.md) and the help for the file types it writes. Every example in the help passes the validator.
+- **MCP server.** The extension registers a Model Context Protocol server with VS Code, so Copilot agent mode and other MCP clients can query the model: summaries, search, traceability, impact, model health, and the exact syntax of each file type. **Sylang: Copy MCP Server Configuration** gives the entry for other tools.
+- **`@sylang` in chat.** For example `/trace TM_REQ_001`, `/health` or `/schema req`.
+- **Prompts.** [`sylang-prompts/`](language/sylang-help/sylang-prompts/) has one prompt per file type.
 
-### Basic Syntax
-- **Indentation-based**: Use consistent indentation to define structure (2 or 4 spaces)
-- **Comments**: 
-  - Single-line: `// This is a comment`
-  - Multi-line: `/* This is a multi-line comment */`
-- **No brackets**: The language avoids begin/end keywords or braces
-- **Multiline strings**: Use `"""` triple quotes for multiline descriptions
-- **Keywords**: `hdef`, `def`, `use`, `ref`, and relationship keywords
+## Reference
 
-### File Structure Pattern
-Every Sylang file follows this structure:
-1. **Import statements** (`use` keyword) - Reference external symbols
-2. **Header definition** (`hdef` keyword) - ONE per file, defines main container
-3. **Symbol definitions** (`def` keyword) - Multiple allowed (varies by extension)
-4. **Properties** - Indented under parent symbols
-5. **Relations** - Cross-file references using `ref` keyword
+| Document | What it covers |
+|---|---|
+| [Help index](language/sylang-help/README.md) | All help files, by topic |
+| [Project Guide](language/sylang-help/project-guide-help.md) | Files, folders and build order per domain |
+| [Complete reference](language/sylang-help/SYLANG_COMPLETE_REFERENCE.md) | Every file type in one document |
+| [Relations matrix](language/sylang-help/relations-matrix-help.md) | Every relation, and the kinds of element it connects |
+| [Extending the language](language/sylang-help/extend-help.md) | Your own properties and enum values with `.sylangextend` |
 
-### Example Project Layout
-```
-my-project/
-├── system.ple                      # Product line definition (root file)
-├── features.fml                    # Feature model
-├── variants/
-│   ├── variant-a.vml               # Variant model A (auto-generated)
-│   ├── variant-b.vml               # Variant model B (auto-generated)
-│   └── config.vcf                  # Configuration (auto-generated)
-├── architecture/
-│   ├── main-system.blk             # Main system block
-│   ├── interfaces.ifc              # Interface definitions
-│   └── subsystems/
-│       ├── control.blk             # Control subsystem
-│       └── monitoring.blk          # Monitoring subsystem
-├── functions/
-│   ├── safety.fun                  # Safety functions
-│   └── operational.fun             # Operational functions
-├── requirements/
-│   ├── system-req.req              # System requirements
-│   └── safety-req.req              # Safety requirements
-├── tests/
-│   └── integration-tests.tst       # Test definitions
-├── safety/                         # ISO 26262 artifacts
-│   ├── item-definition.itm         # Item definition
-│   ├── hazard-analysis.haz         # HARA
-│   ├── safety-goals.sgl            # Safety goals
-│   ├── safety-mechanisms.sam       # Safety mechanisms
-│   ├── fmea.flr                    # FMEA analysis
-│   └── fault-tree.fta              # FTA analysis
-└── diagrams/
-    ├── use-cases.ucd               # Use case diagrams
-    ├── sequences.seq               # Sequence diagrams
-    └── state-machines.smd          # State machine diagrams
-```
+## Feedback
 
-## 📚 Documentation & Help
+Report problems and ideas in [Issues](https://github.com/balaji-embedcentrum/sylang/issues). More at [sylang.dev](https://sylang.dev).
 
-### Complete Language Reference
-- **[SYLANG_COMPLETE_REFERENCE.md](language/SYLANG_COMPLETE_REFERENCE.md)** - Comprehensive reference for all 23 extensions
-- **[sylang-help/](language/sylang-help/)** - Individual help files for each extension
-- **[sylang-prompts/](language/sylang-help/sylang-prompts/)** - AI prompting templates and strategies
+## License
 
-### Quick Links by Topic
-- **Getting Started**: [sylang-help/README.md](language/sylang-help/README.md)
-- **Product Line Engineering**: [ple-help.md](language/sylang-help/ple-help.md), [fml-help.md](language/sylang-help/fml-help.md)
-- **Architecture**: [blk-help.md](language/sylang-help/blk-help.md), [fun-help.md](language/sylang-help/fun-help.md), [ifc-help.md](language/sylang-help/ifc-help.md)
-- **Requirements & Testing**: [req-help.md](language/sylang-help/req-help.md), [tst-help.md](language/sylang-help/tst-help.md)
-- **ISO 26262 Safety**: [itm-help.md](language/sylang-help/itm-help.md), [haz-help.md](language/sylang-help/haz-help.md), [sgl-help.md](language/sylang-help/sgl-help.md)
-- **AI-Assisted Development**: [sylang-prompts/README.md](language/sylang-help/sylang-prompts/README.md)
-
-## 🤖 AI-Assisted Development
-
-Sylang is designed with the philosophy **"AI creates, humans validate"**. The language is optimized for AI-assisted development:
-
-- **Structured Prompts**: Pre-built prompts for each extension type
-- **Context-Aware Generation**: AI tools can generate complete files with proper syntax
-- **Traceability**: Automatic relationship generation between artifacts
-- **Validation**: Human review and refinement of AI-generated content
-
-See [sylang-prompts/README.md](language/sylang-help/sylang-prompts/README.md) for detailed prompting strategies.
-
-## 🏭 Standards Compliance
-
-Sylang provides complete support for industry standards:
-
-- ✅ **ISO 26262** (Automotive Functional Safety) - Parts 3 & 4
-- ✅ **ASPICE/Automotive SPICE** - Full traceability and process compliance
-- ✅ **INCOSE Systems Engineering** - Complete SE lifecycle support
-- ✅ **DO-178** (Aviation Software) - Requirements and test coverage
-- ✅ **IEC 62304** (Medical Device Software) - Risk management and design control
-- ✅ **AIAG VDA FMEA** - Failure mode and effects analysis
-
-## 🔑 Key Features
-
-- **Indentation-based syntax** - Clean, readable structure without braces
-- **Bidirectional traceability** - Complete relationship tracking across artifacts
-- **Variant management** - Feature models with automatic variant generation
-- **Safety analysis** - Built-in ISO 26262 compliance artifacts
-- **Behavioral modeling** - UML-style diagrams (use case, sequence, state machine)
-- **AI-optimized** - Designed for AI-assisted content generation
-- **Git-friendly** - Text-based format for version control
-
-## 🌐 Related Resources
-
-- **Official Documentation**: [sylang.dev/docs](https://sylang.dev/docs)
-- **VSCode Extension**: Available for syntax highlighting and validation
-- **Visual Forge**: Interactive development environment
-
-## 🙏 Standing on the Shoulders of Giants
-
-Sylang is inspired by and builds upon the ideas of excellent open-source projects:
-
-- **PlantUML** & **Mermaid** - Pioneered text-to-diagram generation, proving that complex visualizations can be created from simple text
-- **Markdown** - Demonstrated that human-readable text formats can be both simple and powerful
-- **YAML** & **TOML** - Showed that indentation-based, declarative formats work beautifully for configuration
-- **Git** - Revolutionized version control and proved that text-based workflows enable true collaboration
-- **Language Server Protocol (LSP)** - Made it possible to build rich editor support across multiple platforms
-
-I'm grateful to these communities for showing what's possible when tools are open, text-based, and designed for humans first.
-
-## 🤝 Contributing
-
-This repository serves as a language reference. For contributions:
-1. Follow the established file structure
-2. Ensure examples are well-documented
-3. Maintain consistency with language specifications
-4. Test examples for correctness
-5. Update help files when adding new features
-
-## 📄 License
-
-Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
-
-## 🔗 Links
-
-- [Sylang Official Website](https://sylang.dev)
-- [Documentation](https://sylang.dev/docs)
-- [VSCode Extension](https://marketplace.visualstudio.com/items?itemName=sylang.sylang-language-support)
-- [GitHub Repository](https://github.com/balaji-embedcentrum/sylang)
-
----
-
-**Note**: This repository focuses on language reference and examples. For the complete development environment and tooling, refer to the official Sylang ecosystem.
-
-**Version**: 0.9.27 | **Last Updated**: October 2025
+The language reference in this repository is licensed under the [Apache License 2.0](LICENSE). Copyright © 2025 Balaji Boominathan.

@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Sequence Diagram (.seq)
 
 ## Overview
@@ -10,9 +16,9 @@ Defines **message flow sequences** between blocks with operation/signal flows. S
 
 ## Valid Keywords
 ```
-use, hdef, sequenceset, functionset, def, sequence, fragment, name, description, 
-owner, tags, level, safetylevel, from, to, flow, fragmenttype, 
-condition, when, ref, block, function, operation, signal
+use, hdef, sequenceset, name, description, owner, tags, level, safetylevel,
+def, sequence, block, fragment, from, to, flow, fragmenttype, condition,
+when, requires, ref
 ```
 
 ## Syntax Structure
@@ -66,16 +72,14 @@ fragmenttype loop     # Loop iteration
 use block PerceptionControlModule
 use block PlanningControlModule
 use block VehicleControlModule
-use operation EnvironmentModelUpdate
-use operation PathPlanningRequest
-use signal EmergencyStopSignal
+use interfaceset AutonomousDrivingInterfaces
 
 hdef sequenceset AutonomousEmergencyBraking
-  name "Autonomous Emergency Braking Sequence"
-  description "Message flow sequence for emergency braking scenario"
-  owner "Safety Systems Integration Team"
+  name """Autonomous Emergency Braking Sequence"""
+  description """Message flow sequence for emergency braking scenario"""
+  owner """Safety Systems Integration Team"""
   safetylevel ASIL-D
-  tags "emergency-braking", "sequence", "safety-critical", "AEB"
+  tags """emergency-braking""", """sequence""", """safety-critical""", """AEB"""
   
   // Main emergency braking sequence
   def sequence SEQ_001
@@ -101,7 +105,7 @@ hdef sequenceset AutonomousEmergencyBraking
   // Error handling fragment
   def fragment CommunicationFailure
     fragmenttype alt
-    condition "Communication timeout > 100ms"
+    condition """Communication timeout > 100ms"""
     
     def sequence SEQ_005
       from ref block VehicleControlModule
@@ -111,7 +115,7 @@ hdef sequenceset AutonomousEmergencyBraking
   // Parallel status reporting fragment  
   def fragment StatusReporting
     fragmenttype parallel
-    condition "All modules must report status concurrently"
+    condition """All modules must report status concurrently"""
     
     def sequence SEQ_006
       from ref block PerceptionControlModule
@@ -127,19 +131,14 @@ hdef sequenceset AutonomousEmergencyBraking
 ## Example with Functions
 ```sylang
 use functionset AutonomousDrivingFunctions
-use function PerceptionProcessing
-use function PathPlanning
-use function MotionControl
-use operation ComputeObstacleMap
-use operation PlanTrajectory
-use operation ExecuteManeuver
+use interfaceset AutonomousDrivingInterfaces
 
 hdef sequenceset AutonomousDrivingSequence
-  name "Autonomous Driving Function Sequence"
-  description "Message flow sequence between autonomous driving functions"
-  owner "AD Systems Team"
+  name """Autonomous Driving Function Sequence"""
+  description """Message flow sequence between autonomous driving functions"""
+  owner """AD Systems Team"""
   safetylevel ASIL-D
-  tags "autonomous-driving", "function-sequence", "safety-critical"
+  tags """autonomous-driving""", """function-sequence""", """safety-critical"""
   
   // Function-to-function sequence
   def sequence SEQ_001

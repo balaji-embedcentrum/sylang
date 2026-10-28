@@ -1,10 +1,12 @@
 # Variant Model (.vml) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## ⚠️ CRITICAL: AUTO-GENERATED FILE
 **DO NOT CREATE .VML FILES MANUALLY!**
 
 `.vml` files are **AUTO-GENERATED** from `.fml` (Feature Model) files using the command:
-**Right-click `.fml` file → "Generate VML from FML"**
+**Right-click `.fml` file → "Create .vml template"**
 
 ## Purpose
 Variant Model files define **variant selections** from a feature model. VML files capture which features are selected for a specific product variant, supporting systematic product line engineering and configuration management. They are the bridge between feature models (.fml) and configuration files (.vcf).
@@ -27,28 +29,28 @@ First, create your feature model defining all available features:
 use productline AutonomousVehicleProductLine
 
 hdef featureset AutonomousVehicleFeatures
-  name "Autonomous Vehicle Feature Model"
-  description "Complete feature model for L3 autonomous vehicle"
-  owner "Product Line Engineering"
+  name """Autonomous Vehicle Feature Model"""
+  description """Complete feature model for L3 autonomous vehicle"""
+  owner """Product Line Engineering"""
 
   def feature CoreAutonomousFeatures mandatory
-    name "Core Autonomous Driving Features"
-    description "Essential features required for autonomous operation"
+    name """Core Autonomous Driving Features"""
+    description """Essential features required for autonomous operation"""
     
     def feature PerceptionSystem mandatory
-      name "Perception System"
+      name """Perception System"""
       def feature CameraSystem mandatory
       def feature LidarSystem optional
       def feature RadarSystem mandatory
       
     def feature PlanningSystem mandatory
-      name "Planning System"
+      name """Planning System"""
       def feature GlobalPlanning mandatory
       def feature LocalPlanning mandatory
 ```
 
-### Step 2: Generate VML from FML
-**Right-click `AutonomousVehicleFeatures.fml` → "Generate VML from FML"**
+### Step 2: Create .vml template
+**Right-click `AutonomousVehicleFeatures.fml` → "Create .vml template"**
 
 This auto-generates:
 ```sylang
@@ -56,10 +58,10 @@ This auto-generates:
 use featureset AutonomousVehicleFeatures
 
 hdef variantset AutonomousVehicleFeaturesVariants
-  name "Autonomous Vehicle Features Variants"
-  description "Auto-generated variant selections"
-  owner "Product Line Engineering"
-  tags "variants", "auto-generated"
+  name """Autonomous Vehicle Features Variants"""
+  description """Auto-generated variant selections"""
+  owner """Product Line Engineering"""
+  tags """variants""", """auto-generated"""
 
   extends ref feature CoreAutonomousFeatures mandatory selected
     extends ref feature PerceptionSystem mandatory selected
@@ -83,7 +85,7 @@ extends ref feature LidarSystem optional  # Remove 'selected'
 ```
 
 ### Step 4: Generate Configuration (.vcf)
-**Right-click `.vml` → "Generate VCF from VML"**
+**Right-click `.vml` → "Generate variant config (.vcf)"**
 
 ## Key Syntax Elements
 
@@ -156,8 +158,8 @@ extends ref feature TransmissionType mandatory selected
 ```
 Given an existing .fml file: AutonomousVehicleFeatures.fml
 
-Step 1: Generate VML from FML
-- Right-click AutonomousVehicleFeatures.fml → "Generate VML from FML"
+Step 1: Create .vml template
+- Right-click AutonomousVehicleFeatures.fml → """Create .vml template"""
 - This creates AutonomousVehicleFeatures.vml with ALL features selected by default
 
 Step 2: Edit .vml to create Premium variant
@@ -210,15 +212,15 @@ hdef variantset AutonomousVehicleFeatures_Premium
 ```
 
 Step 3: Generate configuration
-- Right-click AutonomousVehicleFeatures_Premium.vml → "Generate VCF from VML"
+- Right-click AutonomousVehicleFeatures_Premium.vml → """Generate variant config (.vcf)"""
 ```
 
 ### 2. Automotive Basic/Economy Variant Selection
 ```
 Given the same .fml file: AutonomousVehicleFeatures.fml
 
-Step 1: Generate VML from FML
-- Right-click AutonomousVehicleFeatures.fml → "Generate VML from FML"
+Step 1: Create .vml template
+- Right-click AutonomousVehicleFeatures.fml → """Create .vml template"""
 
 Step 2: Edit .vml to create Basic variant
 Save as: AutonomousVehicleFeatures_Basic.vml
@@ -280,7 +282,7 @@ Create THREE variants:
 3. Advanced Monitor (ICU advanced with analytics)
 
 Step 1: Generate VML
-- Right-click PatientMonitoringFeatures.fml → "Generate VML from FML"
+- Right-click PatientMonitoringFeatures.fml → """Create .vml template"""
 
 Step 2: Create three variant files
 
@@ -408,7 +410,7 @@ hdef variantset FlightControlFeatures_WideBody
 Given .fml file: {FEATURE_MODEL_NAME}.fml
 
 Step 1: Generate VML
-- Right-click {FEATURE_MODEL_NAME}.fml → "Generate VML from FML"
+- Right-click {FEATURE_MODEL_NAME}.fml → """Create .vml template"""
 
 Step 2: Create variant by editing selections
 Save as: {FEATURE_MODEL_NAME}_{VARIANT_NAME}.vml
@@ -507,7 +509,7 @@ After editing auto-generated .vml, verify:
 - Not selecting any OR feature when at least one required
 
 ✅ **BEST PRACTICES:**
-- Always generate from `.fml` using "Generate VML from FML"
+- Always generate from `.fml` using "Create .vml template"
 - Edit selections by adding/removing `selected` keyword
 - Document variant strategy in description
 - Use descriptive variant names (e.g., `_Premium`, `_Basic`, `_Regional`)
@@ -537,14 +539,14 @@ hdef featureset AutonomousVehicleFeatures
 use featureset AutonomousVehicleFeatures
 
 hdef variantset AutonomousVehicleFeatures_Premium
-  name "Premium Autonomous Vehicle Configuration"
+  name """Premium Autonomous Vehicle Configuration"""
   description """
     Premium variant with full sensor suite including LiDAR and 
     advanced HMI features for luxury autonomous vehicles. Targets 
     luxury market segment with no cost constraints.
     """
-  owner "Product Line Engineering"
-  tags "variants", "premium", "full-sensor", "L3-automation", "luxury"
+  owner """Product Line Engineering"""
+  tags """variants""", """premium""", """full-sensor""", """L3-automation""", """luxury"""
 
   extends ref feature CoreAutonomousFeatures mandatory selected
     extends ref feature PerceptionSystem mandatory selected
@@ -558,14 +560,14 @@ hdef variantset AutonomousVehicleFeatures_Premium
 use featureset AutonomousVehicleFeatures
 
 hdef variantset AutonomousVehicleFeatures_Basic
-  name "Basic Autonomous Vehicle Configuration"
+  name """Basic Autonomous Vehicle Configuration"""
   description """
     Entry-level autonomous configuration with essential sensors only. 
     Cost-optimized for mass market deployment. LiDAR excluded to meet 
     aggressive cost targets.
     """
-  owner "Product Engineering"
-  tags "basic", "entry-level", "cost-optimized", "L3-minimal"
+  owner """Product Engineering"""
+  tags """basic""", """entry-level""", """cost-optimized""", """L3-minimal"""
 
   extends ref feature CoreAutonomousFeatures mandatory selected
     extends ref feature PerceptionSystem mandatory selected
@@ -576,4 +578,4 @@ hdef variantset AutonomousVehicleFeatures_Basic
 
 ---
 
-**Remember:** `.vml` files are **AUTO-GENERATED** from `.fml` files. Never create them manually! Always use "Generate VML from FML" command, then edit the selections by adding/removing the `selected` keyword. Use `hdef variantset` (not `variantmodel`), and only use `extends ref feature` statements (no `def` statements). Respect mandatory/optional/or/alternative constraints. After editing, generate `.vcf` configuration file using "Generate VCF from VML".
+**Remember:** `.vml` files are **AUTO-GENERATED** from `.fml` files. Never create them manually! Always use "Create .vml template" command, then edit the selections by adding/removing the `selected` keyword. Use `hdef variantset` (not `variantmodel`), and only use `extends ref feature` statements (no `def` statements). Respect mandatory/optional/or/alternative constraints. After editing, generate `.vcf` configuration file using "Generate variant config (.vcf)".

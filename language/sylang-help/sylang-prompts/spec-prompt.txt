@@ -1,5 +1,7 @@
 # Specification Documents (.spec) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Specification files generate beautiful, professional documentation with hierarchical sections and dynamic content. They auto-populate content from requirements, use cases, functions, blocks, tests, and other Sylang artifacts with advanced filtering, grouping, and sorting capabilities.
 
@@ -203,50 +205,50 @@ use functionset VehicleFunctions
 use testset VehicleTests
 
 hdef specification VehicleSystemSpec
-  name "Vehicle System Requirements Specification"
-  description "Complete system requirements with traceability"
-  owner "Systems Engineering"
-  version "1.0"
+  name """Vehicle System Requirements Specification"""
+  description """Complete system requirements with traceability"""
+  owner """Systems Engineering"""
+  version """1.0"""
 
   def section Introduction
-    name "Introduction"
+    name """Introduction"""
     def spec Overview
-      name "System Overview"
+      name """System Overview"""
       source requirementset VehicleRequirements
       where level = system
       orderby identifier asc
   
   def section FunctionalRequirements
-    name "Functional Requirements"
+    name """Functional Requirements"""
     
     def table FunctionalReqs
-      name "Functional Requirements"
+      name """Functional Requirements"""
       source requirementset VehicleRequirements
       where reqtype = functional and status = approved
       orderby identifier asc
       columns identifier, name, description, owner, status
     
     def section SafetyRequirements
-      name "Safety-Critical Requirements"
+      name """Safety-Critical Requirements"""
       
       def table SafetyReqs
-        name "ASIL-D Requirements"
+        name """ASIL-D Requirements"""
         source requirementset VehicleRequirements
         where safetylevel = ASIL-D
         orderby identifier asc
         columns identifier, name, verificationcriteria, status
   
   def section Traceability
-    name "Traceability Matrix"
+    name """Traceability Matrix"""
     
     def table ReqToFunc
-      name "Requirements to Functions"
+      name """Requirements to Functions"""
       source functionset VehicleFunctions
       orderby identifier asc
       columns identifier, name, implements, status
     
     def table FuncToTest
-      name "Functions to Tests"
+      name """Functions to Tests"""
       source testcaseset VehicleTests
       where testresult in [pass, intest]
       orderby identifier asc

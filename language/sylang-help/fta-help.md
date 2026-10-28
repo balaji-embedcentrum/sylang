@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Fault Tree Analysis (.fta)
 
 ## Overview
@@ -10,8 +16,9 @@ Defines **quantitative fault tree analysis** with hierarchical gate structures. 
 
 ## Valid Keywords
 ```
-use, hdef, faulttree, def, gate, name, description, owner, tags, 
-safetylevel, topevent, gatetype, input, output, allocatedto, when, ref
+use, hdef, faulttree, name, description, owner, tags, level, safetylevel,
+topevent, def, gate, gatetype, input, output, allocatedto, requires, ref,
+when, analysiseffort, deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -56,11 +63,11 @@ use hazardanalysis AutonomousVehicleHazards
 use safetymechanismset AutonomousVehicleSafetyMechanisms
 
 hdef faulttree VehicleCollisionFaultTree
-  name "Vehicle Collision Fault Tree Analysis"
-  description "Complete FTA for vehicle collision scenarios in autonomous operation"
-  owner "Safety Analysis Team"
+  name """Vehicle Collision Fault Tree Analysis"""
+  description """Complete FTA for vehicle collision scenarios in autonomous operation"""
+  owner """Safety Analysis Team"""
   safetylevel ASIL-D
-  tags "fault-tree", "collision-analysis", "quantitative-fta"
+  tags """fault-tree""", """collision-analysis""", """quantitative-fta"""
   
   // Top event - what we're analyzing
   topevent ref failuremode VehicleCollisionEvent
@@ -76,12 +83,14 @@ hdef faulttree VehicleCollisionFaultTree
     input ref failuremode HumanFactorError
     
     output ref failuremode VehicleCollisionEvent
+```
 
-// Block-level FTA - separate conceptual file
+```sylang
+// Block-level FTA - a separate .fta file
 hdef faulttree PerceptionModuleFaultTree
-  name "Perception Module Fault Tree"
-  description "Detailed fault tree for perception system failures"
-  owner "Perception Safety Team"
+  name """Perception Module Fault Tree"""
+  description """Detailed fault tree for perception system failures"""
+  owner """Perception Safety Team"""
   allocatedto ref block PerceptionControlModule
   safetylevel ASIL-D
   

@@ -1,5 +1,7 @@
 # Product Requirements Document (PRD) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 A PRD is the foundation document that defines WHAT to build before creating any Sylang files. It captures business goals, user needs, functional requirements, and system context. The PRD drives all downstream Sylang artifacts (.ple, .fml, .req, .blk, etc.).
 
@@ -306,7 +308,7 @@ PRD Features → Sylang .fml Mapping:
 ```
 PRD Requirements → Sylang .req Mapping:
 - Functional requirements → reqtype functional
-- Performance requirements → reqtype non-functional
+- Performance requirements → reqtype nonfunctional
 - Safety requirements → reqtype safety, safetylevel
 - Each requirement → def requirement [id]
 ```
@@ -466,7 +468,7 @@ Include preliminary Fault Tree Analysis (FTA) in PRD.
 
 ### Step 1: Create Product Line (.ple)
 ```prompt
-Using PRD section "Executive Summary" and "Goals & Objectives", 
+Using PRD section """Executive Summary""" and """Goals & Objectives""", 
 create a Sylang .ple file with:
 - Product line name from PRD title
 - Domain from target market
@@ -476,7 +478,7 @@ create a Sylang .ple file with:
 
 ### Step 2: Create Feature Model (.fml)
 ```prompt
-Using PRD section "Functional Requirements", create Sylang .fml file:
+Using PRD section """Functional Requirements""", create Sylang .fml file:
 - Map must-have features to mandatory
 - Map optional features to optional
 - Map variant features to alternative/or
@@ -485,7 +487,7 @@ Using PRD section "Functional Requirements", create Sylang .fml file:
 
 ### Step 3: Create Initial Requirements (.req)
 ```prompt
-Using PRD sections "Functional Requirements" and "Non-Functional Requirements",
+Using PRD sections """Functional Requirements""" and """Non-Functional Requirements""",
 create Sylang .req file:
 - One requirement per PRD requirement
 - Maintain PRD numbering (e.g., PRD-FR-001 → REQ_FR_001)

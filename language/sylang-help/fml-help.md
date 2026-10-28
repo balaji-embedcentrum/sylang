@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Feature Model (.fml)
 
 ## Overview
@@ -8,13 +14,13 @@ The `.fml` file defines a **hierarchical feature model** with variability constr
 - **ONE** `.fml` file per folder (strict limitation)
 - **MULTIPLE** `def feature` statements (hierarchical)
 - Must `use productline` at the top
-- Supports `performs`, `needs`, `offers` relations to functions/operations/signals
+- Supports `performs`, `needs`, `provides` relations to functions/operations/signals
 
 ## Valid Keywords
 ```
-use, hdef, featureset, listedfor, def, feature, name, description, owner, 
-tags, safetylevel, requires, excludes, mandatory, optional, or, alternative, 
-performs, needs, offers, ref, operation, signal, function
+use, hdef, featureset, listedfor, name, description, owner, tags, level,
+safetylevel, status, def, feature, mandatory, optional, or, alternative,
+requires, excludes, performs, needs, provides, meets, ref, inherits, attach
 ```
 
 ## Syntax Structure
@@ -37,8 +43,8 @@ hdef featureset [identifier]
     performs ref function [function-ref], [function-ref], ...
     needs ref operation [operation-ref], [operation-ref], ...
     needs ref signal [signal-ref], [signal-ref], ...
-    offers ref operation [operation-ref], [operation-ref], ...
-    offers ref signal [signal-ref], [signal-ref], ...
+    provides ref operation [operation-ref], [operation-ref], ...
+    provides ref signal [signal-ref], [signal-ref], ...
     requires ref feature [feature-ref], [feature-ref], ...
     excludes ref feature [feature-ref], [feature-ref], ...
 
@@ -97,7 +103,7 @@ def feature RadarSystem mandatory
 - `safetylevel` - ASIL level for safety-critical features
 - `performs` - Functions this feature performs
 - `needs` - Input operations/signals required
-- `offers` - Output operations/signals provided
+- `provides` - Output operations/signals provided
 
 ### Relationship Keywords (ASPICE Bilateral Traceability)
 - `performs ref function` - Maps to functional implementation (multiple allowed)
@@ -106,8 +112,8 @@ def feature RadarSystem mandatory
 - `excludes ref feature` - Mutually exclusive with other features (multiple allowed)
 - `needs ref operation` - Input operation interfaces (multiple allowed)
 - `needs ref signal` - Input signal interfaces (multiple allowed)
-- `offers ref operation` - Output operation interfaces (multiple allowed)
-- `offers ref signal` - Output signal interfaces (multiple allowed)
+- `provides ref operation` - Output operation interfaces (multiple allowed)
+- `provides ref signal` - Output signal interfaces (multiple allowed)
 
 ## Complete Example
 
@@ -115,74 +121,74 @@ def feature RadarSystem mandatory
 use productline AutonomousVehicleProductLine
 
 hdef featureset AutonomousVehicleFeatures
-  name "Autonomous Vehicle Feature Set"
+  name """Autonomous Vehicle Feature Set"""
   description """
     Comprehensive feature model for autonomous vehicle platform with 
     L3 automation capabilities including perception, planning, and control.
     """
-  owner "Product Engineering Team"
-  tags "features", "autonomous-vehicle", "L3-automation"
+  owner """Product Engineering Team"""
+  tags """features""", """autonomous-vehicle""", """L3-automation"""
   listedfor ref productline AutonomousVehicleProductLine
 
   def feature CoreAutonomousFeatures mandatory
-    name "Core Autonomous Driving Features"
-    description "Essential autonomous driving functionality for L3 automation"
-    owner "Autonomous Systems Team"
+    name """Core Autonomous Driving Features"""
+    description """Essential autonomous driving functionality for L3 automation"""
+    owner """Autonomous Systems Team"""
     safetylevel ASIL-D
     performs ref function AutonomousDrivingController, PathPlanner
     needs ref operation GetVehicleState, GetEnvironmentData
     needs ref signal VehicleSpeed, SteeringAngle
-    offers ref operation SetSteeringAngle, SetBrakePressure
-    offers ref signal AutonomousModeActive, SystemReady
+    provides ref operation SetSteeringAngle, SetBrakePressure
+    provides ref signal AutonomousModeActive, SystemReady
 
     def feature PerceptionSystem mandatory
-      name "Environmental Perception System"
-      description "Multi-sensor fusion for environmental awareness"
-      owner "Perception Team"
+      name """Environmental Perception System"""
+      description """Multi-sensor fusion for environmental awareness"""
+      owner """Perception Team"""
       safetylevel ASIL-D
 
       def feature CameraSystem mandatory
-        name "Camera-based Vision System"
-        description "Stereo and mono camera processing"
+        name """Camera-based Vision System"""
+        description """Stereo and mono camera processing"""
         safetylevel ASIL-D
 
       def feature LidarSystem optional
-        name "LiDAR Scanning System"
-        description "3D point cloud processing"
+        name """LiDAR Scanning System"""
+        description """3D point cloud processing"""
         safetylevel ASIL-C
 
       def feature RadarSystem mandatory
-        name "Radar Detection System"
-        description "Long and short range radar"
+        name """Radar Detection System"""
+        description """Long and short range radar"""
         safetylevel ASIL-D
 
     def feature PlanningSystem mandatory
-      name "Path Planning and Decision System"
+      name """Path Planning and Decision System"""
       safetylevel ASIL-D
 
       def feature GlobalPlanning mandatory
-        name "Global Path Planning"
+        name """Global Path Planning"""
         safetylevel ASIL-C
 
       def feature LocalPlanning mandatory
-        name "Local Path Planning"
+        name """Local Path Planning"""
         safetylevel ASIL-D
 
   def feature HumanMachineInterface optional
-    name "Human Machine Interface Systems"
-    description "Driver interaction and takeover request"
+    name """Human Machine Interface Systems"""
+    description """Driver interaction and takeover request"""
     safetylevel ASIL-B
 
     def feature TakeoverRequest or
-      name "Takeover Request System"
+      name """Takeover Request System"""
       safetylevel ASIL-B
 
     def feature StatusDisplay or
-      name "Autonomous System Status Display"
+      name """Autonomous System Status Display"""
       safetylevel ASIL-A
 
     def feature VoiceInterface or
-      name "Voice Command Interface"
+      name """Voice Command Interface"""
       safetylevel QM
 ```
 
@@ -249,8 +255,13 @@ def feature ObjectDetection mandatory
 def feature BrakeControl mandatory
   needs ref operation GetBrakePedalPosition
   needs ref signal WheelSpeedSensor
-  offers ref operation SetBrakePressure
-  offers ref signal BrakeSystemStatus
+  provides ref operation SetBrakePressure
+  provides ref signal BrakeSystemStatus
+  
+  # Optional: Control port placement with left/right keywords (for decomposition diagrams)
+  needs ref signal WheelSpeedSensor right
+  provides ref operation SetBrakePressure left
+  # Default: needs → left, provides → right. Keywords override defaults.
 ```
 
 ## Common Patterns
@@ -291,12 +302,11 @@ def feature ComfortFeatures optional
 ## Validation Rules
 ✅ Exactly one `hdef featureset` per file  
 ✅ Only ONE `.fml` file per folder  
-✅ Must include `use productline` statement  
-✅ Must include `listedfor ref productline`  
+✅ Links to its product line with `use productline` and `listedfor ref productline` (recommended; a project without a `.ple` leaves them out)  
 ✅ Sibling features must have consistent flags  
 ✅ Multiline strings use `"""` triple quotes  
 ✅ Can reference functions via `performs`  
-✅ Can reference operations/signals via `needs`/`offers`  
+✅ Can reference operations/signals via `needs`/`provides`  
 ❌ Cannot use `when ref config` (not allowed in .fml)  
 ❌ Cannot have multiple `.fml` files in same folder
 
@@ -322,8 +332,8 @@ ProductLine/
 
 ## Generate Variants
 After creating `.fml`, right-click and select:
-- **"Generate VML from FML"** → Creates `.vml` file
-- Then right-click `.vml` and **"Generate VCF from VML"** → Creates `.vcf` file
+- **"Create .vml template"** → Creates `.vml` file
+- Then right-click `.vml` and **"Generate variant config (.vcf)"** → Creates `.vcf` file
 
 ---
 

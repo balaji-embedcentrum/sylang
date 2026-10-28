@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Interface Definition (.ifc)
 
 ## Overview
@@ -11,10 +17,10 @@ The `.ifc` file defines **interface specifications** including operations, signa
 
 ## Valid Keywords
 ```
-use, hdef, interfaceset, def, operation, signal, datatype, parameter, 
-name, description, owner, tags, safetylevel, level, decomposedfrom, 
-decomposesto, allocatedto, derivedfrom, implementedby, when, requires, 
-meets, ref, config, interfaceset, block, requirement, characteristic
+use, hdef, interfaceset, name, description, owner, tags, value, unit,
+safetylevel, level, def, operation, signal, datatype, parameter,
+decomposedfrom, decomposesto, allocatedto, derivedfrom, implementedby, when,
+requires, meets, ref, config, attach, analysiseffort, deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -102,9 +108,9 @@ Use this table to decide between `operation` and `signal`:
 Functions or methods provided by an interface:
 ```sylang
 def operation GetSystemStatus
-  name "Get System Status"
-  description "Retrieves current system status information"
-  owner "System Team"
+  name """Get System Status"""
+  description """Retrieves current system status information"""
+  owner """System Team"""
   level solution
   requires ref datatype StatusData
   safetylevel ASIL-D
@@ -114,9 +120,9 @@ def operation GetSystemStatus
 Events or data streams:
 ```sylang
 def signal EmergencyAlert
-  name "Emergency Alert Signal"
-  description "Signal indicating emergency condition"
-  owner "Safety Team"
+  name """Emergency Alert Signal"""
+  description """Signal indicating emergency condition"""
+  owner """Safety Team"""
   level solution
   requires ref datatype AlertType
   safetylevel ASIL-D
@@ -126,9 +132,9 @@ def signal EmergencyAlert
 Data structure definitions:
 ```sylang
 def datatype VehicleStateData
-  name "Vehicle State Data"
-  description "Complete vehicle state information"
-  owner "Data Architecture Team"
+  name """Vehicle State Data"""
+  description """Complete vehicle state information"""
+  owner """Data Architecture Team"""
   level solution
 ```
 
@@ -136,12 +142,12 @@ def datatype VehicleStateData
 Configurable values:
 ```sylang
 def parameter MaxVelocity
-  name "Maximum Velocity"
-  description "Maximum allowed velocity parameter"
-  owner "Control Team"
+  name """Maximum Velocity"""
+  description """Maximum allowed velocity parameter"""
+  owner """Control Team"""
   level solution
   requires ref datatype VelocityValue
-  value "120.0"
+  value """120.0"""
 ```
 
 ## Complete Example
@@ -150,103 +156,103 @@ def parameter MaxVelocity
 use configset VehicleConfig
 
 hdef interfaceset VehicleControlInterfaces
-  name "Vehicle Control Interface Definitions"
+  name """Vehicle Control Interface Definitions"""
   description """
     Comprehensive interface definitions for vehicle control system including
     operations, signals, datatypes, and parameters for autonomous operation.
     """
-  owner "System Architecture Team"
-  tags "vehicle", "control", "interfaces", "autonomous"
+  owner """System Architecture Team"""
+  tags """vehicle""", """control""", """interfaces""", """autonomous"""
   safetylevel ASIL-B
 
   def operation GetVehicleState
-    name "Get Vehicle State"
-    description "Retrieves current vehicle state information including speed, position, and heading"
-    owner "Control Team"
+    name """Get Vehicle State"""
+    description """Retrieves current vehicle state information including speed, position, and heading"""
+    owner """Control Team"""
     level solution
     requires ref datatype VehicleStateData
     safetylevel ASIL-B
     when ref config c_VehicleControl
 
   def operation SetVehicleSpeed
-    name "Set Vehicle Speed"
-    description "Sets target vehicle speed for autonomous control"
-    owner "Control Team"
+    name """Set Vehicle Speed"""
+    description """Sets target vehicle speed for autonomous control"""
+    owner """Control Team"""
     level solution
     requires ref datatype SpeedValue
     safetylevel ASIL-C
 
   def operation GetEnvironmentData
-    name "Get Environment Data"
-    description "Retrieves environmental perception data from sensors"
-    owner "Perception Team"
+    name """Get Environment Data"""
+    description """Retrieves environmental perception data from sensors"""
+    owner """Perception Team"""
     level solution
     requires ref datatype EnvironmentModelData
     safetylevel ASIL-D
     when ref config c_PerceptionSystem
 
   def signal VehicleSpeedUpdate
-    name "Vehicle Speed Update"
-    description "Signal indicating vehicle speed has changed"
-    owner "Control Team"
+    name """Vehicle Speed Update"""
+    description """Signal indicating vehicle speed has changed"""
+    owner """Control Team"""
     level solution
     requires ref datatype SpeedValue
     safetylevel ASIL-C
 
   def signal EmergencyBrakeRequest
-    name "Emergency Brake Request"
-    description "Critical signal requesting immediate emergency braking"
-    owner "Safety Team"
+    name """Emergency Brake Request"""
+    description """Critical signal requesting immediate emergency braking"""
+    owner """Safety Team"""
     level solution
     requires ref datatype BrakeRequestData
     safetylevel ASIL-D
 
   def signal SystemHeartbeat
-    name "System Heartbeat"
-    description "Periodic heartbeat signal for system health monitoring"
-    owner "Diagnostic Team"
+    name """System Heartbeat"""
+    description """Periodic heartbeat signal for system health monitoring"""
+    owner """Diagnostic Team"""
     level solution
     requires ref datatype uint32
 
   def datatype VehicleStateData
-    name "Vehicle State Data"
-    description "Complete vehicle state information structure"
-    owner "Data Architecture Team"
+    name """Vehicle State Data"""
+    description """Complete vehicle state information structure"""
+    owner """Data Architecture Team"""
     level solution
 
   def datatype SpeedValue
-    name "Speed Value"
-    description "Data type for vehicle speed values in km/h"
-    owner "Control Team"
+    name """Speed Value"""
+    description """Data type for vehicle speed values in km/h"""
+    owner """Control Team"""
     level solution
 
   def datatype EnvironmentModelData
-    name "Environment Model Data"
-    description "Environmental perception data structure"
-    owner "Perception Team"
+    name """Environment Model Data"""
+    description """Environmental perception data structure"""
+    owner """Perception Team"""
     level solution
 
   def datatype BrakeRequestData
-    name "Brake Request Data"
-    description "Emergency brake request data structure"
-    owner "Safety Team"
+    name """Brake Request Data"""
+    description """Emergency brake request data structure"""
+    owner """Safety Team"""
     level solution
 
   def parameter MaxSpeed
-    name "Maximum Speed"
-    description "Maximum allowed vehicle speed parameter"
-    owner "Control Team"
+    name """Maximum Speed"""
+    description """Maximum allowed vehicle speed parameter"""
+    owner """Control Team"""
     level solution
     requires ref datatype SpeedValue
-    value "120.0"
+    value """120.0"""
 
   def parameter EmergencyBrakeThreshold
-    name "Emergency Brake Threshold"
-    description "Distance threshold for emergency braking activation"
-    owner "Safety Team"
+    name """Emergency Brake Threshold"""
+    description """Distance threshold for emergency braking activation"""
+    owner """Safety Team"""
     level solution
     requires ref datatype DistanceValue
-    value "5.0"
+    value """5.0"""
 ```
 
 ## Usage in Other Files
@@ -262,8 +268,7 @@ hdef block ControlModule
   needs ref signal VehicleSpeedUpdate
   
   # Output interfaces (what this block provides)
-  def operation SetVehicleSpeed
-    # Implements the operation defined in .ifc
+  provides ref operation SetVehicleSpeed
 ```
 
 ### In Function Files (.fun)
@@ -278,7 +283,7 @@ hdef functionset ControlFunctions
 ```
 
 ### In Feature Files (.fml)
-Features reference interfaces via `needs` and `offers`:
+Features reference interfaces via `needs` and `provides`:
 ```sylang
 use interfaceset VehicleControlInterfaces
 
@@ -286,8 +291,8 @@ hdef featureset VehicleFeatures
   def feature AutonomousControl mandatory
     needs ref operation GetVehicleState
     needs ref operation GetEnvironmentData
-    offers ref operation SetVehicleSpeed
-    offers ref signal EmergencyBrakeRequest
+    provides ref operation SetVehicleSpeed
+    provides ref signal EmergencyBrakeRequest
 ```
 
 ## Level Hierarchy
@@ -307,11 +312,11 @@ level solutionelement  # Solution element level
 ```sylang
 hdef interfaceset SensorInterfaces
   def operation GetSensorData
-    name "Get Sensor Data"
+    name """Get Sensor Data"""
     requires ref datatype SensorReadingData
     
   def signal SensorFault
-    name "Sensor Fault Signal"
+    name """Sensor Fault Signal"""
     requires ref datatype FaultCode
     safetylevel ASIL-D
 ```
@@ -320,12 +325,12 @@ hdef interfaceset SensorInterfaces
 ```sylang
 hdef interfaceset ActuatorInterfaces
   def operation SetActuatorCommand
-    name "Set Actuator Command"
+    name """Set Actuator Command"""
     requires ref datatype ActuatorCommandData
     safetylevel ASIL-C
     
   def signal ActuatorFeedback
-    name "Actuator Feedback"
+    name """Actuator Feedback"""
     requires ref datatype ActuatorStatusData
 ```
 
@@ -333,17 +338,17 @@ hdef interfaceset ActuatorInterfaces
 ```sylang
 hdef interfaceset DiagnosticInterfaces
   def operation GetDiagnosticData
-    name "Get Diagnostic Data"
+    name """Get Diagnostic Data"""
     requires ref datatype DiagnosticReport
     
   def signal DiagnosticTrigger
-    name "Diagnostic Trigger"
+    name """Diagnostic Trigger"""
     requires ref datatype TriggerType
     
   def parameter DiagnosticTimeout
-    name "Diagnostic Timeout"
+    name """Diagnostic Timeout"""
     requires ref datatype TimeValue
-    value "500"
+    value """500"""
 ```
 
 ## Validation Rules
@@ -354,7 +359,7 @@ hdef interfaceset DiagnosticInterfaces
 ✅ Can use `when ref config` for conditional visibility  
 ✅ Interfaces are referenced by blocks via `needs`/`provides`  
 ✅ Interfaces are referenced by functions via `needs`/`provides`  
-✅ Interfaces are referenced by features via `needs`/`offers`  
+✅ Interfaces are referenced by features via `needs`/`provides`  
 ❌ No hierarchical definitions (flat structure only)
 
 ## Relationships
@@ -373,7 +378,7 @@ hdef interfaceset DiagnosticInterfaces
 ### From other files to .ifc
 - `.blk` files: `needs ref operation/signal`, `provides ref operation/signal`
 - `.fun` files: `needs ref operation/signal`, `provides ref operation/signal`
-- `.fml` files: `needs ref operation/signal`, `offers ref operation/signal`
+- `.fml` files: `needs ref operation/signal`, `provides ref operation/signal`
 
 ## Best Practices
 
@@ -409,6 +414,6 @@ def operation EmergencyBrake
 
 ---
 
-**Next Steps**: Reference these interfaces in `.blk`, `.fun`, and `.fml` files using `needs`/`provides`/`offers` relations.
+**Next Steps**: Reference these interfaces in `.blk`, `.fun`, and `.fml` files using `needs`/`provides` relations.
 
 

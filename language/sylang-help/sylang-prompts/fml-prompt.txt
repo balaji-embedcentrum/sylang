@@ -1,5 +1,7 @@
 # Feature Model (.fml) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Feature Model files define product line features with hierarchical structure, variability (mandatory/optional/or/alternative), and constraints. Foundation for variant management and configuration-based development.
 
@@ -35,8 +37,12 @@ hdef featureset [identifier]
     # Interface Definition
     needs ref operation [operation-ref], [operation-ref], ...
     needs ref signal [signal-ref], [signal-ref], ...
+    # Optional: Add 'left' or 'right' after interface name to control port placement
+    # Example: needs ref signal XXXX right (default: needs → left, provides → right)
     provides ref operation [operation-ref], [operation-ref], ...
     provides ref signal [signal-ref], [signal-ref], ...
+    # Optional: Add 'left' or 'right' after interface name to control port placement
+    # Example: provides ref operation IIII left (default: needs → left, provides → right)
     
     # Feature Constraints
     requires ref feature [feature-ref], [feature-ref], ...
@@ -128,7 +134,7 @@ Range Options (alternative):
 - LongRange (700km)
 
 Use proper constraints, include ASIL levels for safety-critical features, 
-add feature dependencies with "requires" and "excludes".
+add feature dependencies with """requires""" and """excludes""".
 ```
 
 ### 3. Feature Model with Complex Constraints
@@ -334,123 +340,123 @@ use productline AutonomousVehicleProductLine
 use interfaceset AVInterfaces
 
 hdef featureset AutonomousVehicleFeatures
-  name "Autonomous Vehicle Feature Set"
+  name """Autonomous Vehicle Feature Set"""
   description """
     Complete feature model for L3 autonomous vehicle product line covering 
     perception, planning, control, and human-machine interface features with 
     functional mapping and interface definitions.
     """
-  owner "Product Line Engineering Team"
-  tags "autonomous-driving", "L3", "feature-model"
+  owner """Product Line Engineering Team"""
+  tags """autonomous-driving""", """L3""", """feature-model"""
   listedfor ref productline AutonomousVehicleProductLine
 
   // MANDATORY: Legal and safety-critical features
   def feature BaseSafetyFeatures mandatory
-    name "Base Safety Features"
+    name """Base Safety Features"""
     description """
       Legally mandated safety features required in all markets. 
       Cannot be disabled or removed from any variant.
       """
-    owner "Safety Engineering"
-    tags "safety", "mandatory", "legal-requirement"
+    owner """Safety Engineering"""
+    tags """safety""", """mandatory""", """legal-requirement"""
     safetylevel ASIL-D
     performs ref function SafetyMonitoring, EmergencyBrakeControl
 
     def feature AntiLockBraking mandatory
-      name "Anti-Lock Braking System (ABS)"
-      description "Prevents wheel lockup during emergency braking"
+      name """Anti-Lock Braking System (ABS)"""
+      description """Prevents wheel lockup during emergency braking"""
       safetylevel ASIL-D
-      tags "braking", "safety-critical"
+      tags """braking""", """safety-critical"""
       performs ref function ABSController
       needs ref signal WheelSpeedSensor, BrakePressure
       provides ref operation SetBrakePressure
 
     def feature ElectronicStabilityControl mandatory
-      name "Electronic Stability Control (ESC)"
-      description "Maintains vehicle stability during emergency maneuvers"
+      name """Electronic Stability Control (ESC)"""
+      description """Maintains vehicle stability during emergency maneuvers"""
       safetylevel ASIL-D
-      tags "stability", "safety-critical"
+      tags """stability""", """safety-critical"""
       performs ref function ESCController
       needs ref signal YawRate, SteeringAngle, WheelSpeedSensor
       provides ref operation SetBrakePressure, SetSteeringTorque
 
     def feature AutomaticEmergencyBraking mandatory
-      name "Automatic Emergency Braking (AEB)"
-      description "Autonomous collision avoidance braking"
+      name """Automatic Emergency Braking (AEB)"""
+      description """Autonomous collision avoidance braking"""
       safetylevel ASIL-D
-      tags "collision-avoidance", "safety-critical"
+      tags """collision-avoidance""", """safety-critical"""
       performs ref function CollisionDetection, EmergencyBraking
       needs ref operation GetObjectDistance, GetVehicleSpeed
       provides ref operation SetEmergencyBrake
 
   // OR: At least one perception sensor required
   def feature PerceptionSensors or
-    name "Perception Sensor Suite"
+    name """Perception Sensor Suite"""
     description """
       Multi-modal sensor fusion for environmental perception. 
       At least one sensor type required; multiple recommended for redundancy.
       """
-    owner "Perception Engineering"
-    tags "sensors", "perception", "redundancy"
+    owner """Perception Engineering"""
+    tags """sensors""", """perception""", """redundancy"""
     safetylevel ASIL-D
     performs ref function SensorFusion, ObjectDetection
 
     def feature FrontCamera or
-      name "Front-Facing Camera"
-      description "High-resolution camera for object detection and lane recognition"
-      tags "camera", "vision"
+      name """Front-Facing Camera"""
+      description """High-resolution camera for object detection and lane recognition"""
+      tags """camera""", """vision"""
       safetylevel ASIL-D
       performs ref function ImageProcessing, LaneDetection
       provides ref signal CameraImage, DetectedObjects
 
     def feature FrontLidar or
-      name "Front-Facing Lidar"
-      description "3D Lidar for precise distance and object classification"
-      tags "lidar", "3d-sensing"
+      name """Front-Facing Lidar"""
+      description """3D Lidar for precise distance and object classification"""
+      tags """lidar""", """3d-sensing"""
       safetylevel ASIL-C
       performs ref function PointCloudProcessing, ObjectClassification
       provides ref signal LidarPointCloud, ObjectDistance
 
     def feature FrontRadar or
-      name "Front-Facing Radar"
-      description "All-weather radar for velocity and distance measurement"
-      tags "radar", "all-weather"
+      name """Front-Facing Radar"""
+      description """All-weather radar for velocity and distance measurement"""
+      tags """radar""", """all-weather"""
       safetylevel ASIL-D
       performs ref function RadarProcessing, VelocityEstimation
       provides ref signal RadarObjects, RelativeVelocity
 
     def feature FrontUltrasonic or
-      name "Front Ultrasonic Sensors"
-      description "Short-range proximity detection for low-speed scenarios"
-      tags "ultrasonic", "parking"
+      name """Front Ultrasonic Sensors"""
+      description """Short-range proximity detection for low-speed scenarios"""
+      tags """ultrasonic""", """parking"""
       performs ref function UltrasonicProcessing
       provides ref signal ProximityDistance
 
   // ALTERNATIVE: Exactly one autonomous level (XOR)
   def feature AutonomyLevel alternative
-    name "Autonomous Driving Level"
+    name """Autonomous Driving Level"""
     description """
       SAE J3016 autonomous driving level. Determines system capabilities 
       and operational design domain (ODD). Exactly one level per variant.
       """
-    owner "Autonomous Systems Team"
-    tags "autonomy", "SAE-J3016"
+    owner """Autonomous Systems Team"""
+    tags """autonomy""", """SAE-J3016"""
     safetylevel ASIL-D
     performs ref function AutonomousDrivingController, PathPlanner
 
     def feature L2Advanced alternative
-      name "Level 2+ Advanced Driver Assistance"
-      description "Hands-on, eyes-on driver assistance on highways"
-      tags "L2", "driver-assistance"
+      name """Level 2+ Advanced Driver Assistance"""
+      description """Hands-on, eyes-on driver assistance on highways"""
+      tags """L2""", """driver-assistance"""
       safetylevel ASIL-C
       performs ref function LateralControl, LongitudinalControl
       needs ref operation GetSteeringTorque, GetDriverInput
       provides ref operation SetSteeringAssist, SetCruiseControl
 
     def feature L3Conditional alternative
-      name "Level 3 Conditional Automation"
-      description "Hands-off, eyes-off in specific conditions (highway, <60 km/h)"
-      tags "L3", "conditional-automation"
+      name """Level 3 Conditional Automation"""
+      description """Hands-off, eyes-off in specific conditions (highway, <60 km/h)"""
+      tags """L3""", """conditional-automation"""
       safetylevel ASIL-D
       performs ref function FullLateralControl, AdaptiveCruiseControl, TakeoverRequest
       needs ref operation GetEnvironmentData, GetVehicleState
@@ -459,9 +465,9 @@ hdef featureset AutonomousVehicleFeatures
       requires ref feature HDMap
 
     def feature L4High alternative
-      name "Level 4 High Automation"
-      description "Full automation in defined operational design domain"
-      tags "L4", "high-automation"
+      name """Level 4 High Automation"""
+      description """Full automation in defined operational design domain"""
+      tags """L4""", """high-automation"""
       safetylevel ASIL-D
       performs ref function FullAutonomousControl, MinimalRiskCondition
       needs ref operation GetEnvironmentData, GetV2XData, GetHDMapData
@@ -472,16 +478,16 @@ hdef featureset AutonomousVehicleFeatures
 
   // OPTIONAL: Enhanced features (customer choice)
   def feature ComfortFeatures optional
-    name "Comfort and Convenience Features"
-    description "Optional premium features for enhanced user experience"
-    owner "UX Engineering"
-    tags "comfort", "premium", "optional"
+    name """Comfort and Convenience Features"""
+    description """Optional premium features for enhanced user experience"""
+    owner """UX Engineering"""
+    tags """comfort""", """premium""", """optional"""
     performs ref function DriverAssistance
 
     def feature AdaptiveCruiseControl optional
-      name "Adaptive Cruise Control"
-      description "Maintains set speed and following distance"
-      tags "ACC", "cruise-control"
+      name """Adaptive Cruise Control"""
+      description """Maintains set speed and following distance"""
+      tags """ACC""", """cruise-control"""
       safetylevel ASIL-B
       performs ref function CruiseControlRegulation
       needs ref operation GetLeadVehicleDistance, GetVehicleSpeed
@@ -490,9 +496,9 @@ hdef featureset AutonomousVehicleFeatures
       requires ref feature FrontRadar
 
     def feature LaneKeepingAssist optional
-      name "Lane Keeping Assist"
-      description "Automatic lane centering and departure prevention"
-      tags "lane-keeping", "LKAS"
+      name """Lane Keeping Assist"""
+      description """Automatic lane centering and departure prevention"""
+      tags """lane-keeping""", """LKAS"""
       safetylevel ASIL-B
       performs ref function LaneCentering, LaneDepartureWarning
       needs ref signal CameraImage, LaneMarkers
@@ -501,9 +507,9 @@ hdef featureset AutonomousVehicleFeatures
       requires ref feature FrontCamera
 
     def feature TrafficJamAssist optional
-      name "Traffic Jam Assist"
-      description "Low-speed stop-and-go automation in congested traffic"
-      tags "traffic-jam", "stop-and-go"
+      name """Traffic Jam Assist"""
+      description """Low-speed stop-and-go automation in congested traffic"""
+      tags """traffic-jam""", """stop-and-go"""
       safetylevel ASIL-C
       performs ref function StopAndGo, LowSpeedSteering
       needs ref operation GetLeadVehicleDistance, GetVehicleSpeed

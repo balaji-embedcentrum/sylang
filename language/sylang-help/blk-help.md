@@ -1,3 +1,9 @@
+---
+**📚 Sylang Help Documentation | Version 3.0.12**
+---
+
+> **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
+
 # Block Definition (.blk)
 
 ## Overview
@@ -14,13 +20,15 @@ The `.blk` file defines **hardware/software blocks** with their product characte
 
 ## Valid Keywords
 ```
-use, hdef, block, def, characteristic,
-name, description, designrationale, comment, owner, tags, level, 
-safetylevel, blocktype, chartype, unit, nominalvalue, upperlimit, lowerlimit,
-tolerance, controlmethod, measuringequipment, samplingplan, inspectionfrequency,
-documentreference, decomposedfrom, decomposesto, implements, enables,
-derivedfrom, implementedby, needs, meets, verifiedby,
-when, ref, config, feature, function, operation, signal, requirement, testcase
+use, hdef, block, name, description, designrationale, owner, tags, level,
+safetylevel, blocktype, status, modelfile, mass, volume, centerofmass,
+materialname, density, youngsmodulus, poissonratio, yieldstrength,
+ultimatestrength, def, characteristic, chartype, unit, nominalvalue,
+upperlimit, lowerlimit, tolerance, controlmethod, measuringequipment,
+samplingplan, inspectionfrequency, documentreference, value, decomposedfrom,
+decomposesto, implements, enables, derivedfrom, implementedby, needs,
+provides, requires, meets, verifiedby, ref, config, when, attach,
+analysiseffort, deveffort, testeffort
 ```
 
 ## Syntax Structure
@@ -34,12 +42,11 @@ hdef block [identifier]
   name [string-literal]
   description [string-literal]
   designrationale [string-literal]
-  comment [string-literal]
   owner [string-literal]
   level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
   tags [string-literal], [string-literal], ...
-  blocktype [hardware|software|hybrid]
+  blocktype [object|objectelement|buildingblock|component|part]
   
   # Input interfaces (NEEDS - at hdef level)
   needs ref operation [operation-ref], [operation-ref], ...
@@ -88,7 +95,7 @@ use functionset PerceptionProcessingFunctions
 use interfaceset PerceptionInterfaces
 
 hdef block AdvancedPerceptionControlModule
-  name "Advanced Perception Control Module"
+  name """Advanced Perception Control Module"""
   description """
     Comprehensive perception processing unit for Level 4 autonomous vehicle 
     environmental awareness. Handles multi-sensor data fusion, object detection, 
@@ -99,15 +106,11 @@ hdef block AdvancedPerceptionControlModule
     reduces computational redundancy. Hardware-software co-design approach 
     ensures deterministic real-time performance for safety-critical operations.
     """
-  comment """
-    This module represents the core perception system for autonomous vehicles,
-    implementing ISO 26262 ASIL-D requirements for functional safety.
-    """
-  owner "Advanced Perception Engineering Team"
+  owner """Advanced Perception Engineering Team"""
   level module
   safetylevel ASIL-D
-  blocktype hybrid
-  tags "perception", "sensor-fusion", "AI-processing", "safety-critical"
+  blocktype component
+  tags """perception""", """sensor-fusion""", """AI-processing""", """safety-critical"""
   
   # Input interfaces (NEEDS - what this block requires)
   needs ref operation CameraRawData, LidarPointCloud, RadarTargets
@@ -130,72 +133,72 @@ hdef block AdvancedPerceptionControlModule
 
   # Product Characteristics (AIAG VDA)
   def characteristic ProcessingLatency
-    name "Perception Processing Cycle Latency"
-    description "Maximum time between sensor data input and environmental model output"
+    name """Perception Processing Cycle Latency"""
+    description """Maximum time between sensor data input and environmental model output"""
     chartype critical
-    unit "milliseconds"
+    unit """milliseconds"""
     nominalvalue 50.0
     upperlimit 75.0
     lowerlimit 30.0
     tolerance 5.0
-    controlmethod "Real-time performance monitoring with cycle time measurement"
-    measuringequipment "Oscilloscope with timing analysis software"
-    samplingplan "100% continuous monitoring during operation"
-    inspectionfrequency "Every processing cycle"
-    documentreference "PERC-SPEC-001-v2.3"
+    controlmethod """Real-time performance monitoring with cycle time measurement"""
+    measuringequipment """Oscilloscope with timing analysis software"""
+    samplingplan """100% continuous monitoring during operation"""
+    inspectionfrequency """Every processing cycle"""
+    documentreference """PERC-SPEC-001-v2.3"""
     derivedfrom ref requirement PERF_REQ_010
     implementedby ref requirement SW_REQ_150
-    meets ref requirement PERF_REQ_010
+    derivedfrom ref requirement PERF_REQ_010
     verifiedby ref testcase TEST_PERF_001
     
   def characteristic DetectionAccuracy
-    name "Object Detection Accuracy Rate"
-    description "Percentage of correctly detected and classified objects"
+    name """Object Detection Accuracy Rate"""
+    description """Percentage of correctly detected and classified objects"""
     chartype critical
-    unit "percent"
+    unit """percent"""
     nominalvalue 99.5
     upperlimit 100.0
     lowerlimit 98.0
     tolerance 0.5
-    controlmethod "Statistical validation with test datasets"
-    measuringequipment "ML model validation framework"
-    samplingplan "10,000 test scenarios per validation cycle"
-    inspectionfrequency "Monthly validation runs"
-    documentreference "PERC-VALIDATION-001-v1.5"
+    controlmethod """Statistical validation with test datasets"""
+    measuringequipment """ML model validation framework"""
+    samplingplan """10,000 test scenarios per validation cycle"""
+    inspectionfrequency """Monthly validation runs"""
+    documentreference """PERC-VALIDATION-001-v1.5"""
     derivedfrom ref requirement SAFETY_REQ_020
-    meets ref requirement SAFETY_REQ_020
+    derivedfrom ref requirement SAFETY_REQ_020
     verifiedby ref testcase TEST_DETECTION_001
     
   def characteristic PowerConsumption
-    name "Module Power Consumption"
-    description "Electrical power consumption under typical operating conditions"
+    name """Module Power Consumption"""
+    description """Electrical power consumption under typical operating conditions"""
     chartype significant
-    unit "watts"
+    unit """watts"""
     nominalvalue 45.0
     upperlimit 60.0
     lowerlimit 30.0
     tolerance 5.0
-    controlmethod "Power monitoring during HIL testing"
-    measuringequipment "Precision power analyzer"
-    samplingplan "Sample 5 units per production batch"
-    inspectionfrequency "Per batch during production"
-    documentreference "HW-POWER-SPEC-001"
+    controlmethod """Power monitoring during HIL testing"""
+    measuringequipment """Precision power analyzer"""
+    samplingplan """Sample 5 units per production batch"""
+    inspectionfrequency """Per batch during production"""
+    documentreference """HW-POWER-SPEC-001"""
     derivedfrom ref requirement HW_REQ_030
     
   def characteristic OperatingTemperature
-    name "Module Operating Temperature Range"
-    description "Ambient temperature range for normal operation"
+    name """Module Operating Temperature Range"""
+    description """Ambient temperature range for normal operation"""
     chartype special
-    unit "celsius"
+    unit """celsius"""
     nominalvalue 25.0
     upperlimit 85.0
     lowerlimit -40.0
     tolerance 5.0
-    controlmethod "Environmental chamber testing"
-    measuringequipment "Calibrated thermocouples"
-    samplingplan "Temperature cycling test for qualification"
-    inspectionfrequency "Design validation and qualification testing"
-    documentreference "ENV-TEST-SPEC-001"
+    controlmethod """Environmental chamber testing"""
+    measuringequipment """Calibrated thermocouples"""
+    samplingplan """Temperature cycling test for qualification"""
+    inspectionfrequency """Design validation and qualification testing"""
+    documentreference """ENV-TEST-SPEC-001"""
     derivedfrom ref requirement ENV_REQ_001
 ```
 
@@ -207,6 +210,11 @@ hdef block MyBlock
   # What this block needs from others (defined in .ifc files)
   needs ref operation InputOperation1, InputOperation2
   needs ref signal InputSignal1, InputSignal2, InputSignal3
+  
+  # Optional: Control port placement with left/right keywords
+  needs ref operation ActuatorFeedbackOutput right
+  needs ref signal VehicleSpeedOutput right, SlopeAngleOutput right
+  # Default: needs → left side. Use 'right' keyword to place on right side.
 ```
 
 ### PROVIDES (Outputs) - At hdef Level
@@ -215,9 +223,20 @@ hdef block MyBlock
   # What this block provides to others (defined in .ifc files)
   provides ref operation OutputOperation1, OutputOperation2
   provides ref signal OutputSignal1, OutputSignal2
+  
+  # Optional: Control port placement with left/right keywords
+  provides ref operation ProcessedVehicleState left, ProcessedDriverCommand
+  # Default: provides → right side. Use 'left' keyword to place on left side.
 ```
 
 **Note**: Operations and signals are defined in `.ifc` files and only *referenced* in `.blk` files via `needs` and `provides`.
+
+### Port Side Placement Control
+You can control where ports appear on decomposition diagrams using `left` or `right` keywords:
+- **Default behavior**: `needs` → left side, `provides` → right side
+- **Override**: Add `left` or `right` keyword after interface name to override default placement
+- **Syntax**: `needs ref signal XXXX right, YYYY` or `provides ref operation IIII left`
+- **Use cases**: Useful for organizing ports on specific sides for better diagram clarity
 
 ## Block Relationships (ASPICE Bilateral Traceability)
 
@@ -277,7 +296,7 @@ level subpart          # Subpart level
 hdef block VehicleControllerECU
   level component
   safetylevel ASIL-D
-  blocktype hardware
+  blocktype component
   
   needs ref operation VehicleStateData
   needs ref signal SensorInputs
@@ -286,9 +305,9 @@ hdef block VehicleControllerECU
   decomposesto ref block ProcessorModule, MemoryModule, CommunicationModule
   
   def characteristic ProcessingPower
-    name "ECU Processing Power"
+    name """ECU Processing Power"""
     chartype critical
-    unit "MIPS"
+    unit """MIPS"""
     nominalvalue 2000.0
     upperlimit 2500.0
     lowerlimit 1500.0
@@ -299,16 +318,16 @@ hdef block VehicleControllerECU
 hdef block RadarSensor
   level part
   safetylevel ASIL-C
-  blocktype hardware
+  blocktype component
   
   needs ref operation CalibrationData
   needs ref signal PowerSupply
   provides ref signal RadarTargets
   
   def characteristic DetectionRange
-    name "Maximum Detection Range"
+    name """Maximum Detection Range"""
     chartype critical
-    unit "meters"
+    unit """meters"""
     nominalvalue 200.0
     upperlimit 250.0
     lowerlimit 150.0
@@ -319,15 +338,15 @@ hdef block RadarSensor
 hdef block SignalProcessingModule
   level module
   safetylevel ASIL-B
-  blocktype software
+  blocktype component
   
   needs ref signal RawSensorData
   provides ref operation ProcessedData
   
   def characteristic CycleTime
-    name "Processing Cycle Time"
+    name """Processing Cycle Time"""
     chartype critical
-    unit "milliseconds"
+    unit """milliseconds"""
     nominalvalue 10.0
     upperlimit 15.0
     lowerlimit 5.0

@@ -1,5 +1,7 @@
 # Block Definition (.blk) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Block files define hardware/software architectural elements with AIAG VDA-compliant product characteristics. Each .blk file contains ONE block with its characteristics. Blocks represent physical components (ECUs, sensors) or logical components (software modules) with defined interfaces for communication. Blocks connect via relationship keywords like `decomposesto` and `decomposedfrom`.
 
@@ -19,20 +21,23 @@ hdef block [identifier]
   name [string-literal]
   description [string-literal]
   designrationale [string-literal]
-  comment [string-literal]
   owner [string-literal]
   level [product|system|subsystem|component|module|part|externalstakeholder|internalstakeholder|vehicle|sys1|sys2|sys3|sys4|sys5|hwe1|hwe2|hwe3|hwe4|swe1|swe2|swe3|swe4|swe5|swe6]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
   tags [string-literal], [string-literal], ...
-  blocktype [hardware|software|hybrid]
+  blocktype [object|objectelement|buildingblock|component|part]
   
   # Input interfaces (NEEDS)
   needs ref operation [operation-ref], [operation-ref], ...
   needs ref signal [signal-ref], [signal-ref], ...
+  # Optional: Add 'left' or 'right' after interface name to control port placement
+  # Example: needs ref signal XXXX right, YYYY (default: needs → left, provides → right)
   
   # Output interfaces (PROVIDES)
   provides ref operation [operation-ref], [operation-ref], ...
   provides ref signal [signal-ref], [signal-ref], ...
+  # Optional: Add 'left' or 'right' after interface name to control port placement
+  # Example: provides ref operation IIII left (default: needs → left, provides → right)
   
   # Block relationships
   decomposedfrom ref block [block-ref]
@@ -456,7 +461,7 @@ use functionset PerceptionProcessingFunctions
 use interfaceset PerceptionInterfaces
 
 hdef block AdvancedPerceptionControlModule
-  name "Advanced Perception Control Module"
+  name """Advanced Perception Control Module"""
   description """
     Comprehensive perception processing unit for Level 4 autonomous vehicle 
     environmental awareness. Handles multi-sensor data fusion, object detection, 
@@ -467,15 +472,11 @@ hdef block AdvancedPerceptionControlModule
     reduces computational redundancy. Hardware-software co-design approach 
     ensures deterministic real-time performance for safety-critical operations.
     """
-  comment """
-    This module represents the core perception system for autonomous vehicles,
-    implementing ISO 26262 ASIL-D requirements for functional safety.
-    """
-  owner "Advanced Perception Engineering Team"
+  owner """Advanced Perception Engineering Team"""
   level module
   safetylevel ASIL-D
-  blocktype hybrid
-  tags "perception", "sensor-fusion", "AI-processing", "safety-critical"
+  blocktype component
+  tags """perception""", """sensor-fusion""", """AI-processing""", """safety-critical"""
   
   # Input interfaces (NEEDS - what this block requires)
   needs ref operation CameraRawData, LidarPointCloud, RadarTargets
@@ -498,56 +499,56 @@ hdef block AdvancedPerceptionControlModule
 
   # Product Characteristics (AIAG VDA)
   def characteristic ProcessingLatency
-    name "Perception Processing Cycle Latency"
-    description "Maximum time between sensor data input and environmental model output"
+    name """Perception Processing Cycle Latency"""
+    description """Maximum time between sensor data input and environmental model output"""
     chartype critical
-    unit "milliseconds"
+    unit """milliseconds"""
     nominalvalue 50.0
     upperlimit 75.0
     lowerlimit 30.0
     tolerance 5.0
-    controlmethod "Real-time performance monitoring with cycle time measurement"
-    measuringequipment "Oscilloscope with timing analysis software"
-    samplingplan "100% continuous monitoring during operation"
-    inspectionfrequency "Every processing cycle"
-    documentreference "PERC-SPEC-001-v2.3"
+    controlmethod """Real-time performance monitoring with cycle time measurement"""
+    measuringequipment """Oscilloscope with timing analysis software"""
+    samplingplan """100% continuous monitoring during operation"""
+    inspectionfrequency """Every processing cycle"""
+    documentreference """PERC-SPEC-001-v2.3"""
     derivedfrom ref requirement PERF_REQ_010
     implementedby ref requirement SW_REQ_150
     meets ref requirement PERF_REQ_010
     verifiedby ref testcase TEST_PERF_001
     
   def characteristic DetectionAccuracy
-    name "Object Detection Accuracy Rate"
-    description "Percentage of correctly detected and classified objects"
+    name """Object Detection Accuracy Rate"""
+    description """Percentage of correctly detected and classified objects"""
     chartype critical
-    unit "percent"
+    unit """percent"""
     nominalvalue 99.5
     upperlimit 100.0
     lowerlimit 98.0
     tolerance 0.5
-    controlmethod "Statistical validation with test datasets"
-    measuringequipment "ML model validation framework"
-    samplingplan "10,000 test scenarios per validation cycle"
-    inspectionfrequency "Monthly validation runs"
-    documentreference "PERC-VALIDATION-001-v1.5"
+    controlmethod """Statistical validation with test datasets"""
+    measuringequipment """ML model validation framework"""
+    samplingplan """10,000 test scenarios per validation cycle"""
+    inspectionfrequency """Monthly validation runs"""
+    documentreference """PERC-VALIDATION-001-v1.5"""
     derivedfrom ref requirement SAFETY_REQ_020
     meets ref requirement SAFETY_REQ_020
     verifiedby ref testcase TEST_DETECTION_001
     
   def characteristic PowerConsumption
-    name "Module Power Consumption"
-    description "Electrical power consumption under typical operating conditions"
+    name """Module Power Consumption"""
+    description """Electrical power consumption under typical operating conditions"""
     chartype significant
-    unit "watts"
+    unit """watts"""
     nominalvalue 45.0
     upperlimit 60.0
     lowerlimit 30.0
     tolerance 5.0
-    controlmethod "Power monitoring during HIL testing"
-    measuringequipment "Precision power analyzer"
-    samplingplan "Sample 5 units per production batch"
-    inspectionfrequency "Per batch during production"
-    documentreference "HW-POWER-SPEC-001"
+    controlmethod """Power monitoring during HIL testing"""
+    measuringequipment """Precision power analyzer"""
+    samplingplan """Sample 5 units per production batch"""
+    inspectionfrequency """Per batch during production"""
+    documentreference """HW-POWER-SPEC-001"""
     derivedfrom ref requirement HW_REQ_030
 ```
 

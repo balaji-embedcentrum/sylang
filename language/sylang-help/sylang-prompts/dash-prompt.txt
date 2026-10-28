@@ -1,5 +1,7 @@
 # Dashboard (.dash) - AI Prompting Guide
 
+Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
+
 ## Purpose
 Dashboard files create interactive, real-time dashboards with metrics, charts, and tables. They provide visual insights into project status, requirements coverage, test results, safety analysis, and sprint progress using grid-based layouts and Chart.js visualizations.
 
@@ -242,8 +244,8 @@ def metric PassRate
 def chart ResultsByLevel
   type bar
   span 1x2
-  xaxis "Test Level"
-  yaxis "Count"
+  xaxis """Test Level"""
+  yaxis """Count"""
   source testcaseset SystemTests
   groupby testlevel
 
@@ -297,8 +299,8 @@ def metric Blocked
 def chart BurndownChart
   type line
   span 1x2
-  xaxis "Day"
-  yaxis "Points"
+  xaxis """Day"""
+  yaxis """Points"""
   source sprintset CurrentSprint
   groupby issuestatus
 
@@ -380,56 +382,56 @@ use testcaseset VehicleTests
 use failuremodeset VehicleFailures
 
 hdef dashboard VehicleProjectDashboard
-  name "Vehicle Project Dashboard"
-  description "Real-time project status and metrics"
-  owner "Project Management"
-  version "1.0"
+  name """Vehicle Project Dashboard"""
+  description """Real-time project status and metrics"""
+  owner """Project Management"""
+  version """1.0"""
   grid 3x4
 
   # Row 1: Key Metrics
   def metric TotalReqs
-    name "Total Requirements"
+    name """Total Requirements"""
     type count
     source requirementset VehicleRequirements
   
   def metric ApprovedReqs
-    name "Approved"
+    name """Approved"""
     type count
     source requirementset VehicleRequirements
     where status = approved
   
   def metric TestsPassed
-    name "Tests Passed"
+    name """Tests Passed"""
     type count
     source testcaseset VehicleTests
     where testresult = pass
   
   def metric TestCoverage
-    name "Coverage %"
+    name """Coverage %"""
     type percentage
     source testcaseset VehicleTests
     where testresult = pass
 
   # Row 2: Charts
   def chart ReqsByType
-    name "Requirements by Type"
+    name """Requirements by Type"""
     type pie
     span 1x2
     source requirementset VehicleRequirements
     groupby reqtype
   
   def chart TestResults
-    name "Test Results"
+    name """Test Results"""
     type bar
-    xaxis "Result"
-    yaxis "Count"
+    xaxis """Result"""
+    yaxis """Count"""
     span 1x2
     source testcaseset VehicleTests
     groupby testresult
 
   # Row 3: Tables
   def table CriticalFailures
-    name "Critical Failure Modes"
+    name """Critical Failure Modes"""
     span 1x2
     source failuremodeset VehicleFailures
     where severity in [S2, S3]
@@ -437,7 +439,7 @@ hdef dashboard VehicleProjectDashboard
     columns identifier, name, severity, rpn
   
   def table FailedTests
-    name "Failed Tests"
+    name """Failed Tests"""
     span 1x2
     source testcaseset VehicleTests
     where testresult = fail
