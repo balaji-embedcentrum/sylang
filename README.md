@@ -28,7 +28,17 @@ To show a model on your own site, add one script tag and one element ([@sylang/w
 <sylang-viewer src="https://github.com/<owner>/<repo>/tree/main/<model-folder>" style="height:100vh"></sylang-viewer>
 ```
 
-To read models offline, save [the viewer page](viewer/index.html) as a file and double-click it whenever you need it.
+### Inside a company: a copy that cannot connect anywhere
+
+[**sylang-viewer-offline.html**](viewer/sylang-viewer-offline.html) is the whole viewer in one file (about 6 MB) that is not allowed to use the network at all. Download it once (the download button on that page), put it on your computer or the company share, and double-click it. The address bar shows that file, `file:///…/sylang-viewer-offline.html`, and nothing else. Then choose your model folder.
+
+Your IT department can check this without trusting us:
+
+- **The rule is in the file.** Its first lines hold the browser policy `connect-src 'none'`, and scripts, styles and fonts are allowed only from inside the file. The browser itself blocks any connection the page tries: no upload, no tracking, no update check. Open the file in a text editor to read it.
+- **Watch it.** Open the browser's network tools (F12 → Network) while using the viewer: no requests. It works with the network cable unplugged.
+- **Same file everywhere.** Version 0.2.0, SHA-256 `72682801c64cd8cf29316468596ac25a2fe446e1bd93986dd28d0e24d6e3c2d3`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
+
+A browser cannot read files next to a page on its own, so the viewer always asks which folder to open; Chrome and Edge open it in one click.
 
 ## Install the VS Code extension
 
