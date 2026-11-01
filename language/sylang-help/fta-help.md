@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.12**
+**📚 Sylang Help Documentation | Version 3.0.13**
 ---
 
 > **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.

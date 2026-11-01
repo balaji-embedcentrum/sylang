@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.12**
+**📚 Sylang Help Documentation | Version 3.0.13**
 ---
 
 > **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
@@ -78,7 +78,7 @@ Sylang provides complete bidirectional traceability through relationship keyword
 - **ASPICE**: Automotive SPICE compliance through structured requirements and traceability
 
 ## Language Version
-**Current Version**: 3.0.12
+**Current Version**: 3.0.13
 
 ## Getting Started
 The [Project Guide](project-guide-help.md) gives the file set, folder structure and build order for each kind of project. For a product line with variants:

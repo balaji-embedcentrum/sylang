@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.12**
+**📚 Sylang Help Documentation | Version 3.0.13**
 ---
 
 > **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
@@ -92,6 +92,9 @@ def feature RadarSystem mandatory
 - If one sibling is `mandatory`/`optional`, ALL siblings must be `mandatory`/`optional`
 - If one sibling is `or`, ALL siblings must be `or`
 - If one sibling is `alternative`, ALL siblings must be `alternative`
+
+### In the diagram
+The feature and variant diagrams mark each feature where its link meets the top of its box: a filled circle for `mandatory`, a hollow circle for `optional`, a filled arrowhead for `or` and a hollow arrowhead for `alternative`. A legend under the diagram repeats this. In a variant, selected features are outlined in green with a tick, and features left out are dashed.
 
 ## Properties
 
