@@ -11,6 +11,25 @@ This repository holds the **language reference**: one help file per file type, t
 
 > Sylang will be fully open-sourced in Q1 2027. The language reference in this repository is published under the Apache License 2.0 now, and the extension is free to use.
 
+## View a model in your browser
+
+No install, no account. Open **[the Sylang viewer](https://balaji-embedcentrum.github.io/sylang/viewer/)** and choose your model folder, or drop it on the page. The folder is read inside your browser tab; nothing is uploaded. You see the same documents, diagrams and traceability views as in VS Code, read-only.
+
+A model in a public GitHub repository can be opened from its link, and shared as one address:
+
+```
+https://balaji-embedcentrum.github.io/sylang/viewer/?src=https://github.com/<owner>/<repo>/tree/main/<model-folder>
+```
+
+To show a model on your own site, add one script tag and one element ([@sylang/web](https://www.npmjs.com/package/@sylang/web)):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.0/dist/sylang-viewer.min.js"></script>
+<sylang-viewer src="https://github.com/<owner>/<repo>/tree/main/<model-folder>" style="height:100vh"></sylang-viewer>
+```
+
+To read models offline, save [the viewer page](viewer/index.html) as a file and double-click it whenever you need it.
+
 ## Install the VS Code extension
 
 1. Open Visual Studio Code (1.101 or later).
