@@ -15,6 +15,8 @@ This repository holds the **language reference**: one help file per file type, t
 
 No install, no account. Open **[the Sylang viewer](https://balaji-embedcentrum.github.io/sylang/viewer/)** and choose your model folder, or drop it on the page. The folder is read inside your browser tab; nothing is uploaded. You see the same documents, diagrams and traceability views as in VS Code, read-only.
 
+**Projects made with the VS Code extension carry their own viewer.** The extension (3.0.14 and later) creates a `sylang-model` folder for the model with `sylang-viewer.html` in it, and keeps a copy of the model files beside it. Double-click that file and the model opens: no folder to choose, nothing to install, no website. Send someone the `sylang-model` folder and they can do the same. In the viewer, the model's folders expand and collapse, and **Change folder…** opens another project.
+
 A model in a public GitHub repository can be opened from its link, and shared as one address:
 
 ```
@@ -24,19 +26,19 @@ https://balaji-embedcentrum.github.io/sylang/viewer/?src=https://github.com/<own
 To show a model on your own site, add one script tag and one element ([@sylang/web](https://www.npmjs.com/package/@sylang/web)):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.0/dist/sylang-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.1/dist/sylang-viewer.min.js"></script>
 <sylang-viewer src="https://github.com/<owner>/<repo>/tree/main/<model-folder>" style="height:100vh"></sylang-viewer>
 ```
 
 ### Inside a company: a copy that cannot connect anywhere
 
-[**sylang-viewer-offline.html**](viewer/sylang-viewer-offline.html) is the whole viewer in one file (about 6 MB) that is not allowed to use the network at all. Download it once (the download button on that page), put it on your computer or the company share, and double-click it. The address bar shows that file, `file:///…/sylang-viewer-offline.html`, and nothing else. Then choose your model folder.
+[**sylang-viewer-offline.html**](viewer/sylang-viewer-offline.html) is the whole viewer in one file (about 5 MB) that is not allowed to use the network at all. Download it once (the download button on that page), put it on your computer or the company share, and double-click it. The address bar shows that file, `file:///…/sylang-viewer-offline.html`, and nothing else. Then choose your model folder. (Inside a project from the VS Code extension, `sylang-model/sylang-viewer.html` is this same file.)
 
 Your IT department can check this without trusting us:
 
 - **The rule is in the file.** Its first lines hold the browser policy `connect-src 'none'`, and scripts, styles and fonts are allowed only from inside the file. The browser itself blocks any connection the page tries: no upload, no tracking, no update check. Open the file in a text editor to read it.
 - **Watch it.** Open the browser's network tools (F12 → Network) while using the viewer: no requests. It works with the network cable unplugged.
-- **Same file everywhere.** Version 0.2.0, SHA-256 `72682801c64cd8cf29316468596ac25a2fe446e1bd93986dd28d0e24d6e3c2d3`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
+- **Same file everywhere.** Version 0.2.1, SHA-256 `b911780fabbe0871744c2fd3c533f1fd12171c01904b0d1df050c1981e256ca4`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
 
 A browser cannot read files next to a page on its own, so the viewer always asks which folder to open; Chrome and Edge open it in one click.
 
@@ -70,7 +72,7 @@ To install a downloaded `.vsix` file instead, open the Extensions view, choose *
 2. The file opens in **Sylang Studio**. Edit text in place, choose values from menus, and add links to elements in other files. Every change is written back to the text as the smallest possible edit. `<>` in the title bar opens the plain text beside it.
 3. Files that describe structure (blocks, functions, interfaces, use cases, sequences, state machines, features, variants, fault trees and failure analyses) open on their **diagram**. The **Document | Diagram** switch at the top left changes the view.
 4. Run **Sylang: Home** from the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`) to see the whole project: coverage across the V-model, problems, and the other views.
-5. Run **Sylang: Create Sylang Help** to copy this reference into your project as a `sylang-help` folder. It opens in a Markdown reading view, and AI assistants working in the project can read it too.
+5. Run **Sylang: Create Sylang Help** to copy this reference into your project as a `sylang-help` folder. It opens in a Markdown reading view, and AI assistants working in the project can read it too. The command also creates `sylang-model`, the folder for your model, with the browser viewer in it.
 
 Problems appear in the Problems panel and on Studio cards as you type: unknown keywords, invalid values, missing `use` imports, references to elements that do not exist, and relations that point at the wrong kind of element.
 

@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.13**
+**📚 Sylang Help Documentation | Version 3.0.14**
 ---
 
 # Project Guide: which files to create, and where
@@ -10,7 +10,7 @@
 
 1. **Identify the domain** from the user's request or from existing files: IT and software, automotive, aerospace, medical devices, or industrial, rail and energy. If it is unclear, ask. Do not assume automotive.
 2. **Pick the file set** for that domain from the table in section 3. Create only the files the project needs. An IT project has no hazard analysis unless the system can harm people.
-3. **Create the folder structure** shown for the domain in section 4, and an empty `.sylangrules` file at the workspace root. The extension activates only when that file exists.
+3. **Put the model in the `sylang-model` folder** at the workspace root, with the folder structure shown for the domain in section 4 inside it. The extension creates `sylang-model` when it creates `sylang-help`, and puts `sylang-viewer.html` in it; create the folder yourself if it is missing. Leave `sylang-viewer.html` and `.sylang-viewer-model.js` alone: they are the browser viewer and the copy of the model the extension writes for it (see the [README](README.md#view-the-model-in-a-browser)), not part of the model.
 4. **Add a `.sylangextend`** at the root when the domain needs properties Sylang does not have built in, such as a DO-178C DAL or an IEC 62304 software class. Section 4 gives the exact lines.
 5. **Build in the order** given for the domain, so that every `ref` points at something that already exists.
 6. **Follow the rules in section 2**, then run the checks in section 6 before you finish.
@@ -116,8 +116,8 @@ Web and mobile applications, SaaS platforms, enterprise and cloud systems, data 
 **Folder structure**
 
 ```
-shop-platform/
-├── .sylangrules                 # empty; marks the Sylang project
+sylang-model/
+├── sylang-viewer.html           # from the extension: opens the model in a browser
 ├── .sylangextend                # optional: story points, SLOs, data classes
 ├── Product/
 │   ├── ShopPlatform.ple         # optional: editions or tenants
@@ -200,8 +200,8 @@ Vehicle systems, ECUs, powertrain, ADAS, body electronics. Standards: ISO 26262 
 - Vehicle variants go in `.fml` and `.vml` at the root; elements switch on and off with `when ref config`.
 
 ```
-inverter/
-├── .sylangrules
+sylang-model/
+├── sylang-viewer.html
 ├── InverterProductLine.ple
 ├── InverterFeatures.fml
 ├── Inverter_150kW.vml
@@ -247,8 +247,8 @@ extend nodetype testcase
 ```
 
 ```
-flight-control/
-├── .sylangrules
+sylang-model/
+├── sylang-viewer.html
 ├── .sylangextend
 ├── Aircraft/          # aircraft-level functions (.fun), requirements (.req), use cases (.ucd)
 ├── Safety/            # FHA (.haz), safety objectives (.sgl), PSSA/SSA fault trees (.fta), FMEA (.flr)
@@ -283,8 +283,8 @@ extend nodetype hazard
 ```
 
 ```
-infusion-pump/
-├── .sylangrules
+sylang-model/
+├── sylang-viewer.html
 ├── .sylangextend
 ├── UserNeeds/         # intended use and user needs (.ucd), stakeholder requirements (.req)
 ├── System/            # system .blk, system requirements (.req), .fun, .ifc
@@ -313,8 +313,8 @@ extend nodetype requirement
 ```
 
 ```
-press-line/
-├── .sylangrules
+sylang-model/
+├── sylang-viewer.html
 ├── Machine/           # top block, machine requirements and functions, operating modes (.smd)
 ├── Safety/            # hazards (.haz), safety goals (.sgl), safety functions (.sam), .fta, .flr
 ├── Control/           # PLC and safety PLC software: .blk .req .fun .ifc .tst
@@ -324,7 +324,7 @@ press-line/
 
 ## 5. Starting a project when you are unsure of the domain
 
-1. Create `.sylangrules`, then `System/` with a top-level `.blk`, a `.req` and a `.fun`.
+1. In `sylang-model`, create `System/` with a top-level `.blk`, a `.req` and a `.fun`.
 2. Add `.ifc` for the interfaces and `.tst` for the tests.
 3. Ask the user which standards apply before adding any safety files, `safetylevel` or extensions.
 

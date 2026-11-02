@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.13**
+**📚 Sylang Help Documentation | Version 3.0.14**
 ---
 
 > **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
@@ -78,7 +78,7 @@ Sylang provides complete bidirectional traceability through relationship keyword
 - **ASPICE**: Automotive SPICE compliance through structured requirements and traceability
 
 ## Language Version
-**Current Version**: 3.0.13
+**Current Version**: 3.0.14
 
 ## Getting Started
 The [Project Guide](project-guide-help.md) gives the file set, folder structure and build order for each kind of project. For a product line with variants:
@@ -89,6 +89,15 @@ The [Project Guide](project-guide-help.md) gives the file set, folder structure 
 5. Specify requirements in `.req` files
 6. Create test cases in `.tst` files
 7. Conduct safety analysis using `.flr`, `.haz`, `.sam`, `.fta` files
+
+## View the model in a browser
+The model lives in the `sylang-model` folder. The extension creates it together with `sylang-help`, and keeps `sylang-model/sylang-viewer.html` in it up to date.
+
+Anyone can read the model without VS Code, with nothing installed: double-click `sylang-viewer.html` and the model opens, with its documents, diagrams, traceability matrix and compliance views, read-only. **Change folder…** opens a different project. The viewer is not allowed to connect to any network, so the model never leaves the computer. Send colleagues the `sylang-model` folder; the viewer comes with it.
+
+A browser page may not read the folder it is in, so the extension keeps a copy of the model's files beside the viewer, in `sylang-model/.sylang-viewer-model.js`, and rewrites it a second after any model file changes. The viewer shows when VS Code last saved it. The `sylang.viewer.modelFile` setting turns this off.
+
+> **AI assistants:** `sylang-viewer.html` is the browser viewer, about 5 MB of packed code, and `.sylang-viewer-model.js` is the copy of the model the extension writes for it. Do not read, search, edit or summarise either; work on the model files themselves. Point people to `sylang-viewer.html` when they ask how to view or share the model without VS Code.
 
 ## Important Notes
 - **One `.fml` per folder**: Only one feature model allowed per directory
