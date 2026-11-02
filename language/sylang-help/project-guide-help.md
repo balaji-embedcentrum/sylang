@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.14**
+**📚 Sylang Help Documentation | Version 3.0.15**
 ---
 
 # Project Guide: which files to create, and where

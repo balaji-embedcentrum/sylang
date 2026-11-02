@@ -15,7 +15,7 @@ This repository holds the **language reference**: one help file per file type, t
 
 No install, no account. Open **[the Sylang viewer](https://balaji-embedcentrum.github.io/sylang/viewer/)** and choose your model folder, or drop it on the page. The folder is read inside your browser tab; nothing is uploaded. You see the same documents, diagrams and traceability views as in VS Code, read-only.
 
-**Projects made with the VS Code extension carry their own viewer.** The extension (3.0.14 and later) creates a `sylang-model` folder for the model with `sylang-viewer.html` in it, and keeps a copy of the model files beside it. Double-click that file and the model opens: no folder to choose, nothing to install, no website. Send someone the `sylang-model` folder and they can do the same. In the viewer, the model's folders expand and collapse, and **Change folder…** opens another project.
+**Projects made with the VS Code extension carry their own viewer.** The extension (3.0.15 and later) creates a `sylang-model` folder for the model with `sylang-viewer.html` in it, and keeps a copy of the model files beside it. Double-click that file and the model opens: no folder to choose, nothing to install, no website. Send someone the `sylang-model` folder and they can do the same. In the viewer, the model's folders expand and collapse, and **Change folder…** opens another project.
 
 A model in a public GitHub repository can be opened from its link, and shared as one address:
 
