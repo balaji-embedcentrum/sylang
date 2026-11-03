@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.15**
+**📚 Sylang Help Documentation | Version 3.0.16**
 ---
 
 # Sylang AI Prompting Strategy

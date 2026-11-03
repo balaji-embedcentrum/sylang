@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.15**
+**📚 Sylang Help Documentation | Version 3.0.16**
 ---
 
 > **Strings:** write single-line text in double quotes, `"like this"`. Use triple quotes `"""..."""` for text that spans several lines or contains a `"`. Both forms are valid in every property.
@@ -37,6 +37,7 @@ Relations are classified based on **which entity actively references the other**
 | Relation Type | Direction | Reasoning |
 |:--------------|:----------|:----------|
 | `listedfor` | **O** | Entity lists itself for another (outgoing) |
+| `variesby` / `realizedby` | **O** | Product line points to its feature model and its top-level block (outgoing) |
 | `decomposesto` | **O** | Entity points to its children (outgoing) |
 | `decomposedfrom` | **I** | Entity is pointed to by parent (incoming) |
 | `allocatedto` | **O** | Entity points to where it's allocated (outgoing) |
@@ -764,7 +765,10 @@ Generated from the language: every relation each file type accepts, and the elem
 <!-- generated:relations -->
 ### Product Line (.ple)
 
-No relations: the file only describes itself.
+| Relation | Points at |
+|:--|:--|
+| `variesby` | featureset |
+| `realizedby` | block |
 
 ### Feature Model (.fml)
 

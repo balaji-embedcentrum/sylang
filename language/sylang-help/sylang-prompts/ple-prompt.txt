@@ -3,7 +3,7 @@
 Strings: write single-line text in double quotes, "like this". Use triple quotes """...""" for text that spans several lines or contains a ". Both forms are valid in every property; enum values (status, safetylevel, ...) are bare words.
 
 ## Purpose
-The `.ple` file is the ROOT file of a Sylang project, defining the product line with no dependencies. It serves as the foundation for all feature modeling, variant management, and system architecture. This is typically the FIRST Sylang file created after the PRD.
+The `.ple` file is the ROOT file of a Sylang project: the first file a reader opens. It names the feature model (`variesby`) and the top-level system block (`realizedby`), and its `compliance` list decides which compliance views (ISO 26262, Automotive SPICE) appear. It serves as the foundation for all feature modeling, variant management, and system architecture. This is typically the FIRST Sylang file created after the PRD.
 
 ## When to Use
 - Immediately after PRD approval
@@ -14,7 +14,10 @@ The `.ple` file is the ROOT file of a Sylang project, defining the product line 
 
 ## Key Syntax Elements
 ```
-hdef productline [identifier]    # NO use statements (root file)
+use featureset [identifier]      # only the feature model and the top-level block may be imported
+use block [identifier]
+
+hdef productline [identifier]
   name [string-literal]
   description [multiline string]
   owner [string-literal]
@@ -24,7 +27,11 @@ hdef productline [identifier]    # NO use statements (root file)
   tags [comma-separated list]
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
   region [geographic regions]
+  variesby ref featureset [the .fml header]
+  realizedby ref block [the top-level block, not context blocks such as the vehicle or the battery]
 ```
+
+Add `variesby` and `realizedby` once the .fml and the top-level .blk exist. List only standards the project follows in `compliance`: an IT project lists e.g. "SOC 2", "ISO 27001", never "ISO 26262".
 
 ## Common Patterns
 

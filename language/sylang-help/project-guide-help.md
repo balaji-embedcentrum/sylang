@@ -1,5 +1,5 @@
 ---
-**📚 Sylang Help Documentation | Version 3.0.15**
+**📚 Sylang Help Documentation | Version 3.0.16**
 ---
 
 # Project Guide: which files to create, and where
@@ -19,6 +19,8 @@
 
 - **One header per file.** Each file starts with optional `use` lines, then exactly one `hdef`, then its `def` elements.
 - **One block per `.blk` file.** A `.blk` file *is* a block: its `hdef block` is the block, and its `def`s are characteristics. Model each service, subsystem or component as its own `.blk` file, and connect parent to children with `decomposesto ref block Child1, Child2`. All other file types hold many `def`s.
+- **Start the model at the `.ple`.** It is the first stop for readers: link it to the feature model with `variesby ref featureset …` and to the top-level block with `realizedby ref block …` (import both with `use`). Studio and the browser viewer build the model's hierarchy from there: product line, features, the system block, then everything it `decomposesto`. Name the block that *is* the system, not context blocks (vehicle, battery, motor) that sit next to it.
+- **List only the standards the project follows** in the `.ple`'s `compliance`. It decides which compliance views appear: ISO 26262 and Automotive SPICE are shown only when listed there. An IT project lists standards such as `"SOC 2"` or `"ISO 27001"`.
 - **Import before you reference.** To use an element from another file, add `use <headerkind> <HeaderName>` at the top, for example `use functionset OrderFunctions` or `use block PaymentService`. A `ref` to something that has not been imported is a validation error.
 - **Identifiers are unique across the whole workspace.** Prefix them by area, as in `ORD_REQ_001`, `PAY_REQ_004` or `TM_REQ_002`, and use PascalCase for named elements (`OrderService`, `PlaceOrder`).
 - **Indent with 2 spaces** in model files (4 in `.sylangextend`).
@@ -120,7 +122,7 @@ sylang-model/
 ├── sylang-viewer.html           # from the extension: opens the model in a browser
 ├── .sylangextend                # optional: story points, SLOs, data classes
 ├── Product/
-│   ├── ShopPlatform.ple         # optional: editions or tenants
+│   ├── ShopPlatform.ple         # optional: editions or tenants; variesby the .fml, realizedby ShopPlatform
 │   ├── ShopFeatures.fml         # optional: plan tiers, feature flags
 │   ├── Standard.vml
 │   └── Enterprise.vml
@@ -202,7 +204,7 @@ Vehicle systems, ECUs, powertrain, ADAS, body electronics. Standards: ISO 26262 
 ```
 sylang-model/
 ├── sylang-viewer.html
-├── InverterProductLine.ple
+├── InverterProductLine.ple        # variesby InverterFeatures, realizedby the top-level inverter block
 ├── InverterFeatures.fml
 ├── Inverter_150kW.vml
 ├── Inverter_250kW.vml

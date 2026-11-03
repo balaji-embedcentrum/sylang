@@ -60,22 +60,24 @@ This reference joins the help for all 22 Sylang file types, and for extending th
 # Product Line Engineering (.ple)
 
 ## Overview
-The `.ple` file is the **root file** of a Sylang project, defining the product line with no dependencies on other files. It serves as the foundation for all feature modeling, variant management, and system architecture.
+The `.ple` file is the **root file** of a Sylang project: the first thing a reader opens. It describes the product line and names the two places the model continues: its feature model (`variesby`) and its top-level system block (`realizedby`). Studio and the browser viewer build the model's hierarchy from these links: product line, then features and variants, then the system and everything it decomposes to.
 
 ## File Structure Rules
 - **ONE** `hdef productline` statement per file
-- **NO** `use` statements (root file - no imports)
-- **NO** `def` statements (only properties under hdef)
-- Only property statements are allowed under the header
+- `use` imports only the feature model and the top-level block: `use featureset …` and `use block …`
+- **NO** `def` statements (only properties and the two relations under hdef)
 
 ## Valid Keywords
 ```
-hdef, productline, name, description, owner, domain, compliance,
-firstrelease, tags, safetylevel, status, region
+use, hdef, productline, name, description, owner, domain, compliance,
+firstrelease, tags, safetylevel, status, region, variesby, realizedby
 ```
 
 ## Syntax Structure
 ```
+use featureset [featureset-identifier]
+use block [top-level-block-identifier]
+
 hdef productline [identifier]
   name [string-literal]
   description [string-literal]
@@ -86,6 +88,8 @@ hdef productline [identifier]
   tags [string-literal], [string-literal], ...
   safetylevel [ASIL-A|ASIL-B|ASIL-C|ASIL-D|QM|SIL-1|SIL-2|SIL-3|SIL-4]
   region [string-literal], [string-literal], ...
+  variesby ref featureset [featureset-identifier]
+  realizedby ref block [top-level-block-identifier]
 ```
 
 ## Properties
@@ -103,9 +107,21 @@ hdef productline [identifier]
 - `safetylevel` - Safety integrity level (ASIL-A, ASIL-B, ASIL-C, ASIL-D, QM, SIL-1, SIL-2, SIL-3, SIL-4)
 - `region` - Target regions (comma-separated)
 
+### Relations
+- `variesby ref featureset` - The feature model of the product line (the `.fml` file's header).
+- `realizedby ref block` - The top-level block: the system the product line is built as. Name the block whose `decomposesto` reaches the subsystems, not context blocks such as the vehicle, the battery or the motor that only sit next to it.
+
+Both are optional, and both may list more than one target (a platform with two systems, say). Without them the viewer guesses: the only feature model, and blocks that nothing decomposes to.
+
+### Compliance views
+The `compliance` list decides which compliance views Studio and the viewer compute. A list that mentions ISO 26262 shows the ISO 26262 work products; one that mentions Automotive SPICE (or ASPICE) shows the SPICE processes. A product line that lists neither, such as an IT product with `compliance "SOC 2", "ISO 27001"`, shows no automotive compliance at all. Without a `.ple`, or without a `compliance` property, the views appear only when the model holds ISO 26262 content (an item definition, hazards, safety goals or ASIL ratings).
+
 ## Complete Example
 
 ```sylang
+use featureset AutonomousVehicleFeatures
+use block AutonomousVehicleSystem
+
 hdef productline AutonomousVehicleProductLine
   name """Autonomous Vehicle Platform Product Line"""
   description """
@@ -119,6 +135,8 @@ hdef productline AutonomousVehicleProductLine
   tags """autonomous-driving""", """L3-automation""", """safety-critical""", """connected-vehicle"""
   safetylevel ASIL-D
   region """Global""", """North America""", """Europe""", """Asia-Pacific"""
+  variesby ref featureset AutonomousVehicleFeatures
+  realizedby ref block AutonomousVehicleSystem
 ```
 
 ## Best Practices
@@ -191,15 +209,55 @@ hdef productline IndustrialAutomationProductLine
   region """Global"""
 ```
 
-## Relationship to Other Files
-The `.ple` file is referenced by `.fml` files:
+### IT and Software Product Line
 ```sylang
-# In FeatureModel.fml
+use featureset ShopFeatures
+use block ShopPlatform
+
+hdef productline ShopPlatformProductLine
+  name "Online Shop Platform"
+  description "Multi-tenant shop platform with Standard and Enterprise editions"
+  owner "Platform Engineering"
+  domain "e-commerce", "saas"
+  compliance "SOC 2", "ISO 27001", "PCI DSS"
+  region "Europe", "North America"
+  variesby ref featureset ShopFeatures
+  realizedby ref block ShopPlatform
+```
+No ISO 26262 or Automotive SPICE views appear for this product line, because its `compliance` list names neither.
+
+## Relationship to Other Files
+The `.ple` file points down to the feature model and the top-level block:
+```sylang
+# ProductLine.ple
+use featureset AutonomousFeatures
+use block AutonomousVehicleSystem
+
+hdef productline AutonomousVehicleProductLine
+  variesby ref featureset AutonomousFeatures
+  realizedby ref block AutonomousVehicleSystem
+```
+
+The feature model points back with `listedfor`:
+```sylang
+# FeatureModel.fml
 use productline AutonomousVehicleProductLine
 
 hdef featureset AutonomousFeatures
   listedfor ref productline AutonomousVehicleProductLine
   # ... features
+```
+
+The top-level block decomposes to the subsystems, which is how the hierarchy continues:
+```sylang
+# System/Vehicle.blk
+use block Perception
+use block Planning
+use block VehicleControl
+
+hdef block AutonomousVehicleSystem
+  level system
+  decomposesto ref block Perception, Planning, VehicleControl
 ```
 
 ## Safety Level Reference
@@ -219,20 +277,19 @@ hdef featureset AutonomousFeatures
 
 ## Validation Rules
 ✅ Exactly one `hdef productline` statement  
-✅ No `use` statements allowed  
+✅ `use` only for the feature model (`use featureset`) and the top-level block (`use block`)  
+✅ `variesby` points at a featureset, `realizedby` at a block  
 ✅ No `def` statements allowed  
-✅ Only property statements under hdef  
 ✅ Multiline strings use `"""` triple quotes  
-❌ Cannot reference other files  
 ❌ Cannot use `when ref config` (config not allowed in .ple)
 
 ## File Organization
 Place `.ple` file at the **root** of your product line directory:
 ```
 ProductLine/
-├── ProductLine.ple          # Root product line definition
+├── ProductLine.ple          # Root: variesby the feature model, realizedby the system block
 ├── Features/
-│   └── Features.fml         # References the .ple file
+│   └── Features.fml         # listedfor the .ple
 ├── Architecture/
 │   ├── Blocks.blk
 │   └── Functions.fun

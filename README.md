@@ -15,7 +15,7 @@ This repository holds the **language reference**: one help file per file type, t
 
 No install, no account. Open **[the Sylang viewer](https://balaji-embedcentrum.github.io/sylang/viewer/)** and choose your model folder, or drop it on the page. The folder is read inside your browser tab; nothing is uploaded. You see the same documents, diagrams and traceability views as in VS Code, read-only.
 
-**Projects made with the VS Code extension carry their own viewer.** The extension (3.0.15 and later) creates a `sylang-model` folder for the model with `sylang-viewer.html` in it, and keeps a copy of the model files beside it. Double-click that file and the model opens: no folder to choose, nothing to install, no website. Send someone the `sylang-model` folder and they can do the same. In the viewer, the model's folders expand and collapse, and **Change folder…** opens another project.
+**Projects made with the VS Code extension carry their own viewer.** The extension (3.0.15 and later) creates a `sylang-model` folder for the model with `sylang-viewer.html` in it, and keeps a copy of the model files beside it. Double-click that file and the model opens: no folder to choose, nothing to install, no website. Send someone the `sylang-model` folder and they can do the same. The viewer opens on the product line, and its **Model** tab shows the hierarchy: the feature model and variants, then the system and everything it decomposes to, each block with its files. The **Files** tab shows the folders, and **Change folder…** opens another project.
 
 A model in a public GitHub repository can be opened from its link, and shared as one address:
 
@@ -26,7 +26,7 @@ https://balaji-embedcentrum.github.io/sylang/viewer/?src=https://github.com/<own
 To show a model on your own site, add one script tag and one element ([@sylang/web](https://www.npmjs.com/package/@sylang/web)):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.1/dist/sylang-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.2/dist/sylang-viewer.min.js"></script>
 <sylang-viewer src="https://github.com/<owner>/<repo>/tree/main/<model-folder>" style="height:100vh"></sylang-viewer>
 ```
 
@@ -38,7 +38,7 @@ Your IT department can check this without trusting us:
 
 - **The rule is in the file.** Its first lines hold the browser policy `connect-src 'none'`, and scripts, styles and fonts are allowed only from inside the file. The browser itself blocks any connection the page tries: no upload, no tracking, no update check. Open the file in a text editor to read it.
 - **Watch it.** Open the browser's network tools (F12 → Network) while using the viewer: no requests. It works with the network cable unplugged.
-- **Same file everywhere.** Version 0.2.1, SHA-256 `b911780fabbe0871744c2fd3c533f1fd12171c01904b0d1df050c1981e256ca4`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
+- **Same file everywhere.** Version 0.2.2, SHA-256 `04070cf31bd1ac0571a2358d5ebf9278743be17a57e6c3289a85245da616d919`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
 
 A browser cannot read files next to a page on its own, so the viewer always asks which folder to open; Chrome and Edge open it in one click.
 
