@@ -37,7 +37,7 @@ Relations are classified based on **which entity actively references the other**
 | Relation Type | Direction | Reasoning |
 |:--------------|:----------|:----------|
 | `listedfor` | **O** | Entity lists itself for another (outgoing) |
-| `variesby` / `realizedby` | **O** | Product line points to its feature model and its top-level block (outgoing) |
+| `realizedby` | **O** | Product line points to its top-level block (outgoing) |
 | `decomposesto` | **O** | Entity points to its children (outgoing) |
 | `decomposedfrom` | **I** | Entity is pointed to by parent (incoming) |
 | `allocatedto` | **O** | Entity points to where it's allocated (outgoing) |
@@ -767,7 +767,6 @@ Generated from the language: every relation each file type accepts, and the elem
 
 | Relation | Points at |
 |:--|:--|
-| `variesby` | featureset |
 | `realizedby` | block |
 
 ### Feature Model (.fml)

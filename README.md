@@ -38,7 +38,7 @@ Your IT department can check this without trusting us:
 
 - **The rule is in the file.** Its first lines hold the browser policy `connect-src 'none'`, and scripts, styles and fonts are allowed only from inside the file. The browser itself blocks any connection the page tries: no upload, no tracking, no update check. Open the file in a text editor to read it.
 - **Watch it.** Open the browser's network tools (F12 → Network) while using the viewer: no requests. It works with the network cable unplugged.
-- **Same file everywhere.** Version 0.2.2, SHA-256 `04070cf31bd1ac0571a2358d5ebf9278743be17a57e6c3289a85245da616d919`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
+- **Same file everywhere.** Version 0.2.2, SHA-256 `0ea7c465e5d080e49effb672fd332485aacf6b5c9d38db0c888488e423ca4f73`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
 
 A browser cannot read files next to a page on its own, so the viewer always asks which folder to open; Chrome and Edge open it in one click.
 
