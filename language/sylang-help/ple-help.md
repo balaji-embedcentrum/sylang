@@ -60,7 +60,7 @@ It is optional and may list more than one block (a platform with two systems, sa
 The feature model is not named here: the `.fml` names its product line with `listedfor ref productline …`, as each variability file points one step back up the chain (`.vcf` to `.vml`, `.vml` to `.fml`, `.fml` to `.ple`). Feature models without `listedfor` still appear under the product line.
 
 ### Compliance views
-The `compliance` list decides which compliance views Studio and the viewer compute. A list that mentions ISO 26262 shows the ISO 26262 work products; one that mentions Automotive SPICE (or ASPICE) shows the SPICE processes. A product line that lists neither, such as an IT product with `compliance "SOC 2", "ISO 27001"`, shows no automotive compliance at all. Without a `.ple`, or without a `compliance` property, the views appear only when the model holds ISO 26262 content (an item definition, hazards, safety goals or ASIL ratings).
+The `compliance` list decides which compliance views Studio and the viewer compute. A list that mentions ISO 26262 shows the ISO 26262 work products; one that mentions Automotive SPICE (or ASPICE) shows the SPICE processes. A product line that lists neither, such as an IT product with `compliance "SOC 2", "ISO 27001"`, shows no automotive compliance at all. Without a `.ple`, or without a `compliance` property, the views appear only when the model holds ISO 26262 content (an item definition, hazards, safety goals or ASIL ratings). The same rule keeps ISO 26262 out of Home and Coverage: the V-model starts at features unless the project follows ISO 26262 or has hazards and safety goals, and the ASIL figures appear only when it follows ISO 26262 or its elements carry ASIL levels.
 
 ## Complete Example
 
