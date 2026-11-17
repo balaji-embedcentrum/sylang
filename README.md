@@ -26,7 +26,7 @@ https://balaji-embedcentrum.github.io/sylang/viewer/?src=https://github.com/<own
 To show a model on your own site, add one script tag and one element ([@sylang/web](https://www.npmjs.com/package/@sylang/web)):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.2/dist/sylang-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@sylang/web@0.2.3/dist/sylang-viewer.min.js"></script>
 <sylang-viewer src="https://github.com/<owner>/<repo>/tree/main/<model-folder>" style="height:100vh"></sylang-viewer>
 ```
 
@@ -38,7 +38,7 @@ Your IT department can check this without trusting us:
 
 - **The rule is in the file.** Its first lines hold the browser policy `connect-src 'none'`, and scripts, styles and fonts are allowed only from inside the file. The browser itself blocks any connection the page tries: no upload, no tracking, no update check. Open the file in a text editor to read it.
 - **Watch it.** Open the browser's network tools (F12 → Network) while using the viewer: no requests. It works with the network cable unplugged.
-- **Same file everywhere.** Version 0.2.2, SHA-256 `fc033161a9d46aad94c13288885814394d19f646765924c56e75934eacf955a4`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
+- **Same file everywhere.** Version 0.2.3, SHA-256 `d6782c84b7add279ab40f0fd2e43fe56ccf130ce8a48db5a092f80bd087a2f0b`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
 
 A browser cannot read files next to a page on its own, so the viewer always asks which folder to open; Chrome and Edge open it in one click.
 
