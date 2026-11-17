@@ -13,7 +13,7 @@ This repository holds the **language reference**: one help file per file type, t
 
 ## View a model in your browser
 
-No install, no account. Open **[the Sylang viewer](https://balaji-embedcentrum.github.io/sylang/viewer/)** and choose your model folder, or drop it on the page. The folder is read inside your browser tab; nothing is uploaded. You see the same documents, diagrams and traceability views as in VS Code, read-only.
+No install, no account. Open **[the Sylang viewer](https://balaji-embedcentrum.github.io/sylang/viewer/)** and choose your model folder, or drop it on the page. The folder is read inside your browser tab; nothing is uploaded. You see the same documents, diagrams and traceability views as in VS Code. In Chrome, Edge and other Chromium-based browsers you can also edit a file's text, with Sylang's keywords coloured, and save it straight back to your folder once you allow it. Firefox and Safari show the model read-only. The browser checks nothing; VS Code validates the model when you next open it.
 
 **Projects made with the VS Code extension carry their own viewer.** The extension (3.0.15 and later) creates a `sylang-model` folder for the model with `sylang-viewer.html` in it, and keeps a copy of the model files beside it. Double-click that file and the model opens: no folder to choose, nothing to install, no website. Send someone the `sylang-model` folder and they can do the same. The viewer opens on the product line, and its **Model** tab shows the hierarchy: the feature model and variants, then the system and everything it decomposes to, each block with its files. The **Files** tab shows the folders, and **Change folder…** opens another project.
 
@@ -38,7 +38,7 @@ Your IT department can check this without trusting us:
 
 - **The rule is in the file.** Its first lines hold the browser policy `connect-src 'none'`, and scripts, styles and fonts are allowed only from inside the file. The browser itself blocks any connection the page tries: no upload, no tracking, no update check. Open the file in a text editor to read it.
 - **Watch it.** Open the browser's network tools (F12 → Network) while using the viewer: no requests. It works with the network cable unplugged.
-- **Same file everywhere.** Version 0.2.2, SHA-256 `fa0d3f15e4e3535747f5dd97b8a77d09552bde1715c06b0d2da42ba94dc1d5ac`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
+- **Same file everywhere.** Version 0.2.2, SHA-256 `fc033161a9d46aad94c13288885814394d19f646765924c56e75934eacf955a4`, identical to `dist/sylang-viewer-offline.html` in [@sylang/web on npm](https://www.npmjs.com/package/@sylang/web). Check with `certutil -hashfile sylang-viewer-offline.html SHA256` (Windows) or `shasum -a 256 sylang-viewer-offline.html` (macOS).
 
 A browser cannot read files next to a page on its own, so the viewer always asks which folder to open; Chrome and Edge open it in one click.
 
